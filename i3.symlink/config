@@ -1,0 +1,136 @@
+# i3 config file (v4)
+#
+# Please see http://i3wm.org/docs/userguide.html for a complete reference!
+
+set                     $mod Mod4
+font                    pango:DejaVu Sans Mono 8
+# font -schumacher-clean-medium-r-normal-*-12-*-*-*-*-*-*-*
+
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier       $mod
+
+# define names for workspaces with some nice symbols
+set $w0  ✪
+set $w1  ❶
+set $w2  ❷
+set $w3  ❸
+set $w4  ❹
+set $w5  ❺
+set $w6  ❻
+set $w7  ❼
+set $w8  ❽
+set $w9  ❾
+set $w10 ❿
+
+# resize window (you can also use the mouse for that)
+mode "resize" {
+  # These bindings trigger as soon as you enter the resize mode
+  # Pressing left will shrink the window’s width.
+  # Pressing right will grow the window’s width.
+  # Pressing up will shrink the window’s height.
+  # Pressing down will grow the window’s height.
+  bindsym         j resize shrink width 10 px or 10 ppt
+  bindsym         k resize grow height 10 px or 10 ppt
+  bindsym         l resize shrink height 10 px or 10 ppt
+  bindsym         semicolon resize grow width 10 px or 10 ppt
+
+  # same bindings, but for the arrow keys
+  bindsym         Left resize shrink width 10 px or 10 ppt
+  bindsym         Down resize grow height 10 px or 10 ppt
+  bindsym         Up resize shrink height 10 px or 10 ppt
+  bindsym         Right resize grow width 10 px or 10 ppt
+
+  # back to normal: Enter or Escape
+  bindsym         Return mode "default"
+  bindsym         Escape mode "default"
+}
+
+bindsym $mod+1               workspace $w0
+bindsym $mod+Shift+1         move container to workspace $w0
+bindsym $mod+2               workspace $w2
+bindsym $mod+Shift+2         move container to workspace $w2
+bindsym $mod+3               workspace $w3
+bindsym $mod+Shift+3         move container to workspace $w3
+bindsym $mod+4               workspace $w4
+bindsym $mod+Shift+4         move container to workspace $w4
+bindsym $mod+5               workspace $w5
+bindsym $mod+Shift+5         move container to workspace $w5
+bindsym $mod+6               workspace $w6
+bindsym $mod+Shift+6         move container to workspace $w6
+bindsym $mod+7               workspace $w7
+bindsym $mod+Shift+7         move container to workspace $w7
+bindsym $mod+8               workspace $w8
+bindsym $mod+Shift+8         move container to workspace $w8
+bindsym $mod+9               workspace $w9
+bindsym $mod+Shift+9         move container to workspace $w9
+bindsym $mod+0               workspace $w10
+bindsym $mod+Shift+0         move container to workspace $w10
+bindsym $mod+a               focus parent
+bindsym $mod+Shift+a         focus child
+bindsym $mod+Shift+c         reload
+bindsym $mod+e               layout toggle split
+bindsym $mod+Shift+e         exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+f               fullscreen
+bindsym $mod+g               exec ~/.i3/bin/i3-choose-workspace
+bindsym $mod+h               split h
+# bindsym $mod+j               focus left
+# bindsym $mod+Shift+j         move left
+# bindsym $mod+k               focus down
+# bindsym $mod+Shift+k         move down
+# bindsym $mod+l               focus up
+# bindsym $mod+l               exec i3lock
+bindsym $mod+l               exec gnome-screensaver-command -l
+# bindsym $mod+Shift+l         move up
+bindsym $mod+m               exec clerk
+bindsym $mod+Shift+q         kill
+bindsym $mod+r               mode "resize"
+bindsym $mod+Shift+r         restart
+bindsym $mod+s               layout stacking
+bindsym $mod+v               split v
+bindsym $mod+w               layout tabbed
+bindsym $mod+space           exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85'
+bindsym $mod+Shift+space     floating toggle
+bindsym $mod+Return          exec gnome-terminal
+bindsym $mod+Shift+Return    exec emacsclient -c
+bindsym $mod+Ctrl+Return     exec google-chrome
+bindsym $mod+semicolon       exec ~/.i3/bin/i3-prompt
+# bindsym $mod+semicolon       focus right
+# bindsym $mod+Shift+semicolon move right
+bindsym $mod+Down            focus down
+bindsym $mod+Shift+Down      move down
+bindsym $mod+Left            focus left
+bindsym $mod+Shift+Left      move left
+bindsym $mod+Right           focus right
+bindsym $mod+Shift+Right     move right
+bindsym $mod+Up              focus up
+bindsym $mod+Shift+Up        move up
+# bindsym F12                  exec --no-startup-id rofi -now F12
+# bindsym F11                  exec --no-startup-id rofi -rnow F11
+bindsym XF86AudioLowerVolume exec /usr/bin/pactl set-sink-volume 0 '-5%'
+bindsym XF86AudioRaiseVolume exec /usr/bin/pactl set-sink-volume 0 '+5%'
+
+# list open windows to switch to
+# bindsym $mod+Tab exec rofi -i3 -now -font "Inconsolata-10" -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85
+
+# change focus between tiling / floating windows
+# bindsym                 $mod+space focus mode_toggle
+
+bar {
+    colors {
+        # Whole color settings
+        background #000000
+        statusline #ffffff
+        separator  #666666
+
+        # Type             border  background font
+        focused_workspace  #008fff #007fff #ffffff
+        active_workspace   #333333 #5f676a #ffffff
+        inactive_workspace #333333 #222222 #888888
+        urgent_workspace   #aa0000 #990000 #ffffff
+    }
+
+    font                    pango:DejaVu Sans Mono 10
+    status_command i3status --config ~/.i3/i3status.conf
+    # status_command ~/.i3/.i3status.sh
+    position top
+}
