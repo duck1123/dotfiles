@@ -90,7 +90,7 @@ bindsym $mod+v               split v
 bindsym $mod+w               layout tabbed
 bindsym $mod+space           exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85'
 bindsym $mod+Shift+space     floating toggle
-bindsym $mod+Return          exec gnome-terminal
+bindsym $mod+Return          exec urxvt
 bindsym $mod+Shift+Return    exec emacsclient -c
 bindsym $mod+Ctrl+Return     exec google-chrome
 bindsym $mod+semicolon       exec ~/.i3/bin/i3-prompt
