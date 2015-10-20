@@ -21,6 +21,7 @@
 (global-set-key (kbd "C-c C-SPC") 'hs-toggle-hiding)
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
+(global-set-key (kbd "C-x C-c") 'save-buffers-kill-emacs)
 
 (add-hook 'java-mode-hook
           (lambda ()
@@ -67,6 +68,15 @@
  '(helm-github-stars-refetch-time 0.5)
  '(helm-github-stars-username "duck1123")
  '(js2-basic-offset 2)
+ '(js-indent-level 2)
+ '(js-switch-indent-offset 2)
+ '(mingus-mpd-host "dev.jiksnu.com")
+ '(mingus-use-mouse-p nil)
+ '(projectile-create-missing-test-files t)
+ '(projectile-enable-caching t)
+ '(projectile-globally-ignored-directories
+   (quote
+    (".idea" ".eunit" ".git" ".hg" ".fslckout" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "vendor" "node_modules" "target" "build" "View")))
  '(projectile-globally-ignored-buffers (quote ("target")))
  '(projectile-tags-command "ctags-exuberant -Re -f \"%s\" %s")
  '(smartparens-global-strict-mode t))
