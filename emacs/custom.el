@@ -1,0 +1,78 @@
+(setq prelude-guru nil)
+
+(setq package-archives '(
+                         ;; ("elpa" . "http://tromey.com/elpa/")
+                         ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("marmalade" . "http://marmalade-repo.org/packages/")
+                         ("melpa" . "http://melpa.milkbox.net/packages/")
+                         ("org" . "http://orgmode.org/elpa/")
+                         ))
+
+(prelude-require-packages
+ '(ack-and-a-half auth-password-store bts bts-github ctags helm-ack helm-github-stars log4j-mode mingus nyan-mode org-gcal))
+
+(global-set-key (kbd "C-x C-k") 'kill-this-buffer)
+(global-set-key (kbd "<mouse-6>") 'next-buffer)
+(global-set-key (kbd "<mouse-7>") 'prev-buffer)
+(global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
+(global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
+(global-set-key (kbd "S-C-<down>") 'shrink-window)
+(global-set-key (kbd "S-C-<up>") 'enlarge-window)
+(global-set-key (kbd "C-c C-SPC") 'hs-toggle-hiding)
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+
+(add-hook 'java-mode-hook
+          (lambda ()
+            "Treat Java 1.5 @-style annotations as comments."
+            (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
+            (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
+
+(nyan-mode)
+
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
+
+;; set this in all c-based programming modes
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (c-set-offset 'case-label '+)))
+
+(require 'org-gcal)
+
+(set-time-zone-rule "GMT")
+
+(load-file "~/.dotfiles/emacs/private.el.gpg")
+
+(add-hook 'php-mode-hook
+          (lambda ()
+            (hs-org/minor-mode 1)))
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(browse-url-browser-function (quote browse-url-generic))
+ '(browse-url-generic-program "google-chrome")
+ '(cider-known-endpoints (quote ("jiksnu.dev" "7888")))
+ '(clojure-defun-indents (quote (describe it)))
+ '(helm-github-stars-refetch-time 0.5)
+ '(helm-github-stars-username "duck1123")
+ '(js2-basic-offset 2)
+ '(projectile-globally-ignored-buffers (quote ("target")))
+ '(projectile-tags-command "ctags-exuberant -Re -f \"%s\" %s")
+ '(smartparens-global-strict-mode t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
