@@ -3,6 +3,7 @@
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
 set                     $mod Mod4
+set                     $hyper Mod3
 font                    pango:DejaVu Sans Mono 8
 # font -schumacher-clean-medium-r-normal-*-12-*-*-*-*-*-*-*
 
@@ -82,6 +83,8 @@ bindsym $mod+h               split h
 bindsym $mod+l               exec gnome-screensaver-command -l
 # bindsym $mod+Shift+l         move up
 bindsym $mod+m               exec clerk
+bindsym $hyper+n             exec mpc next
+bindsym $hyper+p             exec vlc http://dev.jiksnu.com:8000/
 bindsym $mod+Shift+q         kill
 bindsym $mod+r               mode "resize"
 bindsym $mod+Shift+r         restart
@@ -90,7 +93,7 @@ bindsym $mod+v               split v
 bindsym $mod+w               layout tabbed
 bindsym $mod+space           exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85'
 bindsym $mod+Shift+space     floating toggle
-bindsym $mod+Return          exec urxvt
+bindsym $mod+Return          exec gnome-terminal
 bindsym $mod+Shift+Return    exec emacsclient -c
 bindsym $mod+Ctrl+Return     exec google-chrome
 bindsym $mod+semicolon       exec ~/.i3/bin/i3-prompt
@@ -98,12 +101,16 @@ bindsym $mod+semicolon       exec ~/.i3/bin/i3-prompt
 # bindsym $mod+Shift+semicolon move right
 bindsym $mod+Down            focus down
 bindsym $mod+Shift+Down      move down
+bindsym $hyper+Down          move down
 bindsym $mod+Left            focus left
 bindsym $mod+Shift+Left      move left
+bindsym $hyper+Left          move left
 bindsym $mod+Right           focus right
 bindsym $mod+Shift+Right     move right
+bindsym $hyper+Right         move right
 bindsym $mod+Up              focus up
 bindsym $mod+Shift+Up        move up
+bindsym $hyper+Up            move up
 # bindsym F12                  exec --no-startup-id rofi -now F12
 # bindsym F11                  exec --no-startup-id rofi -rnow F11
 bindsym XF86AudioLowerVolume exec /usr/bin/pactl set-sink-volume 0 '-5%'
