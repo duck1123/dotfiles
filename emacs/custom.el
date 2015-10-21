@@ -81,6 +81,9 @@
     (".idea" ".eunit" ".git" ".hg" ".fslckout" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "vendor" "node_modules" "target" "build" "View")))
  '(projectile-tags-command "ctags-exuberant -Re -f \"%s\" %s")
  '(smartparens-global-strict-mode t))
+ '(org-agenda-files
+   (quote
+    ("~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
