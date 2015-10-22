@@ -7,6 +7,8 @@ set                     $hyper Mod3
 font                    pango:DejaVu Sans Mono 8
 # font -schumacher-clean-medium-r-normal-*-12-*-*-*-*-*-*-*
 
+exec --no-startup-id xsetroot -solid "#002244"
+
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier       $mod
 
@@ -123,6 +125,8 @@ bindsym XF86AudioRaiseVolume exec /usr/bin/pactl set-sink-volume 0 '+5%'
 # bindsym                 $mod+space focus mode_toggle
 
 bar {
+    i3bar_command i3bar -t
+
     colors {
         # Whole color settings
         background #000000
@@ -141,3 +145,9 @@ bar {
     # status_command ~/.i3/.i3status.sh
     position top
 }
+
+for_window [class="^.*"] border pixel 5
+smart_borders on
+
+gaps inner 15
+gaps outer 0
