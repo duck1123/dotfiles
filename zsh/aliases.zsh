@@ -8,3 +8,4 @@ alias ec='emacsclient -c'
 alias vim='emacsclient -t'
 alias vi='emacsclient -t'
 alias k='gitk --all &'
+alias lmp-verify="mvn verify -P local-enterprise-test-db -am -DskipPreTestTeardown=false -DskipPostTestTeardown=true -DskipDesignTests=false -DskipTransactionTests=false -DskipMulticastTests=false -DskipTestCoverage=false -Dtoybox.limiting_service_host=http://127.0.0.1:9091/ -Dtoybox.code_manager_host=http://127.0.0.1:9091/ -pl ControlCenter"
