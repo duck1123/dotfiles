@@ -149,7 +149,7 @@ bar {
     position top
 }
 
-for_window [class="^.*"] border pixel 0
+for_window [class="^.*"] border pixel 5
 smart_borders on
 
 gaps inner 15
