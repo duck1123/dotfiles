@@ -1,0 +1,3 @@
+#!/bin/sh
+
+vagrant global-status | tail -n +3 | head -n -7

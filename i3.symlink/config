@@ -8,6 +8,7 @@ font                    pango:DejaVu Sans Mono 8
 # font -schumacher-clean-medium-r-normal-*-12-*-*-*-*-*-*-*
 
 exec --no-startup-id xsetroot -solid "#002244"
+exec --no-startup-id rofi --daemon
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier       $mod
@@ -117,6 +118,8 @@ bindsym $hyper+Up            move up
 # bindsym F11                  exec --no-startup-id rofi -rnow F11
 bindsym XF86AudioLowerVolume exec /usr/bin/pactl set-sink-volume 0 '-5%'
 bindsym XF86AudioRaiseVolume exec /usr/bin/pactl set-sink-volume 0 '+5%'
+bindsym $hyper+plus gaps inner all plus 5
+bindsym $hyper+minus gaps inner all minus 5
 
 # list open windows to switch to
 # bindsym $mod+Tab exec rofi -i3 -now -font "Inconsolata-10" -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85
@@ -146,7 +149,7 @@ bar {
     position top
 }
 
-for_window [class="^.*"] border pixel 5
+for_window [class="^.*"] border pixel 0
 smart_borders on
 
 gaps inner 15

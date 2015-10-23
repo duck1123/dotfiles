@@ -7,8 +7,8 @@ Xft.hintstyle:  hintfull
 Xft.lcdfilter:  lcddefault
 Xft.rgba:       rgb
 
-rofi.opacity: 85
-rofi.width: 1924
+rofi.opacity: 80
+rofi.width: 95
 rofi.lines: 7
 rofi.columns: 4
 rofi.font: SourceCodePro 9
@@ -18,7 +18,7 @@ rofi.hlfg: #0F3B5F
 rofi.hlbg: #CC9752
 rofi.bc: #CC9752
 rofi.bw: 2
-rofi.location: 6
+rofi.location: 2
 rofi.padding: 2
 rofi.yoffset: 0
 rofi.xoffset: 0
