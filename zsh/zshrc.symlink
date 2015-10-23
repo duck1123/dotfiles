@@ -1,3 +1,6 @@
+# Make sure that emacs doesn't hang
+[[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
+
 # shortcut to this dotfiles path is $ZSH
 export ZSH=$HOME/.dotfiles
 
