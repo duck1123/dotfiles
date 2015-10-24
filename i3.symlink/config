@@ -73,7 +73,7 @@ bindsym $mod+a               focus parent
 bindsym $mod+Shift+a         focus child
 bindsym $mod+Shift+c         reload
 bindsym $mod+e               layout toggle split
-bindsym $mod+Shift+e         exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+bindsym $mod+Shift+e         exec ~/.i3/bin/nag-exit
 bindsym $mod+f               fullscreen
 bindsym $mod+g               exec ~/.i3/bin/i3-choose-workspace
 bindsym $mod+h               split h
