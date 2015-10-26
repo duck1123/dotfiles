@@ -11,7 +11,7 @@
 (prelude-require-packages
  '(ack-and-a-half auth-password-store bts bts-github ctags helm-ack
                   helm-github-stars hideshow-org log4j-mode mingus nyan-mode
-                  org-gcal))
+                  org-gcal paredit))
 
 (global-set-key (kbd "C-x C-k") 'kill-this-buffer)
 (global-set-key (kbd "<mouse-6>") 'next-buffer)
@@ -56,9 +56,9 @@
 
 (require 'hideshow-org)
 
-(add-hook 'php-mode-hook
-          (lambda ()
-            (hs-org/minor-mode 1)))
+(add-hook 'php-mode-hook (lambda () (hs-org/minor-mode 1)))
+(add-hook 'clojure-mode-hook #'subword-mode)
+(add-hook 'clojure-mode-hook #'paredit-mode)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -68,7 +68,7 @@
  '(browse-url-browser-function (quote browse-url-generic))
  '(browse-url-generic-program "google-chrome")
  '(cider-known-endpoints (quote ("jiksnu.dev" "7888")))
- '(clojure-defun-indents (quote (describe it)))
+ '(clojure-defun-indents (quote (describe it fact facts)))
  '(helm-github-stars-refetch-time 0.5)
  '(helm-github-stars-username "duck1123")
  '(js-indent-level 2)
