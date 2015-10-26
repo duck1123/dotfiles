@@ -1,0 +1,8 @@
+{
+ [:super        :1] "workspace $w0"
+ [:super :shift :1] "move container to workspace $w0"
+ [:super        :a] "focus parent"
+ [:super :shift :a] "focus child"
+ [:super :shift :c] "reload"
+ [:super        :e] "layout toggle split"
+ }
