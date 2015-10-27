@@ -75,8 +75,12 @@
  '(js-switch-indent-offset 2)
  '(js2-basic-offset 2)
  '(mingus-mpd-host "dev.jiksnu.com")
+ '(mingus-playlist-separator " | ")
+ '(mingus-use-ido-mode-p t)
  '(mingus-use-mouse-p nil)
- '(org-agenda-files (quote ("~/Dropbox/org/hw-schedule.org")))
+ '(org-agenda-files
+   (quote
+    ("~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
  '(projectile-create-missing-test-files t)
  '(projectile-enable-caching t)
  '(projectile-globally-ignored-buffers (quote ("target")))
@@ -84,10 +88,9 @@
    (quote
     (".idea" ".eunit" ".git" ".hg" ".fslckout" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "vendor" "node_modules" "target" "build" "View")))
  '(projectile-tags-command "ctags-exuberant -Re -f \"%s\" %s")
+ '(safe-local-variable-values (quote ((projectile-project-type (quote symphony)))))
  '(smartparens-global-strict-mode t)
- '(org-agenda-files
-   (quote
-    ("~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org"))))
+ '(sql-connection-alist (quote) t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

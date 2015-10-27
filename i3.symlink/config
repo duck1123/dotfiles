@@ -2,7 +2,7 @@
 #
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
-set                     $mod Mod4
+set                     $super Mod4
 set                     $hyper Mod3
 font                    pango:DejaVu Sans Mono 8
 # font -schumacher-clean-medium-r-normal-*-12-*-*-*-*-*-*-*
@@ -11,8 +11,8 @@ exec --no-startup-id xsetroot -solid "#002244"
 exec --no-startup-id rofi --daemon
 exec --no-startup-id compton
 
-# Use Mouse+$mod to drag floating windows to their wanted position
-floating_modifier       $mod
+# Use Mouse+$super to drag floating windows to their wanted position
+floating_modifier       $super
 
 # define names for workspaces with some nice symbols
 set $w0  ✪
@@ -50,70 +50,71 @@ mode "resize" {
   bindsym         Escape mode "default"
 }
 
-bindsym $mod+1               workspace $w0
-bindsym $mod+Shift+1         move container to workspace $w0
-bindsym $mod+2               workspace $w2
-bindsym $mod+Shift+2         move container to workspace $w2
-bindsym $mod+3               workspace $w3
-bindsym $mod+Shift+3         move container to workspace $w3
-bindsym $mod+4               workspace $w4
-bindsym $mod+Shift+4         move container to workspace $w4
-bindsym $mod+5               workspace $w5
-bindsym $mod+Shift+5         move container to workspace $w5
-bindsym $mod+6               workspace $w6
-bindsym $mod+Shift+6         move container to workspace $w6
-bindsym $mod+7               workspace $w7
-bindsym $mod+Shift+7         move container to workspace $w7
-bindsym $mod+8               workspace $w8
-bindsym $mod+Shift+8         move container to workspace $w8
-bindsym $mod+9               workspace $w9
-bindsym $mod+Shift+9         move container to workspace $w9
-bindsym $mod+0               workspace $w10
-bindsym $mod+Shift+0         move container to workspace $w10
-bindsym $mod+a               focus parent
-bindsym $mod+Shift+a         focus child
-bindsym $mod+Shift+c         reload
-bindsym $mod+e               layout toggle split
-bindsym $mod+Shift+e         exec ~/.i3/bin/nag-exit
-bindsym $mod+f               fullscreen
-bindsym $mod+g               exec ~/.i3/bin/i3-choose-workspace
-bindsym $mod+h               split h
-# bindsym $mod+j               focus left
-# bindsym $mod+Shift+j         move left
-# bindsym $mod+k               focus down
-# bindsym $mod+Shift+k         move down
-# bindsym $mod+l               focus up
-# bindsym $mod+l               exec i3lock
-bindsym $mod+l               exec gnome-screensaver-command -l
-# bindsym $mod+Shift+l         move up
-bindsym $mod+m               exec clerk
+bindsym $super+1               workspace $w0
+bindsym $super+Shift+1         move container to workspace $w0
+bindsym $super+2               workspace $w2
+bindsym $super+Shift+2         move container to workspace $w2
+bindsym $super+3               workspace $w3
+bindsym $super+Shift+3         move container to workspace $w3
+bindsym $super+4               workspace $w4
+bindsym $super+Shift+4         move container to workspace $w4
+bindsym $super+5               workspace $w5
+bindsym $super+Shift+5         move container to workspace $w5
+bindsym $super+6               workspace $w6
+bindsym $super+Shift+6         move container to workspace $w6
+bindsym $super+7               workspace $w7
+bindsym $super+Shift+7         move container to workspace $w7
+bindsym $super+8               workspace $w8
+bindsym $super+Shift+8         move container to workspace $w8
+bindsym $super+9               workspace $w9
+bindsym $super+Shift+9         move container to workspace $w9
+bindsym $super+0               workspace $w10
+bindsym $super+Shift+0         move container to workspace $w10
+bindsym $super+a               focus parent
+bindsym $super+Shift+a         focus child
+bindsym $super+Shift+c         reload
+bindsym $super+e               layout toggle split
+bindsym $super+Shift+e         exec ~/.i3/bin/nag-exit
+bindsym $super+f               fullscreen
+bindsym $super+g               exec ~/.i3/bin/i3-choose-workspace
+bindsym $super+h               split h
+# bindsym $super+j               focus left
+# bindsym $super+Shift+j         move left
+# bindsym $super+k               focus down
+# bindsym $super+Shift+k         move down
+# bindsym $super+l               focus up
+# bindsym $super+l               exec i3lock
+bindsym $super+l               exec gnome-screensaver-command -l
+# bindsym $super+l               exec xtrlock
+# bindsym $super+Shift+l         move up
+bindsym $super+m               exec clerk
 bindsym $hyper+n             exec mpc next
 bindsym $hyper+p             exec vlc http://dev.jiksnu.com:8000/
-bindsym $mod+Shift+q         kill
-bindsym $mod+r               mode "resize"
-bindsym $mod+Shift+r         restart
-bindsym $mod+s               layout stacking
-bindsym $mod+v               split v
-bindsym $mod+w               layout tabbed
-bindsym $mod+space           exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85'
-bindsym $mod+Shift+space     floating toggle
-bindsym $mod+Return          exec gnome-terminal
-bindsym $mod+Shift+Return    exec emacsclient -a '' -c
-bindsym $mod+Ctrl+Return     exec google-chrome
-bindsym $mod+semicolon       exec ~/.i3/bin/i3-prompt
-# bindsym $mod+semicolon       focus right
-# bindsym $mod+Shift+semicolon move right
-bindsym $mod+Down            focus down
-bindsym $mod+Shift+Down      move down
+bindsym $super+Shift+q         kill
+bindsym $super+r               mode "resize"
+bindsym $super+Shift+r         restart
+bindsym $super+s               layout stacking
+bindsym $super+v               split v
+bindsym $super+w               layout tabbed
+bindsym $super+space           exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85'
+bindsym $super+Shift+space     floating toggle
+bindsym $super+Return          exec gnome-terminal
+bindsym $super+Shift+Return    exec emacsclient -a '' -c
+bindsym $super+Ctrl+Return     exec google-chrome
+bindsym $super+semicolon       exec ~/.i3/bin/i3-prompt
+# bindsym $super+semicolon       focus right
+# bindsym $super+Shift+semicolon move right
+bindsym $super+Down            focus down
+bindsym $super+Shift+Down      move down
 bindsym $hyper+Down          move down
-bindsym $mod+Left            focus left
-bindsym $mod+Shift+Left      move left
+bindsym $super+Left            focus left
+bindsym $super+Shift+Left      move left
 bindsym $hyper+Left          move left
-bindsym $mod+Right           focus right
-bindsym $mod+Shift+Right     move right
+bindsym $super+Right           focus right
+bindsym $super+Shift+Right     move right
 bindsym $hyper+Right         move right
-bindsym $mod+Up              focus up
-bindsym $mod+Shift+Up        move up
+bindsym $super+Up              focus up
+bindsym $super+Shift+Up        move up
 bindsym $hyper+Up            move up
 # bindsym F12                  exec --no-startup-id rofi -now F12
 # bindsym F11                  exec --no-startup-id rofi -rnow F11
@@ -123,10 +124,10 @@ bindsym $hyper+plus gaps inner all plus 5
 bindsym $hyper+minus gaps inner all minus 5
 
 # list open windows to switch to
-# bindsym $mod+Tab exec rofi -i3 -now -font "Inconsolata-10" -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85
+# bindsym $super+Tab exec rofi -i3 -now -font "Inconsolata-10" -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85
 
 # change focus between tiling / floating windows
-# bindsym                 $mod+space focus mode_toggle
+# bindsym                 $super+space focus mode_toggle
 
 bar {
     i3bar_command i3bar -t
