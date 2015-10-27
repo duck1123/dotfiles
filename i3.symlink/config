@@ -7,10 +7,14 @@ set                     $hyper Mod3
 font                    pango:DejaVu Sans Mono 8
 # font -schumacher-clean-medium-r-normal-*-12-*-*-*-*-*-*-*
 
-exec --no-startup-id xsetroot -solid "#002244"
-exec --no-startup-id rofi --daemon
-exec --no-startup-id compton
+exec --no-startup-id compton -b -c --backend xrender
 exec --no-startup-id ssh-add
+# exec --no-startup-id xsetroot -solid "#002244"
+exec --no-startup-id hsetroot -solid "#002244"
+exec --no-startup-id rofi --daemon
+exec --no-startup-id dropbox
+exec --no-startup-id keepass2
+exec --no-startup-id owncloud
 
 # Use Mouse+$super to drag floating windows to their wanted position
 floating_modifier       $super
