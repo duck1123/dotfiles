@@ -10,6 +10,7 @@ font                    pango:DejaVu Sans Mono 8
 exec --no-startup-id xsetroot -solid "#002244"
 exec --no-startup-id rofi --daemon
 exec --no-startup-id compton
+exec --no-startup-id ssh-add
 
 # Use Mouse+$super to drag floating windows to their wanted position
 floating_modifier       $super
