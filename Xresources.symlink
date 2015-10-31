@@ -8,7 +8,7 @@ Xft.lcdfilter:  lcddefault
 Xft.rgba:       rgb
 
 rofi.opacity: 80
-rofi.width: 95
+rofi.width: 100
 rofi.lines: 7
 rofi.columns: 4
 rofi.font: SourceCodePro 9

@@ -7,14 +7,16 @@ set                     $hyper Mod3
 font                    pango:DejaVu Sans Mono 8
 # font -schumacher-clean-medium-r-normal-*-12-*-*-*-*-*-*-*
 
+exec --no-startup-id rofi --daemon
+exec --no-startup-id gnome-settings-daemon
+exec --no-startup-id gnome-session
 exec --no-startup-id compton -b -c --backend xrender
 exec --no-startup-id ssh-add
 # exec --no-startup-id xsetroot -solid "#002244"
 exec --no-startup-id hsetroot -solid "#002244"
-exec --no-startup-id rofi --daemon
-exec --no-startup-id dropbox
-exec --no-startup-id keepass2
-exec --no-startup-id owncloud
+# exec --no-startup-id dropbox
+# exec --no-startup-id keepass2
+# exec --no-startup-id owncloud
 
 # Use Mouse+$super to drag floating windows to their wanted position
 floating_modifier       $super
@@ -77,6 +79,7 @@ bindsym $super+0               workspace $w10
 bindsym $super+Shift+0         move container to workspace $w10
 bindsym $super+a               focus parent
 bindsym $super+Shift+a         focus child
+bindsym Ctrl+Alt+a             exec mono /usr/lib/keepass2/KeePass.exe --auto-type
 bindsym $super+Shift+c         reload
 bindsym $super+e               layout toggle split
 bindsym $super+Shift+e         exec ~/.i3/bin/nag-exit
@@ -101,7 +104,8 @@ bindsym $super+Shift+r         restart
 bindsym $super+s               layout stacking
 bindsym $super+v               split v
 bindsym $super+w               layout tabbed
-bindsym $super+space           exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85'
+# bindsym $super+space           exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85'
+bindsym $super+space           exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu'
 bindsym $super+Shift+space     floating toggle
 bindsym $super+Return          exec gnome-terminal
 bindsym $super+Shift+Return    exec emacsclient -a '' -c
