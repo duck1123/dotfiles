@@ -10,7 +10,7 @@ font                    pango:DejaVu Sans Mono 8
 exec --no-startup-id rofi --daemon
 exec --no-startup-id gnome-settings-daemon
 exec --no-startup-id gnome-session
-exec --no-startup-id compton -b -c --backend xrender
+exec --no-startup-id compton --config ~/.compton
 exec --no-startup-id ssh-add
 # exec --no-startup-id xsetroot -solid "#002244"
 exec --no-startup-id hsetroot -solid "#002244"
