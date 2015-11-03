@@ -155,8 +155,9 @@ bar {
     }
 
     font                    pango:DejaVu Sans Mono 10
-    status_command i3status --config ~/.i3/i3status.conf
+    # status_command i3status --config ~/.i3/i3status.conf
     # status_command ~/.i3/.i3status.sh
+    status_command i3blocks
     position top
 }
 
