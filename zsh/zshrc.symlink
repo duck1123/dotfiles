@@ -42,3 +42,5 @@ do
 done
 
 unset config_files
+
+export JENKINS_URL=http://jenkins.int.eprize.net/
