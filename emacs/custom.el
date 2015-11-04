@@ -73,6 +73,8 @@
  '(company-auto-complete t)
  '(helm-github-stars-refetch-time 0.5)
  '(helm-github-stars-username "duck1123")
+ '(jira-url "https://jira.helloworld.com/rpc/xmlrpc")
+ '(jira-username "daniel.renfer@helloworld.com")
  '(js-indent-level 2)
  '(js-switch-indent-offset 2)
  '(js2-basic-offset 2)
