@@ -67,8 +67,10 @@
  ;; If there is more than one, they won't work right.
  '(browse-url-browser-function (quote browse-url-generic))
  '(browse-url-generic-program "google-chrome")
- '(cider-known-endpoints (quote ("jiksnu.dev" "7888")))
+ '(cider-known-endpoints (quote (("dev.jiksnu.com" "7888"))))
+ '(cider-prefer-local-resources t)
  '(cider-prompt-for-project-on-connect nil)
+ '(cider-repl-history-file "~/.cider-history")
  '(clojure-defun-indents (quote (describe it fact facts)))
  '(company-auto-complete t)
  '(helm-github-stars-refetch-time 0.5)
