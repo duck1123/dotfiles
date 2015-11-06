@@ -79,7 +79,7 @@ bindsym $super+0               workspace $w10
 bindsym $super+Shift+0         move container to workspace $w10
 bindsym $super+a               focus parent
 bindsym $super+Shift+a         focus child
-bindsym Ctrl+Alt+a             exec mono /usr/lib/keepass2/KeePass.exe --auto-type
+bindsym $super+Ctrl+a          exec mono /usr/lib/keepass2/KeePass.exe --auto-type
 bindsym $super+Shift+c         reload
 bindsym $super+e               layout toggle split
 bindsym $super+Shift+e         exec ~/.i3/bin/nag-exit
