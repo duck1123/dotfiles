@@ -12,11 +12,11 @@ rofi.width: 100
 rofi.lines: 7
 rofi.columns: 4
 rofi.font: SourceCodePro 9
-rofi.fg: #E5DBCF
-rofi.bg: #0F3B5F
+rofi.fg:   #E5DBCF
+rofi.bg:   #002244
 rofi.hlfg: #0F3B5F
 rofi.hlbg: #CC9752
-rofi.bc: #CC9752
+rofi.bc:   #CC9752
 rofi.bw: 2
 rofi.location: 2
 rofi.padding: 2
