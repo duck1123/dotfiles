@@ -7,11 +7,12 @@ Xft.hintstyle:  hintfull
 Xft.lcdfilter:  lcddefault
 Xft.rgba:       rgb
 
+
 rofi.opacity: 80
-rofi.width: 100
+rofi.width: 50
 rofi.lines: 7
-rofi.columns: 4
-rofi.font: SourceCodePro 9
+rofi.columns: 1
+rofi.font: SourceCodePro 12
 rofi.fg:   #E5DBCF
 rofi.bg:   #002244
 rofi.hlfg: #0F3B5F
@@ -20,16 +21,17 @@ rofi.bc:   #CC9752
 rofi.bw: 2
 rofi.location: 2
 rofi.padding: 2
-rofi.yoffset: 0
+rofi.yoffset: 22
 rofi.xoffset: 0
 rofi.fixed-num-lines: true
 rofi.hmode: false
-rofi.terminal: x-terminal-emulator
+rofi.terminal: gnome-terminal
 rofi.ssh-set-title: true
 rofi.disable-history: true
 rofi.key-window: Mod4+Tab
 rofi.key-run: Mod4+space
 rofi.key-ssh: Mod1+F3
+rofi.case-sensitive: false
 
 ! to match gnome-terminal "Linux console" scheme
 ! foreground/background

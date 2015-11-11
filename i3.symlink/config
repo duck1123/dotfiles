@@ -99,6 +99,7 @@ bindsym $super+l                 exec gnome-screensaver-command -l
 # bindsym $super+l               exec xtrlock
 # bindsym $super+Shift+l         move up
 bindsym $super+m                 exec clerk
+bindsym $hyper+m                 exec MultiMc
 bindsym $hyper+n                 exec mpc next
 bindsym $hyper+p                 exec vlc http://dev.jiksnu.com:8000/
 bindsym $super+Shift+q           kill
