@@ -134,7 +134,9 @@ bindsym $hyper+Up                move up
 bindsym XF86AudioLowerVolume     exec /usr/bin/pactl set-sink-volume 0 '-5%'
 bindsym XF86AudioRaiseVolume     exec /usr/bin/pactl set-sink-volume 0 '+5%'
 bindsym $hyper+plus              gaps inner all plus 5
+bindsym $hyper+Ctrl+plus         gaps inner current plus 5
 bindsym $hyper+minus             gaps inner all minus 5
+bindsym $hyper+Ctrl+minus        gaps inner current minus 5
 
 # list open windows to switch to
 # bindsym $super+Tab exec rofi -i3 -now -font "Inconsolata-10" -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85
