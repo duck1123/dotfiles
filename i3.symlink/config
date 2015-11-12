@@ -149,14 +149,14 @@ bar {
 
     colors {
         # Whole color settings
-        background $background
+        background #ffffff00
         statusline #ffffff
-        separator  #666666
+        separator  #66666600
 
         # Type             border  background font
         focused_workspace  #008fff #007fff #ffffff
-        active_workspace   #333333 #5f676a #ffffff
-        inactive_workspace #333333 #222222 #888888
+        active_workspace   #33333300 #5f676a00 #ffffff
+        inactive_workspace #33333300 #22222200 #888888
         urgent_workspace   #aa0000 #990000 #ffffff
     }
 

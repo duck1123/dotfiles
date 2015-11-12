@@ -1,0 +1,9 @@
+#!/bin/sh
+
+STATUS=`toggl now`
+
+echo "$STATUS"
+echo
+echo \#FFFFFF
+
+exit 0
