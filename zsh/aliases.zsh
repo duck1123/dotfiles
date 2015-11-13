@@ -13,11 +13,11 @@ alias v="vagrant"
 
 alias lmp-verify="mvn verify -P local-enterprise-test-db -am \
 -DskipPreTestTeardown=false \
--DskipPostTestTeardown=true \
--DskipDesignTests=false \
+-DskipPostTestTeardown=false \
+-DskipDesignTests=true \
 -DskipTransactionTests=false \
--DskipMulticastTests=false \
--DskipTestCoverage=false \
+-DskipMulticastTests=true \
+-DskipTestCoverage=true \
 -Dtoybox.limiting_service_host=http://127.0.0.1:9091/ \
 -Dtoybox.code_manager_host=http://127.0.0.1:9091/"
 
