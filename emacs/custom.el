@@ -83,6 +83,7 @@
  '(js-indent-level 2)
  '(js-switch-indent-offset 2)
  '(js2-basic-offset 2)
+ '(malabar-repl-grooysh "~/.sdkman/candidates/groovy/2.4.5/bin/groovysh")
  '(mingus-mpd-host "dev.jiksnu.com")
  '(mingus-playlist-separator " | ")
  '(mingus-use-ido-mode-p t)
