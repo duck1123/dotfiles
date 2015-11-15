@@ -21,3 +21,4 @@ emacs.d.symlink/tramp
 emacs.d.symlink/recentf
 emacs.d.symlink/ido.last
 emacs.d.symlink/.bts-*
+/ncmpcpp.symlink/error.log

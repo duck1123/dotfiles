@@ -24,10 +24,8 @@
 separator_block_width=15
 
 [toggl]
-command=~/.i3/scripts/toggl
-full_text=Toggl
-label=Toggl
-interval=30
+command=/home/duck/.i3/scripts/toggl
+interval=10
 
 [volume]
 #label=VOL
@@ -55,13 +53,17 @@ instance=$HOME
 command=/usr/share/i3blocks/disk
 interval=30
 
-[wireless]
-label=W
-instance=wlan1
-#instance=wlp3s0
-command=/usr/share/i3blocks/network
-color=#00FF00
+# [wireless]
+# label=W
+# instance=wlan1
+# #instance=wlp3s0
+# command=/usr/share/i3blocks/network
+# color=#00FF00
+# interval=10
+
+[iface]
 interval=10
+instance=eth0
 
 [ethernet]
 label=E
