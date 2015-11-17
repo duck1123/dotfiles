@@ -24,8 +24,8 @@
 separator_block_width=15
 
 [toggl]
-command=/home/duck/.i3/scripts/toggl
-interval=10
+command=~/.i3/scripts/toggl
+interval=15
 
 [volume]
 #label=VOL

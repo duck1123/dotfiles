@@ -106,6 +106,7 @@ bindsym $super+Shift+q           kill
 bindsym $super+r                 mode "resize"
 bindsym $super+Shift+r           restart
 bindsym $super+s                 layout stacking
+bindsym $hyper+t                 exec --no-startup-id i3-input -P 'Task:' -F 'exec "~/.dotfiles/bin/toggl start %s"'
 bindsym $super+v                 split v
 bindsym $super+w                 layout tabbed
 # bindsym $super+space           exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -fg "#9f9f9f" -bg "#2c2c2e" -hlfg "#2c2c2e" -hlbg "#ccdc90" -o 85'
