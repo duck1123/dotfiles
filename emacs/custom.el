@@ -91,7 +91,7 @@
  '(mingus-use-mouse-p nil)
  '(org-agenda-files
    (quote
-    ("~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
+    ("~/.notes" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
  '(projectile-create-missing-test-files t)
  '(projectile-enable-caching t)
  '(projectile-globally-ignored-buffers (quote ("target")))
