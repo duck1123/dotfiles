@@ -21,6 +21,7 @@
 (global-set-key (kbd "S-C-<down>") 'shrink-window)
 (global-set-key (kbd "S-C-<up>") 'enlarge-window)
 (global-set-key (kbd "C-c C-SPC") 'hs-toggle-hiding)
+(global-set-key (kbd "S-C-g") 'helm-github-stars)
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key (kbd "C-x C-c") 'save-buffers-kill-emacs)
