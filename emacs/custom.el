@@ -11,7 +11,7 @@
 (prelude-require-packages
  '(ack-and-a-half auth-password-store bts bts-github ctags helm-ack
                   helm-github-stars hideshow-org log4j-mode mingus nyan-mode
-                  org-gcal paredit))
+                  org-gcal org-sync paredit))
 
 (global-set-key (kbd "C-x C-k") 'kill-this-buffer)
 (global-set-key (kbd "<mouse-6>") 'next-buffer)
