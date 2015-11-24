@@ -91,7 +91,10 @@
  '(mingus-use-mouse-p nil)
  '(org-agenda-files
    (quote
-    ("~/.notes" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
+    ("~/.notes" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
+ '(org-datetree-add-timestamp (quote active))
+ '(org-default-notes-file "~/Dropbox/org/inbox.org")
+ '(org-directory "~/Dropbox/org")
  '(projectile-create-missing-test-files t)
  '(projectile-enable-caching t)
  '(projectile-globally-ignored-buffers (quote ("target")))
