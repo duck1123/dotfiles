@@ -55,7 +55,7 @@
 
 (set-time-zone-rule "GMT")
 
-(load-file "~/.dotfiles/emacs/private.el.gpg")
+;; (load-file "~/.dotfiles/emacs/private.el.gpg")
 
 (require 'hideshow-org)
 
