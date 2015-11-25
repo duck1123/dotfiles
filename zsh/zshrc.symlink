@@ -45,7 +45,7 @@ unset config_files
 
 export JENKINS_URL=http://jenkins.int.eprize.net/
 
-source ~/.dotenv.sh
+# source ~/.dotenv.sh
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/home/daniel-renfer/.sdkman"
