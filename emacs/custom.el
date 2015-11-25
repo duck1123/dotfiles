@@ -92,7 +92,7 @@
  '(mingus-use-mouse-p nil)
  '(org-agenda-files
    (quote
-    ("~/.notes" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
+    ("~/.notes" "~/Dropbox/org/github.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
  '(org-datetree-add-timestamp (quote active))
  '(org-default-notes-file "~/Dropbox/org/inbox.org")
  '(org-directory "~/Dropbox/org")
