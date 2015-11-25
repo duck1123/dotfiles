@@ -13,18 +13,19 @@
                   helm-github-stars hideshow-org log4j-mode mingus nyan-mode
                   org-gcal org-sync paredit))
 
-(global-set-key (kbd "C-x C-k") 'kill-this-buffer)
 (global-set-key (kbd "<mouse-6>") 'next-buffer)
 (global-set-key (kbd "<mouse-7>") 'prev-buffer)
 (global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
 (global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
 (global-set-key (kbd "S-C-<down>") 'shrink-window)
 (global-set-key (kbd "S-C-<up>") 'enlarge-window)
+(global-set-key (kbd "C-c a") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c l") 'org-store-link)
 (global-set-key (kbd "C-c C-SPC") 'hs-toggle-hiding)
 (global-set-key (kbd "S-C-g") 'helm-github-stars)
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
 (global-set-key (kbd "C-x C-c") 'save-buffers-kill-emacs)
+(global-set-key (kbd "C-x C-k") 'kill-this-buffer)
 
 (add-hook 'java-mode-hook
           (lambda ()
