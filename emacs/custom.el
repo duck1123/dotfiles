@@ -83,6 +83,7 @@
  '(jdee-import-auto-collapse-imports t)
  '(jira-url "https://jira.helloworld.com/rpc/xmlrpc")
  '(jira-username "daniel.renfer@helloworld.com")
+ '(jiralib-url "https://jira.helloworld.com/")
  '(js-indent-level 2)
  '(js-switch-indent-offset 2)
  '(js2-basic-offset 2)
@@ -93,10 +94,13 @@
  '(mingus-use-mouse-p nil)
  '(org-agenda-files
    (quote
-    ("~/.notes" "~/Dropbox/org/github.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
+    ("~/Dropbox/org/github.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org" "~/.org-jira/MPD.org")))
  '(org-datetree-add-timestamp (quote active))
  '(org-default-notes-file "~/Dropbox/org/inbox.org")
  '(org-directory "~/Dropbox/org")
+ '(org-jira-default-jql
+   "project = MPD AND assignee in (EMPTY, currentUser()) and resolution = unresolved ORDER BY
+  priority DESC, created ASC")
  '(projectile-create-missing-test-files t)
  '(projectile-enable-caching t)
  '(projectile-globally-ignored-buffers (quote ("target")))
