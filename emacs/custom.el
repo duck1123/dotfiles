@@ -94,10 +94,11 @@
  '(mingus-use-mouse-p nil)
  '(org-agenda-files
    (quote
-    ("~/Dropbox/org/github.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org" "~/.org-jira/MPD.org")))
+    ("~/Dropbox/org/doing.org" "~/Dropbox/org/github.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org" "~/.org-jira/MPD.org")))
  '(org-datetree-add-timestamp (quote active))
  '(org-default-notes-file "~/Dropbox/org/inbox.org")
  '(org-directory "~/Dropbox/org")
+ '(org-doing-file "~/Dropbox/org/doing.org")
  '(org-jira-default-jql
    "project = MPD AND assignee in (EMPTY, currentUser()) and resolution = unresolved ORDER BY
   priority DESC, created ASC")
