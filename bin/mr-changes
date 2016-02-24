@@ -1,4 +1,7 @@
 #!/bin/sh
 
 cd ~/
-mr status 2>&1 | grep -v "^$" | grep -v ".*failed to chdir" | perl -pe 's|mr status: /home/.*?/(.+)$|> \1|'
+mr status 2>&1 | \
+    grep -v "^$" | \
+    # grep -v ".*failed to chdir" | \
+    perl -pe 's|mr status: /home/.*?/(.+)$|> \1|'
