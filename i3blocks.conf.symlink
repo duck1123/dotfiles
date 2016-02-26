@@ -23,9 +23,9 @@
 # Global properties
 separator_block_width=15
 
-[toggl]
-command=~/.i3/scripts/toggl
-interval=15
+# [toggl]
+# command=~/.i3/scripts/toggl
+# interval=15
 
 [volume]
 #label=VOL
