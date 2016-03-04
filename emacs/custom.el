@@ -63,6 +63,22 @@
 (add-hook 'clojure-mode-hook #'subword-mode)
 (add-hook 'clojure-mode-hook #'paredit-mode)
 
+(require 'bts)
+(require 'bts-github)
+
+;; Key Binding
+(global-unset-key (kbd "M-b"))
+(global-set-key (kbd "M-b n")   'bts:ticket-new)
+(global-set-key (kbd "M-b s")   'bts:summary-open)
+(global-set-key (kbd "M-b p n") 'bts:project-new)
+(global-set-key (kbd "M-b p u") 'bts:project-update)
+(global-set-key (kbd "M-b p d") 'bts:project-remove)
+(global-set-key (kbd "M-b p D") 'bts:project-remove-all)
+(global-set-key (kbd "M-b q n") 'bts:query-new)
+(global-set-key (kbd "M-b q u") 'bts:query-update)
+(global-set-key (kbd "M-b q d") 'bts:query-remove)
+(global-set-key (kbd "M-b q D") 'bts:query-remove-all)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
