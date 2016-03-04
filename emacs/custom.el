@@ -11,7 +11,8 @@
 (prelude-require-packages
  '(ack-and-a-half auth-password-store bts bts-github ctags helm-ack
                   helm-github-stars hideshow-org log4j-mode mingus nyan-mode
-                  org-gcal org-sync paredit))
+                  org-gcal org-sync paredit
+                  docker dockerfile-mode ewmctrl feature-mode))
 
 (global-set-key (kbd "<mouse-6>") 'next-buffer)
 (global-set-key (kbd "<mouse-7>") 'prev-buffer)
