@@ -129,6 +129,12 @@
  '(safe-local-variable-values (quote ((projectile-project-type (quote symphony)))))
  '(sh-indentation 2)
  '(smartparens-global-strict-mode t)
+ '(web-mode-code-indent-offset 2)
+ '(web-mode-css-indent-offset 2)
+ '(web-mode-enable-element-content-fontification t)
+ '(web-mode-enable-element-tag-fontification t)
+ '(web-mode-enable-html-entities-fontification t)
+ '(web-mode-markup-indent-offset 2)
  '(whitespace-line-column 120))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
