@@ -84,7 +84,7 @@ plugins=(
 
 # User configuration
 
-  export PATH="./bin:/usr/local/bin:/usr/local/sbin:/home/daniel-renfer/.dotfiles/bin:/home/daniel-renfer/.local/bin:/home/daniel-renfer/projects/go/bin:/home/daniel-renfer/.sdkman/candidates/groovy/current/bin:/home/daniel-renfer/.sdkman/candidates/gradle/current/bin:/home/daniel-renfer/.nix-profile/bin:/home/daniel-renfer/.nix-profile/sbin:/home/daniel-renfer/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+  export PATH="./bin:~/.dotfiles-old/bin:~/.local/bin:~/projects/go/bin:~/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
