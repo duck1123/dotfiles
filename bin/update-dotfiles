@@ -1,5 +1,9 @@
 #!/bin/sh
 
-cd ~/.dotfiles
+cd "$(dirname "$0")/.."
+DOTFILES_ROOT=$(pwd -P)
+
+set -e
+
 git pull
 script/bootstrap

@@ -2,7 +2,8 @@
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
 
 # Path to your oh-my-zsh installation.
-export ZSH=/home/daniel-renfer/.dotfiles
+export ZSH=~/.dotfiles
+export ZSHDOTFILES=~/.dotfiles-old
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -128,3 +129,7 @@ fi
 export JENKINS_URL=http://jenkins.int.eprize.net/
 
 # source ~/.dotenv.sh
+
+fpath=($ZSHDOTFILES/functions $fpath)
+
+autoload -U $ZSHDOTFILES/functions/*(:t)
