@@ -91,7 +91,9 @@
  '(cider-prefer-local-resources t)
  '(cider-prompt-for-project-on-connect nil)
  '(cider-repl-history-file "~/.cider-history")
- '(clojure-defun-indents (quote (describe it fact facts future-fact future-facts)))
+ '(clojure-defun-indents
+   (quote
+    (describe it fact facts future-fact future-facts Given When Then)))
  '(company-auto-complete t)
  '(ede-auto-add-method (quote always))
  '(ede-project-directories (quote ("/home/daniel-renfer/projects/LMP")))
