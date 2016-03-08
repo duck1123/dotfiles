@@ -129,6 +129,7 @@ then
 fi
 
 export JENKINS_URL=http://jenkins.int.eprize.net/
+export JIRA_URL=http://jira.helloworld.com/
 
 # source ~/.dotenv.sh
 
