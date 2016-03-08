@@ -1,3 +1,5 @@
+#!/usr/bin/zsh
+
 # Make sure that emacs doesn't hang
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
 
@@ -85,7 +87,7 @@ plugins=(
 
 # User configuration
 
-  export PATH="./bin:~/.dotfiles-old/bin:~/.local/bin:~/projects/go/bin:~/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+export PATH="./bin:$HOME/.dotfiles-old/bin:$HOME/.local/bin:$HOME/projects/go/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
