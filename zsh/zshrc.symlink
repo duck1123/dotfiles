@@ -64,6 +64,7 @@ plugins=(
     bower
     bundler
     catimg
+    colored-man-pages
     colorize
     command-not-found
     compleat
@@ -74,18 +75,35 @@ plugins=(
     git
     git-extras
     git-flow
+    git-hubflow
     gulp
     history
+    httpie
     jira
+    jump
+    kitchen
+    knife
+    knife_ssh
+
     lein
     lol
+    man
     mvn
+    node
     npm
+    nyan
+    redis-cli
+    ruby
     # rvm
+    sudo
     supervisor
+    systemd
+    thefuck
     tmux
+    ubuntu
     vagrant
-    virtualenv)
+    virtualenv
+    zsh_reload)
 
 # User configuration
 
