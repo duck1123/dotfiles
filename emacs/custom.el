@@ -132,6 +132,7 @@
  '(safe-local-variable-values (quote ((projectile-project-type (quote symphony)))))
  '(sh-indentation 2)
  '(smartparens-global-strict-mode t)
+ '(sql-connection-alist (quote))
  '(web-mode-code-indent-offset 2)
  '(web-mode-css-indent-offset 2)
  '(web-mode-enable-element-content-fontification t)
