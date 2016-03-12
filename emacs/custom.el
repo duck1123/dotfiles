@@ -10,7 +10,7 @@
 
 (prelude-require-packages
  '(ack-and-a-half auth-password-store bts bts-github ctags docker dockerfile-mode
-                  docker-tramp ewmctrl feature-mode gnupg helm-ack helm-github-stars
+                  docker-tramp ewmctrl feature-mode helm-ack helm-github-stars
                   hideshow-org log4j-mode magit-gh-pulls magit-popup markdown-mode
                   mingus nginx-mode nodejs-repl nyan-mode org-gcal org-sync paredit
                   popup rainbow-delimiters realgud))
@@ -94,7 +94,7 @@
  '(cider-repl-history-file "~/.cider-history")
  '(clojure-defun-indents
    (quote
-    (describe it fact facts future-fact future-facts Given When Then)))
+    (describe describe-config it fact facts future-fact future-facts Given When Then)))
  '(company-auto-complete t)
  '(ede-auto-add-method (quote always))
  '(ede-project-directories (quote ("/home/daniel-renfer/projects/LMP")))

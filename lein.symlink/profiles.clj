@@ -1,8 +1,8 @@
 {:user
  {:plugins
   [
-   [codox "0.8.10"]
-   [lein-ancient "0.6.5"
+   [codox "0.9.4"]
+   [lein-ancient "0.6.8"
     :exclusions [org.clojure/clojure]
     ]
    ]}}
