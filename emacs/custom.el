@@ -65,6 +65,7 @@
 (add-hook 'php-mode-hook (lambda () (hs-org/minor-mode 1)))
 (add-hook 'clojure-mode-hook #'subword-mode)
 (add-hook 'clojure-mode-hook #'paredit-mode)
+(add-hook 'clojure-mode-hook (lambda () (hs-org/minor-mode 1)))
 
 (require 'bts)
 (require 'bts-github)
