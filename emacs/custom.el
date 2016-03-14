@@ -35,6 +35,7 @@
             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
 
+(rainbow-delimiters-mode-enable)
 (nyan-mode)
 (scroll-bar-mode -1)
 
