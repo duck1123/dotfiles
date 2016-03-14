@@ -9,11 +9,57 @@
                          ))
 
 (prelude-require-packages
- '(ack-and-a-half auth-password-store bts bts-github ctags docker dockerfile-mode
-                  docker-tramp ewmctrl feature-mode helm-ack helm-github-stars
-                  hideshow-org log4j-mode magit-gh-pulls magit-popup markdown-mode
-                  mingus nginx-mode nodejs-repl nyan-mode org-gcal org-sync paredit
-                  popup rainbow-delimiters realgud))
+ '(ack-and-a-half
+   auth-password-store
+   bts
+   bts-github
+   clojure-mode
+   cider
+   company
+   ctags
+   dash
+   docker
+   dockerfile-mode
+   docker-tramp
+   ewmctrl
+   feature-mode
+   gh
+   gh-md
+   gist
+   git-commit
+   gitconfig-mode
+   github-browse-file
+   github-notifier
+   gitignore-mode
+   git-timemachine
+   helm-ack
+   helm-company
+   helm-descbinds
+   helm-github-stars
+   helm-projectile
+   hideshow-org
+   idle-highlight-mode
+   js2-mode
+   json-mode
+   less-css-mode
+   log4j-mode
+   magit
+   magit-gh-pulls
+   magit-gitflow
+   magit-popup
+   magit-rockstar
+   markdown-mode
+   mingus
+   nginx-mode
+   nodejs-repl
+   nyan-mode
+   org
+   org-gcal
+   org-sync
+   paredit
+   popup
+   rainbow-delimiters
+   realgud))
 
 (global-set-key (kbd "<mouse-6>")   'next-buffer)
 (global-set-key (kbd "<mouse-7>")   'prev-buffer)
