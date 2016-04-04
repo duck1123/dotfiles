@@ -171,3 +171,4 @@ alias ec='emacsclient -c'
 alias vim='emacsclient -t'
 alias vi='emacsclient -t'
 alias v="vagrant"
+alias dkcp="docker-compose"
