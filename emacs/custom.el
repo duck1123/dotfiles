@@ -163,6 +163,7 @@
  '(mingus-playlist-separator " | ")
  '(mingus-use-ido-mode-p t)
  '(mingus-use-mouse-p nil)
+ '(nginx-indent-level 2)
  '(org-agenda-files
    (quote
     ("~/Dropbox/org/doing.org" "~/Dropbox/org/github.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org" "~/.org-jira/MPD.org")))
