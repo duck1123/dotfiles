@@ -13,7 +13,7 @@ export ZSHDOTFILES=~/.dotfiles-old
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="random"
+ZSH_THEME="jonathan"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -58,17 +58,12 @@ ZSH_THEME="random"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
-    ant
-    battery
     bgnotify
     bower
     bundler
-    catimg
-    colored-man-pages
     colorize
     command-not-found
     compleat
-    dircycle
     docker-compose
     docker
     gem
@@ -84,7 +79,6 @@ plugins=(
     kitchen
     knife
     knife_ssh
-
     lein
     lol
     man
@@ -98,11 +92,9 @@ plugins=(
     sudo
     supervisor
     systemd
-    thefuck
     tmux
     ubuntu
     vagrant
-    virtualenv
     zsh_reload)
 
 # User configuration
