@@ -3,7 +3,7 @@
 # Make sure that emacs doesn't hang
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
 
-source ~/.dotenv.sh
+# source ~/.dotenv.sh
 
 # Path to your oh-my-zsh installation.
 export ZSH=~/.dotfiles
