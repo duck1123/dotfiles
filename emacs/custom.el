@@ -162,6 +162,7 @@
  '(js-switch-indent-offset 2)
  '(js2-basic-offset 2)
  '(magit-commit-arguments (quote ("--verbose")))
+ '(magit-diff-arguments (quote ("--ignore-space-change" "--no-ext-diff" "--stat")))
  '(magit-fetch-arguments (quote ("--prune")))
  '(magit-log-arguments (quote ("--graph" "--color" "--decorate" "-n256")))
  '(malabar-repl-grooysh "~/.sdkman/candidates/groovy/2.4.5/bin/groovysh")
