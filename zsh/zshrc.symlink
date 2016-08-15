@@ -151,8 +151,8 @@ fpath=($ZSHDOTFILES/functions $fpath)
 
 autoload -U $ZSHDOTFILES/functions/*(:t)
 
-source ~/.percol.d/percol.zsh
-bindkey '^R' percol_select_history
+# source ~/.percol.d/percol.zsh
+# bindkey '^R' percol_select_history
 
 alias reload!='. ~/.zshrc'
 alias sagi='sudo apt-get install'

@@ -98,9 +98,14 @@
 (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
+(add-to-list 'auto-mode-alist '("\\.t\\'" . perl-mode))
 
 ;; set this in all c-based programming modes
 (add-hook 'c-mode-common-hook
+          (lambda ()
+            (c-set-offset 'case-label '+)))
+
+(add-hook 'js2-mode-hook
           (lambda ()
             (c-set-offset 'case-label '+)))
 
@@ -142,6 +147,7 @@
  ;; If there is more than one, they won't work right.
  '(browse-url-browser-function (quote browse-url-generic))
  '(browse-url-generic-program "google-chrome")
+ '(c-basic-offset 2)
  '(cider-known-endpoints (quote (("dev.jiksnu.com" "7888"))))
  '(cider-prefer-local-resources t)
  '(cider-prompt-for-project-on-connect nil)
@@ -150,6 +156,8 @@
    (quote
     (describe describe-config it fact facts future-fact future-facts Given When Then)))
  '(company-auto-complete t)
+ '(cperl-close-paren-offset -4)
+ '(cperl-indent-parens-as-block t)
  '(ede-auto-add-method (quote always))
  '(ede-project-directories (quote ("/home/daniel-renfer/projects/LMP")))
  '(helm-github-stars-refetch-time 0.5)
@@ -162,7 +170,9 @@
  '(js-switch-indent-offset 2)
  '(js2-basic-offset 2)
  '(magit-commit-arguments (quote ("--verbose")))
- '(magit-diff-arguments (quote ("--ignore-space-change" "--no-ext-diff" "--stat")))
+ '(magit-diff-arguments
+   (quote
+    ("--ignore-space-change" "--ignore-all-space" "--no-ext-diff" "--stat")))
  '(magit-fetch-arguments (quote ("--prune")))
  '(magit-log-arguments (quote ("--graph" "--color" "--decorate" "-n256")))
  '(malabar-repl-grooysh "~/.sdkman/candidates/groovy/2.4.5/bin/groovysh")
@@ -171,9 +181,7 @@
  '(mingus-use-ido-mode-p t)
  '(mingus-use-mouse-p nil)
  '(nginx-indent-level 2)
- '(org-agenda-files
-   (quote
-    ("~/Dropbox/org/doing.org" "~/Dropbox/org/github.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org" "~/.org-jira/MPD.org")))
+ '(org-agenda-files (quote ("~/Dropbox/org/inbox.org" "~/.org-jira/MPD.org")))
  '(org-datetree-add-timestamp (quote active))
  '(org-default-notes-file "~/Dropbox/org/inbox.org")
  '(org-directory "~/Dropbox/org")
