@@ -145,6 +145,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(auto-revert-check-vc-info t)
+ '(aws-command "~/.local/bin/aws")
  '(browse-url-browser-function (quote browse-url-generic))
  '(browse-url-generic-program "google-chrome")
  '(c-basic-offset 2)
@@ -181,6 +183,8 @@
  '(mingus-use-ido-mode-p t)
  '(mingus-use-mouse-p nil)
  '(nginx-indent-level 2)
+ '(nxml-sexp-element-flag t)
+ '(nxml-slash-auto-complete-flag nil)
  '(org-agenda-files (quote ("~/Dropbox/org/inbox.org" "~/.org-jira/MPD.org")))
  '(org-datetree-add-timestamp (quote active))
  '(org-default-notes-file "~/Dropbox/org/inbox.org")
