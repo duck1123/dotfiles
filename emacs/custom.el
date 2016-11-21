@@ -13,7 +13,10 @@
                          ))
 
 (prelude-require-packages
- '(ack-and-a-half
+ '(ac-cider
+   ack-and-a-half
+   apt-utils-ido
+   auto-complete
    aws-ec2
    bts
    bts-github
@@ -25,6 +28,7 @@
    docker
    dockerfile-mode
    docker-tramp
+   edn
    ewmctrl
    feature-mode
    gh
@@ -36,19 +40,30 @@
    github-notifier
    gitignore-mode
    git-timemachine
+   go-projectile
+   helm
    helm-ack
    helm-ag
+   helm-bundle-show
+   helm-chrome
+   helm-clojuredocs
    helm-company
+   helm-helm-commands
    helm-descbinds
    helm-github-stars
+   helm-package
    helm-projectile
+   helm-rhythmbox
    hideshow-org
    idle-highlight-mode
    js2-mode
    json-mode
+   kodi-remote
    less-css-mode
    log4j-mode
    magit
+   magithub
+   magit-filenotify
    magit-gh-pulls
    magit-gitflow
    magit-popup
