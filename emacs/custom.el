@@ -152,9 +152,9 @@
  '(browse-url-browser-function (quote browse-url-generic))
  '(browse-url-generic-program "google-chrome")
  '(c-basic-offset 2)
- '(cider-known-endpoints (quote (("dev.jiksnu.com" "7888"))))
+ '(cider-known-endpoints (quote (("local" "localhost" "7888"))))
  '(cider-prefer-local-resources t)
- '(cider-prompt-for-project-on-connect nil)
+ '(cider-prompt-for-project-on-connect (quote when-needed))
  '(cider-repl-history-file "~/.cider-history")
  '(clojure-defun-indents
    (quote
