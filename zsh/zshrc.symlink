@@ -101,7 +101,10 @@ plugins=(
 
 # User configuration
 
-export PATH="./bin:$HOME/.dotfiles-old/bin:$HOME/.local/bin:$HOME/go/bin:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+export PATH="./bin:$HOME/.dotfiles-old/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
