@@ -14,7 +14,7 @@
 
 (prelude-require-packages
  '(ack-and-a-half
-   auth-password-store
+   aws-ec2
    bts
    bts-github
    clojure-mode
@@ -37,6 +37,7 @@
    gitignore-mode
    git-timemachine
    helm-ack
+   helm-ag
    helm-company
    helm-descbinds
    helm-github-stars
@@ -53,12 +54,13 @@
    magit-popup
    magit-rockstar
    markdown-mode
-   mingus
    nginx-mode
    nodejs-repl
    nyan-mode
    org
    org-gcal
+   org-jira
+   org-magit
    org-sync
    paredit
    popup
