@@ -7,7 +7,7 @@ set                     $hyper Mod3
 font                    pango:DejaVu Sans Mono 8
 # font -schumacher-clean-medium-r-normal-*-12-*-*-*-*-*-*-*
 
-set $background  "#002244"
+# set $background  "#002244"
 
 
 exec --no-startup-id rofi --daemon
@@ -150,9 +150,9 @@ bar {
 
     colors {
         # Whole color settings
-        background #ffffff00
-        statusline #ffffff
-        separator  #66666600
+        # background #ffffff00
+        # statusline #ffffff
+        # separator  #66666600
 
         # Type             border  background font
         focused_workspace  #008fff #007fff #ffffff
@@ -165,7 +165,7 @@ bar {
     status_command i3status --config ~/.i3/i3status.conf
     # status_command ~/.i3/.i3status.sh
     # status_command i3blocks
-    position top
+    position bottom
 }
 
 for_window [class="^.*"] border pixel 5
