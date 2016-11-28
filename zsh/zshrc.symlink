@@ -150,14 +150,9 @@ export LDAP_USERNAME=daniel-renfer
 
 fpath=($ZSHDOTFILES/functions $fpath)
 
-autoload -U $ZSHDOTFILES/functions/*(:t)
-
-# source ~/.percol.d/percol.zsh
 # bindkey '^R' percol_select_history
 
 alias reload!='. ~/.zshrc'
-alias sagi='sudo apt-get install'
-alias sasearch='sudo apt-cache search'
 alias psgrep='ps -ef | grep -v grep | grep '
 alias e='emacsclient -t'
 alias ec='emacsclient -c'
