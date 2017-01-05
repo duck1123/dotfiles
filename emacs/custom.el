@@ -80,7 +80,8 @@
    paredit
    popup
    rainbow-delimiters
-   realgud))
+   realgud
+   restclient))
 
 ;; Emacs IRC client
 (require 'prelude-erc)
