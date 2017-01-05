@@ -231,7 +231,9 @@
    (quote
     ("--ignore-space-change" "--ignore-all-space" "--no-ext-diff" "--stat")))
  '(magit-fetch-arguments (quote ("--prune")))
- '(magit-log-arguments (quote ("--graph" "--color" "--decorate" "-n256")))
+ '(magit-log-arguments
+   (quote
+    ("--graph" "--color" "--decorate" "--simplify-by-decoration" "-n256")))
  '(malabar-repl-grooysh "~/.sdkman/candidates/groovy/2.4.5/bin/groovysh")
  '(mingus-mpd-host "dev.jiksnu.com")
  '(mingus-playlist-separator " | ")
