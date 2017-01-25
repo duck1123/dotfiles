@@ -88,6 +88,7 @@ plugins=(
     node
     npm
     nyan
+    pj
     redis-cli
     ruby
     # rvm
@@ -100,6 +101,8 @@ plugins=(
     zsh_reload)
 
 # User configuration
+
+PROJECT_PATHS=(~/projects)
 
 export PATH="./bin:$HOME/.dotfiles-old/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
