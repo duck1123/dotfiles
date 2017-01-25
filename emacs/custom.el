@@ -75,7 +75,6 @@
    org
    org-gcal
    org-jira
-   org-magit
    org-sync
    paredit
    popup
