@@ -192,14 +192,6 @@
 (add-to-list 'auto-mode-alist '("\\.t\\'" . perl-mode))
 
 ;; set this in all c-based programming modes
-(add-hook 'c-mode-common-hook
-          (lambda ()
-            (c-set-offset 'case-label '+)))
-
-(add-hook 'js2-mode-hook
-          (lambda ()
-            (c-set-offset 'case-label '+)))
-
 (require 'org-gcal)
 
 (set-time-zone-rule "GMT")
@@ -208,10 +200,13 @@
 
 (require 'hideshow-org)
 
-(add-hook 'php-mode-hook (lambda () (hs-org/minor-mode 1)))
 (add-hook 'clojure-mode-hook #'subword-mode)
 (add-hook 'clojure-mode-hook #'paredit-mode)
-(add-hook 'clojure-mode-hook (lambda () (hs-org/minor-mode 1)))
+(add-hook 'clojure-mode-hook  (lambda () (hs-org/minor-mode 1)))
+(add-hook 'php-mode-hook      (lambda () (hs-org/minor-mode 1)))
+(add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
+(add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
+
 
 (setq default-tab-width 2)
 
