@@ -1,7 +1,7 @@
 ;;; custom --- Custom code
 ;;; Commentary:
 
-
+;;; Code:
 (setq prelude-guru nil)
 
 (setq package-archives '(
