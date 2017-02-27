@@ -276,6 +276,7 @@
  '(mingus-use-ido-mode-p t)
  '(mingus-use-mouse-p nil)
  '(nginx-indent-level 2)
+ '(nxml-child-indent 2)
  '(nxml-sexp-element-flag t)
  '(nxml-slash-auto-complete-flag nil)
  '(org-agenda-files
