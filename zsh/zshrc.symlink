@@ -168,16 +168,22 @@ alias vi='emacsclient -t'
 alias v="vagrant"
 alias dkcp="docker-compose"
 
-export REGISTRY_PATH=https://registry.kronkltd.net
-
 function docker-tags () {
-    docker-ls tags -registry $REGISTRY_PATH $1 2>/dev/null | \
+    docker-ls \
+      tags \
+      -registry $DOCKER_REGISTRY_PATH \
+      -allow-insecure \
+      $1 2>/dev/null | \
       tail -n +3 | \
       awk '{gsub("- ", "");print}'
 }
 
 function docker-digest () {
-    docker-ls tag -registry $REGISTRY_PATH $1 2>/dev/null | \
+    docker-ls \
+      tag \
+      -registry $DOCKER_REGISTRY_PATH \
+      -allow-insecure \
+      $1 2>/dev/null | \
       awk 'FNR == 3 {gsub("digest: ", "");print}'
 }
 
@@ -185,5 +191,18 @@ function docker-image-rm () {
     repository=`echo "$1" | cut -d':' -f1`
     tag=`echo "$1" | cut -d':' -f2`
 
-    docker-rm -registry $REGISTRY_PATH $repository:`docker-digest $1`
+    docker-rm \
+      -registry $DOCKER_REGISTRY_PATH \
+      -allow-insecure \
+      $repository:`docker-digest $1`
+}
+
+function docker-repositories () {
+    docker-ls \
+      repositories \
+      --registry $DOCKER_REGISTRY_PATH \
+      -allow-insecure \
+      2>/dev/null | \
+      tail -n +2 | \
+      awk '{gsub("- ", "");print}'
 }
