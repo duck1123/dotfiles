@@ -167,6 +167,7 @@ alias vim='emacsclient -t'
 alias vi='emacsclient -t'
 alias v="vagrant"
 alias dkcp="docker-compose"
+alias rancher-hosts="rancher hosts --format json | jq -r '.Host | (.name // .hostname)' | sort"
 
 function docker-tags () {
     docker-ls \
