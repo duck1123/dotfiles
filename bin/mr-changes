@@ -1,7 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 cd ~/
 mr status 2>&1 | \
     grep -v "^$" | \
-    # grep -v ".*failed to chdir" | \
-    perl -pe 's|mr status: /home/.*?/(.+)$|> \1|'
+    perl -pe 's|mr status: /home/.*?/(.+)$|> \1|' | \
+    perl -0777 -pe 's|(?<!-)>([^\n]*?)\n(?=>)||sg'
