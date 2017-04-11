@@ -103,6 +103,7 @@ plugins=(
 # User configuration
 
 PROJECT_PATHS=(~/projects)
+fpath=($fpath ~/.dotfiles-old/zsh/rancher-zsh-completion/)
 
 export PATH="./bin:$HOME/.dotfiles-old/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
