@@ -28,6 +28,7 @@
    docker
    dockerfile-mode
    docker-tramp
+   editorconfig
    edn
    ewmctrl
    feature-mode
