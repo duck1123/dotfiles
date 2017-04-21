@@ -213,10 +213,9 @@ function docker-trace () {
 
     echo "Submitting trace for ${imageName}"
 
-    curl -I http://build.jiksnu.org/docker-traceability/submitContainerStatus \
+    curl -v http://build.jiksnu.org/docker-traceability/submitContainerStatus \
          --data-urlencode status=create \
          --data-urlencode imageName=${imageName?} \
          --data-urlencode hostName=$(hostname) \
-         --data-urlencode hostName=development \
          --data-urlencode inspectData="$(docker inspect ${imageName})"
 }
