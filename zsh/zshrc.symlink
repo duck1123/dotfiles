@@ -207,3 +207,14 @@ function docker-repositories () {
       tail -n +2 | \
       awk '{gsub("- ", "");print}'
 }
+
+function docker-trace () {
+    imageName="$1"
+
+    curl http://build.jiksnu.org/docker-traceability/submitContainerStatus \
+         --data-urlencode status=create \
+         --data-urlencode imageName=${imageName?} \
+         --data-urlencode hostName=$(hostname) \
+         --data-urlencode hostName=development \
+         --data-urlencode inspectData="$(docker inspect ${imageName})"
+}
