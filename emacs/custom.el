@@ -235,6 +235,7 @@
  '(cider-prefer-local-resources t)
  '(cider-prompt-for-project-on-connect (quote when-needed))
  '(cider-repl-history-file "~/.cider-history")
+ '(cider-repl-use-pretty-printing t)
  '(clojure-defun-indents
    (quote
     (describe describe-config it fact facts future-fact future-facts Given When Then)))
