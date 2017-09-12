@@ -272,6 +272,7 @@
  '(org-agenda-files
    (quote
     ("~/Dropbox/org/doing.org" "~/Dropbox/org/github.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
+ '(org-capture-use-agenda-date t)
  '(org-datetree-add-timestamp (quote active))
  '(org-default-notes-file "~/Dropbox/org/inbox.org")
  '(org-directory "~/Dropbox/org")
