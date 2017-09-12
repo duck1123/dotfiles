@@ -201,6 +201,7 @@
 (add-hook 'php-mode-hook      (lambda () (hs-org/minor-mode 1)))
 (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
 (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
+(add-hook 'js2-mode-hook  (lambda () (hs-org/minor-mode 1)))
 
 
 (setq default-tab-width 2)
