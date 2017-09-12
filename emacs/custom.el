@@ -271,7 +271,7 @@
  '(nxml-slash-auto-complete-flag nil)
  '(org-agenda-files
    (quote
-    ("~/Dropbox/org/doing.org" "~/Dropbox/org/github.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/schedule.org" "~/Dropbox/org/hw-schedule.org")))
+    ("~/Dropbox/org/inbox.org" "~/Dropbox/org/HelloWorld.org" "~/Dropbox/org/lmp.org" "~/Dropbox/org/medical.org" "~/Dropbox/org/Tasks.org")))
  '(org-capture-use-agenda-date t)
  '(org-datetree-add-timestamp (quote active))
  '(org-default-notes-file "~/Dropbox/org/inbox.org")
