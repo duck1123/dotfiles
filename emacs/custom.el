@@ -63,12 +63,6 @@
    less-css-mode
    log4j-mode
    magit
-   magithub
-   magit-filenotify
-   magit-gh-pulls
-   magit-gitflow
-   magit-popup
-   magit-rockstar
    markdown-mode
    nginx-mode
    nodejs-repl
