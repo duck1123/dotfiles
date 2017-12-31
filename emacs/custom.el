@@ -202,7 +202,7 @@
 (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
 (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
 (add-hook 'js2-mode-hook  (lambda () (hs-org/minor-mode 1)))
-
+(add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
 
 (setq default-tab-width 2)
 
