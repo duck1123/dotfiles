@@ -7,6 +7,8 @@ atom.symlink/storage
 atom.symlink/themes
 byobu.symlink/.ssh-agent
 git/gitconfig.symlink
+lein.symlink/credentials.clj
+lein.symlink/repl-history
 lein.symlink/self-installs/
 emacs.d.symlink/.smex-items
 emacs.d.symlink/ac-comphist.dat
