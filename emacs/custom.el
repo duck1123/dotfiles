@@ -15,69 +15,21 @@
                          ))
 
 (prelude-require-packages
- '(ac-cider
-   ack-and-a-half
-   apt-utils-ido
+ '(
    auto-complete
-   aws-ec2
-   bts
-   bts-github
    clojure-mode
    cider
-   company
-   ctags
-   dash
-   docker
-   dockerfile-mode
-   docker-tramp
    editorconfig
-   edn
-   ewmctrl
-   feature-mode
-   gh
-   gh-md
-   gist
-   git-commit
-   gitconfig-mode
-   github-browse-file
-   github-notifier
-   gitignore-mode
-   git-timemachine
-   go-projectile
    helm
-   helm-ack
-   helm-ag
-   helm-bundle-show
-   helm-chrome
-   helm-clojuredocs
-   helm-company
-   helm-helm-commands
-   helm-descbinds
    helm-github-stars
-   helm-package
    helm-projectile
-   helm-rhythmbox
    hideshow-org
-   idle-highlight-mode
-   js2-mode
-   json-mode
-   kodi-remote
-   less-css-mode
-   log4j-mode
    magit
-   markdown-mode
-   nginx-mode
-   nodejs-repl
    nyan-mode
    org
-   org-gcal
-   org-jira
-   org-sync
    paredit
-   popup
    rainbow-delimiters
-   realgud
-   restclient))
+   ))
 
 ;; Emacs IRC client
 (require 'prelude-erc)
@@ -95,7 +47,7 @@
 ;; (require 'prelude-coffee)
 ;; (require 'prelude-common-lisp)
 (require 'prelude-css)
-(require 'prelude-emacs-lisp)
+;; (require 'prelude-emacs-lisp)
 ;; (require 'prelude-erlang)
 ;; (require 'prelude-elixir)
 (require 'prelude-go)
@@ -105,11 +57,11 @@
 (require 'prelude-lisp)
 ;; (require 'prelude-ocaml)
 (require 'prelude-org) ;; Org-mode helps you keep TODO lists, notes and more
-(require 'prelude-perl)
-(require 'prelude-python)
-(require 'prelude-ruby)
+;; (require 'prelude-perl)
+;; (require 'prelude-python)
+;; (require 'prelude-ruby)
 ;; (require 'prelude-scala)
-(require 'prelude-scheme)
+;; (require 'prelude-scheme)
 (require 'prelude-shell)
 ;; (require 'prelude-scss)
 (require 'prelude-web) ;; Emacs mode for web templates
@@ -121,18 +73,18 @@
 (require 'prelude-ido) ;; Super charges Emacs completion for C-x C-f and more
 (require 'prelude-helm) ;; Interface for narrowing and search
 (require 'prelude-helm-everywhere) ;; Enable Helm everywhere
-(require 'prelude-company)
+;; (require 'prelude-company)
 ;; (require 'prelude-key-chord) ;; Binds useful features to key combinations
 ;; (require 'prelude-mediawiki)
 ;; (require 'prelude-evil)
 
 ;;; Programming languages support
-(require 'prelude-c)
+;; (require 'prelude-c)
 (require 'prelude-clojure)
 ;; (require 'prelude-coffee)
 ;; (require 'prelude-common-lisp)
 (require 'prelude-css)
-(require 'prelude-emacs-lisp)
+;; (require 'prelude-emacs-lisp)
 ;; (require 'prelude-erlang)
 ;; (require 'prelude-elixir)
 (require 'prelude-go)
@@ -142,11 +94,11 @@
 (require 'prelude-lisp)
 ;; (require 'prelude-ocaml)
 (require 'prelude-org) ;; Org-mode helps you keep TODO lists, notes and more
-(require 'prelude-perl)
-(require 'prelude-python)
-(require 'prelude-ruby)
+;; (require 'prelude-perl)
+;; (require 'prelude-python)
+;; (require 'prelude-ruby)
 ;; (require 'prelude-scala)
-(require 'prelude-scheme)
+;; (require 'prelude-scheme)
 (require 'prelude-shell)
 ;; (require 'prelude-scss)
 (require 'prelude-web) ;; Emacs mode for web templates
@@ -189,7 +141,7 @@
 (add-to-list 'auto-mode-alist '("\\.t\\'" . perl-mode))
 
 ;; set this in all c-based programming modes
-(require 'org-gcal)
+;; (require 'org-gcal)
 
 (set-time-zone-rule "GMT")
 
@@ -274,7 +226,17 @@
   priority DESC, created ASC")
  '(package-selected-packages
    (quote
-    (counsel swiper ivy alert anaconda-mode async avy cider clojure-mode company dash epl f gh helm helm-core ht js2-mode magit-popup marshal projectile pythonic restclient s auto-package-update groovy-mode zop-to-char zenburn-theme yari yaml-mode which-key volatile-highlights undo-tree smex smartrep smartparens smart-mode-line slamhound scss-mode ruby-tools rjsx-mode restclient-test restclient-helm realgud rainbow-mode rainbow-delimiters php-mode ov org-sync org-jira org-gcal operate-on-number nyan-mode npm-mode nodejs-repl nginx-mode move-text mingus markdown-mode magithub magit-rockstar magit-gitflow magit-gh-pulls magit-filenotify lua-mode log4j-mode less-css-mode kodi-remote js-auto-beautify jade-mode imenu-anywhere ido-ubiquitous idle-highlight-mode hideshow-org helm-rhythmbox helm-projectile helm-package helm-helm-commands helm-github-stars helm-git helm-descbinds helm-company helm-clojuredocs helm-chrome helm-bundle-show helm-ag helm-ack guru-mode grizzl gotest god-mode go-projectile gitignore-mode github-notifier github-browse-file gitconfig-mode gitconfig git-timemachine gist gh-md geiser flycheck-color-mode-line flycheck-clojure flx-ido feature-mode expand-region ewmctrl elisp-slime-nav editorconfig easy-kill dockerfile-mode docker discover-my-major diminish diff-hl ctags csv-mode crux company-go company-anaconda coffee-mode clojurescript-mode clojure-mode-extra-font-locking cljr-helm cljdoc cider-spy cider-profile cider-decompile bundler bts-github browse-kill-ring beacon aws-ec2 auth-password-store apt-utils-ido anzu ack-and-a-half ace-window ac-cider)))
+    (ac-cider ack-and-a-half alert anaconda-mode anzu async auto-package-update avy beacon browse-kill-ring
+     cider cider-spy cljdoc cljr-helm clojure-mode clojure-mode-extra-font-locking clojurescript-mode company
+     company-anaconda company-go counsel crux csv-mode dash diff-hl diminish discover-my-major docker dockerfile-mode
+     easy-kill editorconfig epl expand-region f feature-mode flx-ido flycheck flycheck-clojure flycheck-color-mode-line
+     geiser gh gh-md gitignore-mode grizzl go-projectile god-mode gotest groovy-mode guru-mode helm helm-core helm-ack
+     helm-bundle-show helm-clojuredocs helm-company helm-descbinds helm-github-stars helm-helm-commands helm-git
+     helm-package helm-projectile hideshow-org ht idle-highlight-mode ivy jade-mode js-auto-beautify js2-mode
+     less-css-mode log4j-mode lua-mode magit magit-popup markdown-mode marshal move-text nodejs-repl npm-mode nyan-mode
+     operate-on-number ov php-mode projectile pythonic rainbow-delimiters rainbow-mode realgud restclient
+     restclient-test restclient-helm s smex smart-mode-line smartparens smartrep swiper undo-tree volatile-highlights
+     which-key yari yaml-mode zop-to-char)))
  '(projectile-create-missing-test-files t)
  '(projectile-enable-caching t)
  '(projectile-globally-ignored-buffers (quote ("target")))
