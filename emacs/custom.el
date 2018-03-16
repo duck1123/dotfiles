@@ -209,21 +209,7 @@
 (setq tab-width 2)
 (setq default-tab-width 2)
 
-;; (require 'bts)
-;; (require 'bts-github)
-
-;; ;; Key Binding
-;; (global-unset-key (kbd "M-b"))
-;; (global-set-key (kbd "M-b n")   'bts:ticket-new)
-;; (global-set-key (kbd "M-b s")   'bts:summary-open)
-;; (global-set-key (kbd "M-b p n") 'bts:project-new)
-;; (global-set-key (kbd "M-b p u") 'bts:project-update)
-;; (global-set-key (kbd "M-b p d") 'bts:project-remove)
-;; (global-set-key (kbd "M-b p D") 'bts:project-remove-all)
-;; (global-set-key (kbd "M-b q n") 'bts:query-new)
-;; (global-set-key (kbd "M-b q u") 'bts:query-update)
-;; (global-set-key (kbd "M-b q d") 'bts:query-remove)
-;; (global-set-key (kbd "M-b q D") 'bts:query-remove-all)
+(require 'org-protocol)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
