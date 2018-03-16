@@ -90,8 +90,16 @@ plugins=(
 
 # User configuration
 
-PROJECT_PATHS=(~/projects)
-fpath=($fpath ~/.dotfiles-old/zsh/rancher-zsh-completion/)
+PROJECT_PATHS=(~/projects
+               ~/go/src/github.com/duck1123/
+               ~/go/src/github.com/lightningnetwork/
+               ~/go/src/github.com/roasbeef/
+              )
+fpath=(
+    $fpath
+    ~/.dotfiles-old/zsh/rancher-zsh-completion/
+    ~/projects/lncli-completion/
+)
 
 export PATH="./bin:$HOME/.dotfiles-old/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
