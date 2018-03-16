@@ -4,6 +4,8 @@
 ;;; Code:
 (setq prelude-guru nil)
 
+(require 'cl)
+
 (setq package-archives '(
                          ;; ("elpa" . "http://tromey.com/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
