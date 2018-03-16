@@ -103,7 +103,6 @@ fpath=(
 
 export PATH="./bin:$HOME/.dotfiles-old/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/go/bin:$PATH"
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
@@ -145,7 +144,6 @@ then
   source ~/.localrc
 fi
 
-export GOPATH=$HOME/go
 export JENKINS_URL=http://jenkins.int.eprize.net/
 export JIRA_URL=http://jira.helloworld.com/
 export LDAP_USERNAME=daniel-renfer
@@ -216,9 +214,3 @@ function docker-trace () {
          --data-urlencode hostName=$(hostname) \
          --data-urlencode inspectData="$(docker inspect ${imageName})"
 }
-
-PATH="/home/daniel-renfer/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="/home/daniel-renfer/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="/home/daniel-renfer/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"/home/daniel-renfer/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=/home/daniel-renfer/perl5"; export PERL_MM_OPT;
