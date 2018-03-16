@@ -146,7 +146,7 @@ bindsym $super+Tab exec rofi -i3 -now -font "Inconsolata-10" -fg "#9f9f9f" -bg "
 # bindsym                 $super+space focus mode_toggle
 
 bar {
-    i3bar_command i3bar -t
+    # i3bar_command i3bar -t
 
     colors {
         # Whole color settings
@@ -162,9 +162,9 @@ bar {
     }
 
     font                    pango:DejaVu Sans Mono 10
-    status_command i3status --config ~/.i3/i3status.conf
+    # status_command i3status --config ~/.i3/i3status.conf
     # status_command ~/.i3/.i3status.sh
-    # status_command i3blocks
+    status_command i3blocks
     position top
 }
 
