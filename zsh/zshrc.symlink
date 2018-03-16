@@ -144,12 +144,6 @@ then
   source ~/.localrc
 fi
 
-export JENKINS_URL=http://jenkins.int.eprize.net/
-export JIRA_URL=http://jira.helloworld.com/
-export LDAP_USERNAME=daniel-renfer
-
-# source ~/.dotenv.sh
-
 fpath=($ZSHDOTFILES/functions $fpath)
 
 # bindkey '^R' percol_select_history
