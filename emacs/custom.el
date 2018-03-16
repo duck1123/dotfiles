@@ -234,6 +234,7 @@
  '(cperl-indent-parens-as-block t)
  '(ede-auto-add-method (quote always))
  '(ede-project-directories (quote ("/home/daniel-renfer/projects/LMP")))
+ '(global-org-gnome-minor-mode t)
  '(helm-github-stars-refetch-time 0.5)
  '(helm-github-stars-username "duck1123")
  '(jdee-import-auto-collapse-imports t)
@@ -267,6 +268,8 @@
  '(org-default-notes-file "~/Dropbox/org/inbox.org")
  '(org-directory "~/Dropbox/org")
  '(org-doing-file "~/Dropbox/org/doing.org")
+ '(org-gnome-integrate-with-calendar t)
+ '(org-gnome-integrate-with-empathy nil)
  '(org-jira-default-jql
    "project = MPD AND assignee in (EMPTY, currentUser()) and resolution = unresolved ORDER BY
   priority DESC, created ASC")
