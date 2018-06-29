@@ -196,12 +196,13 @@
  '(js-switch-indent-offset 2)
  '(js2-indent-switch-body t)
  '(js2-mode-indent-ignore-first-tab t)
- '(magit-commit-arguments (quote ("--verbose")))
+ '(magit-commit-arguments (quote ("--verbose" "--gpg-sign=80E3B47F0495EF7E")))
  '(magit-diff-arguments (quote ("--ignore-space-change" "--no-ext-diff" "--stat")))
  '(magit-fetch-arguments (quote ("--prune")))
  '(magit-log-arguments
    (quote
-    ("--graph" "--color" "--decorate" "--simplify-by-decoration" "-n256")))
+    ("--graph" "--color" "--decorate" "--show-signature" "-n256")))
+ '(magit-log-section-arguments (quote ("--graph" "--color" "--decorate" "-n256")))
  '(malabar-repl-grooysh "~/.sdkman/candidates/groovy/2.4.5/bin/groovysh")
  '(mingus-mpd-host "dev.jiksnu.com")
  '(mingus-playlist-separator " | ")
@@ -226,17 +227,7 @@
   priority DESC, created ASC")
  '(package-selected-packages
    (quote
-    (ac-cider ack-and-a-half alert anaconda-mode anzu async auto-package-update avy beacon browse-kill-ring
-     cider cider-spy cljdoc cljr-helm clojure-mode clojure-mode-extra-font-locking clojurescript-mode company
-     company-anaconda company-go counsel crux csv-mode dash diff-hl diminish discover-my-major docker dockerfile-mode
-     easy-kill editorconfig epl expand-region f feature-mode flx-ido flycheck flycheck-clojure flycheck-color-mode-line
-     geiser gh gh-md gitignore-mode grizzl go-projectile god-mode gotest groovy-mode guru-mode helm helm-core helm-ack
-     helm-bundle-show helm-clojuredocs helm-company helm-descbinds helm-github-stars helm-helm-commands helm-git
-     helm-package helm-projectile hideshow-org ht idle-highlight-mode ivy jade-mode js-auto-beautify js2-mode
-     less-css-mode log4j-mode lua-mode magit magit-popup markdown-mode marshal move-text nodejs-repl npm-mode nyan-mode
-     operate-on-number ov php-mode projectile pythonic rainbow-delimiters rainbow-mode realgud restclient
-     restclient-test restclient-helm s smex smart-mode-line smartparens smartrep swiper undo-tree volatile-highlights
-     which-key yari yaml-mode zop-to-char)))
+    (puppet-mode playerctl counsel-spotify spotify helm-spotify-plus ac-cider ack-and-a-half alert anaconda-mode anzu async auto-package-update avy beacon browse-kill-ring cider cider-spy cljdoc cljr-helm clojure-mode clojure-mode-extra-font-locking clojurescript-mode company company-anaconda company-go counsel crux csv-mode dash diff-hl diminish discover-my-major docker dockerfile-mode easy-kill editorconfig epl expand-region f feature-mode flx-ido flycheck flycheck-clojure flycheck-color-mode-line geiser gh gh-md gitignore-mode grizzl go-projectile god-mode gotest groovy-mode guru-mode helm helm-core helm-ack helm-bundle-show helm-clojuredocs helm-company helm-descbinds helm-github-stars helm-helm-commands helm-git helm-package helm-projectile hideshow-org ht idle-highlight-mode ivy jade-mode js-auto-beautify js2-mode less-css-mode log4j-mode lua-mode magit magit-popup markdown-mode marshal move-text nodejs-repl npm-mode nyan-mode operate-on-number ov php-mode projectile pythonic rainbow-delimiters rainbow-mode realgud restclient restclient-test restclient-helm s smex smart-mode-line smartparens smartrep swiper undo-tree volatile-highlights which-key yari yaml-mode zop-to-char)))
  '(projectile-create-missing-test-files t)
  '(projectile-enable-caching t)
  '(projectile-globally-ignored-buffers (quote ("target")))
