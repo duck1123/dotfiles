@@ -145,6 +145,12 @@ then
   git clone https://github.com/robbyrussell/oh-my-zsh.git $HOME/.dotfiles
 fi
 
+export PRELUDE_INSTALL_DIR="$HOME/.emacs.d"
+
+if ! [ -d $PRELUDE_INSTALL_DIR ]; then
+    curl -L https://github.com/bbatsov/prelude/raw/master/utils/installer.sh | sh
+fi
+
 # If we're on a Mac, let's install and setup homebrew.
 if [ "$(uname -s)" == "Darwin" ]
 then
