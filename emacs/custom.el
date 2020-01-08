@@ -148,6 +148,7 @@
 ;; (load-file "~/.dotfiles/emacs/private.el.gpg")
 
 (require 'hideshow-org)
+(require 'flycheck-flow)
 
 (add-hook 'clojure-mode-hook #'subword-mode)
 (add-hook 'clojure-mode-hook #'paredit-mode)
