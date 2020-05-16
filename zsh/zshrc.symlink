@@ -75,6 +75,7 @@ plugins=(
     gulp
     history
     httpie
+    keybase
     lein
     mvn
     nmap
@@ -99,6 +100,7 @@ fpath=(
     $fpath
     ~/.dotfiles-old/zsh/rancher-zsh-completion/
     ~/projects/lncli-completion/
+    ~/.dotfiles/custom/plugins/keybase/
 )
 
 export PATH="./bin:$HOME/.dotfiles-old/bin:$PATH"
