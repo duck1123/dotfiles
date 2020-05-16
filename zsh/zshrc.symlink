@@ -160,6 +160,8 @@ alias vi='emacsclient -t'
 alias v="vagrant"
 alias dkcp="docker-compose"
 alias rancher-hosts="rancher hosts --format json | jq -r '.Host | (.name // .hostname)' | sort"
+alias dockerlogs="cd /home/duck/projects/btcpayserver-docker/Generated &&  docker-compose -f docker-compose.generated.yml  logs -f "
+
 
 function docker-tags () {
     docker-ls \
