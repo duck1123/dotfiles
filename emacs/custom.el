@@ -213,9 +213,7 @@
  '(nxml-child-indent 2)
  '(nxml-sexp-element-flag t)
  '(nxml-slash-auto-complete-flag nil)
- '(org-agenda-files
-   (quote
-    ("~/Dropbox/org/2017/09.org" "~/Dropbox/org/inbox.org" "~/Dropbox/org/HelloWorld.org" "~/Dropbox/org/lmp.org" "~/Dropbox/org/medical.org" "~/Dropbox/org/Tasks.org")))
+ '(org-agenda-files (quote ("~/Nextcloud/org/")))
  '(org-capture-use-agenda-date t)
  '(org-datetree-add-timestamp (quote active))
  '(org-default-notes-file "~/Dropbox/org/inbox.org")
