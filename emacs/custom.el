@@ -22,6 +22,7 @@
    company-flow
    crappy-jsp-mode
    editorconfig
+   flycheck-clj-kondo
    flycheck-flow
    helm
    helm-github-stars
@@ -95,6 +96,7 @@
 (rainbow-delimiters-mode-enable)
 (nyan-mode)
 (scroll-bar-mode -1)
+(require 'flycheck-clj-kondo)
 
 (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
   (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
@@ -147,19 +149,22 @@
  '(browse-url-browser-function (quote browse-url-generic))
  '(browse-url-generic-program "google-chrome")
  '(c-basic-offset 2)
- '(cider-known-endpoints (quote (("local" "localhost" "7888"))))
+ '(cider-known-endpoints (quote (("local" "localhost" "7000"))))
  '(cider-prefer-local-resources t)
  '(cider-prompt-for-project-on-connect (quote when-needed))
- '(cider-repl-history-file "~/.cider-history")
+ '(cider-repl-pop-to-buffer-on-connect (quote display-only))
+ '(cider-repl-require-ns-on-set t)
  '(cider-repl-use-pretty-printing t)
+ '(clojure-align-cond-forms (quote ("condp" "cond" "cond->" "cond->>" "case" "are")))
  '(clojure-defun-indents
    (quote
-    (describe describe-config it fact facts future-fact future-facts Given When Then)))
+    (describe describe-config it fact facts future-fact future-facts Given When Then context GET POST DELETE fn-traced)))
  '(company-auto-complete t)
+ '(epg-gpg-program "gpg")
  '(global-org-gnome-minor-mode t)
  '(helm-github-stars-refetch-time 0.5)
  '(helm-github-stars-username "duck1123")
- '(js-indent-level 2)
+ '(js-indent-level 4)
  '(js-switch-indent-offset 2)
  '(js2-indent-switch-body t)
  '(js2-mode-indent-ignore-first-tab t)
@@ -170,7 +175,6 @@
    (quote
     ("--graph" "--color" "--decorate" "--show-signature" "-n256")))
  '(magit-log-section-arguments (quote ("--graph" "--color" "--decorate" "-n256")))
- '(malabar-repl-grooysh "~/.sdkman/candidates/groovy/2.4.5/bin/groovysh")
  '(nxml-child-indent 2)
  '(nxml-sexp-element-flag t)
  '(nxml-slash-auto-complete-flag nil)
@@ -189,7 +193,14 @@
    (quote
     (".idea" ".eunit" ".git" ".hg" ".fslckout" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "vendor" "node_modules" "target" "build" "View")))
  '(projectile-tags-command "ctags-exuberant -Re -f \"%s\" %s")
- '(safe-local-variable-values (quote ((projectile-project-type (quote symphony)))))
+ '(safe-local-variable-values
+   (quote
+    ((cider-figwheel-main-default-options . "dev")
+     (cider-default-cljs-repl . figwheel-main)
+     (cider-shadow-cljs-default-options . "app")
+     (cider-default-cljs-repl . shadow)
+     (projectile-project-type
+      (quote symphony)))))
  '(sh-indentation 2)
  '(smartparens-global-strict-mode t)
  '(web-mode-code-indent-offset 2)
