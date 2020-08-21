@@ -28,6 +28,7 @@
    nyan-mode
    org
    paredit
+   prettier-js
    rainbow-delimiters
    ))
 
@@ -158,6 +159,9 @@
 (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
 (add-hook 'js2-mode-hook  (lambda () (hs-org/minor-mode 1)))
 (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
 
 (setq tab-width 2)
 (setq default-tab-width 2)
