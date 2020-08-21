@@ -76,11 +76,12 @@ plugins=(
     history
     httpie
     keybase
+    kubectl
     lein
     mvn
     nmap
     node
-
+    nvm
     npm
     pj
     redis-cli
