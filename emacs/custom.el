@@ -138,7 +138,6 @@
 (setq tab-width 2)
 (setq default-tab-width 2)
 
-;; (require 'org-protocol)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
