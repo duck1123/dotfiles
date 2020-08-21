@@ -169,7 +169,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(aws-command "~/.local/bin/aws")
  '(browse-url-browser-function (quote browse-url-generic))
  '(browse-url-generic-program "google-chrome")
  '(c-basic-offset 2)
@@ -182,13 +181,9 @@
    (quote
     (describe describe-config it fact facts future-fact future-facts Given When Then)))
  '(company-auto-complete t)
- '(cperl-close-paren-offset -4)
- '(cperl-indent-parens-as-block t)
- '(ede-auto-add-method (quote always))
  '(global-org-gnome-minor-mode t)
  '(helm-github-stars-refetch-time 0.5)
  '(helm-github-stars-username "duck1123")
- '(jdee-import-auto-collapse-imports t)
  '(js-indent-level 2)
  '(js-switch-indent-offset 2)
  '(js2-indent-switch-body t)
@@ -201,25 +196,14 @@
     ("--graph" "--color" "--decorate" "--show-signature" "-n256")))
  '(magit-log-section-arguments (quote ("--graph" "--color" "--decorate" "-n256")))
  '(malabar-repl-grooysh "~/.sdkman/candidates/groovy/2.4.5/bin/groovysh")
- '(mingus-mpd-host "dev.jiksnu.com")
- '(mingus-playlist-separator " | ")
- '(mingus-use-ido-mode-p t)
- '(mingus-use-mouse-p nil)
- '(nginx-indent-level 2)
  '(nxml-child-indent 2)
  '(nxml-sexp-element-flag t)
  '(nxml-slash-auto-complete-flag nil)
  '(org-agenda-files (quote ("~/Nextcloud/org/")))
  '(org-capture-use-agenda-date t)
  '(org-datetree-add-timestamp (quote active))
- '(org-default-notes-file "~/Dropbox/org/inbox.org")
- '(org-directory "~/Dropbox/org")
- '(org-doing-file "~/Dropbox/org/doing.org")
  '(org-gnome-integrate-with-calendar t)
  '(org-gnome-integrate-with-empathy nil)
- '(org-jira-default-jql
-   "project = MPD AND assignee in (EMPTY, currentUser()) and resolution = unresolved ORDER BY
-  priority DESC, created ASC")
  '(package-selected-packages
    (quote
     (flycheck-flow puppet-mode playerctl counsel-spotify spotify helm-spotify-plus ac-cider ack-and-a-half alert anaconda-mode anzu async auto-package-update avy beacon browse-kill-ring cider cider-spy cljdoc cljr-helm clojure-mode clojure-mode-extra-font-locking clojurescript-mode company company-anaconda company-go counsel crux csv-mode dash diff-hl diminish discover-my-major docker dockerfile-mode easy-kill editorconfig epl expand-region f feature-mode flx-ido flycheck flycheck-clojure flycheck-color-mode-line geiser gh gh-md gitignore-mode grizzl go-projectile god-mode gotest groovy-mode guru-mode helm helm-core helm-ack helm-bundle-show helm-clojuredocs helm-company helm-descbinds helm-github-stars helm-helm-commands helm-git helm-package helm-projectile hideshow-org ht idle-highlight-mode ivy jade-mode js-auto-beautify js2-mode less-css-mode log4j-mode lua-mode magit magit-popup markdown-mode marshal move-text nodejs-repl npm-mode nyan-mode operate-on-number ov php-mode projectile pythonic rainbow-delimiters rainbow-mode realgud restclient restclient-test restclient-helm s smex smart-mode-line smartparens smartrep swiper undo-tree volatile-highlights which-key yari yaml-mode zop-to-char)))
