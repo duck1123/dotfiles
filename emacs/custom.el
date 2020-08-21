@@ -20,6 +20,7 @@
    clojure-mode
    cider
    editorconfig
+   flycheck-flow
    helm
    helm-github-stars
    helm-projectile
