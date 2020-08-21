@@ -128,9 +128,6 @@ git_diff_commits() {
 # Git aliases
 alias gdc=git_diff_commits
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/daniel-renfer/.sdkman"
-[[ -s "/home/daniel-renfer/.sdkman/bin/sdkman-init.sh" ]] && source "/home/daniel-renfer/.sdkman/bin/sdkman-init.sh"
 export PATH="$PATH:/opt/mssql-tools/bin"
 
 export NVM_DIR="$HOME/.nvm"
