@@ -112,7 +112,7 @@
 ;; set this in all c-based programming modes
 ;; (require 'org-gcal)
 
-(set-time-zone-rule "GMT")
+;; (set-time-zone-rule "GMT")
 
 ;; (load-file "~/.dotfiles/emacs/private.el.gpg")
 
@@ -136,7 +136,7 @@
 (setq tab-width 2)
 (setq default-tab-width 2)
 
-(require 'org-protocol)
+;; (require 'org-protocol)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
