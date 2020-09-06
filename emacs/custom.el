@@ -142,7 +142,6 @@
 
 ;; (require 'org-protocol)
 
-
 ;; ac-cider
 ;; ack-and-a-half
 ;; alert
