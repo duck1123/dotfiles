@@ -19,6 +19,8 @@
    auto-complete
    clojure-mode
    cider
+   company-flow
+   crappy-jsp-mode
    editorconfig
    flycheck-flow
    helm
