@@ -94,6 +94,9 @@
 (nyan-mode)
 (scroll-bar-mode -1)
 
+(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+
 (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.tpl\\'" . web-mode))
@@ -104,6 +107,7 @@
 (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
 (add-to-list 'auto-mode-alist '("\\.t\\'" . perl-mode))
+(add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
 
 ;; set this in all c-based programming modes
 ;; (require 'org-gcal)
@@ -123,6 +127,8 @@
 (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
 (add-hook 'js2-mode-hook  (lambda () (hs-org/minor-mode 1)))
 (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+
+(add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
 
 (add-hook 'js2-mode-hook 'prettier-js-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)
