@@ -163,58 +163,6 @@ alias dkcp="docker-compose"
 alias rancher-hosts="rancher hosts --format json | jq -r '.Host | (.name // .hostname)' | sort"
 alias dockerlogs="cd /home/duck/projects/btcpayserver-docker/Generated &&  docker-compose -f docker-compose.generated.yml  logs -f "
 
-
-function docker-tags () {
-    docker-ls \
-      tags \
-      -registry $DOCKER_REGISTRY_PATH \
-      -allow-insecure \
-      $1 2>/dev/null | \
-      tail -n +3 | \
-      awk '{gsub("- ", "");print}'
-}
-
-function docker-digest () {
-    docker-ls \
-      tag \
-      -registry $DOCKER_REGISTRY_PATH \
-      -allow-insecure \
-      $1 2>/dev/null | \
-      awk 'FNR == 3 {gsub("digest: ", "");print}'
-}
-
-function docker-image-rm () {
-    repository=`echo "$1" | cut -d':' -f1`
-    tag=`echo "$1" | cut -d':' -f2`
-
-    docker-rm \
-      -registry $DOCKER_REGISTRY_PATH \
-      -allow-insecure \
-      $repository:`docker-digest $1`
-}
-
-function docker-repositories () {
-    docker-ls \
-      repositories \
-      --registry $DOCKER_REGISTRY_PATH \
-      -allow-insecure \
-      2>/dev/null | \
-      tail -n +2 | \
-      awk '{gsub("- ", "");print}'
-}
-
-function docker-trace () {
-    imageName="$1"
-
-    echo "Submitting trace for ${imageName}"
-
-    curl -v http://build.jiksnu.org/docker-traceability/submitContainerStatus \
-         --data-urlencode status=create \
-         --data-urlencode imageName=${imageName?} \
-         --data-urlencode hostName=$(hostname) \
-         --data-urlencode inspectData="$(docker inspect ${imageName})"
-}
-
 # alias rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src ekidd/rust-musl-builder'
 alias rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src messense/rust-musl-cross:armv7-musleabihf'
 
