@@ -7,7 +7,7 @@
 (require 'cl)
 
 (setq package-archives '(
-                         ;; ("elpa" . "http://tromey.com/elpa/")
+                         ("elpa" . "http://tromey.com/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")
@@ -86,6 +86,8 @@
 (global-set-key (kbd "C-c C-SPC")   'hs-toggle-hiding)
 (global-set-key (kbd "C-x C-c")     'save-buffers-kill-emacs)
 (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
+
+(require 'magit-lfs)
 
 (add-hook 'java-mode-hook
           (lambda ()
@@ -181,7 +183,7 @@
  '(org-gnome-integrate-with-calendar t)
  '(org-gnome-integrate-with-empathy nil)
  '(package-selected-packages
-   '(helm-ag flycheck-flow elisp-slime-nav exec-path-from-shell imenu-anywhere hl-todo gitconfig-mode easy-kill anzu ace-window zop-to-char zenburn-theme yaml-mode which-key web-mode volatile-highlights undo-tree super-save smex smartrep smartparens rainbow-mode rainbow-delimiters protobuf-mode prettier-js paredit operate-on-number nyan-mode mustache-mode move-text memoize lua-mode hideshow-org helm-projectile helm-github-stars helm-descbinds helm-cider-history helm-cider gotest go-projectile gitignore-mode flycheck-clojure flycheck-clj-kondo flow-js2-mode expand-region editorconfig dockerfile-mode discover-my-major diminish diff-hl d-mode csv-mode crux crappy-jsp-mode counsel company-go company-flow browse-kill-ring avy ack-and-a-half ac-cider))
+   '(magit-lfs groovy-mode flymake-lua company-lua markdown-mode helm-ag flycheck-flow elisp-slime-nav exec-path-from-shell imenu-anywhere hl-todo gitconfig-mode easy-kill anzu ace-window zop-to-char zenburn-theme yaml-mode which-key web-mode volatile-highlights undo-tree super-save smex smartrep smartparens rainbow-mode rainbow-delimiters protobuf-mode prettier-js paredit operate-on-number nyan-mode mustache-mode move-text memoize lua-mode hideshow-org helm-projectile helm-github-stars helm-descbinds helm-cider-history helm-cider gotest go-projectile gitignore-mode flycheck-clojure flycheck-clj-kondo flow-js2-mode expand-region editorconfig dockerfile-mode discover-my-major diminish diff-hl d-mode csv-mode crux crappy-jsp-mode counsel company-go company-flow browse-kill-ring avy ack-and-a-half ac-cider))
  '(projectile-create-missing-test-files t)
  '(projectile-enable-caching t)
  '(projectile-globally-ignored-buffers '("target"))
