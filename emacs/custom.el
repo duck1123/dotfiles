@@ -4,7 +4,7 @@
 ;;; Code:
 (setq prelude-guru nil)
 
-(require 'cl)
+;; (require 'cl)
 
 (setq package-archives '(
                          ("elpa" . "http://tromey.com/elpa/")
