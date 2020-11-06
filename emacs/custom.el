@@ -142,6 +142,9 @@
 (setq tab-width 2)
 (setq default-tab-width 2)
 
+(require 'kubernetes)
+
+
 ;; (require 'org-protocol)
 
 ;; ac-cider
