@@ -30,7 +30,6 @@
    hideshow-org
    magit
    nyan-mode
-   org
    paredit
    prettier-js
    rainbow-delimiters
