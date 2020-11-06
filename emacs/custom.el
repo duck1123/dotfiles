@@ -61,7 +61,7 @@
 ;; (require 'prelude-latex)
 ;; (require 'prelude-lisp)
 ;; (require 'prelude-ocaml)
-(require 'prelude-org) ;; Org-mode helps you keep TODO lists, notes and more
+;; (require 'prelude-org) ;; Org-mode helps you keep TODO lists, notes and more
 ;; (require 'prelude-perl)
 ;; (require 'prelude-python)
 ;; (require 'prelude-ruby)
@@ -80,9 +80,9 @@
 (global-set-key (kbd "S-C-<down>")  'shrink-window)
 (global-set-key (kbd "S-C-<up>")    'enlarge-window)
 (global-set-key (kbd "S-C-g")       'helm-github-stars)
-(global-set-key (kbd "C-c a")       'org-agenda)
-(global-set-key (kbd "C-c c")       'org-capture)
-(global-set-key (kbd "C-c l")       'org-store-link)
+;; (global-set-key (kbd "C-c a")       'org-agenda)
+;; (global-set-key (kbd "C-c c")       'org-capture)
+;; (global-set-key (kbd "C-c l")       'org-store-link)
 (global-set-key (kbd "C-c C-SPC")   'hs-toggle-hiding)
 (global-set-key (kbd "C-x C-c")     'save-buffers-kill-emacs)
 (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
@@ -175,9 +175,6 @@
  '(nxml-child-indent 2)
  '(nxml-sexp-element-flag t)
  '(nxml-slash-auto-complete-flag nil)
- '(org-agenda-files '("~/Nextcloud/org/"))
- '(org-capture-use-agenda-date t)
- '(org-datetree-add-timestamp 'active)
  '(package-selected-packages
    '(magit-lfs groovy-mode flymake-lua company-lua markdown-mode flycheck-flow elisp-slime-nav exec-path-from-shell imenu-anywhere hl-todo gitconfig-mode easy-kill anzu ace-window zop-to-char zenburn-theme yaml-mode which-key web-mode volatile-highlights undo-tree super-save smex smartrep smartparens rainbow-mode rainbow-delimiters protobuf-mode prettier-js paredit operate-on-number nyan-mode mustache-mode move-text memoize lua-mode hideshow-org helm-projectile helm-github-stars helm-descbinds helm-cider-history helm-cider gotest go-projectile gitignore-mode flycheck-clojure flycheck-clj-kondo flow-js2-mode expand-region editorconfig dockerfile-mode discover-my-major diminish diff-hl d-mode csv-mode crux crappy-jsp-mode counsel company-go company-flow browse-kill-ring avy ack-and-a-half ac-cider))
  '(projectile-create-missing-test-files t)
