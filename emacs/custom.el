@@ -115,9 +115,6 @@
 (add-to-list 'auto-mode-alist '("\\.t\\'" . perl-mode))
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
 
-;; set this in all c-based programming modes
-;; (require 'org-gcal)
-
 ;; (set-time-zone-rule "GMT")
 
 ;; (load-file "~/.dotfiles/emacs/private.el.gpg")
@@ -163,7 +160,6 @@
    '(describe describe-config it fact facts future-fact future-facts Given When Then context GET POST DELETE fn-traced))
  '(company-auto-commit t)
  '(epg-gpg-program "gpg")
- '(global-org-gnome-minor-mode t)
  '(helm-github-stars-refetch-time 0.5)
  '(helm-github-stars-username "duck1123")
  '(js-indent-level 4)
@@ -182,8 +178,6 @@
  '(org-agenda-files '("~/Nextcloud/org/"))
  '(org-capture-use-agenda-date t)
  '(org-datetree-add-timestamp 'active)
- '(org-gnome-integrate-with-calendar t)
- '(org-gnome-integrate-with-empathy nil)
  '(package-selected-packages
    '(magit-lfs groovy-mode flymake-lua company-lua markdown-mode flycheck-flow elisp-slime-nav exec-path-from-shell imenu-anywhere hl-todo gitconfig-mode easy-kill anzu ace-window zop-to-char zenburn-theme yaml-mode which-key web-mode volatile-highlights undo-tree super-save smex smartrep smartparens rainbow-mode rainbow-delimiters protobuf-mode prettier-js paredit operate-on-number nyan-mode mustache-mode move-text memoize lua-mode hideshow-org helm-projectile helm-github-stars helm-descbinds helm-cider-history helm-cider gotest go-projectile gitignore-mode flycheck-clojure flycheck-clj-kondo flow-js2-mode expand-region editorconfig dockerfile-mode discover-my-major diminish diff-hl d-mode csv-mode crux crappy-jsp-mode counsel company-go company-flow browse-kill-ring avy ack-and-a-half ac-cider))
  '(projectile-create-missing-test-files t)
