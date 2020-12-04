@@ -3,8 +3,6 @@
 # Make sure that emacs doesn't hang
 [[ $TERM == "dumb" ]] && unsetopt zle && PS1='$ ' && return
 
-# source ~/.dotenv.sh
-
 # Path to your oh-my-zsh installation.
 export ZSH=~/.dotfiles
 export ZSHDOTFILES=~/.dotfiles-old
@@ -66,7 +64,6 @@ plugins=(
     dircycle
     docker-compose
     docker
-
     git
     git-extras
     go
@@ -122,12 +119,6 @@ if [[ -n $SSH_CONNECTION ]]; then
 else
   export EDITOR='emacsclient'
 fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
 
 # Set personal aliases, overriding those provided by oh-my-zsh libs,
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
@@ -195,3 +186,11 @@ bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode che
 source <(doctl completion zsh)
 source <(helm completion zsh)
 # source <(k3d completion zsh)
+
+PATH="/home/duck/perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="/home/duck/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="/home/duck/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"/home/duck/perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=/home/duck/perl5"; export PERL_MM_OPT;
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
