@@ -195,3 +195,23 @@ PERL_MM_OPT="INSTALL_BASE=/home/duck/perl5"; export PERL_MM_OPT;
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 export PATH=$HOME/.huber/bin:$PATH
+export PATH="$HOME/.radicle/bin:$PATH"
+
+# # >>> conda initialize >>>
+# # !! Contents within this block are managed by 'conda init' !!
+# __conda_setup="$('/home/duck/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
+# if [ $? -eq 0 ]; then
+#   eval "$__conda_setup"
+# else
+#   if [ -f "/home/duck/anaconda3/etc/profile.d/conda.sh" ]; then
+#     . "/home/duck/anaconda3/etc/profile.d/conda.sh"
+#   else
+#     export PATH="/home/duck/anaconda3/bin:$PATH"
+#   fi
+# fi
+# unset __conda_setup
+# # <<< conda initialize <<<
+
+# add Pulumi to the PATH
+export PATH=$PATH:$HOME/.pulumi/bin
+if [ -e /home/duck/.nix-profile/etc/profile.d/nix.sh ]; then . /home/duck/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
