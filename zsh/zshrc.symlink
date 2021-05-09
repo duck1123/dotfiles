@@ -216,3 +216,9 @@ export PATH="$HOME/.radicle/bin:$PATH"
 # add Pulumi to the PATH
 export PATH=$PATH:$HOME/.pulumi/bin
 if [ -e /home/duck/.nix-profile/etc/profile.d/nix.sh ]; then . /home/duck/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
+source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
+
+eval "$(direnv hook zsh)"
+
+autoload -Uz compinit && compinit -i
