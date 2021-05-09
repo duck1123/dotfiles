@@ -117,6 +117,7 @@
 (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
 (add-to-list 'auto-mode-alist '("\\.t\\'" . perl-mode))
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\Earthfile\\'" . dockerfile-mode))
 
 ;; (set-time-zone-rule "GMT")
 
