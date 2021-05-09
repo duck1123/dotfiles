@@ -97,6 +97,7 @@ PROJECT_PATHS=(~/projects
 fpath=(
     $fpath
     ~/.dotfiles-old/zsh/rancher-zsh-completion/
+    ~/projects/bb-task-completion/
     ~/projects/lncli-completion/
     ~/.dotfiles/custom/plugins/keybase/
     ~/.zsh/completions/
