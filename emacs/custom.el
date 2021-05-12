@@ -6,38 +6,30 @@
 
 ;; (require 'cl)
 
-(setq package-archives '(
-                         ("elpa" . "http://tromey.com/elpa/")
-                         ("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "http://marmalade-repo.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")
-                         ))
+(setq package-archives
+      '(("gnu" . "http://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")))
 
 (prelude-require-packages
  '(
-   auto-complete
+   ;; auto-complete
    clojure-mode
    cider
-   company-flow
+   ;; company-flow
    crappy-jsp-mode
    editorconfig
    flycheck-clj-kondo
-   flycheck-flow
+   ;; flycheck-flow
    helm
-   helm-github-stars
+   ;; helm-github-stars
    helm-projectile
-   hideshow-org
+   ;; hideshow-org
    magit
    nyan-mode
    paredit
-   prettier-js
-   rainbow-delimiters
+   ;; prettier-js
+   ;; rainbow-delimiters
    ))
-
-(add-to-list 'load-path "~/.emacs.d/personal/ag-and-a-half")
-(require 'ag-and-a-half)
-(defalias 'ag 'ag-and-a-half)
 
 ;; Emacs IRC client
 ;; (require 'prelude-erc)
@@ -76,19 +68,23 @@
 (require 'prelude-xml)
 (require 'prelude-yaml)
 
-(global-set-key (kbd "<mouse-6>")   'next-buffer)
-(global-set-key (kbd "<mouse-7>")   'prev-buffer)
-(global-set-key (kbd "S-C-<left>")  'shrink-window-horizontally)
-(global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
-(global-set-key (kbd "S-C-<down>")  'shrink-window)
-(global-set-key (kbd "S-C-<up>")    'enlarge-window)
+;; (global-set-key (kbd "<mouse-6>")   'next-buffer)
+;; (global-set-key (kbd "<mouse-7>")   'prev-buffer)
+;; (global-set-key (kbd "S-C-<left>")  'shrink-window-horizontally)
+;; (global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
+;; (global-set-key (kbd "S-C-<down>")  'shrink-window)
+;; (global-set-key (kbd "S-C-<up>")    'enlarge-window)
 (global-set-key (kbd "S-C-g")       'helm-github-stars)
 ;; (global-set-key (kbd "C-c a")       'org-agenda)
 ;; (global-set-key (kbd "C-c c")       'org-capture)
 ;; (global-set-key (kbd "C-c l")       'org-store-link)
-(global-set-key (kbd "C-c C-SPC")   'hs-toggle-hiding)
-(global-set-key (kbd "C-x C-c")     'save-buffers-kill-emacs)
+;; (global-set-key (kbd "C-c C-SPC")   'hs-toggle-hiding)
+;; (global-set-key (kbd "C-x C-c")     'save-buffers-kill-emacs)
 (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
+
+(add-to-list 'load-path "~/.emacs.d/personal/ag-and-a-half")
+(require 'ag-and-a-half)
+(defalias 'ag 'ag-and-a-half)
 
 (require 'magit-lfs)
 
@@ -106,16 +102,16 @@
 (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
   (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
 
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.tpl\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+;; (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
-(add-to-list 'auto-mode-alist '("\\.t\\'" . perl-mode))
+;; (add-to-list 'auto-mode-alist '("\\.t\\'" . perl-mode))
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\Earthfile\\'" . dockerfile-mode))
 
@@ -124,26 +120,25 @@
 ;; (load-file "~/.dotfiles/emacs/private.el.gpg")
 
 (require 'hideshow-org)
-(require 'flycheck-flow)
+;; (require 'flycheck-flow)
 
-(add-hook 'clojure-mode-hook #'subword-mode)
-(add-hook 'clojure-mode-hook #'paredit-mode)
-(add-hook 'clojure-mode-hook  (lambda () (hs-org/minor-mode 1)))
-(add-hook 'php-mode-hook      (lambda () (hs-org/minor-mode 1)))
-(add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
-(add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
-(add-hook 'js2-mode-hook  (lambda () (hs-org/minor-mode 1)))
-(add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+;; (add-hook 'clojure-mode-hook #'subword-mode)
+;; (add-hook 'clojure-mode-hook #'paredit-mode)
+;; (add-hook 'clojure-mode-hook  (lambda () (hs-org/minor-mode 1)))
+;; (add-hook 'php-mode-hook      (lambda () (hs-org/minor-mode 1)))
+;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
+;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
+;; (add-hook 'js2-mode-hook  (lambda () (hs-org/minor-mode 1)))
+;; (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
 
 (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
+;; (add-hook 'js2-mode-hook 'prettier-js-mode)
+;; (add-hook 'web-mode-hook 'prettier-js-mode)
 
-(add-hook 'js2-mode-hook 'prettier-js-mode)
-(add-hook 'web-mode-hook 'prettier-js-mode)
+;; (setq tab-width 2)
+;; (setq default-tab-width 2)
 
-(setq tab-width 2)
-(setq default-tab-width 2)
-
-(require 'kubernetes)
+;; (require 'kubernetes)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -164,11 +159,13 @@
    '(describe describe-config it fact facts future-fact future-facts Given When Then context GET POST DELETE fn-traced))
  '(company-auto-commit t)
  '(epg-gpg-program "gpg")
+ '(flycheck-disabled-checkers '(javascript-jshint))
  '(helm-github-stars-refetch-time 0.5)
  '(helm-github-stars-username "duck1123")
  '(js-indent-level 4)
  '(js-switch-indent-offset 2)
  '(js2-indent-switch-body t)
+ '(js2-mode-assume-strict t)
  '(js2-mode-indent-ignore-first-tab t)
  '(magit-commit-arguments '("--verbose" "--gpg-sign=80E3B47F0495EF7E"))
  '(magit-diff-arguments '("--ignore-space-change" "--no-ext-diff" "--stat"))
@@ -180,15 +177,35 @@
  '(nxml-sexp-element-flag t)
  '(nxml-slash-auto-complete-flag nil)
  '(package-selected-packages
-   '(rjsx-mode css-mode helm-ack ack flow-minor-mode magit-lfs groovy-mode flymake-lua company-lua markdown-mode flycheck-flow elisp-slime-nav exec-path-from-shell imenu-anywhere hl-todo gitconfig-mode easy-kill anzu ace-window zop-to-char zenburn-theme yaml-mode which-key web-mode volatile-highlights undo-tree super-save smex smartrep smartparens rainbow-mode rainbow-delimiters protobuf-mode prettier-js paredit operate-on-number nyan-mode mustache-mode move-text memoize lua-mode hideshow-org helm-projectile helm-github-stars helm-descbinds helm-cider-history helm-cider gotest go-projectile gitignore-mode flycheck-clojure flycheck-clj-kondo flow-js2-mode expand-region editorconfig dockerfile-mode discover-my-major diminish diff-hl d-mode csv-mode crux crappy-jsp-mode counsel company-go company-flow browse-kill-ring avy ack-and-a-half ac-cider))
- '(projectile-create-missing-test-files t)
+   '(lsp-ui a async auto-complete company dash flycheck git-commit helm helm-core ht ivy js2-mode lsp-docker lsp-mode magit popup projectile reformatter swiper transient with-editor rjsx-mode css-mode helm-ack ack flow-minor-mode magit-lfs groovy-mode flymake-lua company-lua markdown-mode flycheck-flow elisp-slime-nav exec-path-from-shell imenu-anywhere hl-todo gitconfig-mode easy-kill anzu ace-window zop-to-char zenburn-theme yaml-mode which-key web-mode volatile-highlights undo-tree super-save smex smartrep smartparens rainbow-mode rainbow-delimiters protobuf-mode prettier-js paredit operate-on-number nyan-mode mustache-mode move-text memoize lua-mode hideshow-org helm-projectile helm-github-stars helm-descbinds helm-cider-history helm-cider gotest go-projectile gitignore-mode flycheck-clojure flycheck-clj-kondo flow-js2-mode expand-region editorconfig dockerfile-mode discover-my-major diminish diff-hl d-mode csv-mode crux crappy-jsp-mode counsel company-go company-flow browse-kill-ring avy ack-and-a-half ac-cider))
  '(projectile-enable-caching t)
  '(projectile-globally-ignored-buffers '("target"))
  '(projectile-globally-ignored-directories
    '(".idea" ".eunit" ".git" ".hg" ".fslckout" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "vendor" "node_modules" "target" "build" "View"))
  '(projectile-tags-command "ctags-exuberant -Re -f \"%s\" %s")
  '(safe-local-variable-values
-   '((clojure-align-forms-automatically t)
+   '((eval progn
+           (define-clojure-indent
+             (>defn 1)
+             (a 1)
+             (behavior 1)
+             (button 1)
+             (div 1)
+             (footer 1)
+             (form 1)
+             (h2 1)
+             (input 1)
+             (nav 1)
+             (select 1)
+             (specification 1)
+             (table 1)
+             (tbody 1)
+             (thead 1)
+             (tr 1)
+             (ui-form 1)
+             (ui-form-field 1)
+             (ui-modal-content 1)))
+     (clojure-align-forms-automatically t)
      (eval progn
            (define-clojure-indent
              (>defn 1)
