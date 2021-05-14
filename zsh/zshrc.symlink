@@ -14,75 +14,36 @@ export ZSHDOTFILES=~/.dotfiles-old
 # ZSH_THEME="random"
 ZSH_THEME="jonathan"
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion. Case
-# sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 HIST_STAMPS="yyyy-mm-dd"
 
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
 plugins=(
     bgnotify
     colorize
     command-not-found
     compleat
-    dircycle
+    # dircycle
     docker-compose
     docker
+    # doctl
     git
     git-extras
-    go
-    golang
-    gradle
-    gulp
+    # go
+    # golang
+    # gradle
+    # gulp
     history
-    httpie
-    k3d
-    keybase
+    # httpie
+    # k3d
+    # keybase
     kubectl
-    lein
-    mvn
+    # lein
+    # mvn
     nmap
     node
-    nvm
+    # nvm
     npm
     pj
-    redis-cli
+    # redis-cli
     sudo
     systemd
     zsh_reload)
@@ -103,34 +64,13 @@ fpath=(
     ~/.zsh/completions/
 )
 
-export PATH="$HOME/.dotfiles-old/bin:$PATH"
-export PATH="$HOME/.local/bin:$PATH"
 # export PATH="$HOME/anaconda3/bin:$PATH"
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='emacsclient'
-else
-  export EDITOR='emacsclient'
-fi
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# your project folder that we can `c [tab]` to
+export PATH="$HOME/.dotfiles-old/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 export PROJECTS=~/projects
 
 # Stash your environment variables in ~/.localrc. This means they'll stay out
@@ -147,17 +87,22 @@ fpath=($ZSHDOTFILES/functions $fpath)
 
 alias reload!='. ~/.zshrc'
 alias psgrep='ps -ef | grep -v grep | grep '
-alias e='emacsclient -t'
-alias ec='emacsclient -c'
-alias vim='emacsclient -t'
-alias vi='emacsclient -t'
-alias v="vagrant"
+# alias e='emacsclient -t'
+# alias ec='emacsclient -c'
+# alias vim='emacsclient -t'
+# alias vi='emacsclient -t'
+# alias v="vagrant"
 alias dkcp="docker-compose"
-alias rancher-hosts="rancher hosts --format json | jq -r '.Host | (.name // .hostname)' | sort"
-alias dockerlogs="cd /home/duck/projects/btcpayserver-docker/Generated &&  docker-compose -f docker-compose.generated.yml  logs -f "
+# alias rancher-hosts="rancher hosts --format json | jq -r '.Host | (.name // .hostname)' | sort"
+# alias dockerlogs="cd /home/duck/projects/btcpayserver-docker/Generated &&  docker-compose -f docker-compose.generated.yml  logs -f "
 
 # alias rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src ekidd/rust-musl-builder'
-alias rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src messense/rust-musl-cross:armv7-musleabihf'
+# alias rust-musl-builder='docker run --rm -it -v "$(pwd)":/home/rust/src messense/rust-musl-cross:armv7-musleabihf'
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+# export PATH="$HOME/.huber/bin:$PATH"
+
+# echo "loading config"
 
 ###-begin-cmd-completions-###
 #
@@ -185,40 +130,15 @@ export HSTR_CONFIG=hicolor       # get more colors
 bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
 
 source <(doctl completion zsh)
-source <(helm completion zsh)
-# source <(k3d completion zsh)
+# source <(helm completion zsh)
+source <(k3d completion zsh)
+source <(direnv hook zsh)
+# eval "$(direnv hook zsh)"
 
-PATH="/home/duck/perl5/bin${PATH:+:${PATH}}"; export PATH;
-PERL5LIB="/home/duck/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
-PERL_LOCAL_LIB_ROOT="/home/duck/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
-PERL_MB_OPT="--install_base \"/home/duck/perl5\""; export PERL_MB_OPT;
-PERL_MM_OPT="INSTALL_BASE=/home/duck/perl5"; export PERL_MM_OPT;
-
-export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-export PATH=$HOME/.huber/bin:$PATH
-export PATH="$HOME/.radicle/bin:$PATH"
-
-# # >>> conda initialize >>>
-# # !! Contents within this block are managed by 'conda init' !!
-# __conda_setup="$('/home/duck/anaconda3/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
-# if [ $? -eq 0 ]; then
-#   eval "$__conda_setup"
-# else
-#   if [ -f "/home/duck/anaconda3/etc/profile.d/conda.sh" ]; then
-#     . "/home/duck/anaconda3/etc/profile.d/conda.sh"
-#   else
-#     export PATH="/home/duck/anaconda3/bin:$PATH"
-#   fi
-# fi
-# unset __conda_setup
-# # <<< conda initialize <<<
-
-# add Pulumi to the PATH
-export PATH=$PATH:$HOME/.pulumi/bin
 if [ -e /home/duck/.nix-profile/etc/profile.d/nix.sh ]; then . /home/duck/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
-source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
-
-eval "$(direnv hook zsh)"
+# source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
 
 autoload -Uz compinit && compinit -i
+
+# echo "loaded config"
