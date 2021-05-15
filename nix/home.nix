@@ -36,6 +36,11 @@ in
     # ];
   };
 
+  programs.direnv = {
+    enable = true;
+
+  };
+
   programs.git = {
     enable = true;
     userName = "Duck Nebuchadnezzar";
@@ -48,7 +53,10 @@ in
 
   programs.zsh = {
     enable = true;
-    history.extended = true;
+    defaultKeymap = "emacs";
+    history = {
+      extended = true;
+    };
 
     oh-my-zsh = {
       enable = true;
@@ -74,9 +82,46 @@ in
       ];
     };
 
+    plugins = [
+      # {
+      #   name = "bb-task-completion";
+      #   src = "~/projects/bb-task-completion";
+      # }
+      {
+        name = "bb-task-completion";
+        src = pkgs.fetchFromGitHub {
+          owner = "duck1123";
+          repo = "bb-task-completion";
+          rev = "0.0.1";
+          sha256 = "04gvnd0kngy057ia1w9s52yjbkb8vnpv811p7cqfsqpac9ici19b";
+        };
+      }
+    ];
 
-    sessionVariables = {
-      PROJECT_PATHS = [ "~/projects" ];
+    initExtra = ''
+        if [ -e /home/duck/.nix-profile/etc/profile.d/nix.sh ]; then
+            . /home/duck/.nix-profile/etc/profile.d/nix.sh;
+        fi # added by Nix installer
+        export PATH="~/.yarn/bin:~/.config/yarn/global/node_modules/.bin:$PATH"
+        export PATH="~/.huber/bin:$PATH"
+
+        # export HSTR_CONFIG=hicolor       # get more colors
+        bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
+        source <(doctl completion zsh)
+        source <(k3d completion zsh)
+    '';
+
+    # initExtraFirst = ''
+    #     echo a
+    #     echo b
+    # '';
+
+    localVariables = {
+      PROJECT_PATHS = [ ~/projects ];
+      # fpath = [
+      #   \$fpath
+      #   "~/projects/bb-task-completion/"
+      # ];
     };
 
     shellAliases = {
