@@ -182,12 +182,13 @@ in
     ];
 
     initExtra = ''
-        if [ -e /home/duck/.nix-profile/etc/profile.d/nix.sh ]; then
-            . /home/duck/.nix-profile/etc/profile.d/nix.sh;
+        if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
+            . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
         fi # added by Nix installer
-        export PATH="~/.yarn/bin:$PATH"
-        export PATH="~/.config/yarn/global/node_modules/.bin:$PATH"
-        export PATH="~/.huber/bin:$PATH"
+        export PATH="/home/${username}/.local/bin:$PATH"
+        export PATH="/home/${username}/.yarn/bin:$PATH"
+        export PATH="/home/${username}/.config/yarn/global/node_modules/.bin:$PATH"
+        export PATH="/home/${username}/.huber/bin:$PATH"
 
         bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
         source <(doctl completion zsh)
