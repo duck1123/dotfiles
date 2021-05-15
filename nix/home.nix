@@ -29,7 +29,6 @@ in
       nixfmt
       tdesktop
     ];
-
     # sessionPath = [
     #   "~/.dotnet/tools"
     #   "~/.cargo/bin"
@@ -42,10 +41,18 @@ in
     # ];
   };
 
+  # home.file.".emacs/init.el".text = ''
+  #   (load "default.el")
+  # '';
+
   programs.direnv = {
     enable = true;
 
   };
+
+  # programs.emacs = {
+  #   enable = true;
+  # };
 
   programs.git = {
     enable = true;
