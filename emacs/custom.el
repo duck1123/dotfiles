@@ -128,6 +128,7 @@
  '(projectile-globally-ignored-buffers '("target"))
  '(projectile-globally-ignored-directories
    '(".idea" ".eunit" ".git" ".hg" ".fslckout" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "vendor" "node_modules" "target" "build" "View"))
+ '(safe-local-variable-values '((cider-default-cljs-repl . shadow)))
  '(sh-basic-offset 2)
  '(smartparens-global-strict-mode t)
  '(whitespace-line-column 120))
