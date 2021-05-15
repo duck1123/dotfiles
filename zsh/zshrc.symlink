@@ -68,6 +68,10 @@ fpath=(
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
+if [ -e /home/duck/.nix-profile/etc/profile.d/nix.sh ]; then . /home/duck/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
+# source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
+
 source $ZSH/oh-my-zsh.sh
 export PATH="$HOME/.dotfiles-old/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
@@ -134,10 +138,6 @@ source <(doctl completion zsh)
 source <(k3d completion zsh)
 source <(direnv hook zsh)
 # eval "$(direnv hook zsh)"
-
-if [ -e /home/duck/.nix-profile/etc/profile.d/nix.sh ]; then . /home/duck/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
-
-# source $HOME/.nix-profile/etc/profile.d/hm-session-vars.sh
 
 autoload -Uz compinit && compinit -i
 
