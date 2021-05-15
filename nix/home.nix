@@ -20,14 +20,22 @@ in
     packages = with pkgs; [
       bat
       curl
-      fish
       emacs
+      fish
+      git
+      gnumake
       helm
       hstr
+      htop
+
+      # i3
       keepassxc
       kubectl
       nixfmt
+      slack
+      steam
       tdesktop
+      tree
     ];
     # sessionPath = [
     #   "~/.dotnet/tools"
@@ -52,6 +60,15 @@ in
 
   # programs.emacs = {
   #   enable = true;
+  # };
+
+  # programs.i3status = {
+  #   enable = true;
+  # };
+
+  # programs.jq = {
+  #   enable = true;
+  #   colors = true;
   # };
 
   programs.git = {
@@ -209,6 +226,19 @@ in
       hh = "hstr";
       psgrep = "ps -ef | grep -v grep | grep ";
       "reload!" = "home-manager switch && . ~/.zshrc";
+    };
+  };
+
+  xsession = {
+    windowManager = {
+      i3 = {
+        enable = true;
+        config = {
+          gaps = {
+            smartGaps = true;
+          };
+        };
+      };
     };
   };
 }
