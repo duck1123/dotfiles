@@ -33,9 +33,10 @@ in
       kubectl
       nixfmt
       slack
-      steam
+      # steam
       tdesktop
       tree
+      virtualbox
     ];
     # sessionPath = [
     #   "~/.dotnet/tools"
@@ -62,9 +63,9 @@ in
   #   enable = true;
   # };
 
-  # programs.i3status = {
-  #   enable = true;
-  # };
+  programs.i3status-rust = {
+    enable = true;
+  };
 
   # programs.jq = {
   #   enable = true;
@@ -75,10 +76,11 @@ in
     enable = true;
     userName = "${name}";
     userEmail = "${email}";
-    # signing = {
-    #   signByDefault = true;
-    #   key = "";
-    # };
+    lfs.enable = true;
+    signing = {
+      signByDefault = true;
+      key = "80E3B47F0495EF7E";
+    };
   };
 
   programs.ncmpcpp = {
@@ -229,15 +231,48 @@ in
     };
   };
 
-  xsession = {
-    windowManager = {
-      i3 = {
-        enable = true;
-        config = {
-          gaps = {
-            smartGaps = true;
-          };
-        };
+  services = {
+    # gnome3.gnome-keyring.enable = true;
+
+    # dbus = {
+    #   enable = true;
+    #   socketActivated = true;
+    #   packages = [ pkgs.gnome3.dconf ];
+    # };
+
+    polybar = {
+      enable = true;
+      config = ./polybar-config;
+      script = ''
+      for m in $(polybar --list-monitors | ${pkgs.coreutils}/bin/cut -d":" -f1); do
+        MONITOR=$m polybar nord &
+      done
+    '';
+    };
+  };
+
+  xsession.windowManager.i3 = {
+    enable = true;
+    config = {
+      bars = [];
+      # bars = [{
+      #   statusCommand = "i3bar";
+      # }];
+      gaps = {
+        inner = 12;
+        outer = 5;
+        smartBorders = "off";
+        smartGaps = true;
+      };
+
+      modifier = "Mod4";
+
+      startup = [
+        { command = "systemctl --user restart polybar"; always = true; notification = false; }
+      ];
+
+      window = {
+        hideEdgeBorders = "smart";
       };
     };
   };

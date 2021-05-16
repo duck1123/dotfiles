@@ -74,11 +74,15 @@
 
 ;; (add-hook 'clojure-mode-hook #'subword-mode)
 ;; (add-hook 'clojure-mode-hook #'paredit-mode)
-;; (add-hook 'clojure-mode-hook  (lambda () (hs-org/minor-mode 1)))
-;; (add-hook 'php-mode-hook      (lambda () (hs-org/minor-mode 1)))
+
+(add-hook 'clojure-mode-hook (lambda () (hs-org/minor-mode 1)))
+(add-hook 'php-mode-hook     (lambda () (hs-org/minor-mode 1)))
+(add-hook 'js2-mode-hook     (lambda () (hs-org/minor-mode 1)))
+(add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1)))
+
+
 ;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
 ;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
-;; (add-hook 'js2-mode-hook  (lambda () (hs-org/minor-mode 1)))
 ;; (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
 
 (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
