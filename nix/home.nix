@@ -20,6 +20,7 @@ in
     packages = with pkgs; [
       bat
       curl
+      dunst
       emacs
       fish
       git
@@ -87,6 +88,11 @@ in
     };
   };
 
+  programs.rofi = {
+    enable = true;
+    terminal = "${pkgs.alacritty}/bin/alacritty";
+    # theme = ./theme.rafi;
+  };
 
   programs.tmux = {
     enable = true;
@@ -186,6 +192,29 @@ in
     #   packages = [ pkgs.gnome3.dconf ];
     # };
 
+    dunst = {
+      enable = true;
+      iconTheme = {
+        name = "Adwaita";
+        package = pkgs.gnome3.adwaita-icon-theme;
+        size = "16x16";
+      };
+
+      settings = {
+        global = {
+          monitor = 0;
+          geometry = "600x50-50+65";
+          shrink = "yes";
+          transparency = 10;
+          padding = 16;
+          horizontal_padding = 16;
+          font = "JetBrainsMono Nerd Font 10";
+          line_height = 4;
+          format = ''<b>%s</b>\n%b'';
+        };
+      };
+    };
+
     polybar = {
       enable = true;
       config = ./polybar-config;
@@ -215,6 +244,7 @@ in
 
       startup = [
         { command = "systemctl --user restart polybar"; always = true; notification = false; }
+        { command = "systemctl --user start dunst.service"; always = true; notification = false; }
       ];
 
       window = {
