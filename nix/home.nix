@@ -18,6 +18,7 @@ in
     homeDirectory = "/home/${username}";
 
     packages = with pkgs; [
+      babashka
       bat
       curl
       dunst
@@ -25,7 +26,7 @@ in
       fish
       git
       gnumake
-      helm
+      # helm
       hstr
       htop
 
@@ -72,10 +73,10 @@ in
     enable = true;
   };
 
-  # programs.jq = {
-  #   enable = true;
-  #   colors = true;
-  # };
+  programs.jq = {
+    enable = true;
+    # colors = true;
+  };
 
   programs.git = {
     enable = true;
