@@ -161,6 +161,7 @@ in
         export PATH="/home/${username}/.local/bin:$PATH"
         export PATH="/home/${username}/.yarn/bin:$PATH"
         export PATH="/home/${username}/.config/yarn/global/node_modules/.bin:$PATH"
+        export PATH="/home/${username}/.pulumi/bin:$PATH"
         export PATH="/home/${username}/.huber/bin:$PATH"
 
         bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
