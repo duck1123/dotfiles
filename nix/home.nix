@@ -174,6 +174,7 @@ in
     };
 
     sessionVariables = {
+      EDITOR = "emacsclient -ct";
       HSTR_CONFIG = "hicolor";
     };
 
