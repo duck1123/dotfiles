@@ -34,6 +34,7 @@ in
       keepassxc
       kubectl
       nixfmt
+      nixUnstable
       slack
       # steam
       tdesktop
@@ -226,6 +227,10 @@ in
     '';
     };
   };
+
+  xdg.configFile."nix/nix.conf".text = ''
+    experimental-features = nix-command flakes
+  '';
 
   xsession.windowManager.i3 = {
     enable = true;
