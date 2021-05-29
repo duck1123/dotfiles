@@ -1,0 +1,8 @@
+{:tasks
+ {
+  foo
+  {:task (shell "echo bar")}
+
+  stop-k3d
+  {:task (shell "k3d cluster stop")}}
+ }

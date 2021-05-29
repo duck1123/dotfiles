@@ -5,8 +5,7 @@ let
   username = "duck";
   email = "duck@kronkltd.net";
   gpgKey = "80E3B47F0495EF7E";
-in
-{
+in {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 
@@ -31,7 +30,6 @@ in
       # helm
       hstr
       htop
-
       # i3
       keepassxc
       kubectl
@@ -54,18 +52,11 @@ in
     #   "~/.yarn/bin"
     # ];
 
-    file.".bb/bb.edn".text = ''
-      {:tasks
-       {foo
-        {:task (shell "echo bar")}
-        stop-k3d
-        {:task (shell "k3d cluster stop")}}}
-    '';
   };
 
-  imports = [
-    ./programs/ncmpcpp/default.nix
-  ];
+  imports = [ ./programs/i3/default.nix ./programs/ncmpcpp/default.nix ];
+
+  home.file.".bb/bb.edn".source = ./bb.edn;
 
   # home.file.".emacs/init.el".text = ''
   #   (load "default.el")
@@ -79,10 +70,6 @@ in
   # programs.emacs = {
   #   enable = true;
   # };
-
-  programs.i3status-rust = {
-    enable = true;
-  };
 
   programs.jq = {
     enable = true;
@@ -100,22 +87,14 @@ in
     };
   };
 
-  programs.rofi = {
-    enable = true;
-    terminal = "${pkgs.alacritty}/bin/alacritty";
-    # theme = ./theme.rafi;
-  };
-
-  programs.tmux = {
-    enable = true;
-  };
+  programs.tmux = { enable = true; };
 
   programs.vim = {
     enable = true;
     extraConfig = ''
-        syntax on
-        " Wrap gitcommit file types at the appropriate length
-        filetype indent plugin on
+      syntax on
+      " Wrap gitcommit file types at the appropriate length
+      filetype indent plugin on
     '';
   };
 
@@ -124,9 +103,7 @@ in
     enableAutosuggestions = true;
     defaultKeymap = "emacs";
 
-    history = {
-      extended = true;
-    };
+    history = { extended = true; };
 
     oh-my-zsh = {
       enable = true;
@@ -152,36 +129,32 @@ in
       ];
     };
 
-    plugins = [
-      {
-        name = "bb-task-completion";
-        src = pkgs.fetchFromGitHub {
-          owner = "duck1123";
-          repo = "bb-task-completion";
-          rev = "0.0.1";
-          sha256 = "04gvnd0kngy057ia1w9s52yjbkb8vnpv811p7cqfsqpac9ici19b";
-        };
-      }
-    ];
+    plugins = [{
+      name = "bb-task-completion";
+      src = pkgs.fetchFromGitHub {
+        owner = "duck1123";
+        repo = "bb-task-completion";
+        rev = "0.0.1";
+        sha256 = "04gvnd0kngy057ia1w9s52yjbkb8vnpv811p7cqfsqpac9ici19b";
+      };
+    }];
 
     initExtra = ''
-        if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
-            . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
-        fi # added by Nix installer
-        export PATH="/home/${username}/.local/bin:$PATH"
-        export PATH="/home/${username}/.yarn/bin:$PATH"
-        export PATH="/home/${username}/.config/yarn/global/node_modules/.bin:$PATH"
-        export PATH="/home/${username}/.pulumi/bin:$PATH"
-        export PATH="/home/${username}/.huber/bin:$PATH"
+      if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
+          . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
+      fi # added by Nix installer
+      export PATH="/home/${username}/.local/bin:$PATH"
+      export PATH="/home/${username}/.yarn/bin:$PATH"
+      export PATH="/home/${username}/.config/yarn/global/node_modules/.bin:$PATH"
+      export PATH="/home/${username}/.pulumi/bin:$PATH"
+      export PATH="/home/${username}/.huber/bin:$PATH"
 
-        bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
-        source <(doctl completion zsh)
-        source <(k3d completion zsh)
+      bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
+      source <(doctl completion zsh)
+      source <(k3d completion zsh)
     '';
 
-    localVariables = {
-      PROJECT_PATHS = [ ~/projects ];
-    };
+    localVariables = { PROJECT_PATHS = [ ~/projects ]; };
 
     sessionVariables = {
       EDITOR = "emacsclient -ct";
@@ -206,69 +179,9 @@ in
     #   socketActivated = true;
     #   packages = [ pkgs.gnome3.dconf ];
     # };
-
-    dunst = {
-      enable = true;
-      iconTheme = {
-        name = "Adwaita";
-        package = pkgs.gnome3.adwaita-icon-theme;
-        size = "16x16";
-      };
-
-      settings = {
-        global = {
-          monitor = 0;
-          geometry = "600x50-50+65";
-          shrink = "yes";
-          transparency = 10;
-          padding = 16;
-          horizontal_padding = 16;
-          font = "JetBrainsMono Nerd Font 10";
-          line_height = 4;
-          format = ''<b>%s</b>\n%b'';
-        };
-      };
-    };
-
-    polybar = {
-      enable = true;
-      config = ./polybar-config;
-      script = ''
-      for m in $(polybar --list-monitors | ${pkgs.coreutils}/bin/cut -d":" -f1); do
-        MONITOR=$m polybar nord &
-      done
-    '';
-    };
   };
 
   xdg.configFile."nix/nix.conf".text = ''
     experimental-features = nix-command flakes
   '';
-
-  xsession.windowManager.i3 = {
-    enable = true;
-    config = {
-      bars = [];
-      # bars = [{
-      #   statusCommand = "i3bar";
-      # }];
-      gaps = {
-        inner = 12;
-        outer = 5;
-        smartBorders = "off";
-        smartGaps = true;
-      };
-
-      modifier = "Mod4";
-
-      startup = [
-        { command = "systemctl --user restart polybar"; always = true; notification = false; }
-        { command = "systemctl --user start dunst.service"; always = true; notification = false; }
-      ];
-
-      window = {
-        hideEdgeBorders = "smart";
-      };
-    };
-  };
 }
