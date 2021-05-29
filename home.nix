@@ -54,22 +54,18 @@ in {
 
   };
 
-  imports = [ ./programs/i3/default.nix ./programs/ncmpcpp/default.nix ];
+  imports = [
+    ./programs/emacs/default.nix
+    ./programs/i3/default.nix
+    ./programs/ncmpcpp/default.nix
+  ];
 
   home.file.".bb/bb.edn".source = ./bb.edn;
-
-  # home.file.".emacs/init.el".text = ''
-  #   (load "default.el")
-  # '';
 
   programs.direnv = {
     enable = true;
 
   };
-
-  # programs.emacs = {
-  #   enable = true;
-  # };
 
   programs.jq = {
     enable = true;
