@@ -27,29 +27,6 @@ fail () {
   exit
 }
 
-setup_gitconfig () {
-  if ! [ -f git/gitconfig.symlink ]
-  then
-    info 'setup gitconfig'
-
-    git_credential='cache'
-    if [ "$(uname -s)" == "Darwin" ]
-    then
-      git_credential='osxkeychain'
-    fi
-
-    user ' - What is your github author name?'
-    read -e git_authorname
-    user ' - What is your github author email?'
-    read -e git_authoremail
-
-    sed -e "s/AUTHORNAME/$git_authorname/g" -e "s/AUTHOREMAIL/$git_authoremail/g" -e "s/GIT_CREDENTIAL_HELPER/$git_credential/g" git/gitconfig.symlink.example > git/gitconfig.symlink
-
-    success 'gitconfig'
-  fi
-}
-
-
 link_file () {
   local src=$1 dst=$2
 
@@ -140,27 +117,10 @@ install_dotfiles () {
 # setup_gitconfig
 install_dotfiles
 
-if ! [ -d $HOME/.dotfiles ]
-then
-  git clone https://github.com/robbyrussell/oh-my-zsh.git $HOME/.dotfiles
-fi
-
 export PRELUDE_INSTALL_DIR="$HOME/.emacs.d"
 
 if ! [ -d $PRELUDE_INSTALL_DIR ]; then
     curl -L https://github.com/bbatsov/prelude/raw/master/utils/installer.sh | sh
-fi
-
-# If we're on a Mac, let's install and setup homebrew.
-if [ "$(uname -s)" == "Darwin" ]
-then
-  info "installing dependencies"
-  if source bin/dot > /tmp/dotfiles-dot 2>&1
-  then
-    success "dependencies installed"
-  else
-    fail "error installing dependencies"
-  fi
 fi
 
 echo ''
