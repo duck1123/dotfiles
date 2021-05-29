@@ -41,7 +41,7 @@ in
       # steam
       tdesktop
       tree
-      virtualbox
+      # virtualbox
     ];
     # sessionPath = [
     #   "~/.dotnet/tools"
