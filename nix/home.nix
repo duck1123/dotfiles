@@ -21,6 +21,7 @@ in
     packages = with pkgs; [
       babashka
       bat
+      byobu
       curl
       dunst
       emacs
