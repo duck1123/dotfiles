@@ -53,6 +53,14 @@ in
     #   "~/.nix-profile/bin"
     #   "~/.yarn/bin"
     # ];
+
+    file.".bb/bb.edn".text = ''
+      {:tasks
+       {foo
+        {:task (shell "echo bar")}
+        stop-k3d
+        {:task (shell "k3d cluster stop")}}}
+    '';
   };
 
   imports = [
@@ -181,6 +189,7 @@ in
     };
 
     shellAliases = {
+      bbg = "BABASHKA_EDN=~/.bb/bb.edn bb";
       cat = "bat";
       dkcp = "docker-compose";
       hh = "hstr";
