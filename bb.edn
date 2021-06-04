@@ -1,6 +1,17 @@
 {:tasks
  {
-  create-cluster
+  install-cert-manager
+  {:task
+   (let [version "1.3.1"
+         url (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.crds.yaml"
+                     version)]
+     (shell (format "kubectl apply -f %s" url)))}
+
+  read-windows-key
+  {:task
+   (shell "sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM")}
+
+  k3d-create
   {:description "Create a k3d cluster"
    :task
    (shell
@@ -14,21 +25,10 @@
       "--registry-create"
       "--kubeconfig-update-default"]))}
 
-  foo
-  {:task (shell "echo bar")}
+  k3d-start
+  {:task (shell "k3d cluster start")}
 
-  install-cert-manager
-  {:task
-   (let [version "1.3.1"
-         url (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.crds.yaml"
-                     version)]
-     (shell (format "kubectl apply -f %s" url)))}
-
-  read-windows-key
-  {:task
-   (shell "sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM")}
-
-  stop-k3d
+  k3d-stop
   {:task (shell "k3d cluster stop")}
 
   watch-pods
