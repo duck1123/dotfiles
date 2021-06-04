@@ -99,7 +99,10 @@ in {
     enableAutosuggestions = true;
     defaultKeymap = "emacs";
 
-    history = { extended = true; };
+    history = {
+      extended = true;
+      ignoreDups = true;
+    };
 
     oh-my-zsh = {
       enable = true;
