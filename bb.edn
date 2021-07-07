@@ -2,7 +2,7 @@
  {
   install-cert-manager
   {:task
-   (let [version "1.3.1"
+   (let [version "1.4.0"
          url (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.crds.yaml"
                      version)]
      (shell (format "kubectl apply -f %s" url)))}
@@ -25,11 +25,27 @@
       "--registry-create"
       "--kubeconfig-update-default"]))}
 
+  k3d-delete
+  {:task (shell "k3d cluster delete k3s-default")}
+
   k3d-start
   {:task (shell "k3d cluster start")}
 
   k3d-stop
   {:task (shell "k3d cluster stop")}
+
+  install-rancher
+  {:task
+   (let [namespace "cattle-system"
+         hostname "rancher.localhost"]
+     #_(shell (format "kubectl create namespace %s | true" namespace))
+     (let [cmd (clojure.string/join
+                " "
+                ["helm install rancher rancher-latest/rancher "
+                 (format "--namespace %s" namespace)
+                 (format "--set hostname=%s" hostname)])]
+       (println cmd)
+       (shell cmd)))}
 
   watch-pods
   {:task (shell "watch kubectl get pods --all-namespaces")}
