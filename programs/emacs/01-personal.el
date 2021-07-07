@@ -71,7 +71,7 @@
 (add-to-list 'auto-mode-alist '("\\Earthfile\\'" . dockerfile-mode))
 
 (require 'hideshow-org)
-;; (require 'flycheck-flow)
+(require 'flycheck-flow)
 
 ;; (add-hook 'clojure-mode-hook #'subword-mode)
 ;; (add-hook 'clojure-mode-hook #'paredit-mode)
