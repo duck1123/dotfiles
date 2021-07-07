@@ -44,6 +44,9 @@
 (global-set-key (kbd "S-C-g")       'helm-github-stars)
 (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
 
+(setq create-lockfiles nil)
+;; (setq make-backup-files nil)
+
 (add-to-list 'load-path "~/.emacs.d/personal/ag-and-a-half")
 (require 'ag-and-a-half)
 (defalias 'ag 'ag-and-a-half)
