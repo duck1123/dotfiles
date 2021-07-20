@@ -60,7 +60,7 @@
 ;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
 ;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
 
-;; (rainbow-delimiters-mode-enable)
+(rainbow-delimiters-mode-enable)
 (nyan-mode)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -84,16 +84,15 @@
 (add-hook 'js2-mode-hook     (lambda () (hs-org/minor-mode 1)))
 (add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1)))
 
-
 ;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
 ;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
 ;; (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
 
 (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
-;; (add-hook 'js2-mode-hook 'prettier-js-mode)
-;; (add-hook 'web-mode-hook 'prettier-js-mode)
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
 
 ;; (setq tab-width 2)
 ;; (setq default-tab-width 2)
 
-;; (require 'kubernetes)
+(require 'kubernetes)
