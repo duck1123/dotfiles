@@ -1,6 +1,5 @@
 {:tasks
- {
-  install-cert-manager
+ {install-cert-manager
   {:task
    (let [version "1.4.0"
          url (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.yaml"
@@ -48,6 +47,4 @@
        (shell cmd)))}
 
   watch-pods
-  {:task (shell "watch kubectl get pods --all-namespaces")}
-
-  }}
+  {:task (shell "watch kubectl get pods --all-namespaces")}}}
