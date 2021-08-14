@@ -79,7 +79,7 @@ in {
     userEmail = "${email}";
     lfs.enable = true;
     signing = {
-      signByDefault = true;
+      signByDefault = false;
       key = gpgKey;
     };
   };
