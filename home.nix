@@ -22,6 +22,7 @@ in {
       bat
       byobu
       curl
+      doctl
       dunst
       emacs
       fish
