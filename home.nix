@@ -152,6 +152,7 @@ in {
       bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
       source <(doctl completion zsh)
       source <(k3d completion zsh)
+      source <(arkade completion zsh)
     '';
 
     localVariables = { PROJECT_PATHS = [ ~/projects ]; };
