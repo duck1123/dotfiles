@@ -46,6 +46,9 @@
        (println cmd)
        (shell cmd)))}
 
+  update-nix
+  {:task (shell "nix-channel --update")}
+
   watch-namespaces
   {:task (shell "watch kubectl get namespaces")}
 
