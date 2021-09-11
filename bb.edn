@@ -46,5 +46,8 @@
        (println cmd)
        (shell cmd)))}
 
+  watch-namespaces
+  {:task (shell "watch kubectl get namespaces")}
+
   watch-pods
   {:task (shell "watch kubectl get pods --all-namespaces")}}}
