@@ -51,8 +51,9 @@
 (require 'ag-and-a-half)
 (defalias 'ag 'ag-and-a-half)
 
+(use-package earthfile-mode :ensure t)
+
 (require 'magit-lfs)
-;;; 01-personal.el ends here
 
 ;; (add-hook 'java-mode-hook
 ;;           (lambda ()
@@ -71,7 +72,6 @@
 
 (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\Earthfile\\'" . dockerfile-mode))
 
 (require 'hideshow-org)
 (require 'flycheck-flow)
