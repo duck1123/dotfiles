@@ -101,6 +101,7 @@ in {
     defaultKeymap = "emacs";
 
     history = {
+      expireDuplicatesFirst = true;
       extended = true;
       ignoreDups = true;
     };
