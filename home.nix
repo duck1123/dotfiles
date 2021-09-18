@@ -42,6 +42,7 @@ in {
       tree
       # virtualbox
     ];
+
     # sessionPath = [
     #   "~/.dotnet/tools"
     #   "~/.cargo/bin"
@@ -52,7 +53,6 @@ in {
     #   "~/.nix-profile/bin"
     #   "~/.yarn/bin"
     # ];
-
   };
 
   imports = [
@@ -62,10 +62,10 @@ in {
   ];
 
   home.file.".bb/bb.edn".source = ./bb.edn;
+  home.file.".local/bin/bbg".source = ./bin/bbg;
 
   programs.direnv = {
     enable = true;
-
   };
 
   programs.jq = {
@@ -154,6 +154,20 @@ in {
       source <(doctl completion zsh)
       source <(k3d completion zsh)
       source <(arkade completion zsh)
+
+      _bb_tasks() {
+        local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
+        compadd -a matches
+        _files # autocomplete filenames as well
+      }
+      compdef _bb_tasks bb
+
+      _bbg_tasks() {
+        local matches=(`bbg tasks |tail -n +3 |cut -f1 -d ' '`)
+        compadd -a matches
+        _files # autocomplete filenames as well
+      }
+      compdef _bbg_tasks bbg
     '';
 
     localVariables = { PROJECT_PATHS = [ ~/projects ]; };
@@ -164,7 +178,6 @@ in {
     };
 
     shellAliases = {
-      bbg = "BABASHKA_EDN=~/.bb/bb.edn bb";
       cat = "bat";
       dkcp = "docker-compose";
       hh = "hstr";
