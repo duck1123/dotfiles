@@ -141,6 +141,12 @@ in {
       export PATH="/home/${username}/.huber/bin:$PATH"
 
       bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
+
+      bindkey -s "\C-x\C-td" "tilt down --delete-namespaces\C-j"
+      bindkey -s "\C-x\C-tn" "bbg watch-namespaces\C-j"
+      bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
+      bindkey -s "\C-x\C-tu" "tilt up --legacy=true\C-j"
+
       source <(doctl completion zsh)
       source <(k3d completion zsh)
       source <(arkade completion zsh)
