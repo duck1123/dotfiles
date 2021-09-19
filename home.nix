@@ -130,16 +130,6 @@ in {
       ];
     };
 
-    plugins = [{
-      name = "bb-task-completion";
-      src = pkgs.fetchFromGitHub {
-        owner = "duck1123";
-        repo = "bb-task-completion";
-        rev = "0.0.1";
-        sha256 = "04gvnd0kngy057ia1w9s52yjbkb8vnpv811p7cqfsqpac9ici19b";
-      };
-    }];
-
     initExtra = ''
       if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
