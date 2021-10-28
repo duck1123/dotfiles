@@ -36,15 +36,19 @@
   install-rancher
   {:task
    (let [namespace "cattle-system"
-         hostname "rancher.localhost"]
-     #_(shell (format "kubectl create namespace %s | true" namespace))
-     (let [cmd (clojure.string/join
-                " "
-                ["helm install rancher rancher-latest/rancher "
-                 (format "--namespace %s" namespace)
-                 (format "--set hostname=%s" hostname)])]
-       (println cmd)
-       (shell cmd)))}
+         hostname "rancher.dev.kronkltd.net"
+         email "duck@kronkltd.net"
+         replica-count 1
+         cmd (clojure.string/join
+              " "
+              ["helm install rancher rancher-latest/rancher "
+               (format "--namespace %s" namespace)
+               (format "--set hostname=%s" hostname)
+               (format "--set replicas=%s" replica-count)
+               (format "--set ingress.tls.source=%s" "letsEncrypt")
+               (format "--set letsEncrypt.email=%s" email)])]
+     (println cmd)
+     (shell cmd))}
 
   update-nix
   {:task (shell "nix-channel --update")}
