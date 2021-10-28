@@ -41,7 +41,8 @@
  '(projectile-globally-ignored-directories
    '(".idea" ".eunit" ".git" ".hg" ".fslckout" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "vendor" "node_modules" "target" "build" "View"))
  '(safe-local-variable-values
-   '((eval progn
+   '((clojure-align-forms-automatically t)
+     (eval progn
            (define-clojure-indent
              (>defn 1)
              (a 1)
@@ -56,6 +57,7 @@
              (h2 1)
              (input 1)
              (it 1)
+             (li 1)
              (nav 1)
              (ok-action 1)
              (p 1)
@@ -68,8 +70,8 @@
              (tr 1)
              (ui-form 1)
              (ui-form-field 1)
-             (ui-modal-content 1)))
-     (clojure-align-forms-automatically t)))
+             (ui-modal-content 1)
+             (ul 1)))))
  '(sh-basic-offset 2)
  '(smartparens-global-strict-mode t)
  '(whitespace-line-column 120))
