@@ -126,7 +126,6 @@ in {
         "pj"
         "sudo"
         "systemd"
-        "zsh_reload"
       ];
     };
 
