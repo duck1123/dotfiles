@@ -50,6 +50,9 @@
      (println cmd)
      (shell cmd))}
 
+  show-ports
+  {:task (shell "netstat -ltnp")}
+
   update-nix
   {:task (shell "nix-channel --update")}
 
