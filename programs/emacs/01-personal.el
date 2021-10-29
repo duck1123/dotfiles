@@ -9,8 +9,7 @@
 ;;         ("melpa" . "https://melpa.org/packages/")))
 
 (prelude-require-packages
- '(
-   auto-complete
+ '(auto-complete
    clojure-mode
    cider
    company-flow
@@ -18,17 +17,11 @@
    editorconfig
    flycheck-clj-kondo
    flycheck-flow
-   helm
-   helm-github-stars
    helm-projectile
    hideshow-org
    magit
-   nix-mode
-   nyan-mode
    paredit
-   prettier-js
-   rainbow-delimiters
-   ))
+   prettier-js))
 
 (require 'prelude-helm) ;; Interface for narrowing and search
 (require 'prelude-helm-everywhere) ;; Enable Helm everywhere
@@ -52,6 +45,11 @@
 (defalias 'ag 'ag-and-a-half)
 
 (use-package earthfile-mode :ensure t)
+(use-package helm :ensure t)
+(use-package helm-github-stars :ensure t)
+(use-package nix-mode :ensure t)
+(use-package nyan-mode :ensure t)
+(use-package rainbow-delimiters :ensure t)
 
 (require 'magit-lfs)
 
