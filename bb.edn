@@ -13,16 +13,20 @@
   k3d-create
   {:description "Create a k3d cluster"
    :task
-   (shell
-    (clojure.string/join
-     " "
-     ["k3d cluster create"
-      "--api-port 6550"
-      "-p \"80:80@loadbalancer\""
-      "-p \"443:443@loadbalancer\""
-      "--servers 1"
-      "--registry-create"
-      "--kubeconfig-update-default"]))}
+   (let [api-port 6550
+         registry-name "registry"
+         server-count 1
+         cmd (clojure.string/join
+              " "
+              ["k3d cluster create"
+               "--api-port" api-port
+               "-p \"80:80@loadbalancer\""
+               "-p \"443:443@loadbalancer\""
+               "--servers" server-count
+               "--registry-create" registry-name
+               "--kubeconfig-update-default"])]
+     #_(println cmd)
+     (shell cmd))}
 
   k3d-delete
   {:task (shell "k3d cluster delete k3s-default")}
