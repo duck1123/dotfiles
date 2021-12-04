@@ -45,6 +45,7 @@
 (defalias 'ag 'ag-and-a-half)
 
 (use-package earthfile-mode :ensure t)
+(use-package kubernetes :ensure t)
 (use-package helm :ensure t)
 (use-package helm-github-stars :ensure t)
 (use-package nix-mode :ensure t)
