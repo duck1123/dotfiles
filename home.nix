@@ -149,6 +149,7 @@ in {
       source <(doctl completion zsh)
       source <(k3d completion zsh)
       source <(arkade completion zsh)
+      eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
       _bb_tasks() {
         local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
