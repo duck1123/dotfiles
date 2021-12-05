@@ -1,0 +1,9 @@
+{:connectInject {:enabled true
+                 :default true}
+ :replicas 1
+ :controller {:enabled true}
+ :ui
+ {:ingress
+  {:hosts
+   [{:host "consul.localhost"
+     :paths ["/"]}]}}}

@@ -1,0 +1,4 @@
+[{:name "hashicorp"
+  :url  "https://helm.releases.hashicorp.com"}
+ {:name "halkeye"
+  :url  "https://halkeye.github.io/helm-charts"}]

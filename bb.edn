@@ -2,7 +2,7 @@
  {install-cert-manager
   {:task
    (let [version "1.6.0"
-         url (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.yaml"
+         url     (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.yaml"
                      version)]
      (shell (format "kubectl apply -f %s" url)))}
 
@@ -13,10 +13,10 @@
   k3d-create
   {:description "Create a k3d cluster"
    :task
-   (let [api-port 6550
+   (let [api-port      6550
          registry-name "registry"
-         server-count 1
-         cmd (clojure.string/join
+         server-count  1
+         cmd           (clojure.string/join
               " "
               ["k3d cluster create"
                "--api-port" api-port
@@ -37,13 +37,29 @@
   k3d-stop
   {:task (shell "k3d cluster stop")}
 
+  install-consul
+  {:task
+   (let [replicas     1
+         ingress-host "consul.localhost"]
+     (shell
+      (clojure.string/join
+       " "
+       ["consul-k8s install "
+        (str "--set server.replicas=" replicas)
+        "--set ui.ingress.enabled=true "
+        (format "--set \"ui.ingress.hosts[0].host=%s\"" ingress-host)
+        "--set \"ui.ingress.hosts[0].paths[0]=/\""
+        "--set connectInject.enabled=true"
+        "--set connectInject.default=true"
+        "--set controller.enabled=true"])))}
+
   install-rancher
   {:task
-   (let [namespace "cattle-system"
-         hostname "rancher.dev.kronkltd.net"
-         email "duck@kronkltd.net"
+   (let [namespace     "cattle-system"
+         hostname      "rancher.dev.kronkltd.net"
+         email         "duck@kronkltd.net"
          replica-count 1
-         cmd (clojure.string/join
+         cmd           (clojure.string/join
               " "
               ["helm install rancher rancher-latest/rancher "
                (format "--namespace %s" namespace)
