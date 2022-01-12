@@ -1,4 +1,6 @@
 [{:name "hashicorp"
   :url  "https://helm.releases.hashicorp.com"}
  {:name "halkeye"
-  :url  "https://halkeye.github.io/helm-charts"}]
+  :url  "https://halkeye.github.io/helm-charts"}
+ {:name "lsdcapital"
+  :url "https://lsdcapital.github.io/helm-charts"}]
