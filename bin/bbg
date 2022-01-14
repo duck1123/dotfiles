@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-set -e
-
-BABASHKA_EDN=${HOME}/.bb/bb.edn bb $@

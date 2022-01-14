@@ -62,7 +62,6 @@ in {
   ];
 
   home.file.".bb/bb.edn".source = ./bb.edn;
-  home.file.".local/bin/bbg".source = ./bin/bbg;
 
   programs.direnv = {
     enable = true;
@@ -176,6 +175,7 @@ in {
       cat = "bat";
       dkcp = "docker-compose";
       hh = "hstr";
+      bbg = "bb --config ~/.bb/bb.edn";
       psgrep = "ps -ef | grep -v grep | grep ";
       "reload!" = "home-manager switch && . ~/.zshrc";
     };
