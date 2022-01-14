@@ -22,10 +22,10 @@ in {
       bat
       byobu
       curl
-      doctl
-      dunst
+      # doctl
+      # dunst
       emacs
-      fish
+      # fish
       git
       gnumake
       # helm
@@ -113,7 +113,7 @@ in {
         "colorize"
         "command-not-found"
         "compleat"
-        "docker-compose"
+        # "docker-compose"
         "docker"
         "git"
         "git-extras"
@@ -128,6 +128,10 @@ in {
       ];
     };
 
+
+    # export PATH="/home/${username}/.pulumi/bin:$PATH"
+    # export PATH="/home/${username}/.huber/bin:$PATH"
+
     initExtra = ''
       if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
@@ -135,8 +139,6 @@ in {
       export PATH="/home/${username}/.local/bin:$PATH"
       export PATH="/home/${username}/.yarn/bin:$PATH"
       export PATH="/home/${username}/.config/yarn/global/node_modules/.bin:$PATH"
-      export PATH="/home/${username}/.pulumi/bin:$PATH"
-      export PATH="/home/${username}/.huber/bin:$PATH"
 
       bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
 
@@ -145,7 +147,6 @@ in {
       bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
       bindkey -s "\C-x\C-tu" "tilt up --legacy=true\C-j"
 
-      source <(doctl completion zsh)
       source <(k3d completion zsh)
       source <(arkade completion zsh)
       eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
