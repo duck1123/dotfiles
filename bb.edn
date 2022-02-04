@@ -4,6 +4,7 @@
    (let [version "1.6.1"
          url     (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.yaml"
                      version)]
+                         version)]
      (shell (format "kubectl apply -f %s" url)))}
 
   read-windows-key
@@ -13,18 +14,20 @@
   k3d-create
   {:description "Create a k3d cluster"
    :task
-   (let [api-port      6550
+   (let [use-ingress   true
+         api-port      6550
          registry-name "registry"
          server-count  1
          cmd           (clojure.string/join
-              " "
-              ["k3d cluster create"
-               "--api-port" api-port
-               "-p \"80:80@loadbalancer\""
-               "-p \"443:443@loadbalancer\""
-               "--servers" server-count
-               "--registry-create" registry-name
-               "--kubeconfig-update-default"])]
+                        " "
+                        ["k3d cluster create"
+                         "--api-port" api-port
+                         "-p \"80:80@loadbalancer\""
+                         "-p \"443:443@loadbalancer\""
+                         (when-not use-ingress "--k3s-arg \"--disable=traefik@server:0\"")
+                         "--servers" server-count
+                         "--registry-create" registry-name
+                         "--kubeconfig-update-default"])]
      #_(println cmd)
      (shell cmd))}
 
@@ -60,13 +63,13 @@
          email         "duck@kronkltd.net"
          replica-count 1
          cmd           (clojure.string/join
-              " "
-              ["helm install rancher rancher-latest/rancher "
-               (format "--namespace %s" namespace)
-               (format "--set hostname=%s" hostname)
-               (format "--set replicas=%s" replica-count)
-               (format "--set ingress.tls.source=%s" "letsEncrypt")
-               (format "--set letsEncrypt.email=%s" email)])]
+                        " "
+                        ["helm install rancher rancher-latest/rancher "
+                         (format "--namespace %s" namespace)
+                         (format "--set hostname=%s" hostname)
+                         (format "--set replicas=%s" replica-count)
+                         (format "--set ingress.tls.source=%s" "letsEncrypt")
+                         (format "--set letsEncrypt.email=%s" email)])]
      (println cmd)
      (shell cmd))}
 
