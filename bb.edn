@@ -3,7 +3,6 @@
   {:task
    (let [version "1.6.1"
          url     (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.yaml"
-                     version)]
                          version)]
      (shell (format "kubectl apply -f %s" url)))}
 
