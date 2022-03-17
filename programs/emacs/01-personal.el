@@ -51,6 +51,13 @@
 (use-package nix-mode :ensure t)
 (use-package nyan-mode :ensure t)
 (use-package rainbow-delimiters :ensure t)
+(use-package typescript-mode :ensure t)
+(use-package scss-mode :ensure t)
+(use-package docker :ensure t)
+(use-package gradle-mode :ensure t)
+(use-package flycheck-gradle :ensure t)
+(use-package lsp-ui :ensure t)
+(use-package company :ensure t)
 
 (require 'magit-lfs)
 
