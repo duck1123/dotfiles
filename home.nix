@@ -157,12 +157,6 @@ in {
         _files # autocomplete filenames as well
       }
       compdef _bb_tasks bb
-
-      _bbg_tasks() {
-        local matches=(`bbg tasks |tail -n +3 |cut -f1 -d ' '`)
-        compadd -a matches
-      }
-      compdef _bbg_tasks bbg
     '';
 
     localVariables = { PROJECT_PATHS = [ ~/projects ]; };
