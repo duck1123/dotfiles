@@ -33,6 +33,7 @@ in {
       htop
       # i3
       keepassxc
+      # kodi
       kubectl
       nixfmt
       nixUnstable
