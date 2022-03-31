@@ -37,12 +37,35 @@
  '(nxml-slash-auto-complete-flag nil)
  '(org-agenda-files '("~/Nextcloud/org"))
  '(package-selected-packages
-   '(docker gradle-mode flycheck-gradle adoc-mode nix-mode lsp-ui a async auto-complete company dash flycheck git-commit helm helm-core ht ivy js2-mode lsp-docker lsp-mode magit popup projectile reformatter swiper transient with-editor rjsx-mode css-mode helm-ack ack flow-minor-mode magit-lfs groovy-mode flymake-lua company-lua markdown-mode flycheck-flow elisp-slime-nav exec-path-from-shell imenu-anywhere hl-todo gitconfig-mode easy-kill anzu ace-window zop-to-char zenburn-theme yaml-mode which-key web-mode volatile-highlights undo-tree super-save smex smartrep smartparens rainbow-mode rainbow-delimiters protobuf-mode prettier-js paredit operate-on-number nyan-mode mustache-mode move-text memoize lua-mode hideshow-org helm-projectile helm-github-stars helm-descbinds helm-cider-history helm-cider gotest go-projectile gitignore-mode flycheck-clojure flycheck-clj-kondo flow-js2-mode expand-region editorconfig dockerfile-mode discover-my-major diminish diff-hl d-mode csv-mode crux crappy-jsp-mode counsel company-go company-flow browse-kill-ring avy ack-and-a-half ac-cider))
+   '(go-mode docker gradle-mode flycheck-gradle adoc-mode nix-mode lsp-ui a async auto-complete company dash flycheck git-commit helm helm-core ht ivy js2-mode lsp-docker lsp-mode magit popup projectile reformatter swiper transient with-editor rjsx-mode css-mode helm-ack ack flow-minor-mode magit-lfs groovy-mode flymake-lua company-lua markdown-mode flycheck-flow elisp-slime-nav exec-path-from-shell imenu-anywhere hl-todo gitconfig-mode easy-kill anzu ace-window zop-to-char zenburn-theme yaml-mode which-key web-mode volatile-highlights undo-tree super-save smex smartrep smartparens rainbow-mode rainbow-delimiters protobuf-mode prettier-js paredit operate-on-number nyan-mode mustache-mode move-text memoize lua-mode hideshow-org helm-projectile helm-github-stars helm-descbinds helm-cider-history helm-cider gotest go-projectile gitignore-mode flycheck-clojure flycheck-clj-kondo flow-js2-mode expand-region editorconfig dockerfile-mode discover-my-major diminish diff-hl d-mode csv-mode crux crappy-jsp-mode counsel company-go company-flow browse-kill-ring avy ack-and-a-half ac-cider))
  '(projectile-globally-ignored-buffers '("target"))
  '(projectile-globally-ignored-directories
    '(".idea" ".eunit" ".git" ".hg" ".fslckout" ".bzr" "_darcs" ".tox" ".svn" ".stack-work" "vendor" "node_modules" "target" "build" "View"))
  '(safe-local-variable-values
-   '((eval progn
+   '((eval
+      (lambda nil
+        (defun cider-jack-in-wrapper-function
+            (orig-fun &rest args)
+          (if
+              (and
+               (boundp 'use-bb-dev)
+               use-bb-dev)
+              (message "Use `bb dev` to start the development server, then `cider-connect` to the port it specifies.")
+            (apply orig-fun args)))
+        (advice-add 'cider-jack-in :around #'cider-jack-in-wrapper-function)
+        (when
+            (not
+             (featurep 'clerk))
+          (let
+              ((init-file-path
+                (expand-file-name "clerk.el" default-directory)))
+            (when
+                (file-exists-p init-file-path)
+              (load init-file-path)
+              (require 'clerk))))))
+     (use-bb-dev . t)
+     (cider-clojure-cli-global-options . "-A:demo")
+     (eval progn
            (define-clojure-indent
              (>defn 1)
              (a 1)

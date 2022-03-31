@@ -58,6 +58,7 @@
 (use-package flycheck-gradle :ensure t)
 (use-package lsp-ui :ensure t)
 (use-package company :ensure t)
+(use-package go-mode :ensure t)
 
 (require 'magit-lfs)
 
@@ -102,3 +103,19 @@
 ;; (setq default-tab-width 2)
 
 (require 'kubernetes)
+
+;; see https://github.com/nextjournal/clerk
+(require 'clojure-mode)
+(require 'cider-format)
+
+(defun clerk-show ()
+  (interactive)
+  (save-buffer)
+  (let
+      ((filename
+        (buffer-file-name)))
+    (when filename
+      (cider-interactive-eval
+       (concat "(nextjournal.clerk/show! \"" filename "\")")))))
+
+(define-key clojure-mode-map (kbd "<M-return>") 'clerk-show)
