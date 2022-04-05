@@ -28,6 +28,7 @@ in {
       # fish
       git
       gnumake
+      graphviz
       # helm
       hstr
       htop
