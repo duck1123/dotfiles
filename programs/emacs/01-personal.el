@@ -60,7 +60,24 @@
 (use-package lsp-ui :ensure t)
 (use-package company :ensure t)
 (use-package go-mode :ensure t)
-(use-package org-roam :ensure t)
+
+(use-package org-roam
+  :ensure t
+
+  :custom
+  (org-roam-directory "~/Nextcloud/org-roam")
+  (org-roam-capture-templates
+   `(("d" "default" plain "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}" "${title}\n#+date: %U\n")
+      :unnarrowed t)))
+
+  :bind
+  (("C-c n l" . org-roam-buffer-toggle)
+   ("C-c n f" . org-roam-node-find)
+   ("C-c n i" . org-roam-node-insert))
+
+  :config
+  (org-roam-setup))
 
 (require 'magit-lfs)
 
@@ -122,3 +139,6 @@
        (concat "(nextjournal.clerk/show! \"" filename "\")")))))
 
 (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show)
+
+;; enable autosync
+(org-roam-db-autosync-mode)
