@@ -46,6 +46,7 @@
 
 (use-package earthfile-mode :ensure t)
 (use-package kubernetes :ensure t)
+(use-package kubernetes-helm :ensure t)
 (use-package helm :ensure t)
 (use-package helm-github-stars :ensure t)
 (use-package nix-mode :ensure t)
@@ -59,6 +60,7 @@
 (use-package lsp-ui :ensure t)
 (use-package company :ensure t)
 (use-package go-mode :ensure t)
+(use-package org-roam :ensure t)
 
 (require 'magit-lfs)
 
@@ -103,6 +105,7 @@
 ;; (setq default-tab-width 2)
 
 (require 'kubernetes)
+(require 'kubernetes-helm)
 
 ;; see https://github.com/nextjournal/clerk
 (require 'clojure-mode)
