@@ -49,10 +49,22 @@
 (use-package kubernetes-helm :ensure t)
 (use-package helm :ensure t)
 (use-package helm-github-stars :ensure t)
-(use-package nix-mode :ensure t)
-(use-package nyan-mode :ensure t)
-(use-package rainbow-delimiters :ensure t)
+
+(use-package nix-mode
+  :ensure t)
+
+(use-package nyan-mode
+  :ensure t
+  :config
+  (nyan-mode))
+
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  (rainbow-delimiters-mode-enable))
+
 (use-package typescript-mode :ensure t)
+
 (use-package scss-mode :ensure t)
 (use-package docker :ensure t)
 (use-package gradle-mode :ensure t)
@@ -79,6 +91,10 @@
   :config
   (org-roam-setup))
 
+(setq org-roam-dailies-capture-templates
+      `(("d" "default" entry "* %<%I:%M %p>: %?"
+         :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+
 (require 'magit-lfs)
 
 ;; (add-hook 'java-mode-hook
@@ -87,8 +103,6 @@
 ;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
 ;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
 
-(rainbow-delimiters-mode-enable)
-(nyan-mode)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 (require 'flycheck-clj-kondo)
