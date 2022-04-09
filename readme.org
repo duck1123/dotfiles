@@ -1,5 +1,9 @@
 * Duck's dotfiles
 
+** Ubuntu
+
+   - https://ubuntu.com/#download
+
 ** Babashka
 
 - https://github.com/babashka/babashka
