@@ -1,0 +1,25 @@
+* Duck's dotfiles
+
+** Babashka
+
+- https://github.com/babashka/babashka
+
+#+BEGIN_SRC bash
+  bash < <(curl -s https://raw.githubusercontent.com/babashka/babashka/master/install)
+#+END_SRC
+
+** Nix
+
+   - https://nixos.org/download.html
+
+#+BEGIN_SRC bash
+  sh <(curl -L https://nixos.org/nix/install) --daemon
+#+END_SRC
+
+** Prelude
+
+   - https://github.com/bbatsov/prelude
+
+#+BEGIN_SRC bash
+  curl -L https://git.io/epre | sh
+#+END_SRC
