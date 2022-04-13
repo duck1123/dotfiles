@@ -44,8 +44,6 @@
         (expand-file-name (format "emacs-custom-%s.el" (user-uid)) temporary-file-directory)))
 (load custom-file t)
 
-
-
 (set-default-coding-systems 'utf-8)
 (server-start)
 
@@ -55,17 +53,16 @@
   :config
   (setq which-key-idle-delay 0.3))
 
-(add-to-list 'load-path "~/.emacs.d/personal/ag-and-a-half")
-(require 'ag-and-a-half)
-(defalias 'ag 'ag-and-a-half)
 
 (use-package auto-complete
   :ensure t)
 
 (use-package earthfile-mode :ensure t)
-;; (use-package kubernetes :ensure t)
-;; (use-package kubernetes-helm :ensure t)
 ;; (use-package helm :ensure t)
+
+(add-to-list 'load-path "~/.emacs.d/personal/ag-and-a-half")
+(require 'ag-and-a-half)
+(defalias 'ag 'ag-and-a-half)
 
 (use-package helm-github-stars
   :ensure t
@@ -85,9 +82,6 @@
   :init
   (rainbow-delimiters-mode-enable))
 
-(use-package typescript-mode
-  :ensure t)
-
 (use-package scss-mode
   :ensure t)
 (use-package docker :ensure t)
@@ -99,11 +93,14 @@
 (use-package company
   :ensure t)
 
-(use-package company-flow
-  :ensure t)
-
 (use-package go-mode
   :ensure t)
+
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+;; (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+;; (setq tab-width 2)
+;; (setq default-tab-width 2)
 
 (use-package org-roam
   :ensure t
@@ -127,7 +124,6 @@
         `(("d" "default" entry "* %?\n:PROPERTIES:\n:CREATED: %T\n:END:"
            :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")))))
 
-
 (use-package magit-lfs
   :ensure t)
 
@@ -137,20 +133,42 @@
 ;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
 ;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
 
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
+(use-package flycheck-flow
+  :ensure t)
 
-(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
-  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+(use-package typescript-mode
+  :ensure t)
+
+(use-package company-flow
+  :ensure t)
+
+;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
+
+;; (use-package kubernetes :ensure t)
+;; (use-package kubernetes-helm :ensure t)
+;; (require 'kubernetes)
+;; (require 'kubernetes-helm)
 
 (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
-(add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
+(add-hook 'web-mode-hook 'prettier-js-mode)
+
+(use-package clojure-mode
+  :ensure t
+  :config
+  (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show))
+
+(use-package cider
+  :ensure t)
+
 
 (use-package flycheck-clj-kondo
   :ensure t)
 
-(use-package flycheck-flow
-  :ensure t)
+(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+
+;; (add-hook 'clojure-mode-hook #'subword-mode)
+;; (add-hook 'clojure-mode-hook #'paredit-mode)
 
 (use-package hideshow-org
   :ensure t
@@ -160,48 +178,14 @@
   (add-hook 'js2-mode-hook     (lambda () (hs-org/minor-mode 1)))
   (add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1))))
 
-;; (add-hook 'clojure-mode-hook #'subword-mode)
-;; (add-hook 'clojure-mode-hook #'paredit-mode)
+;; (use-package lsp-javascript
+;;   :ensure t)
 
-;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
-;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
-;; (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-
+(add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
+(add-hook 'js2-mode-hook #'lsp-mode)
 (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
 (add-hook 'js2-mode-hook 'prettier-js-mode)
-(add-hook 'web-mode-hook 'prettier-js-mode)
-
-;; (setq tab-width 2)
-;; (setq default-tab-width 2)
-
-;; (require 'kubernetes)
-;; (require 'kubernetes-helm)
-
-;; see https://github.com/nextjournal/clerk
-;; (require 'clojure-mode)
-;; (require 'cider-format)
-
-(use-package clojure-mode
-  :ensure t
-  :config
-  (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show))
-
-(use-package lsp-mode
-  :ensure t
-  :custom
-  (lsp-lens-enable t)
-  (lsp-signature-auto-activate t )
-  :hook
-  (clojure-mode . 'lsp)
-  (clojurescript-mode . 'lsp)
-  (clojurec-mode . 'lsp))
-
-(use-package lsp-ui
-  :ensure t)
-
-
-(use-package cider
-  :ensure t)
+;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
 
 (setq org-confirm-babel-evaluate nil)
 
@@ -230,13 +214,33 @@
 (add-to-list 'org-structure-template-alist '("bb" . "src babashka"))
 (add-to-list 'org-structure-template-alist '("clj" . "src clojure"))
 
-;; https://emacs-lsp.github.io/lsp-mode/tutorials/clojure-guide/
+(defun efs/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
+
+
+(use-package lsp-mode
+  :ensure t
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . efs/lsp-mode-setup)
+  :init
+  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+  :config
+  (lsp-enable-which-key-integration t)
+  :custom
+  (lsp-lens-enable t)
+  (lsp-signature-auto-activate t))
+
+(use-package lsp-ui
+  :ensure t
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
 
 ;; (use-package lsp-treemacs
 ;;   :ensure t
 ;;   :config
-;;   (treemacs-space-between-root-nodes nil)
-;;   )
+;;   (treemacs-space-between-root-nodes nil))
 
 (defun clerk-show ()
   (interactive)
