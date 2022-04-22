@@ -182,7 +182,8 @@
 ;;   :ensure t)
 
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
-(add-hook 'js2-mode-hook #'lsp-mode)
+;; (add-hook 'js2-mode-hook #'lsp-mode)
+;; (add-hook 'js2-mode-hook 'lsp)
 (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
 (add-hook 'js2-mode-hook 'prettier-js-mode)
 ;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
