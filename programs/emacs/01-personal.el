@@ -102,6 +102,80 @@
 ;; (setq tab-width 2)
 ;; (setq default-tab-width 2)
 
+(use-package magit-lfs
+    :ensure t
+    :after magit)
+
+;; (add-hook 'java-mode-hook
+;;           (lambda ()
+;;             "Treat Java 1.5 @-style annotations as comments."
+;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
+;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
+
+(use-package flycheck-flow
+  :ensure t
+  :after flycheck)
+
+(use-package typescript-mode
+  :ensure t)
+
+(use-package company-flow
+  :ensure t)
+
+;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
+
+;; (use-package kubernetes :ensure t)
+;; (use-package kubernetes-helm :ensure t)
+;; (require 'kubernetes)
+;; (require 'kubernetes-helm)
+
+(add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
+(add-hook 'web-mode-hook 'prettier-js-mode)
+
+(use-package clojure-mode
+  :ensure t
+  :config
+  (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show))
+
+(use-package cider
+  :ensure t)
+
+(use-package flycheck-clojure
+  :ensure t)
+
+(use-package ac-cider
+  :ensure t)
+
+(use-package helm-cider
+  :ensure t)
+
+(use-package flycheck-clj-kondo
+  :ensure t)
+
+(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+
+;; (add-hook 'clojure-mode-hook #'subword-mode)
+;; (add-hook 'clojure-mode-hook #'paredit-mode)
+
+(use-package hideshow-org
+  :ensure t
+  :init
+  (add-hook 'clojure-mode-hook (lambda () (hs-org/minor-mode 1)))
+  (add-hook 'php-mode-hook     (lambda () (hs-org/minor-mode 1)))
+  (add-hook 'js2-mode-hook     (lambda () (hs-org/minor-mode 1)))
+  (add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1))))
+
+;; (use-package lsp-javascript
+;;   :ensure t)
+
+(add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
+;; (add-hook 'js2-mode-hook #'lsp-mode)
+;; (add-hook 'js2-mode-hook 'lsp)
+(add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
+
 (use-package org-roam
   :ensure t
 
@@ -138,70 +212,6 @@
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
-
-(use-package magit-lfs
-  :ensure t)
-
-;; (add-hook 'java-mode-hook
-;;           (lambda ()
-;;             "Treat Java 1.5 @-style annotations as comments."
-;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
-;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
-
-(use-package flycheck-flow
-  :ensure t)
-
-(use-package typescript-mode
-  :ensure t)
-
-(use-package company-flow
-  :ensure t)
-
-;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
-
-;; (use-package kubernetes :ensure t)
-;; (use-package kubernetes-helm :ensure t)
-;; (require 'kubernetes)
-;; (require 'kubernetes-helm)
-
-(add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
-(add-hook 'web-mode-hook 'prettier-js-mode)
-
-(use-package clojure-mode
-  :ensure t
-  :config
-  (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show))
-
-(use-package cider
-  :ensure t)
-
-
-(use-package flycheck-clj-kondo
-  :ensure t)
-
-(dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
-  (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
-
-;; (add-hook 'clojure-mode-hook #'subword-mode)
-;; (add-hook 'clojure-mode-hook #'paredit-mode)
-
-(use-package hideshow-org
-  :ensure t
-  :init
-  (add-hook 'clojure-mode-hook (lambda () (hs-org/minor-mode 1)))
-  (add-hook 'php-mode-hook     (lambda () (hs-org/minor-mode 1)))
-  (add-hook 'js2-mode-hook     (lambda () (hs-org/minor-mode 1)))
-  (add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1))))
-
-;; (use-package lsp-javascript
-;;   :ensure t)
-
-(add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
-;; (add-hook 'js2-mode-hook #'lsp-mode)
-;; (add-hook 'js2-mode-hook 'lsp)
-(add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
-(add-hook 'js2-mode-hook 'prettier-js-mode)
-;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
 
 (setq org-confirm-babel-evaluate nil)
 

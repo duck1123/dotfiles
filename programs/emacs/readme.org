@@ -148,6 +148,117 @@
   ;; (setq default-tab-width 2)
 #+end_src
 
+** Magit
+
+#+begin_src emacs-lisp
+  (use-package magit-lfs
+      :ensure t
+      :after magit)
+#+end_src
+
+** Java
+
+#+begin_src emacs-lisp
+  ;; (add-hook 'java-mode-hook
+  ;;           (lambda ()
+  ;;             "Treat Java 1.5 @-style annotations as comments."
+  ;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
+  ;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
+#+end_src
+
+** JS
+
+#+begin_src emacs-lisp
+  (use-package flycheck-flow
+    :ensure t
+    :after flycheck)
+
+  (use-package typescript-mode
+    :ensure t)
+
+  (use-package company-flow
+    :ensure t)
+#+end_src
+
+** C
+
+#+begin_src emacs-lisp
+  ;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
+#+end_src
+
+** Kubernetes
+
+#+begin_src emacs-lisp
+  ;; (use-package kubernetes :ensure t)
+  ;; (use-package kubernetes-helm :ensure t)
+  ;; (require 'kubernetes)
+  ;; (require 'kubernetes-helm)
+#+end_src
+
+** JSP
+
+#+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
+  (add-hook 'web-mode-hook 'prettier-js-mode)
+#+end_src
+
+** Clojure
+
+#+begin_src emacs-lisp
+  (use-package clojure-mode
+    :ensure t
+    :config
+    (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show))
+
+  (use-package cider
+    :ensure t)
+
+  (use-package flycheck-clojure
+    :ensure t)
+
+  (use-package ac-cider
+    :ensure t)
+
+  (use-package helm-cider
+    :ensure t)
+
+  (use-package flycheck-clj-kondo
+    :ensure t)
+
+  (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+    (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
+
+  ;; (add-hook 'clojure-mode-hook #'subword-mode)
+  ;; (add-hook 'clojure-mode-hook #'paredit-mode)
+#+end_src
+
+** hide-show
+
+#+begin_src emacs-lisp
+  (use-package hideshow-org
+    :ensure t
+    :init
+    (add-hook 'clojure-mode-hook (lambda () (hs-org/minor-mode 1)))
+    (add-hook 'php-mode-hook     (lambda () (hs-org/minor-mode 1)))
+    (add-hook 'js2-mode-hook     (lambda () (hs-org/minor-mode 1)))
+    (add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1))))
+#+end_src
+
+** js2
+
+#+begin_src emacs-lisp
+  ;; (use-package lsp-javascript
+  ;;   :ensure t)
+
+  (add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
+  ;; (add-hook 'js2-mode-hook #'lsp-mode)
+  ;; (add-hook 'js2-mode-hook 'lsp)
+  (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
+  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  ;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
+#+end_src
+
+
 ** org-roam
 
 #+begin_src emacs-lisp
@@ -193,105 +304,6 @@
           org-roam-ui-open-on-start t))
 #+end_src
 
-** Magit
-
-#+begin_src emacs-lisp
-  (use-package magit-lfs
-    :ensure t)
-#+end_src
-
-** Java
-
-#+begin_src emacs-lisp
-  ;; (add-hook 'java-mode-hook
-  ;;           (lambda ()
-  ;;             "Treat Java 1.5 @-style annotations as comments."
-  ;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
-  ;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
-#+end_src
-
-** JS
-
-#+begin_src emacs-lisp
-  (use-package flycheck-flow
-    :ensure t)
-
-  (use-package typescript-mode
-    :ensure t)
-
-  (use-package company-flow
-    :ensure t)
-#+end_src
-
-** C
-
-#+begin_src emacs-lisp
-  ;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
-#+end_src
-
-** Kubernetes
-
-#+begin_src emacs-lisp
-  ;; (use-package kubernetes :ensure t)
-  ;; (use-package kubernetes-helm :ensure t)
-  ;; (require 'kubernetes)
-  ;; (require 'kubernetes-helm)
-#+end_src
-
-** JSP
-
-#+begin_src emacs-lisp
-  (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
-  (add-hook 'web-mode-hook 'prettier-js-mode)
-#+end_src
-
-** Clojure
-
-#+begin_src emacs-lisp
-  (use-package clojure-mode
-    :ensure t
-    :config
-    (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show))
-
-  (use-package cider
-    :ensure t)
-
-
-  (use-package flycheck-clj-kondo
-    :ensure t)
-
-  (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
-    (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
-
-  ;; (add-hook 'clojure-mode-hook #'subword-mode)
-  ;; (add-hook 'clojure-mode-hook #'paredit-mode)
-#+end_src
-
-** hide-show
-
-#+begin_src emacs-lisp
-  (use-package hideshow-org
-    :ensure t
-    :init
-    (add-hook 'clojure-mode-hook (lambda () (hs-org/minor-mode 1)))
-    (add-hook 'php-mode-hook     (lambda () (hs-org/minor-mode 1)))
-    (add-hook 'js2-mode-hook     (lambda () (hs-org/minor-mode 1)))
-    (add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1))))
-#+end_src
-
-** js2
-
-#+begin_src emacs-lisp
-  ;; (use-package lsp-javascript
-  ;;   :ensure t)
-
-  (add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
-  ;; (add-hook 'js2-mode-hook #'lsp-mode)
-  ;; (add-hook 'js2-mode-hook 'lsp)
-  (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
-  (add-hook 'js2-mode-hook 'prettier-js-mode)
-  ;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
-#+end_src
 
 ** org-babel
 
