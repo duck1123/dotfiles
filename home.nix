@@ -49,7 +49,7 @@ in {
     #   "~/.dotnet/tools"
     #   "~/.cargo/bin"
     #   "~/.config/yarn/global/node_modules/.bin"
-    #   "~/.dotfiles-old/bin"
+    #   "~/.dotfiles/bin"
     #   "~/.local/bin"
     #   "~/.huber/bin"
     #   "~/.nix-profile/bin"

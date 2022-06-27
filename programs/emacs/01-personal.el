@@ -221,7 +221,7 @@
    (python . t)
    (clojure . t)))
 
-(setq user-emacs-directory "~/.dotfiles-old/programs/emacs/")
+(setq user-emacs-directory "~/.dotfiles/programs/emacs/")
 
 ;; Automatically tangle our Emacs.org config file when we save it
 (defun efs/org-babel-tangle-config ()

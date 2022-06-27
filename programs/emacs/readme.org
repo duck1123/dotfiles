@@ -106,14 +106,18 @@
   (defalias 'ag 'ag-and-a-half)
 #+end_src
 
-** more config
+** Helm Github Stars
 
 #+begin_src emacs-lisp
   (use-package helm-github-stars
     :ensure t
     :commands (helm-github-stars)
     :bind (("S-C-g" . helm-github-stars)))
+#+end_src
 
+** more config
+
+#+begin_src emacs-lisp
   (use-package nix-mode
     :ensure t)
 
@@ -320,7 +324,7 @@
 ** org-babel autosaving
 
 #+begin_src emacs-lisp
-  (setq user-emacs-directory "~/.dotfiles-old/programs/emacs/")
+  (setq user-emacs-directory "~/.dotfiles/programs/emacs/")
 
   ;; Automatically tangle our Emacs.org config file when we save it
   (defun efs/org-babel-tangle-config ()
