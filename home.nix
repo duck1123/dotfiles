@@ -24,6 +24,7 @@ in {
       babashka
       bat
       byobu
+      chromium
       curl
       # doctl
       # dunst
