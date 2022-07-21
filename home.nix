@@ -117,6 +117,11 @@ in {
     '';
   };
 
+  programs.bash = {
+    enable = true;
+    profileExtra = "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels$\{NIX_PATH:+:$NIX_PATH\}";
+  };
+
   programs.zsh = {
     enable = true;
     enableAutosuggestions = true;
@@ -173,7 +178,6 @@ in {
 
       source <(k3d completion zsh)
       source <(arkade completion zsh)
-      eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
       _bb_tasks() {
         local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
@@ -208,6 +212,17 @@ in {
     #   socketActivated = true;
     #   packages = [ pkgs.gnome3.dconf ];
     # };
+  };
+
+  xdg = {
+    enable = true;
+    mime = {
+      enable = true;
+    };
+  };
+
+  targets.genericLinux = {
+    enable = true;
   };
 
   xdg.configFile."nix/nix.conf".text = ''
