@@ -44,6 +44,7 @@ in {
       kubectl
       nixfmt
       nixUnstable
+      silver-searcher
       slack
       # steam
       # tdesktop
