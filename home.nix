@@ -27,7 +27,7 @@ in {
       curl
       # doctl
       # dunst
-      emacs
+      # emacs
       # fish
       git
       gnumake
