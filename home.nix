@@ -28,7 +28,9 @@ in {
       chromium
       curl
       # doctl
+      # docker
       # dunst
+      # earthly
       # emacs
       # fish
       git
@@ -40,8 +42,10 @@ in {
       htop
       # i3
       keepassxc
+      # k3d
       # kodi
       kubectl
+      # nextcloud-24.0.3
       nixfmt
       nixUnstable
       silver-searcher
