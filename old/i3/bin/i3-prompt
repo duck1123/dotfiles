@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# Source: https://github.com/ashleyh/dotfiles/blob/master/.i3/bin/i3-prompt
-
-dmenu -p 'i3-msg' </dev/null | xargs i3-msg
