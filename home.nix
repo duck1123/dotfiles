@@ -33,6 +33,7 @@ in {
       git
       gnumake
       graphviz
+      guake
       # helm
       hstr
       htop
