@@ -3,4 +3,16 @@
  {:name "halkeye"
   :url  "https://halkeye.github.io/helm-charts"}
  {:name "lsdcapital"
-  :url "https://lsdcapital.github.io/helm-charts"}]
+  :url "https://lsdcapital.github.io/helm-charts"}
+ {:name "grafana"
+  :url "https://grafana.github.io/helm-charts"}
+ {:name "inseefrlab"
+  :url "https://inseefrlab.github.io/helm-charts-datascience"}
+ {:name "k8s-at-home"
+  :url "https://k8s-at-home.com/charts/"}
+ {:name "bitnami"
+  :url "https://charts.bitnami.com/bitnami"}
+ {:name "dinsro"
+  :url "https://chart.kronkltd.net/"}
+ {:name "nextcloud"
+  :url "https://nextcloud.github.io/helm/"}]
