@@ -15,4 +15,6 @@
  {:name "dinsro"
   :url "https://chart.kronkltd.net/"}
  {:name "nextcloud"
-  :url "https://nextcloud.github.io/helm/"}]
+  :url "https://nextcloud.github.io/helm/"}
+ {:name "rancher-latest"
+  :url "https://releases.rancher.com/server-charts/latest"}]
