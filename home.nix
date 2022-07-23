@@ -22,6 +22,7 @@ in {
     packages = with pkgs; [
       arkade
       babashka
+      barrier
       bat
       byobu
       chromium
