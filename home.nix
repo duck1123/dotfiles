@@ -40,7 +40,7 @@ in {
       nixUnstable
       slack
       # steam
-      tdesktop
+      # tdesktop
       tree
       # virtualbox
     ];
