@@ -96,14 +96,7 @@
     #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     #  wget
     #  emacs
-    curl
-    htop
-    neofetch
-    syncthing
     git
-    guake
-    fish
-    keepassxc
     zsh
   ];
 
@@ -125,6 +118,10 @@
     enable = true;
     # package = doom-emacs;  # use programs.emacs.package instead if using home-manager
   };
+
+  programs.steam.enable = true;
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
