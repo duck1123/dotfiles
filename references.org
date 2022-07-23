@@ -1,0 +1,21 @@
+* https://github.com/Misterio77/nix-starter-config/blob/main/flake.nix
+
+* Articles
+
+** Example: Use nix-flakes with home-manager on non-nixos systems
+
+- https://discourse.nixos.org/t/example-use-nix-flakes-with-home-manager-on-non-nixos-systems/10185/8
+
+** Getting Started with flakes
+
+- https://yuanwang.ca/posts/getting-started-with-flakes.html
+
+* Packages
+
+** Flake utils
+
+- https://github.com/numtide/flake-utils
+
+** devshell
+
+- https://github.com/numtide/devshell
