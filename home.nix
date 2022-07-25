@@ -47,7 +47,7 @@ in {
       silver-searcher
       slack
       # steam
-      # tdesktop
+      tdesktop
       tree
       # virtualbox
     ];
