@@ -48,6 +48,7 @@ in {
       # nextcloud-24.0.3
       nixfmt
       nixUnstable
+      nmap
       silver-searcher
       slack
       # steam
