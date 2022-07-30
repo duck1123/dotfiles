@@ -45,6 +45,8 @@ in {
       # k3d
       # kodi
       kubectl
+      nodejs
+      openjdk
       # nextcloud-24.0.3
       nixfmt
       nixUnstable
