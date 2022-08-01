@@ -5,6 +5,7 @@ let
   username = "duck";
   email = "duck@kronkltd.net";
   gpgKey = "9564904D297DBF3C";
+  extraNodePackages = import ./node/default.nix {};
 in {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
@@ -32,6 +33,7 @@ in {
       # dunst
       # earthly
       # emacs
+      # extraNodePackages.prettier
       # fish
       git
       gnumake
