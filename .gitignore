@@ -24,3 +24,6 @@ emacs.d.symlink/recentf
 emacs.d.symlink/ido.last
 emacs.d.symlink/.bts-*
 /ncmpcpp.symlink/error.log
+programs/emacs/.org-id-locations
+programs/emacs/org-roam.db
+programs/emacs/session*
