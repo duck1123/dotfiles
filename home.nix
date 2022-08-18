@@ -53,6 +53,7 @@ in {
       slack
       # steam
       tdesktop
+      thunderbird
       tree
       # virtualbox
     ];
