@@ -49,6 +49,11 @@ in {
       kubectl
       nodejs-16_x
       openjdk
+      plex-media-player
+      # plex-media-server
+      plex-mpv-shim
+      # plexmediaserver
+      # plexmediaserver
       # nextcloud-24.0.3
       nixfmt
       nixUnstable
