@@ -55,6 +55,7 @@ in {
       slack
       # steam
       tdesktop
+      teams
       thunderbird
       tilt
       tree
