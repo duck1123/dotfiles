@@ -56,6 +56,7 @@ in {
       # steam
       tdesktop
       thunderbird
+      tilt
       tree
       # virtualbox
     ];
