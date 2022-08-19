@@ -59,6 +59,7 @@ in {
       teams
       thunderbird
       tilt
+      transmission
       tree
       # virtualbox
     ];
