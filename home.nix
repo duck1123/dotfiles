@@ -35,6 +35,7 @@ in {
       # fish
       git
       gnumake
+      go
       graphviz
       guake
       # helm
