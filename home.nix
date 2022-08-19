@@ -53,6 +53,7 @@ in {
       nmap
       silver-searcher
       slack
+      sparrow
       # steam
       tdesktop
       teams
