@@ -36,6 +36,7 @@ in {
       git
       gnumake
       go
+      gpa
       graphviz
       guake
       # helm
