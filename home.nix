@@ -34,7 +34,7 @@ in {
       # earthly
       # emacs
       # extraNodePackages.prettier
-      # fish
+      fish
       git
       gnumake
       go
