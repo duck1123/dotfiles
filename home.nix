@@ -4,7 +4,7 @@ let
   name = "Duck Nebuchadnezzar";
   username = "duck";
   email = "duck@kronkltd.net";
-  gpgKey = "80E3B47F0495EF7E";
+  gpgKey = "9564904D297DBF3C";
 in {
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
@@ -100,7 +100,7 @@ in {
     userEmail = "${email}";
     lfs.enable = true;
     signing = {
-      signByDefault = false;
+      signByDefault = true;
       key = gpgKey;
     };
   };
