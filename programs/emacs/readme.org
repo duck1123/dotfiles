@@ -42,8 +42,7 @@
      editorconfig
      helm-projectile
      magit
-     paredit
-     prettier-js))
+     paredit))
 #+end_src
 
 #+begin_src emacs-lisp :tangle ./01-personal.el
@@ -67,7 +66,7 @@
   ;;   )
 #+end_src
 
-** more config
+** Custom file
 
 #+begin_src emacs-lisp
   ;; Keep customization settings in a temporary file (thanks Ambrevar!)
@@ -112,7 +111,9 @@
   (use-package helm-github-stars
     :ensure t
     :commands (helm-github-stars)
-    :bind (("S-C-g" . helm-github-stars)))
+    :bind (("S-C-g" . helm-github-stars))
+    :config
+    (setq helm-github-stars-username "duck1123"))
 #+end_src
 
 ** more config
@@ -155,6 +156,11 @@
 ** Magit
 
 #+begin_src emacs-lisp
+  (use-package magit
+    :ensure t
+    :config
+    (setq magit-commit-arguments '("--verbose" "--gpg-sign=80E3B47F0495EF7E")))
+
   (use-package magit-lfs
       :ensure t
       :after magit)
@@ -203,7 +209,30 @@
 
 #+begin_src emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
-  (add-hook 'web-mode-hook 'prettier-js-mode)
+#+end_src
+
+** Code Formatting
+
+*** Prettier-js
+
+#+begin_src emacs-lisp :tangle no
+    (use-package prettier-js
+      :ensure t
+      :init
+      (add-hook 'web-mode-hook 'prettier-js-mode)
+      (add-hook 'js2-mode-hook 'prettier-js-mode))
+
+    (setq prettier-js-command "npx prettier")
+
+#+end_src
+
+*** Prettier
+
+- https://github.com/jscheid/prettier.el
+
+#+begin_src emacs-lisp
+  (use-package prettier
+    :ensure t)
 #+end_src
 
 ** Clojure
@@ -236,6 +265,7 @@
   ;; (add-hook 'clojure-mode-hook #'paredit-mode)
 #+end_src
 
+
 ** hide-show
 
 #+begin_src emacs-lisp
@@ -248,6 +278,7 @@
     (add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1))))
 #+end_src
 
+
 ** js2
 
 #+begin_src emacs-lisp
@@ -257,11 +288,17 @@
   (add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
   ;; (add-hook 'js2-mode-hook #'lsp-mode)
   ;; (add-hook 'js2-mode-hook 'lsp)
-  (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
-  (add-hook 'js2-mode-hook 'prettier-js-mode)
+  ;; (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
+
   ;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
 #+end_src
 
+** org
+
+#+begin_src emacs-lisp
+  (setq org-agenda-files
+   '("~/Nextcloud/org-roam" "~/Nextcloud/org-roam/daily" "~/Nextcloud/org"))
+#+end_src
 
 ** org-roam
 
@@ -362,7 +399,6 @@
   (defun efs/lsp-mode-setup ()
     (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
     (lsp-headerline-breadcrumb-mode))
-
 
   (use-package lsp-mode
     :ensure t

@@ -20,8 +20,7 @@
    editorconfig
    helm-projectile
    magit
-   paredit
-   prettier-js))
+   paredit))
 
 (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
 
@@ -67,7 +66,9 @@
 (use-package helm-github-stars
   :ensure t
   :commands (helm-github-stars)
-  :bind (("S-C-g" . helm-github-stars)))
+  :bind (("S-C-g" . helm-github-stars))
+  :config
+  (setq helm-github-stars-username "duck1123"))
 
 (use-package nix-mode
   :ensure t)
@@ -102,6 +103,11 @@
 ;; (setq tab-width 2)
 ;; (setq default-tab-width 2)
 
+(use-package magit
+  :ensure t
+  :config
+  (setq magit-commit-arguments '("--verbose" "--gpg-sign=80E3B47F0495EF7E")))
+
 (use-package magit-lfs
     :ensure t
     :after magit)
@@ -130,7 +136,9 @@
 ;; (require 'kubernetes-helm)
 
 (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
-(add-hook 'web-mode-hook 'prettier-js-mode)
+
+(use-package prettier
+  :ensure t)
 
 (use-package clojure-mode
   :ensure t
@@ -172,9 +180,12 @@
 (add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
 ;; (add-hook 'js2-mode-hook #'lsp-mode)
 ;; (add-hook 'js2-mode-hook 'lsp)
-(add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
-(add-hook 'js2-mode-hook 'prettier-js-mode)
+;; (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
+
 ;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
+
+(setq org-agenda-files
+ '("~/Nextcloud/org-roam" "~/Nextcloud/org-roam/daily" "~/Nextcloud/org"))
 
 (use-package org-roam
   :ensure t
@@ -243,7 +254,6 @@
 (defun efs/lsp-mode-setup ()
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
-
 
 (use-package lsp-mode
   :ensure t
