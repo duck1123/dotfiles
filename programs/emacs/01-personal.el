@@ -184,6 +184,26 @@
 
 ;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
 
+(use-package org
+  :ensure t
+  :init
+  (progn
+    (setq org-log-done 'time)
+  (setq org-directory "~/Nextcloud/org/"))
+  :config
+   ;; Capture templates for links to pages having [ and ]
+  ;; characters in their page titles - notably ArXiv
+  ;; From https://github.com/sprig/org-capture-extension
+  (defun transform-square-brackets-to-round-ones(string-to-transform)
+    "Transforms [ into ( and ] into ), other chars left unchanged."
+    (concat
+     (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform)))
+  (setq org-capture-templates `(
+        ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+        "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+        ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+        "* %? [[%:link][%:description]] \nCaptured On: %U"))))
+
 (setq org-agenda-files
  '("~/Nextcloud/org-roam" "~/Nextcloud/org-roam/daily" "~/Nextcloud/org"))
 
@@ -191,11 +211,12 @@
   :ensure t
 
   :custom
-  (org-roam-directory "~/Nextcloud/org-roam")
+  (org-roam-directory "~/Nextcloud/org-roam/")
   (org-roam-capture-templates
    `(("d" "default" plain "%?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t)))
+      :unnarrowed t))
+   )
 
   :bind
   (("C-c n l" . org-roam-buffer-toggle)
@@ -205,6 +226,7 @@
   :config
   (org-roam-setup)
   (org-roam-db-autosync-mode)
+
   (setq org-roam-dailies-capture-templates
         `(("d" "default" entry "* %?\n:PROPERTIES:\n:CREATED: %T\n:END:"
            :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")))))
