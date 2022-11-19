@@ -9,7 +9,7 @@
 (setq package-archives
       '(("melpa" . "https://melpa.org/packages/")
         ("melpa-stable" . "https://stable.melpa.org/packages/")
-        ("org" . "https://orgmode.org/elpa/")
+        ;; ("org" . "https://orgmode.org/elpa/")
         ("elpa" . "https://elpa.gnu.org/packages/")))
 
 (setq gc-cons-threshold (* 100 1024 1024))
@@ -154,8 +154,8 @@
 (use-package ac-cider
   :ensure t)
 
-(use-package helm-cider
-  :ensure t)
+;; (use-package helm-cider
+;;   :ensure t)
 
 (use-package flycheck-clj-kondo
   :ensure t)
@@ -165,14 +165,6 @@
 
 ;; (add-hook 'clojure-mode-hook #'subword-mode)
 ;; (add-hook 'clojure-mode-hook #'paredit-mode)
-
-(use-package hideshow-org
-  :ensure t
-  :init
-  (add-hook 'clojure-mode-hook (lambda () (hs-org/minor-mode 1)))
-  (add-hook 'php-mode-hook     (lambda () (hs-org/minor-mode 1)))
-  (add-hook 'js2-mode-hook     (lambda () (hs-org/minor-mode 1)))
-  (add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1))))
 
 ;; (use-package lsp-javascript
 ;;   :ensure t)
