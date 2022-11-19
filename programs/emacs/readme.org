@@ -268,7 +268,7 @@
 
 ** hide-show
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package hideshow-org
     :ensure t
     :init
