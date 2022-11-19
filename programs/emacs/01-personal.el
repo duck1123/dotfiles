@@ -109,8 +109,8 @@
   (setq magit-commit-arguments '("--verbose" "--gpg-sign=80E3B47F0495EF7E")))
 
 (use-package magit-lfs
-    :ensure t
-    :after magit)
+  :ensure t
+  :after magit)
 
 ;; (add-hook 'java-mode-hook
 ;;           (lambda ()
@@ -181,39 +181,42 @@
   :init
   (progn
     (setq org-log-done 'time)
-  (setq org-directory "~/Nextcloud/org/"))
+    (setq org-directory "~/Nextcloud/org/"))
   :config
-   ;; Capture templates for links to pages having [ and ]
+  (require 'org-protocol)
+  ;; Capture templates for links to pages having [ and ]
   ;; characters in their page titles - notably ArXiv
   ;; From https://github.com/sprig/org-capture-extension
   (defun transform-square-brackets-to-round-ones(string-to-transform)
     "Transforms [ into ( and ] into ), other chars left unchanged."
     (concat
      (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform)))
-  (setq org-capture-templates `(
-        ("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-        "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-        ("L" "Protocol Link" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-        "* %? [[%:link][%:description]] \nCaptured On: %U"))))
+  (setq org-capture-templates `(("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+                                 "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+                                ("L" "Protocol Link" entry (file ,(concat org-directory "001 - browser-links.org"))
+                                 "* [[%:link][%:description]] :link:\n:PROPERTIES:\n:CREATED: %T\n:END:\n\n%?"))))
 
 (setq org-agenda-files
- '("~/Nextcloud/org-roam" "~/Nextcloud/org-roam/daily" "~/Nextcloud/org"))
+      '("~/Nextcloud/org-roam" "~/Nextcloud/org-roam/daily" "~/Nextcloud/org"))
 
 (use-package org-roam
   :ensure t
+  ;; :straight
+  ;; (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+  :after org-roam
 
   :custom
   (org-roam-directory "~/Nextcloud/org-roam/")
   (org-roam-capture-templates
    `(("d" "default" plain "%?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-      :unnarrowed t))
-   )
+      :unnarrowed t)))
 
   :bind
-  (("C-c n l" . org-roam-buffer-toggle)
-   ("C-c n f" . org-roam-node-find)
-   ("C-c n i" . org-roam-node-insert))
+  (("C-x n c" . org-roam-dailies-capture-today)
+   ("C-x n l" . org-roam-buffer-toggle)
+   ("C-x n f" . org-roam-node-find)
+   ("C-x n i" . org-roam-node-insert))
 
   :config
   (org-roam-setup)
@@ -221,7 +224,9 @@
 
   (setq org-roam-dailies-capture-templates
         `(("d" "default" entry "* %?\n:PROPERTIES:\n:CREATED: %T\n:END:"
-           :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n")))))
+           :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+  (setq org-roam-file-exclude-regexp
+        (concat "^" (expand-file-name org-roam-directory) "logseq/.*")))
 
 (use-package org-roam-ui
   :ensure t
