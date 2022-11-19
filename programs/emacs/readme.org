@@ -252,8 +252,8 @@
   (use-package ac-cider
     :ensure t)
 
-  (use-package helm-cider
-    :ensure t)
+  ;; (use-package helm-cider
+  ;;   :ensure t)
 
   (use-package flycheck-clj-kondo
     :ensure t)
