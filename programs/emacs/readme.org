@@ -350,7 +350,9 @@ Despite that message, this file is /not/ auto generated. Edit away.
           `(("d" "default" entry "* %?\n:PROPERTIES:\n:CREATED: %T\n:END:"
              :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
     (setq org-roam-file-exclude-regexp
-          (concat "^" (expand-file-name org-roam-directory) "logseq/.*")))
+          (concat "^" (expand-file-name org-roam-directory) "logseq/.*"))
+    (global-set-key (kbd "C-x n c")     'org-roam-dailies-capture-today)
+    (global-set-key (kbd "C-x n f")     'org-roam-node-find))
 #+end_src
 
 ** org-roam-ui
@@ -371,7 +373,6 @@ Despite that message, this file is /not/ auto generated. Edit away.
           org-roam-ui-update-on-save t
           org-roam-ui-open-on-start t))
 #+end_src
-
 
 ** org-babel
 
@@ -403,6 +404,8 @@ Despite that message, this file is /not/ auto generated. Edit away.
 #+end_src
 
 ** org tempo
+
+- https://github.com/dangom/org-mode/blob/b47dcf43067cd57e2ee3c1f8e4dfea94bca7d14b/lisp/org-tempo.el
 
 #+begin_src emacs-lisp
   (require 'org-tempo)

@@ -226,7 +226,9 @@
         `(("d" "default" entry "* %?\n:PROPERTIES:\n:CREATED: %T\n:END:"
            :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
   (setq org-roam-file-exclude-regexp
-        (concat "^" (expand-file-name org-roam-directory) "logseq/.*")))
+        (concat "^" (expand-file-name org-roam-directory) "logseq/.*"))
+  (global-set-key (kbd "C-x n c")     'org-roam-dailies-capture-today)
+  (global-set-key (kbd "C-x n f")     'org-roam-node-find))
 
 (use-package org-roam-ui
   :ensure t
