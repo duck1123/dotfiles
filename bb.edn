@@ -1,7 +1,7 @@
 {:tasks
  {install-cert-manager
   {:task
-   (let [version "1.6.1"
+   (let [version "1.10.0"
          url     (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.yaml"
                          version)]
      (shell (format "kubectl apply -f %s" url)))}
