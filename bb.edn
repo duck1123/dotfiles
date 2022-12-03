@@ -6,6 +6,18 @@
                          version)]
      (shell (format "kubectl apply -f %s" url)))}
 
+  make-chart-repo
+  {:task
+   (do
+     (println "make chart repo")
+     (let [name ""
+           url  ""
+           data {:apiVersion "catalog.cattle.io/v1"
+                 :kind       "ClusterRepo"
+                 :metadata   {:name name}
+                 :spec       {:url url}}]
+       data))}
+
   read-windows-key
   {:task
    (shell "sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM")}
