@@ -49,8 +49,8 @@ in {
       # k3d
       # kodi
       kubectl
-      nodejs-16_x
-      openjdk
+      # nodejs-16_x
+      # openjdk
       plex-media-player
       # plex-media-server
       plex-mpv-shim
@@ -62,12 +62,12 @@ in {
       nmap
       silver-searcher
       slack
-      sparrow
+      # sparrow
       # steam
       tdesktop
       teams
       thunderbird
-      tilt
+      # tilt
       transmission
       tree
       # virtualbox
