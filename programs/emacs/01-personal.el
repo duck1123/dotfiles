@@ -203,7 +203,7 @@
   :ensure t
   ;; :straight
   ;; (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
-  :after org-roam
+  :after org
 
   :custom
   (org-roam-directory "~/Nextcloud/org-roam/")
