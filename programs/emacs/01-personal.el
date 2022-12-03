@@ -4,6 +4,7 @@
 ;;; Code:
 
 (setq prelude-guru nil)
+
 (setq load-package-verbose t)
 
 (setq package-archives
@@ -14,6 +15,12 @@
 
 (setq gc-cons-threshold (* 100 1024 1024))
 (setq read-process-output-max (* 1024 1024))
+(setq create-lockfiles nil)
+;; (setq make-backup-files nil)
+
+;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+(setq user-emacs-directory (expand-file-name "~/.cache/emacs/"))
+(setq url-history-file (expand-file-name "url/history" user-emacs-directory))
 
 (prelude-require-packages
  '(crappy-jsp-mode
@@ -24,17 +31,9 @@
 
 (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
 
-(setq create-lockfiles nil)
-;; (setq make-backup-files nil)
-
-;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
-(setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
-      url-history-file (expand-file-name "url/history" user-emacs-directory))
-
 ;; Use no-littering to automatically set common paths to the new user-emacs-directory
 ;; (use-package no-littering
-;;   :ensure true
-;;   )
+;;   :ensure true)
 
 ;; Keep customization settings in a temporary file (thanks Ambrevar!)
 (setq custom-file
@@ -46,18 +45,20 @@
 (set-default-coding-systems 'utf-8)
 (server-start)
 
+
+
+;; (use-package helm :ensure t)
+
 (use-package which-key
   :init (which-key-mode)
   :diminish which-key-mode
   :config
   (setq which-key-idle-delay 0.3))
 
-
 (use-package auto-complete
   :ensure t)
 
 (use-package earthfile-mode :ensure t)
-;; (use-package helm :ensure t)
 
 (add-to-list 'load-path "~/.emacs.d/personal/ag-and-a-half")
 (require 'ag-and-a-half)
@@ -85,6 +86,7 @@
 
 (use-package scss-mode
   :ensure t)
+
 (use-package docker :ensure t)
 
 (use-package gradle-mode :ensure t)

@@ -1,7 +1,7 @@
 #+title Emacs Personalizations
 #+PROPERTY: header-args:emacs-lisp :tangle ./01-personal.el :mkdirp yes
 
-** commentary
+* commentary
 
 Write out the lines saying that this file is auto generated.
 
@@ -14,12 +14,25 @@ Write out the lines saying that this file is auto generated.
 
 Despite that message, this file is /not/ auto generated. Edit away.
 
-** package setup
+* Initial Setup
+
+** Package Setup
+
+Get rid of the stupid message telling my not to use certain keys
+
+#+BEGIN_SRC  emacs-lisp
+  (setq prelude-guru nil)
+#+END_SRC
+
+Log package load information
+
+#+BEGIN_SRC emacs-lisp
+  (setq load-package-verbose t)
+#+END_SRC
+
+Set archives
 
 #+begin_src emacs-lisp
-  (setq prelude-guru nil)
-  (setq load-package-verbose t)
-
   (setq package-archives
         '(("melpa" . "https://melpa.org/packages/")
           ("melpa-stable" . "https://stable.melpa.org/packages/")
@@ -32,6 +45,12 @@ Despite that message, this file is /not/ auto generated. Edit away.
 #+begin_src emacs-lisp
   (setq gc-cons-threshold (* 100 1024 1024))
   (setq read-process-output-max (* 1024 1024))
+  (setq create-lockfiles nil)
+  ;; (setq make-backup-files nil)
+
+  ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+  (setq user-emacs-directory (expand-file-name "~/.cache/emacs/"))
+  (setq url-history-file (expand-file-name "url/history" user-emacs-directory))
 #+end_src
 
 ** prelude packages
@@ -45,25 +64,18 @@ Despite that message, this file is /not/ auto generated. Edit away.
      paredit))
 #+end_src
 
-#+begin_src emacs-lisp :tangle ./01-personal.el
+** keybindings
+
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
-
-  (setq create-lockfiles nil)
-  ;; (setq make-backup-files nil)
-
-  ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
-  (setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
-        url-history-file (expand-file-name "url/history" user-emacs-directory))
-
 #+end_src
 
-** No littering
+** No Littering Mode
 
 #+begin_src emacs-lisp
   ;; Use no-littering to automatically set common paths to the new user-emacs-directory
   ;; (use-package no-littering
-  ;;   :ensure true
-  ;;   )
+  ;;   :ensure true)
 #+end_src
 
 ** Custom file
@@ -83,19 +95,33 @@ Despite that message, this file is /not/ auto generated. Edit away.
   (set-default-coding-systems 'utf-8)
   (server-start)
 
+
+
+  ;; (use-package helm :ensure t)
+#+end_src
+
+** Which Key
+
+#+BEGIN_SRC emacs-lisp
   (use-package which-key
     :init (which-key-mode)
     :diminish which-key-mode
     :config
     (setq which-key-idle-delay 0.3))
+#+END_SRC
 
+** Auto Complete
 
+#+BEGIN_SRC emacs-lisp
   (use-package auto-complete
     :ensure t)
+#+END_SRC
 
+** Earthfile
+
+#+BEGIN_SRC emacs-lisp
   (use-package earthfile-mode :ensure t)
-  ;; (use-package helm :ensure t)
-#+end_src
+#+END_SRC
 
 ** AG
 
@@ -116,26 +142,47 @@ Despite that message, this file is /not/ auto generated. Edit away.
     (setq helm-github-stars-username "duck1123"))
 #+end_src
 
-** more config
+** Nix
 
-#+begin_src emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (use-package nix-mode
     :ensure t)
+#+END_SRC
 
+** Nyan
+
+#+BEGIN_SRC emacs-lisp
   (use-package nyan-mode
     :ensure t
     :config
     (nyan-mode))
+#+END_SRC
 
+** Rainbow delimiters
+
+#+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
     :init
     (rainbow-delimiters-mode-enable))
+#+END_SRC
 
+** SCSS
+
+#+BEGIN_SRC emacs-lisp
   (use-package scss-mode
     :ensure t)
-  (use-package docker :ensure t)
+#+END_SRC
 
+** Docker
+
+#+BEGIN_SRC emacs-lisp
+  (use-package docker :ensure t)
+#+END_SRC
+
+** more config
+
+#+begin_src emacs-lisp
   (use-package gradle-mode :ensure t)
   (use-package flycheck-gradle
     :ensure t)
