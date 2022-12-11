@@ -17,4 +17,6 @@
  {:name "nextcloud"
   :url "https://nextcloud.github.io/helm/"}
  {:name "rancher-latest"
-  :url "https://releases.rancher.com/server-charts/latest"}]
+  :url "https://releases.rancher.com/server-charts/latest"}
+ {:name "uptime-kuma"
+  :url "https://dirsigler.github.io/uptime-kuma-helm"}]
