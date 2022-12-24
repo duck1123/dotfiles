@@ -49,6 +49,7 @@ in {
       # k3d
       # kodi
       kubectl
+      kustomize
       # nodejs-16_x
       # openjdk
       plex-media-player
