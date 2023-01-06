@@ -186,6 +186,7 @@ in {
 
       source <(k3d completion zsh)
       source <(arkade completion zsh)
+      source <(devspace completion zsh)
 
       _bb_tasks() {
         local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
