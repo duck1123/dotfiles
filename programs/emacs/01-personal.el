@@ -90,14 +90,11 @@
 (use-package docker :ensure t)
 
 (use-package gradle-mode :ensure t)
-(use-package flycheck-gradle
-  :ensure t)
+(use-package flycheck-gradle :ensure t)
 
-(use-package company
-  :ensure t)
+(use-package company :ensure t)
 
-(use-package go-mode
-  :ensure t)
+(use-package go-mode :ensure t)
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
@@ -281,7 +278,9 @@
 (use-package lsp-mode
   :ensure t
   :commands (lsp lsp-deferred)
-  :hook (lsp-mode . efs/lsp-mode-setup)
+  :hook
+  ((javascript-mode . lsp)
+   (lsp-mode . efs/lsp-mode-setup))
   :init
   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
   :config
@@ -289,6 +288,8 @@
   :custom
   (lsp-lens-enable t)
   (lsp-signature-auto-activate t))
+
+(use-package helm-lsp :commands helm-lsp-workspace-symbol)
 
 (use-package lsp-ui
   :ensure t

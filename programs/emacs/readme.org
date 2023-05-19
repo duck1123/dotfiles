@@ -180,19 +180,28 @@ Set archives
   (use-package docker :ensure t)
 #+END_SRC
 
+** Gradle Mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package gradle-mode :ensure t)
+  (use-package flycheck-gradle :ensure t)
+#+END_SRC
+
+** Company
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company :ensure t)
+#+END_SRC
+
+** Golang
+
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode :ensure t)
+#+END_SRC
+
 ** more config
 
 #+begin_src emacs-lisp
-  (use-package gradle-mode :ensure t)
-  (use-package flycheck-gradle
-    :ensure t)
-
-  (use-package company
-    :ensure t)
-
-  (use-package go-mode
-    :ensure t)
-
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
   ;; (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
@@ -465,6 +474,8 @@ Set archives
 
 ** lsp
 
+[[https://emacs-lsp.github.io/lsp-mode/page/installation/#use-package][Docs]]
+
 :hook
 (clojure-mode . 'lsp)
 (clojurescript-mode . 'lsp)
@@ -480,7 +491,9 @@ Set archives
   (use-package lsp-mode
     :ensure t
     :commands (lsp lsp-deferred)
-    :hook (lsp-mode . efs/lsp-mode-setup)
+    :hook
+    ((javascript-mode . lsp)
+     (lsp-mode . efs/lsp-mode-setup))
     :init
     (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
     :config
@@ -489,6 +502,7 @@ Set archives
     (lsp-lens-enable t)
     (lsp-signature-auto-activate t))
 
+  (use-package helm-lsp :commands helm-lsp-workspace-symbol)
 #+end_src
 
 ** lsp-ui
