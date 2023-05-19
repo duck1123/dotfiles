@@ -476,12 +476,8 @@ Set archives
 
 [[https://emacs-lsp.github.io/lsp-mode/page/installation/#use-package][Docs]]
 
-:hook
-(clojure-mode . 'lsp)
-(clojurescript-mode . 'lsp)
-(clojurec-mode . 'lsp)
-
 - https://emacs-lsp.github.io/lsp-mode/tutorials/clojure-guide/
+
 
 #+begin_src emacs-lisp
   (defun efs/lsp-mode-setup ()
@@ -492,7 +488,10 @@ Set archives
     :ensure t
     :commands (lsp lsp-deferred)
     :hook
-    ((javascript-mode . lsp)
+    ((js2-mode . lsp)
+     (clojure-mode . 'lsp)
+     (clojurescript-mode . 'lsp)
+     (clojurec-mode . 'lsp)
      (lsp-mode . efs/lsp-mode-setup))
     :init
     (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'

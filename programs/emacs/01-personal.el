@@ -279,7 +279,10 @@
   :ensure t
   :commands (lsp lsp-deferred)
   :hook
-  ((javascript-mode . lsp)
+  ((js2-mode . lsp)
+   (clojure-mode . 'lsp)
+   (clojurescript-mode . 'lsp)
+   (clojurec-mode . 'lsp)
    (lsp-mode . efs/lsp-mode-setup))
   :init
   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
