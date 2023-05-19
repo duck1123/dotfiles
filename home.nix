@@ -52,6 +52,7 @@ in {
       kustomize
       # nodejs-16_x
       # openjdk
+      openjdk17
       plex-media-player
       # plex-media-server
       plex-mpv-shim
