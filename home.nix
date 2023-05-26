@@ -47,6 +47,7 @@ in {
       # i3
       keepassxc
       # k3d
+      k9s
       # kodi
       kubectl
       kustomize
