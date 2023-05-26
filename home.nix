@@ -74,6 +74,7 @@ in {
       transmission
       tree
       # virtualbox
+      vlc
     ];
 
     # sessionPath = [
