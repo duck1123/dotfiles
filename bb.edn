@@ -1,5 +1,9 @@
 {:tasks
- {install-cert-manager
+ {:requires ([babashka.fs :as fs]
+             [clojure.edn :as edn]
+             [clojure.string :as str])
+
+  install-cert-manager
   {:task
    (let [version "1.10.0"
          url     (format "https://github.com/jetstack/cert-manager/releases/download/v%s/cert-manager.yaml"
@@ -7,7 +11,8 @@
      (shell (format "kubectl apply -f %s" url)))}
 
   make-chart-repo
-  {:task
+  {:description "Install repo into cluster"
+   :task
    (do
      (println "make chart repo")
      (let [name ""
@@ -19,7 +24,8 @@
        data))}
 
   read-windows-key
-  {:task
+  {:description "Read windows key from firmware"
+   :task
    (shell "sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM")}
 
   k3d-create
@@ -43,13 +49,23 @@
      (shell cmd))}
 
   k3d-delete
-  {:task (shell "k3d cluster delete k3s-default")}
+  {:description "Delete k3d cluster"
+   :task (shell "k3d cluster delete k3s-default")}
 
   k3d-start
   {:task (shell "k3d cluster start")}
 
   k3d-stop
   {:task (shell "k3d cluster stop")}
+
+  install-charts
+  {:task
+   (let [dry-run? false]
+     (doseq [{:keys [name url]} (edn/read-string (slurp "./helm_charts.edn"))]
+       (let [command (str "helm repo add " name " " url)]
+         (if dry-run?
+           (println (str "[DRY-RUN] " command))
+           (shell command)))))}
 
   install-consul
   {:task
