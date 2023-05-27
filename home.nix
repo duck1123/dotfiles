@@ -49,6 +49,7 @@ in {
       # k3d
       k9s
       # kodi
+      krew
       kubectl
       kustomize
       # nodejs-16_x
