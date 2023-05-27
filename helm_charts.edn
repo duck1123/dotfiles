@@ -1,22 +1,23 @@
-[{:name "hashicorp"
-  :url  "https://helm.releases.hashicorp.com"}
- {:name "halkeye"
-  :url  "https://halkeye.github.io/helm-charts"}
- {:name "lsdcapital"
-  :url "https://lsdcapital.github.io/helm-charts"}
- {:name "grafana"
-  :url "https://grafana.github.io/helm-charts"}
- {:name "inseefrlab"
-  :url "https://inseefrlab.github.io/helm-charts-datascience"}
- {:name "k8s-at-home"
-  :url "https://k8s-at-home.com/charts/"}
- {:name "bitnami"
-  :url "https://charts.bitnami.com/bitnami"}
- {:name "dinsro"
-  :url "https://chart.kronkltd.net/"}
- {:name "nextcloud"
-  :url "https://nextcloud.github.io/helm/"}
- {:name "rancher-latest"
-  :url "https://releases.rancher.com/server-charts/latest"}
- {:name "uptime-kuma"
-  :url "https://dirsigler.github.io/uptime-kuma-helm"}]
+[{:name "argo" :url "https://argoproj.github.io/argo-helm"}
+ {:name "bitnami" :url "https://charts.bitnami.com/bitnami"}
+ {:name "crossplane-stable" :url "https://charts.crossplane.io/stable"}
+ {:name "datawire" :url "https://www.getambassador.io"}
+ {:name "elastic" :url "https://helm.elastic.co"}
+ {:name "fold" :url "https://charts.foldapp.com"}
+ {:name "grafana" :url "https://grafana.github.io/helm-charts"}
+ {:name "hashicorp" :url "https://helm.releases.hashicorp.com"}
+ {:name "halkeye" :url "https://halkeye.github.io/helm-charts"}
+ {:name "helm-sh-stable" :url "https://charts.helm.sh/stable"}
+ {:name "inbucket" :url "https://inbucket.github.io/inbucket-community"}
+ {:name "inseefrlab" :url "https://inseefrlab.github.io/helm-charts-datascience"}
+ {:name "jetstack" :url "https://charts.jetstack.io"}
+ {:name "k8s-at-home" :url "https://k8s-at-home.com/charts/"}
+ {:name "kronkltd" :url "https://chart.kronkltd.net/"}
+ {:name "lsdcapital" :url "https://lsdcapital.github.io/helm-charts"}
+ {:name "nextcloud" :url "https://nextcloud.github.io/helm/"}
+ {:name "pmint93" :url "https://pmint93.github.io/helm-charts"}
+ {:name "prometheus-community" :url "https://prometheus-community.github.io/helm-charts"}
+ {:name "rancher-latest" :url "https://releases.rancher.com/server-charts/latest"}
+ {:name "riotkit-org" :url "https://riotkit-org.github.io/helm-of-revolution/"}
+ {:name "sealed-secrets" :url "https://bitnami-labs.github.io/sealed-secrets"}
+ {:name "uptime-kuma" :url "https://dirsigler.github.io/uptime-kuma-helm"}]
