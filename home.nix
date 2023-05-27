@@ -30,6 +30,7 @@ in {
       curl
       # doctl
       # docker
+      digikam
       # dunst
       # earthly
       # emacs
