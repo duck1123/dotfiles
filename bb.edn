@@ -28,16 +28,20 @@
    :task
    (shell "sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM")}
 
+  k3d-create-registry
+  {:task
+   (shell "k3d registry create myregistry.localtest.me --port 12345")}
+
   k3d-create
   {:description "Create a k3d cluster"
    :task
-   (let [dry-run?         true
+   (let [dry-run?         false
          use-ingress      false
          create-registry? false
          use-registry?    true
          api-port         6550
          registry-name    "registry"
-         registy-host     "k3d-myregistry.localtest.me:12345"
+         registry-host    "k3d-myregistry.localtest.me:12345"
          server-count     1
          cmd              (clojure.string/join
                            " "
