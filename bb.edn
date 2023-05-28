@@ -49,7 +49,7 @@
                             "--api-port" api-port
                             "-p \"80:80@loadbalancer\""
                             "-p \"443:443@loadbalancer\""
-                            (when-not use-ingress "--k3s-server-arg \"--no-deploy=traefik\"")
+                            (when-not use-ingress "--k3s-arg \"--no-deploy=traefik@server:0\"")
                             "--servers" server-count
                             (when create-registry?
                               (str "--registry-create " registry-name))
@@ -111,6 +111,9 @@
                          (format "--set letsEncrypt.email=%s" email)])]
      (println cmd)
      (shell cmd))}
+
+  install-traefik
+  {:task (shell "helm install traefik traefik/traefik")}
 
   show-ports
   {:task (shell "netstat -ltnp")}
