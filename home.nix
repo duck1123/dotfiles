@@ -21,7 +21,6 @@ in {
     homeDirectory = "/home/${username}";
 
     packages = with pkgs; [
-      arkade
       babashka
       # barrier
       bat
@@ -177,7 +176,6 @@ in {
       if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
       fi # added by Nix installer
-      export PATH="/home/${username}/.arkade/bin:$PATH"
       export PATH="/home/${username}/.local/bin:$PATH"
       export PATH="/home/${username}/.yarn/bin:$PATH"
       export PATH="/home/${username}/.config/yarn/global/node_modules/.bin:$PATH"
@@ -190,7 +188,6 @@ in {
       bindkey -s "\C-x\C-tu" "tilt up --legacy=true\C-j"
 
       source <(k3d completion zsh)
-      source <(arkade completion zsh)
       source <(devspace completion zsh)
 
       _bb_tasks() {
