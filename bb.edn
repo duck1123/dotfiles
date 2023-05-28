@@ -70,6 +70,19 @@
   k3d-stop
   {:task (shell "k3d cluster stop")}
 
+  install-argocd
+  {:task
+   (do
+     (println "Installing argocd")
+     (let [dry-run? false
+           url      "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+           commands  ["kubectl create namespace argocd"
+                      (str "kubectl apply -n argocd -f " url)]]
+       (doseq [command commands]
+         (if dry-run?
+          (println command)
+          (shell command)))))}
+
   install-charts
   {:task
    (let [dry-run? false]
