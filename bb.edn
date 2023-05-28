@@ -31,26 +31,34 @@
   k3d-create
   {:description "Create a k3d cluster"
    :task
-   (let [use-ingress   true
-         api-port      6550
-         registry-name "registry"
-         server-count  1
-         cmd           (clojure.string/join
-                        " "
-                        ["k3d cluster create"
-                         "--api-port" api-port
-                         "-p \"80:80@loadbalancer\""
-                         "-p \"443:443@loadbalancer\""
-                         (when-not use-ingress "--k3s-arg \"--disable=traefik@server:0\"")
-                         "--servers" server-count
-                         "--registry-create" registry-name
-                         "--kubeconfig-update-default"])]
-     #_(println cmd)
-     (shell cmd))}
+   (let [dry-run?         true
+         use-ingress      false
+         create-registry? false
+         use-registry?    true
+         api-port         6550
+         registry-name    "registry"
+         registy-host     "k3d-myregistry.localtest.me:12345"
+         server-count     1
+         cmd              (clojure.string/join
+                           " "
+                           ["k3d cluster create"
+                            "--api-port" api-port
+                            "-p \"80:80@loadbalancer\""
+                            "-p \"443:443@loadbalancer\""
+                            (when-not use-ingress "--k3s-server-arg \"--no-deploy=traefik\"")
+                            "--servers" server-count
+                            (when create-registry?
+                              (str "--registry-create " registry-name))
+                            (when use-registry?
+                              (str "--registry-use " registry-host))
+                            "--kubeconfig-update-default"])]
+     (if dry-run?
+       (println cmd)
+       (shell cmd)))}
 
   k3d-delete
   {:description "Delete k3d cluster"
-   :task (shell "k3d cluster delete k3s-default")}
+   :task        (shell "k3d cluster delete k3s-default")}
 
   k3d-start
   {:task (shell "k3d cluster start")}
