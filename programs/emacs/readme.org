@@ -24,7 +24,7 @@ Get rid of the stupid message telling my not to use certain keys
   (setq prelude-guru nil)
 #+END_SRC
 
-Log package load information
+** Log package load information
 
 #+BEGIN_SRC emacs-lisp
   (setq load-package-verbose t)
@@ -89,15 +89,16 @@ Set archives
   (load custom-file t)
 #+end_src
 
-** more config
+** Set Default encoding
 
 #+begin_src emacs-lisp
   (set-default-coding-systems 'utf-8)
+#+end_src
+
+** Start the server
+
+#+begin_src emacs-lisp
   (server-start)
-
-
-
-  ;; (use-package helm :ensure t)
 #+end_src
 
 ** Which Key
@@ -234,15 +235,15 @@ Set archives
 
 ** JS
 
+(use-package flycheck-flow
+  :ensure t
+  :after flycheck)
+
+(use-package company-flow
+  :ensure t)
+
 #+begin_src emacs-lisp
-  (use-package flycheck-flow
-    :ensure t
-    :after flycheck)
-
   (use-package typescript-mode
-    :ensure t)
-
-  (use-package company-flow
     :ensure t)
 #+end_src
 
@@ -255,10 +256,14 @@ Set archives
 ** Kubernetes
 
 #+begin_src emacs-lisp
-  ;; (use-package kubernetes :ensure t)
-  ;; (use-package kubernetes-helm :ensure t)
-  ;; (require 'kubernetes)
-  ;; (require 'kubernetes-helm)
+  (use-package kubernetes :ensure t)
+  (use-package kubernetes-helm :ensure t)
+#+end_src
+
+** Make
+
+#+begin_src emacs-lisp
+  (use-package helm-make :ensure t)
 #+end_src
 
 ** JSP

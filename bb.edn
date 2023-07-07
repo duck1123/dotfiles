@@ -49,7 +49,7 @@
                             "--api-port" api-port
                             "-p \"80:80@loadbalancer\""
                             "-p \"443:443@loadbalancer\""
-                            (when-not use-ingress "--k3s-arg \"--no-deploy=traefik@server:0\"")
+                            (when-not use-ingress "--k3s-arg \"--disable=traefik@server:0\"")
                             "--servers" server-count
                             (when create-registry?
                               (str "--registry-create " registry-name))
