@@ -57,7 +57,7 @@ in {
       openjdk17
       plex-media-player
       # plex-media-server
-      plex-mpv-shim
+      # plex-mpv-shim
       # plexmediaserver
       # plexmediaserver
       # nextcloud-24.0.3
