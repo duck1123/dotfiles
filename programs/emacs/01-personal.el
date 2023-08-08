@@ -43,11 +43,8 @@
 (load custom-file t)
 
 (set-default-coding-systems 'utf-8)
+
 (server-start)
-
-
-
-;; (use-package helm :ensure t)
 
 (use-package which-key
   :init (which-key-mode)
@@ -117,22 +114,15 @@
 ;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
 ;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
 
-(use-package flycheck-flow
-  :ensure t
-  :after flycheck)
-
 (use-package typescript-mode
-  :ensure t)
-
-(use-package company-flow
   :ensure t)
 
 ;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
 
-;; (use-package kubernetes :ensure t)
-;; (use-package kubernetes-helm :ensure t)
-;; (require 'kubernetes)
-;; (require 'kubernetes-helm)
+(use-package kubernetes :ensure t)
+(use-package kubernetes-helm :ensure t)
+
+(use-package helm-make :ensure t)
 
 (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
 
@@ -228,6 +218,10 @@
         (concat "^" (expand-file-name org-roam-directory) "logseq/.*"))
   (global-set-key (kbd "C-x n c")     'org-roam-dailies-capture-today)
   (global-set-key (kbd "C-x n f")     'org-roam-node-find))
+
+(use-package orq-ql
+  :ensure t
+  :after org)
 
 (use-package org-roam-ui
   :ensure t

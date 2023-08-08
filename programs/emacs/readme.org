@@ -416,6 +416,14 @@ Set archives
     (global-set-key (kbd "C-x n f")     'org-roam-node-find))
 #+end_src
 
+** org-ql
+
+#+begin_src emacs-lisp
+  (use-package orq-ql
+    :ensure t
+    :after org)
+#+end_src
+
 ** org-roam-ui
 
 #+begin_src emacs-lisp
