@@ -219,7 +219,11 @@
   (global-set-key (kbd "C-x n c")     'org-roam-dailies-capture-today)
   (global-set-key (kbd "C-x n f")     'org-roam-node-find))
 
-(use-package orq-ql
+(use-package org-ql
+  :ensure t
+  :after org)
+
+(use-package org-ai
   :ensure t
   :after org)
 

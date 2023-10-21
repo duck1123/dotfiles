@@ -419,7 +419,15 @@ Set archives
 ** org-ql
 
 #+begin_src emacs-lisp
-  (use-package orq-ql
+  (use-package org-ql
+    :ensure t
+    :after org)
+#+end_src
+
+** org-ai
+
+#+begin_src emacs-lisp
+  (use-package org-ai
     :ensure t
     :after org)
 #+end_src
