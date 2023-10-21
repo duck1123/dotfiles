@@ -69,7 +69,7 @@ in {
       # sparrow
       # steam
       tdesktop
-      teams
+      # teams
       thunderbird
       # tilt
       transmission
