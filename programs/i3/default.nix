@@ -2,13 +2,13 @@
   programs.i3status-rust = { enable = true; };
 
   programs.rofi = {
-    enable = true;
+    enable = false;
     # terminal = "${pkgs.alacritty}/bin/alacritty";
     # theme = ./theme.rafi;
   };
 
   services.dunst = {
-    enable = true;
+    enable = false;
     # iconTheme = {
     #   name = "Adwaita";
     #   package = pkgs.gnome3.adwaita-icon-theme;
@@ -41,7 +41,7 @@
   # };
 
   xsession.windowManager.i3 = {
-    enable = true;
+    enable = false;
     config = {
       bars = [ ];
       # bars = [{

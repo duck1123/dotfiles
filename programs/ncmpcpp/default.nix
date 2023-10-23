@@ -1,6 +1,6 @@
 {
   programs.ncmpcpp = {
-    enable = true;
+    enable = false;
     settings = {
       # Playlist
       now_playing_prefix = "$b";

@@ -25,7 +25,7 @@ in {
       # barrier
       bat
       byobu
-      chromium
+      # chromium
       curl
       # doctl
       # docker
@@ -34,7 +34,7 @@ in {
       # earthly
       # emacs
       # extraNodePackages.prettier
-      fish
+      # fish
       git
       gnumake
       go
@@ -70,9 +70,9 @@ in {
       # steam
       tdesktop
       # teams
-      thunderbird
+      # thunderbird
       # tilt
-      transmission
+      # transmission
       tree
       # virtualbox
       vlc
