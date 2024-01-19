@@ -177,6 +177,7 @@ in {
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
       fi # added by Nix installer
       export PATH="/home/${username}/.local/bin:$PATH"
+      export PATH="/home/${username}/.dotnet:$PATH"
       export PATH="/home/${username}/.yarn/bin:$PATH"
       export PATH="/home/${username}/.config/yarn/global/node_modules/.bin:$PATH"
 
