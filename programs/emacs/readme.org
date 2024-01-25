@@ -342,7 +342,7 @@ Set archives
 
 ** js2
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   ;; (use-package lsp-javascript
   ;;   :ensure t)
 
@@ -372,10 +372,11 @@ Set archives
       "Transforms [ into ( and ] into ), other chars left unchanged."
       (concat
        (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform)))
-    (setq org-capture-templates `(("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-                                   "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-                                  ("L" "Protocol Link" entry (file ,(concat org-directory "001 - browser-links.org"))
-                                   "* [[%:link][%:description]] :link:\n:PROPERTIES:\n:CREATED: %T\n:END:\n\n%?"))))
+    (setq org-capture-templates
+          `(("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+             "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+            ("L" "Protocol Link" entry (file ,(concat org-directory "001 - browser-links.org"))
+             "* [[%:link][%:description]] :link:\n:PROPERTIES:\n:CREATED: %T\n:END:\n\n%?"))))
 
   (setq org-agenda-files
         '("~/Nextcloud/org-roam" "~/Nextcloud/org-roam/daily" "~/Nextcloud/org"))
@@ -418,7 +419,7 @@ Set archives
 
 ** org-ql
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package org-ql
     :ensure t
     :after org)
@@ -426,7 +427,7 @@ Set archives
 
 ** org-ai
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package org-ai
     :ensure t
     :after org)
@@ -484,7 +485,7 @@ Set archives
 
 - https://github.com/dangom/org-mode/blob/b47dcf43067cd57e2ee3c1f8e4dfea94bca7d14b/lisp/org-tempo.el
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (require 'org-tempo)
   (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
@@ -537,7 +538,7 @@ Set archives
 
 ** treemacs
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   ;; (use-package lsp-treemacs
   ;;   :ensure t
   ;;   :config
@@ -546,7 +547,7 @@ Set archives
 
 ** clerk
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (defun clerk-show ()
     (interactive)
     (save-buffer)

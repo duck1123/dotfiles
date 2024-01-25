@@ -155,16 +155,6 @@
 ;; (add-hook 'clojure-mode-hook #'subword-mode)
 ;; (add-hook 'clojure-mode-hook #'paredit-mode)
 
-;; (use-package lsp-javascript
-;;   :ensure t)
-
-(add-to-list 'auto-mode-alist '("\\.flow\\'" . js2-mode))
-;; (add-hook 'js2-mode-hook #'lsp-mode)
-;; (add-hook 'js2-mode-hook 'lsp)
-;; (add-hook 'js2-mode-hook 'flow-minor-enable-automatically)
-
-;; (add-hook 'js2-mode-hook      (lambda () (c-set-offset 'case-label '+)))
-
 (use-package org
   :ensure t
   :init
@@ -180,10 +170,11 @@
     "Transforms [ into ( and ] into ), other chars left unchanged."
     (concat
      (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform)))
-  (setq org-capture-templates `(("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
-                                 "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-                                ("L" "Protocol Link" entry (file ,(concat org-directory "001 - browser-links.org"))
-                                 "* [[%:link][%:description]] :link:\n:PROPERTIES:\n:CREATED: %T\n:END:\n\n%?"))))
+  (setq org-capture-templates
+        `(("p" "Protocol" entry (file+headline ,(concat org-directory "notes.org") "Inbox")
+           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+          ("L" "Protocol Link" entry (file ,(concat org-directory "001 - browser-links.org"))
+           "* [[%:link][%:description]] :link:\n:PROPERTIES:\n:CREATED: %T\n:END:\n\n%?"))))
 
 (setq org-agenda-files
       '("~/Nextcloud/org-roam" "~/Nextcloud/org-roam/daily" "~/Nextcloud/org"))
@@ -218,14 +209,6 @@
         (concat "^" (expand-file-name org-roam-directory) "logseq/.*"))
   (global-set-key (kbd "C-x n c")     'org-roam-dailies-capture-today)
   (global-set-key (kbd "C-x n f")     'org-roam-node-find))
-
-(use-package org-ql
-  :ensure t
-  :after org)
-
-(use-package org-ai
-  :ensure t
-  :after org)
 
 (use-package org-roam-ui
   :ensure t
@@ -263,12 +246,6 @@
 
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 
-(require 'org-tempo)
-(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-(add-to-list 'org-structure-template-alist '("bb" . "src babashka"))
-(add-to-list 'org-structure-template-alist '("clj" . "src clojure"))
-
 (defun efs/lsp-mode-setup ()
   (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
   (lsp-headerline-breadcrumb-mode))
@@ -297,18 +274,3 @@
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-position 'bottom))
-
-;; (use-package lsp-treemacs
-;;   :ensure t
-;;   :config
-;;   (treemacs-space-between-root-nodes nil))
-
-(defun clerk-show ()
-  (interactive)
-  (save-buffer)
-  (let
-      ((filename
-        (buffer-file-name)))
-    (when filename
-      (cider-interactive-eval
-       (concat "(nextjournal.clerk/show! \"" filename "\")")))))
