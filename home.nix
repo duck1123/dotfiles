@@ -29,7 +29,7 @@ in {
       curl
       # doctl
       # docker
-      digikam
+      # digikam
       # dunst
       # earthly
       # emacs
