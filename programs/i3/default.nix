@@ -2,13 +2,13 @@
   programs.i3status-rust = { enable = true; };
 
   programs.rofi = {
-    enable = false;
+    enable = true;
     # terminal = "${pkgs.alacritty}/bin/alacritty";
     # theme = ./theme.rafi;
   };
 
   services.dunst = {
-    enable = false;
+    enable = true;
     # iconTheme = {
     #   name = "Adwaita";
     #   package = pkgs.gnome3.adwaita-icon-theme;
@@ -41,12 +41,18 @@
   # };
 
   xsession.windowManager.i3 = {
-    enable = false;
+    enable = true;
     config = {
-      bars = [ ];
-      # bars = [{
-      #   statusCommand = "i3bar";
-      # }];
+      # bars = [ ];
+      bars = [
+        # {
+        #   statusCommand = "i3bar";
+        # }
+        {
+          statusCommand = "i3status";
+        }
+      ];
+
       gaps = {
         inner = 12;
         outer = 5;
@@ -57,11 +63,11 @@
       modifier = "Mod4";
 
       startup = [
-        {
-          command = "systemctl --user restart polybar";
-          always = true;
-          notification = false;
-        }
+        # {
+        #   command = "systemctl --user restart polybar";
+        #   always = true;
+        #   notification = false;
+        # }
         {
           command = "systemctl --user start dunst.service";
           always = true;
