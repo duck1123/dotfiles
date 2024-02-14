@@ -49,6 +49,7 @@
         #   statusCommand = "i3bar";
         # }
         {
+          position = "top";
           statusCommand = "i3status";
         }
       ];

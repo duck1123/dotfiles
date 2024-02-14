@@ -160,7 +160,7 @@
   :init
   (progn
     (setq org-log-done 'time)
-    (setq org-directory "~/Nextcloud/org/"))
+    (setq org-directory "~/Nextcloud/org-roam/"))
   :config
   (require 'org-protocol)
   ;; Capture templates for links to pages having [ and ]
@@ -194,9 +194,11 @@
 
   :bind
   (("C-x n c" . org-roam-dailies-capture-today)
+   ("C-x n C-d" . org-roam-dailies-goto-date)
    ("C-x n l" . org-roam-buffer-toggle)
    ("C-x n f" . org-roam-node-find)
-   ("C-x n i" . org-roam-node-insert))
+   ("C-x n i" . org-roam-node-insert)
+   ("C-x n C-t" . org-roam-dailies-goto-today))
 
   :config
   (org-roam-setup)

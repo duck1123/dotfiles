@@ -118,7 +118,9 @@ in {
     };
   };
 
-  programs.tmux = { enable = true; };
+  programs.tmux = {
+    enable = true;
+  };
 
   programs.vim = {
     enable = true;
@@ -168,7 +170,6 @@ in {
       ];
     };
 
-
     # export PATH="/home/${username}/.pulumi/bin:$PATH"
     # export PATH="/home/${username}/.huber/bin:$PATH"
 
@@ -200,7 +201,11 @@ in {
 
     # _files # autocomplete filenames as well
 
-    localVariables = { PROJECT_PATHS = [ ~/projects ]; };
+    localVariables = {
+      PROJECT_PATHS = [
+        ~/projects
+      ];
+    };
 
     sessionVariables = {
       EDITOR = "emacsclient -ct";
@@ -231,6 +236,7 @@ in {
 
   xdg = {
     enable = true;
+
     mime = {
       enable = true;
     };
