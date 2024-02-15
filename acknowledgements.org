@@ -1,0 +1,3 @@
+Other repos I've ripped stuff off from
+
+* https://github.com/efim/dotfiles
