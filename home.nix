@@ -74,7 +74,7 @@ in {
       # tilt
       # transmission
       tree
-      # virtualbox
+      virtualbox
       vlc
     ];
 
