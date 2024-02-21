@@ -160,7 +160,7 @@
   :init
   (progn
     (setq org-log-done 'time)
-    (setq org-directory "~/Nextcloud/org-roam/"))
+    (setq org-directory "~/org-roam/"))
   :config
   (require 'org-protocol)
   ;; Capture templates for links to pages having [ and ]
@@ -177,7 +177,7 @@
            "* [[%:link][%:description]] :link:\n:PROPERTIES:\n:CREATED: %T\n:END:\n\n%?"))))
 
 (setq org-agenda-files
-      '("~/Nextcloud/org-roam" "~/Nextcloud/org-roam/daily" "~/Nextcloud/org"))
+      '("~/org-roam" "~/org-roam/daily"))
 
 (use-package org-roam
   :ensure t
@@ -186,7 +186,7 @@
   :after org
 
   :custom
-  (org-roam-directory "~/Nextcloud/org-roam/")
+  (org-roam-directory "~/org-roam/")
   (org-roam-capture-templates
    `(("d" "default" plain "%?"
       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
@@ -235,7 +235,7 @@
    (python . t)
    (clojure . t)))
 
-(setq user-emacs-directory "~/.dotfiles/programs/emacs/")
+(setq user-emacs-directory "~/dotfiles/programs/emacs/")
 
 ;; Automatically tangle our Emacs.org config file when we save it
 (defun efs/org-babel-tangle-config ()
