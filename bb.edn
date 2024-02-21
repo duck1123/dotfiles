@@ -10,6 +10,10 @@
                          version)]
      (shell (format "kubectl apply -f %s" url)))}
 
+  list-secret-keys
+  {:description "List gpg secret keys"
+   :task        (shell "gpg --list-secret-keys --keyid-format=long")}
+
   make-chart-repo
   {:description "Install repo into cluster"
    :task
@@ -27,6 +31,14 @@
   {:description "Read windows key from firmware"
    :task
    (shell "sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM")}
+
+  switch-home
+  {:decription "Update home-manager from flake"
+   :task       (shell "home-manager switch --flake /home/duck/dotfiles#duck --impure")}
+
+  switch-os
+  {:decription "Update nixos from flake"
+   :task       (shell "sudo nixos-rebuild switch --flake /home/duck/dotfiles#nixos")}
 
   k3d-create-registry
   {:task
@@ -76,12 +88,12 @@
      (println "Installing argocd")
      (let [dry-run? false
            url      "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
-           commands  ["kubectl create namespace argocd"
-                      (str "kubectl apply -n argocd -f " url)]]
+           commands ["kubectl create namespace argocd"
+                     (str "kubectl apply -n argocd -f " url)]]
        (doseq [command commands]
          (if dry-run?
-          (println command)
-          (shell command)))))}
+           (println command)
+           (shell command)))))}
 
   install-charts
   {:task
