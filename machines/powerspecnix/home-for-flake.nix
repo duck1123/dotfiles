@@ -39,6 +39,7 @@ in {
       # emacs
       # extraNodePackages.prettier
       fish
+      gcc9
       git
       gnumake
       go
