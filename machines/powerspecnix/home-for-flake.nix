@@ -32,7 +32,7 @@ in {
       # chromium
       curl
       # doctl
-      # docker
+      docker
       # digikam
       # dunst
       # earthly
@@ -183,7 +183,7 @@ in {
       bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
       bindkey -s "\C-x\C-tu" "tilt up --legacy=true\C-j"
 
-      # source <(k3d completion zsh)
+      source <(k3d completion zsh)
       # source <(devspace completion zsh)
 
       _bb_tasks() {
