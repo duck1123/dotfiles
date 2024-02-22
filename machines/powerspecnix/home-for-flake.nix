@@ -25,6 +25,7 @@ in {
     homeDirectory = "/home/${username}";
 
     packages = with pkgs; [
+      arkade
       babashka
       # barrier
       bat
@@ -171,6 +172,8 @@ in {
       if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
       fi # added by Nix installer
+
+      export PATH="/home/${username}/.arkade/bin:$PATH"
       export PATH="/home/${username}/.local/bin:$PATH"
       export PATH="/home/${username}/.dotnet:$PATH"
       export PATH="/home/${username}/.yarn/bin:$PATH"
