@@ -284,7 +284,6 @@ Set archives
     (add-hook 'js2-mode-hook 'prettier-js-mode))
 
   (setq prettier-js-command "npx prettier")
-
 #+end_src
 
 *** Prettier
