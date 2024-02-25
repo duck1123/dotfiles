@@ -25,6 +25,7 @@ in {
     homeDirectory = "/home/${username}";
 
     packages = with pkgs; [
+      appimage-run
       arkade
       babashka
       # barrier
