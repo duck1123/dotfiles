@@ -64,6 +64,8 @@ in {
       # nodejs-16_x
       # openjdk
       openjdk17
+      openlens
+      plex
       plex-media-player
       # plex-media-server
       # plex-mpv-shim
