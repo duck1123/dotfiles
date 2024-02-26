@@ -62,6 +62,7 @@ in {
       hstr
       htop
       # i3
+      itch
       keepassxc
       # k3d
       k9s
