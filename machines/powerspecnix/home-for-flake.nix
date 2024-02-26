@@ -18,11 +18,19 @@ in {
 
   programs.home-manager.enable = true;
 
+  imports = [
+    ../../programs/emacs/default.nix
+    ../../programs/i3/default.nix
+    ../../programs/ncmpcpp/default.nix
+  ];
+
   home = {
     # Home Manager needs a bit of information about you and the
     # paths it should manage.
     username = "${username}";
     homeDirectory = "/home/${username}";
+
+    file.".bb/bb.edn".source = ../../bb.edn;
 
     packages = with pkgs; [
       appimage-run
@@ -46,6 +54,7 @@ in {
       gnumake
       go
       gpa
+      gnome.dconf-editor
       gnupg
       graphviz
       guake
@@ -91,20 +100,13 @@ in {
     ];
   };
 
-  imports = [
-    ../../programs/emacs/default.nix
-    ../../programs/i3/default.nix
-    ../../programs/ncmpcpp/default.nix
-  ];
-
-  home.file.".bb/bb.edn".source = ../../bb.edn;
+  programs.bash = {
+    enable = true;
+    profileExtra =
+      "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
+  };
 
   programs.direnv = { enable = true; };
-
-  programs.jq = {
-    enable = true;
-    # colors = true;
-  };
 
   programs.git = {
     enable = true;
@@ -117,6 +119,11 @@ in {
     };
   };
 
+  programs.jq = {
+    enable = true;
+    # colors = true;
+  };
+
   programs.tmux = { enable = true; };
 
   programs.vim = {
@@ -126,12 +133,6 @@ in {
       " Wrap gitcommit file types at the appropriate length
       filetype indent plugin on
     '';
-  };
-
-  programs.bash = {
-    enable = true;
-    profileExtra =
-      "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
   };
 
   programs.zsh = {
@@ -220,8 +221,12 @@ in {
     };
   };
 
-  dconf.settings."org/gnome/desktop/wm/preferences".button-layout =
-    "minimize,maximize,close";
+  dconf.settings = {
+    "org/gnome/desktop/wm/preferences".button-layout =
+      ":minimize,maximize,close";
+
+    "apps/guake/general".default-shell = "/run/current-system/sw/bin/zsh";
+  };
 
   services = {
     # gnome3.gnome-keyring.enable = true;
@@ -236,12 +241,12 @@ in {
   xdg = {
     enable = true;
 
-    mime = { enable = true; };
+    configFile."nix/nix.conf".text = ''
+      experimental-features = nix-command flakes
+    '';
+
+    mime.enable = true;
   };
 
   targets.genericLinux = { enable = true; };
-
-  xdg.configFile."nix/nix.conf".text = ''
-    experimental-features = nix-command flakes
-  '';
 }
