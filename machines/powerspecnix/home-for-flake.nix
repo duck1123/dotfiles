@@ -99,6 +99,14 @@ in {
       virtualbox
       vlc
     ];
+
+    sessionPath = [
+      "$HOME/.arkade/bin:$PATH"
+      "$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+      "$HOME/.dotnet:$PATH"
+      "$HOME/.local/bin:$PATH"
+      "$HOME/.yarn/bin:$PATH"
+    ];
   };
 
   programs.bash = {
@@ -178,18 +186,10 @@ in {
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
       fi # added by Nix installer
 
-      export PATH="/home/${username}/.arkade/bin:$PATH"
-      export PATH="/home/${username}/.local/bin:$PATH"
-      export PATH="/home/${username}/.dotnet:$PATH"
-      export PATH="/home/${username}/.yarn/bin:$PATH"
-      export PATH="/home/${username}/.config/yarn/global/node_modules/.bin:$PATH"
-
       bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
 
-      bindkey -s "\C-x\C-td" "tilt down --delete-namespaces\C-j"
       bindkey -s "\C-x\C-tn" "bbg watch-namespaces\C-j"
       bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
-      bindkey -s "\C-x\C-tu" "tilt up --legacy=true\C-j"
 
       source <(k3d completion zsh)
       # source <(devspace completion zsh)
