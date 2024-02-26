@@ -92,6 +92,31 @@
     # Enable CUPS to print documents.
     printing.enable = true;
 
+    syncthing = {
+      enable = true;
+      user = "duck";
+      dataDir = "/home/duck/Documents";
+      configDir = "/home/duck/Documents/.config/syncthing";
+
+      settings = {
+        devices = {
+          "Pixel" = { id = "R7RANTI-7SWMPTI-GDRAGOV-TK42PP3-PL3FHI5-LHGGVN3-PVNRIYO-FX7TAQM"; };
+        };
+
+        folders = {
+          "keepass" = {
+            path = "/home/duck/keepass";
+            devices = [ "Pixel" ];
+          };
+
+          "org-roam" = {
+            path = "/home/duck/org-roam";
+            devices = [ "Pixel" ];
+          };
+        };
+      };
+    };
+
     # Configure keymap in X11
     xserver = {
       # Enable the X11 windowing system.
