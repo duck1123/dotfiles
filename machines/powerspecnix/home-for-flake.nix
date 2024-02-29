@@ -98,6 +98,7 @@ in {
       tree
       virtualbox
       vlc
+      vscode
     ];
 
     sessionPath = [
@@ -109,39 +110,37 @@ in {
     ];
   };
 
-  programs.bash = {
-    enable = true;
-    profileExtra =
-      "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
-  };
-
-  programs.direnv = { enable = true; };
-
-  programs.git = {
-    enable = true;
-    userName = "${name}";
-    userEmail = "${email}";
-    lfs.enable = true;
-    signing = {
-      signByDefault = false;
-      key = gpgKey;
+  programs = {
+    bash = {
+      enable = true;
+      profileExtra =
+        "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
     };
-  };
 
-  programs.jq = {
-    enable = true;
-    # colors = true;
-  };
+    direnv.enable = true;
 
-  programs.tmux = { enable = true; };
+    git = {
+      enable = true;
+      userName = "${name}";
+      userEmail = "${email}";
+      lfs.enable = true;
+      signing = {
+        signByDefault = false;
+        key = gpgKey;
+      };
+    };
 
-  programs.vim = {
-    enable = true;
-    extraConfig = ''
+    jq.enable = true;
+    tmux.enable = true;
+
+    vim = {
+      enable = true;
+      extraConfig = ''
       syntax on
       " Wrap gitcommit file types at the appropriate length
       filetype indent plugin on
-    '';
+      '';
+    };
   };
 
   programs.zsh = {
@@ -236,6 +235,10 @@ in {
     #   enable = true;
     #   socketActivated = true;
     #   packages = [ pkgs.gnome3.dconf ];
+    # };
+
+    # openvscode-server = {
+    #   enable = true;
     # };
   };
 
