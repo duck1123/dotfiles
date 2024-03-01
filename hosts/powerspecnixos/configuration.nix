@@ -98,14 +98,22 @@
       user = "duck";
       dataDir = "/home/duck/Documents";
       configDir = "/home/duck/Documents/.config/syncthing";
+      openDefaultPorts = true;
+      overrideFolders = true;
+      overrideDevices = true;
 
       settings = {
         devices = {
-          "Pixel" = { id = "R7RANTI-7SWMPTI-GDRAGOV-TK42PP3-PL3FHI5-LHGGVN3-PVNRIYO-FX7TAQM"; };
+          "Pixel" = {
+            id =
+              "R7RANTI-7SWMPTI-GDRAGOV-TK42PP3-PL3FHI5-LHGGVN3-PVNRIYO-FX7TAQM";
+            autoAcceptFolders = true;
+          };
         };
 
         folders = {
           "keepass" = {
+            label = "keepass";
             path = "/home/duck/keepass";
             devices = [ "Pixel" ];
           };
@@ -115,6 +123,8 @@
             devices = [ "Pixel" ];
           };
         };
+
+        options = { urAccepted = -1; };
       };
     };
 
