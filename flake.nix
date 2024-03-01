@@ -2,10 +2,6 @@
   description = "home-manager config";
 
   nixConfig.extra-experimental-features = "nix-command flakes";
-  # nixConfig.extra-substituters =
-  #  "https://nrdxp.cachix.org https://nix-community.cachix.org";
-  # nixConfig.extra-trusted-public-keys =
-  #  "nrdxp.cachix.org-1:Fc5PSqY2Jm1TrWfm88l6cvGWwz3s93c6IOifQWnhNW4= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=";
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
@@ -19,7 +15,6 @@
 
     # nix-colors.url = "github:misterio77/nix-colors";   # Color schemes for usage with home-manager
     # impermanence.url = "github:riscadoa/impermanence"; # Utilities for opt-in persistance
-    # TODO: Add any other flakes you need
 
     # Track channels with commits tested and built by hydra
     nixos.url = "github:nixos/nixpkgs/nixos-22.05";
@@ -68,7 +63,6 @@
 
     nvfetcher.url = "github:berberman/nvfetcher";
     nvfetcher.inputs.nixpkgs.follows = "nixos";
-
   };
 
   outputs = { self, nixpkgs, home-manager, flake-utils, ... }@inputs:
@@ -80,17 +74,9 @@
       inherit (home-manager.lib) homeManagerConfiguration;
       eachDefaultSystemMap = eachSystemMap defaultSystems;
     in rec {
-      # TODO: If you want to use packages exported from other flakes, add their overlays here.
-      # They will be added to your 'pkgs'
-      # overlays = {
-      #   default = import ./overlay; # Our own overlay
-      #   # nur = nur.overlay
-      # };
-
       # System configurations
       # Accessible via 'nixos-rebuild'
       nixosConfigurations = {
-        # FIXME: Replace with your hostname
         nixos = nixosSystem {
           system = "x86_64-linux";
 
@@ -114,33 +100,9 @@
         # FIXME: Replace with your username@hostname
         duck = homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-          # inherit pkgs;
 
-          modules = [{
-            imports = [ ./machines/powerspecnix/home-for-flake.nix ];
-
-            home = {
-              username = "duck";
-              homeDirectory = "/home/duck";
-              stateVersion = "21.11";
-            };
-            nix.registry.nixpkgs.flake = nixpkgs;
-          }];
-          # FIXME: Replace with your username
-          # username = "duck";
-          # homeDirectory = "/home/${username}";
-          # system = "x86_64-linux";
-
-          # # >> Main home-manager configuration file <<
-          # configuration = ./home-manager/home.nix;
-          # extraModules = [
-          #   # Adds your custom home-manager modules
-          #   ./modules/home-manager
-          #   # Adds overlays
-          #   # { nixpkgs.overlays = attrValues overlays; }
-          # ];
-          # # Make our inputs available to the config (for importing modules)
-          # extraSpecialArgs = { inherit inputs; };
+          modules =
+            [{ imports = [ ./machines/powerspecnix/home-for-flake.nix ]; }];
         };
       };
 
@@ -148,10 +110,7 @@
       # Accessible via 'nix build'
       packages = eachDefaultSystemMap (system:
         # Propagate nixpkgs' packages, with our overlays applied
-        import nixpkgs {
-          inherit system;
-          # overlays = attrValues overlays;
-        });
+        import nixpkgs { inherit system; });
 
       # Devshell for bootstrapping
       # Accessible via 'nix develop'
