@@ -85,9 +85,12 @@ in {
       nixfmt
       nixUnstable
       nmap
+      rtl-sdr
+      sdrangel
       silver-searcher
+      simplex-chat-desktop
       slack
-      # sparrow
+      sparrow
       # steam
       syncthing
       tdesktop
@@ -144,9 +147,9 @@ in {
   };
 
   programs.zsh = {
+    defaultKeymap = "emacs";
     enable = true;
     enableAutosuggestions = true;
-    defaultKeymap = "emacs";
 
     history = {
       expireDuplicatesFirst = true;
@@ -177,9 +180,6 @@ in {
       ];
     };
 
-    # export PATH="/home/${username}/.pulumi/bin:$PATH"
-    # export PATH="/home/${username}/.huber/bin:$PATH"
-
     initExtra = ''
       if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
@@ -200,9 +200,7 @@ in {
       compdef _bb_tasks bb
     '';
 
-    # _files # autocomplete filenames as well
-
-    localVariables = { PROJECT_PATHS = [ ~/projects ]; };
+    localVariables.PROJECT_PATHS = [ ~/projects ];
 
     sessionVariables = {
       EDITOR = "emacsclient -ct";
@@ -242,6 +240,8 @@ in {
     # };
   };
 
+  targets.genericLinux.enable = true;
+
   xdg = {
     enable = true;
 
@@ -251,6 +251,4 @@ in {
 
     mime.enable = true;
   };
-
-  targets.genericLinux = { enable = true; };
 }
