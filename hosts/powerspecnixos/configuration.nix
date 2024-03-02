@@ -136,8 +136,14 @@
       # Enable the GNOME Desktop Environment.
       desktopManager.gnome.enable = true;
 
-      displayManager.gdm.enable = true;
-      displayManager.lightdm.enable = true;
+      displayManager = {
+        defalutSession = "gnome";
+
+        gdm.enable = true;
+        lightdm.enable = true;
+
+
+      };
 
       # Enable touchpad support (enabled default in most desktopManager).
       # libinput.enable = true;
