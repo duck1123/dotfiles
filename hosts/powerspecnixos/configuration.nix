@@ -60,13 +60,16 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  programs.gnupg.agent = {
-    enable = true;
-    enableSSHSupport = true;
-  };
+  programs = {
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+    };
 
-  programs.steam.enable = true;
-  programs.zsh.enable = true;
+    steam.enable = true;
+
+    zsh.enable = true;
+  };
 
   security.rtkit.enable = true;
 
@@ -133,17 +136,35 @@
       # Enable the X11 windowing system.
       enable = true;
 
-      # Enable the GNOME Desktop Environment.
-      desktopManager.gnome.enable = true;
+      desktopManager = {
+        enlightenment.enable = true;
+
+        # Enable the GNOME Desktop Environment.
+        gnome.enable = true;
+
+        # phosh.enable = true;
+
+        # plasma5.enable = true;
+        # plasma6.enable = true;
+        xfce.enable = true;
+        xterm.enable = false;
+      };
 
       displayManager = {
-        defalutSession = "gnome";
+        # defalutSession = "gnome";
+        # defalutSession = "none+i3";
 
         gdm.enable = true;
-        lightdm.enable = true;
-
-
+        # lightdm.enable = true;
       };
+
+      # windowManager = {
+      #   i3 = {
+      #     enable = true;
+      #     # package = pkgs.i3-gaps;
+      #     # extraPackages = with pkgs; [ i3status i3lock polybar ];
+      #   };
+      # };
 
       # Enable touchpad support (enabled default in most desktopManager).
       # libinput.enable = true;
