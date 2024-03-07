@@ -36,14 +36,14 @@ in {
       appimage-run
       arkade
       babashka
-      # barrier
+      barrier
       bat
       byobu
       # chromium
       curl
       # doctl
       docker
-      # digikam
+      digikam
       # dunst
       # earthly
       # emacs
