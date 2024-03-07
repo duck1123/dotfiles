@@ -55,6 +55,8 @@ in {
       go
       gpa
       gnome.dconf-editor
+      gnomeExtensions.appindicator
+      gnomeExtensions.topicons-plus
       gnupg
       graphviz
       guake
