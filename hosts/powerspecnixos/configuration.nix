@@ -137,7 +137,7 @@
       enable = true;
 
       desktopManager = {
-        enlightenment.enable = true;
+        # enlightenment.enable = true;
 
         # Enable the GNOME Desktop Environment.
         gnome.enable = true;
@@ -146,8 +146,8 @@
 
         # plasma5.enable = true;
         # plasma6.enable = true;
-        xfce.enable = true;
-        xterm.enable = false;
+        # xfce.enable = true;
+        # xterm.enable = false;
       };
 
       displayManager = {
