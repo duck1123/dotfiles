@@ -50,6 +50,7 @@ in {
       # extraNodePackages.prettier
       fish
       gcc9
+      gimp
       git
       gnumake
       go
@@ -58,11 +59,13 @@ in {
       gnomeExtensions.appindicator
       gnomeExtensions.topicons-plus
       gnupg
+      gqrx
       graphviz
       guake
       # helm
       hstr
       htop
+      hydrogen
       # i3
       itch
       keepassxc
@@ -95,6 +98,8 @@ in {
       sparrow
       # steam
       syncthing
+      tailscale
+      tailscale-systray
       tdesktop
       # teams
       # thunderbird
@@ -104,6 +109,7 @@ in {
       virtualbox
       vlc
       vscode
+      zoom-us
     ];
 
     sessionPath = [
