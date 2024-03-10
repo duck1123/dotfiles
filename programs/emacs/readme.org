@@ -103,7 +103,7 @@ Set archives
 
 ** Which Key
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package which-key
     :init (which-key-mode)
     :diminish which-key-mode
