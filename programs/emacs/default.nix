@@ -1,7 +1,7 @@
 {
-  programs.emacs = {
-    enable = true;
-  };
+  # programs.emacs = {
+  #   enable = true;
+  # };
 
   home.file.".emacs.d/personal/01-personal.el".source = ./01-personal.el;
   home.file.".emacs.d/personal/prelude-modules.el".source = ./prelude-modules.el;
