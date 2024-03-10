@@ -41,11 +41,11 @@ in {
       byobu
       # chromium
       curl
-      # doctl
+      doctl
       docker
       digikam
       # dunst
-      # earthly
+      earthly
       # emacs
       # extraNodePackages.prettier
       fish
@@ -57,12 +57,12 @@ in {
       gpa
       gnome.dconf-editor
       gnomeExtensions.appindicator
-      gnomeExtensions.topicons-plus
+      # gnomeExtensions.topicons-plus
       gnupg
       gqrx
       graphviz
       guake
-      # helm
+      helm
       hstr
       htop
       hydrogen
@@ -71,7 +71,7 @@ in {
       keepassxc
       # k3d
       k9s
-      # kodi
+      kodi
       krew
       kubectl
       kustomize
@@ -102,9 +102,9 @@ in {
       tailscale-systray
       tdesktop
       # teams
-      # thunderbird
+      thunderbird
       # tilt
-      # transmission
+      transmission
       tree
       virtualbox
       vlc
