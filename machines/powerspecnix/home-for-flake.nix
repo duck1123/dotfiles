@@ -193,7 +193,8 @@ in {
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
       fi # added by Nix installer
 
-      bindkey -s "\C-r" "\C-a hstr -- \C-j"     # bind hstr to Ctrl-r (for Vi mode check doc)
+      # bind hstr to Ctrl-r (for Vi mode check doc)
+      bindkey -s "\C-r" "\C-a hstr -- \C-j"
 
       bindkey -s "\C-x\C-tn" "bbg watch-namespaces\C-j"
       bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
