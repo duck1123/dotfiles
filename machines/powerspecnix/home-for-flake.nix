@@ -48,18 +48,18 @@ in {
       earthly
       # emacs
       # extraNodePackages.prettier
-      fish
+      # fish
       gcc9
       gimp
       git
       gnumake
       go
       gpa
-      gnome.dconf-editor
+      # gnome.dconf-editor
       gnomeExtensions.appindicator
       # gnomeExtensions.topicons-plus
       gnupg
-      gqrx
+      # gqrx
       graphviz
       guake
       helm
@@ -72,7 +72,7 @@ in {
       # k3d
       k9s
       kodi
-      krew
+      # krew
       kubectl
       kustomize
       neofetch
@@ -90,23 +90,23 @@ in {
       nixfmt
       nixUnstable
       nmap
-      rtl-sdr
-      sdrangel
+      # rtl-sdr
+      # sdrangel
       silver-searcher
-      simplex-chat-desktop
-      slack
-      sparrow
+      # simplex-chat-desktop
+      # slack
+      # sparrow
       # steam
       syncthing
-      tailscale
-      tailscale-systray
+      # tailscale
+      # tailscale-systray
       tdesktop
       # teams
       thunderbird
       # tilt
       transmission
       tree
-      virtualbox
+      # virtualbox
       vlc
       vscode
       zoom-us
@@ -236,6 +236,13 @@ in {
   };
 
   services = {
+    # barrier = {
+    #   enable = true;
+    #   # client = {
+    #   #   enable = true;
+    #   # };
+    # };
+
     # gnome3.gnome-keyring.enable = true;
 
     # dbus = {
