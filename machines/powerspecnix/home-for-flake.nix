@@ -155,9 +155,10 @@ in {
   };
 
   programs.zsh = {
+    autosuggestion.enable = true;
+
     defaultKeymap = "emacs";
     enable = true;
-    enableAutosuggestions = true;
 
     history = {
       expireDuplicatesFirst = true;
