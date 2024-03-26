@@ -55,6 +55,7 @@ in {
       gnumake
       go
       gpa
+      gnome.cheese
       # gnome.dconf-editor
       gnomeExtensions.appindicator
       # gnomeExtensions.topicons-plus
