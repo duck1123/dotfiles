@@ -68,7 +68,7 @@ in {
       htop
       hydrogen
       # i3
-      itch
+      # itch
       keepassxc
       # k3d
       k9s
