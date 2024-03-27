@@ -76,6 +76,7 @@ in {
       # krew
       kubectl
       kustomize
+      mullvad-browser
       neofetch
       # nodejs-16_x
       # openjdk
