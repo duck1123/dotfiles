@@ -95,7 +95,7 @@ in {
       # rtl-sdr
       # sdrangel
       silver-searcher
-      # simplex-chat-desktop
+      simplex-chat-desktop
       # slack
       # sparrow
       # steam
