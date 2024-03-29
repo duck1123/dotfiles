@@ -58,6 +58,7 @@ in {
       gnome.cheese
       # gnome.dconf-editor
       gnomeExtensions.appindicator
+      gnomeExtensions.gsconnect
       # gnomeExtensions.topicons-plus
       gnupg
       # gqrx
@@ -145,6 +146,9 @@ in {
     };
 
     jq.enable = true;
+
+    # kdeconnect.enable = true;
+
     tmux.enable = true;
 
     vim = {
