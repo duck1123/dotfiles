@@ -79,6 +79,7 @@ in {
       mullvad-browser
       neofetch
       # nodejs-16_x
+      onlyoffice-bin
       # openjdk
       openjdk17
       openlens
