@@ -101,8 +101,8 @@ in {
       # sparrow
       # steam
       syncthing
-      # tailscale
-      # tailscale-systray
+      tailscale
+      tailscale-systray
       tdesktop
       # teams
       thunderbird

@@ -141,6 +141,8 @@
       };
     };
 
+    tailscale.enable = true;
+
     # Configure keymap in X11
     xserver = {
       # Enable the X11 windowing system.
