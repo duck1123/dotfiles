@@ -46,6 +46,16 @@
   };
 
   networking = {
+    firewall = {
+      enable = false;
+
+      allowedTCPPorts = [ 24800 32400 ];
+
+      # allowedUDPPortRanges = [
+      #   { from = 24800; to = 24800; }
+      # ];
+    };
+
     hostName = "nixos"; # Define your hostname.
 
     # Enable networking
