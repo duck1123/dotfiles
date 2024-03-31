@@ -85,6 +85,9 @@
 
   services = {
     emacs.enable = true;
+
+    # desktopManager.plasma6.enable = true;
+
     flatpak.enable = true;
 
     # Enable the OpenSSH daemon.
@@ -168,6 +171,7 @@
 
         gdm.enable = true;
         # lightdm.enable = true;
+        # sddm.enable = true;
       };
 
       # windowManager = {
