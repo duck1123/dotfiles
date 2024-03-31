@@ -148,6 +148,8 @@
 
     tailscale.enable = true;
 
+    udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
+
     # Configure keymap in X11
     xserver = {
       # Enable the X11 windowing system.
