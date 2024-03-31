@@ -39,8 +39,9 @@ in {
       barrier
       bat
       byobu
-      # chromium
+      chromium
       curl
+      discord
       doctl
       docker
       digikam
@@ -103,13 +104,14 @@ in {
       # steam
       syncthing
       tailscale
-      tailscale-systray
+      # tailscale-systray
       tdesktop
       # teams
       thunderbird
       # tilt
       transmission
       tree
+      # ungoogled-chromium
       # virtualbox
       vlc
       vscode
