@@ -71,6 +71,8 @@
   nixpkgs.config.allowUnfree = true;
 
   programs = {
+    dconf.enable = true;
+
     gnupg.agent = {
       enable = true;
       enableSSHSupport = true;
