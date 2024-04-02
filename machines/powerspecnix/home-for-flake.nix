@@ -93,7 +93,7 @@ in {
       # plexmediaserver
       # plexmediaserver
       # nextcloud-24.0.3
-      nixfmt
+      nixfmt-classic
       nixUnstable
       nmap
       # rtl-sdr
