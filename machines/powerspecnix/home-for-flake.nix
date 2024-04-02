@@ -58,6 +58,7 @@ in {
       gpa
       gnome.cheese
       # gnome.dconf-editor
+      gnome.gnome-tweaks
       gnomeExtensions.appindicator
       gnomeExtensions.gsconnect
       # gnomeExtensions.topicons-plus
