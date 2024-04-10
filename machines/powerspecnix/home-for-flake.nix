@@ -40,11 +40,13 @@ in {
       bat
       byobu
       chromium
+      clojure
       curl
       discord
+      # distrobox
       doctl
       docker
-      digikam
+      # digikam
       # dunst
       earthly
       # emacs
@@ -66,7 +68,8 @@ in {
       # gqrx
       graphviz
       guake
-      helm
+      # helm
+      heroic
       hstr
       htop
       hydrogen
@@ -75,8 +78,9 @@ in {
       keepassxc
       # k3d
       k9s
-      kodi
+      # kodi
       # krew
+      kubernetes-helm
       kubectl
       kustomize
       mullvad-browser
@@ -88,10 +92,6 @@ in {
       openlens
       plex
       plex-media-player
-      # plex-media-server
-      # plex-mpv-shim
-      # plexmediaserver
-      # plexmediaserver
       # nextcloud-24.0.3
       nixfmt-classic
       nixUnstable
@@ -108,7 +108,7 @@ in {
       # tailscale-systray
       tdesktop
       # teams
-      thunderbird
+      # thunderbird
       # tilt
       transmission
       tree
