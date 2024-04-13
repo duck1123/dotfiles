@@ -55,6 +55,7 @@ in {
       gcc9
       gimp
       git
+      gitu
       gnumake
       go
       gpa
