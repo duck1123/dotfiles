@@ -239,7 +239,7 @@ in {
       hh = "hstr";
       bbg = "bb --config ~/.bb/bb.edn";
       psgrep = "ps -ef | grep -v grep | grep ";
-      "reload!" = "home-manager switch && . ~/.zshrc";
+      "reload!" = "bbg switch-home && . ~/.zshrc";
     };
   };
 
