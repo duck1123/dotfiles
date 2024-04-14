@@ -81,7 +81,7 @@ in {
       # k3d
       k9s
       keepassxc
-      khoj
+      # khoj
       # kodi
       # krew
       kubernetes-helm
