@@ -62,6 +62,7 @@ in {
       gnome.cheese
       # gnome.dconf-editor
       gnome.gnome-tweaks
+      gnome-photos
       gnomeExtensions.appindicator
       gnomeExtensions.gsconnect
       # gnomeExtensions.topicons-plus
@@ -71,14 +72,16 @@ in {
       guake
       # helm
       heroic
+      hoard
       hstr
       htop
       hydrogen
       # i3
       # itch
-      keepassxc
       # k3d
       k9s
+      keepassxc
+      khoj
       # kodi
       # krew
       kubernetes-helm
