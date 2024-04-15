@@ -219,9 +219,12 @@
   users.users.duck = {
     isNormalUser = true;
     description = "Duck Nebuchadnezzar";
-    extraGroups = [ "docker" "networkmanager" "wheel" ];
+    extraGroups = [ "docker" "libvirtd" "networkmanager" "wheel" ];
     packages = with pkgs; [ appimage-run firefox ];
   };
 
-  virtualisation.docker.enable = true;
+  virtualisation = {
+    docker.enable = true;
+    libvirtd.enable = true;
+  };
 }
