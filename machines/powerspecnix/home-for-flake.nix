@@ -58,6 +58,7 @@ in {
       gitu
       gnumake
       go
+      gossip
       gpa
       gnome.cheese
       # gnome.dconf-editor
