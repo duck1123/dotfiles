@@ -84,12 +84,20 @@ in {
       # k3d
       k9s
       keepassxc
+
+      # Peer-to-Peer Chat
+      keet
+
       # khoj
       # kodi
       # krew
       kubernetes-helm
       kubectl
       kustomize
+
+      # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
+      logseq
+
       mullvad-browser
       neofetch
       # nodejs-16_x
@@ -103,6 +111,10 @@ in {
       nixfmt-classic
       nixUnstable
       nmap
+
+      # A decentralized app for code collaboration
+      # radicle-upstream
+
       # rtl-sdr
       # sdrangel
       silver-searcher
