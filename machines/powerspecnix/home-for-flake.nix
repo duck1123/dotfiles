@@ -217,7 +217,7 @@ in {
 
       source <(k3d completion zsh)
       # source <(devspace completion zsh)
-      # source <(hoard shell-config --shell zsh)
+      source <(hoard shell-config --shell zsh)
 
       _bb_tasks() {
         local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
