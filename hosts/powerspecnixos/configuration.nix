@@ -98,7 +98,14 @@
     flatpak.enable = true;
 
     # Enable the OpenSSH daemon.
-    # openssh.enable = true;
+    openssh = {
+      enable = true;
+
+      settings = {
+        KbdInteractiveAuthentication = false;
+        PasswordAuthentication = false;
+      };
+    };
 
     pipewire = {
       enable = true;
