@@ -54,7 +54,12 @@
     firewall = {
       enable = false;
 
-      allowedTCPPorts = [ 24800 32400 ];
+      allowedTCPPorts = [
+        # barrier port
+        24800
+        # Plex Media Server
+        32400
+      ];
 
       # allowedUDPPortRanges = [
       #   { from = 24800; to = 24800; }
