@@ -100,6 +100,10 @@
 
     # desktopManager.plasma6.enable = true;
 
+    displayManager = {
+      sddm.enable = true;
+    };
+
     flatpak.enable = true;
 
     # Enable the OpenSSH daemon.
@@ -190,9 +194,8 @@
         # defalutSession = "gnome";
         # defalutSession = "none+i3";
 
-        gdm.enable = true;
+        # gdm.enable = true;
         # lightdm.enable = true;
-        # sddm.enable = true;
       };
 
       # windowManager = {
