@@ -24,4 +24,16 @@ let
   nix = pkgs.writeShellScriptBin "nix" ''
     exec ${pkgs.nixFlakes}/bin/nix --experimental-features "nix-command flakes" "$@"
   '';
-in pkgs.mkShell { nativeBuildInputs = with pkgs; [ nix home-manager git ]; }
+in pkgs.mkShell {
+  # See https://github.com/disassembler/network/blob/c341a3af27611390f13f86d966767ea30c726a92/shell.nix
+  sopsPGPKeyDirs = [ "./nixos/secrets/keys" ];
+
+  nativeBuildInputs = with pkgs; [
+    nix
+    nixpkgs-fmt
+    home-manager
+    git
+    sops
+    ssh-to-pgp
+  ];
+}
