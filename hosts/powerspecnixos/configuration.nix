@@ -61,7 +61,7 @@
       # ];
     };
 
-    hostName = "nixos"; # Define your hostname.
+    hostName = "powerspecnix"; # Define your hostname.
 
     # Enable networking
     networkmanager.enable = true;
