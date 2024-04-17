@@ -1,0 +1,33 @@
+---
+version: 1.4.2
+commands:
+  - name: switch-home
+    namespace: dotfiles
+    tags:
+      - nix
+    command: bbg switch-home
+    description: Update Home Manager
+  - name: update-flakes
+    namespace: dotfiles
+    tags:
+      - nix
+    command: nix flake update
+    description: Update Flakes
+  - name: switch-os
+    namespace: dotfiles
+    tags:
+      - nix
+    command: bbg switch-os
+    description: Update the NixOS config
+  - name: collect-garbage
+    namespace: dotfiles
+    tags:
+      - nix
+    command: sudo nix-collect-garbage --delete-older-than 7d
+    description: Cleans up the nix store
+  - name: reboot
+    namespace: dotfiles
+    tags:
+      - system
+    command: sudo reboot
+    description: Restart the computer
