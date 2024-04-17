@@ -91,7 +91,7 @@
   security.rtkit.enable = true;
 
   services = {
-    emacs.enable = true;
+    # emacs.enable = true;
 
     # desktopManager.plasma6.enable = true;
 
@@ -227,7 +227,7 @@
     isNormalUser = true;
     description = "Duck Nebuchadnezzar";
     extraGroups = [ "docker" "libvirtd" "networkmanager" "wheel" ];
-    packages = with pkgs; [ appimage-run firefox ];
+    packages = with pkgs; [ appimage-run emacs firefox ];
   };
 
   virtualisation = {

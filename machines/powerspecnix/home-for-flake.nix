@@ -49,7 +49,9 @@ in {
       # digikam
       # dunst
       earthly
-      # emacs
+
+      emacs
+
       # extraNodePackages.prettier
       # fish
       gcc9
