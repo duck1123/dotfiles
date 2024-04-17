@@ -31,3 +31,9 @@ commands:
       - system
     command: sudo reboot
     description: Restart the computer
+  - name: watch-pods
+    namespace: k3s
+    tags:
+      - k3s
+    command: bbg watch-pods
+    description: Watch all the pods
