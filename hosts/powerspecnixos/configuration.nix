@@ -28,6 +28,7 @@
     gnome.adwaita-icon-theme
     gnomeExtensions.appindicator
     git
+    k3s
     zsh
   ];
 
@@ -55,10 +56,20 @@
       enable = false;
 
       allowedTCPPorts = [
-        # barrier port
+        ## barrier port
         24800
-        # Plex Media Server
+        ## Plex Media Server
         32400
+
+        ## k3s
+        6443
+        # 2379
+        # 2380
+      ];
+
+      allowedUDPPorts = [
+        ## k3s
+        8472
       ];
 
       # allowedUDPPortRanges = [
@@ -105,6 +116,16 @@
     };
 
     flatpak.enable = true;
+
+    k3s = {
+      enable = true;
+      role = "server";
+      extraFlags = toString [
+        # "--kubelet-arg=v=4" # Optionally add additional args to k3s
+        # "--disable=traefik@server:0"
+        "--disable=traefik"
+      ];
+    };
 
     # Enable the OpenSSH daemon.
     openssh = {
