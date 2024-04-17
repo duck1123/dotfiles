@@ -209,6 +209,8 @@ in {
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
       fi # added by Nix installer
 
+      export PATH="/home/${username}/.arkade/bin:$PATH"
+
       # bind hstr to Ctrl-r (for Vi mode check doc)
       bindkey -s "\C-r" "\C-a hstr -- \C-j"
 
