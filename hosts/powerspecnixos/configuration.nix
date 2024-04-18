@@ -112,7 +112,13 @@
     # desktopManager.plasma6.enable = true;
 
     displayManager = {
-      sddm.enable = true;
+      defaultSession = "gnome";
+
+      sddm = {
+        enable = true;
+        theme = "ocean";
+        wayland.enable = true;
+      };
     };
 
     flatpak.enable = true;
