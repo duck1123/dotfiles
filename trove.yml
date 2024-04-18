@@ -37,3 +37,9 @@ commands:
       - k3s
     command: bbg watch-pods
     description: Watch all the pods
+  - name: list-system-generations
+    namespace: dotfiles
+    tags:
+      - nix
+    command: sudo nix-env -p /nix/var/nix/profiles/system --list-generations
+    description: List system generations
