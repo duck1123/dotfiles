@@ -74,6 +74,18 @@
       inherit (home-manager.lib) homeManagerConfiguration;
       eachDefaultSystemMap = eachSystemMap defaultSystems;
     in rec {
+      # Home configurations
+      # Accessible via 'home-manager'
+      homeConfigurations = {
+        # FIXME: Replace with your username@hostname
+        duck = homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+
+          modules =
+            [{ imports = [ ./machines/powerspecnix/home-for-flake.nix ]; }];
+        };
+      };
+
       # System configurations
       # Accessible via 'nixos-rebuild'
       nixosConfigurations = {
@@ -91,18 +103,6 @@
           ];
           # Make our inputs available to the config (for importing modules)
           specialArgs = { inherit inputs; };
-        };
-      };
-
-      # Home configurations
-      # Accessible via 'home-manager'
-      homeConfigurations = {
-        # FIXME: Replace with your username@hostname
-        duck = homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
-
-          modules =
-            [{ imports = [ ./machines/powerspecnix/home-for-flake.nix ]; }];
         };
       };
 
