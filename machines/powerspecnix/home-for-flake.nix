@@ -100,6 +100,9 @@ in {
 
       mullvad-browser
       neofetch
+
+      nodejs
+
       # nodejs-16_x
       onlyoffice-bin
       # openjdk
