@@ -5,7 +5,7 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-21.11";
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-22.05";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -13,56 +13,29 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # nix-colors.url = "github:misterio77/nix-colors";   # Color schemes for usage with home-manager
-    # impermanence.url = "github:riscadoa/impermanence"; # Utilities for opt-in persistance
-
     # Track channels with commits tested and built by hydra
-    nixos.url = "github:nixos/nixpkgs/nixos-22.05";
-    latest.url = "github:nixos/nixpkgs/nixos-unstable";
-    # For darwin hosts: it can be helpful to track this darwin-specific stable
-    # channel equivalent to the `nixos-*` channels for NixOS. For one, these
-    # channels are more likely to provide cached binaries for darwin systems.
-    # But, perhaps even more usefully, it provides a place for adding
-    # darwin-specific overlays and packages which could otherwise cause build
-    # failures on Linux systems.
-    nixpkgs-darwin-stable.url = "github:NixOS/nixpkgs/nixpkgs-22.05-darwin";
+    # nixos.url = "github:nixos/nixpkgs/nixos-22.05";
 
-    # agenix.url = "github:ryantm/agenix";
-    # agenix.inputs.nixpkgs.follows = "nixos";
-
-    # digga.url = "github:divnix/digga";
-    # digga.inputs.nixpkgs.follows = "nixos";
-    # digga.inputs.nixlib.follows = "nixos";
-    # digga.inputs.home-manager.follows = "home";
-    # digga.inputs.deploy.follows = "deploy";
+    agenix.url = "github:ryantm/agenix";
+    agenix.inputs.nixpkgs.follows = "nixpkgs";
 
     home.url = "github:nix-community/home-manager/release-22.05";
-    home.inputs.nixpkgs.follows = "nixos";
-
-    # darwin.url = "github:LnL7/nix-darwin";
-    # darwin.inputs.nixpkgs.follows = "nixpkgs-darwin-stable";
+    home.inputs.nixpkgs.follows = "nixpkgs";
 
     deploy.url = "github:serokell/deploy-rs";
-    deploy.inputs.nixpkgs.follows = "nixos";
+    deploy.inputs.nixpkgs.follows = "nixpkgs";
 
     # Utilities for building our flake
     flake-utils.url = "github:numtide/flake-utils";
 
-    # Extra flakes for modules, packages, etc
-
     # Convenience modules for hardware-specific quirks
     hardware.url = "github:nixos/nixos-hardware";
-
-    # naersk.url = "github:nmattia/naersk";
-    # naersk.inputs.nixpkgs.follows = "nixos";
 
     nixos-generators.url = "github:nix-community/nixos-generators";
     nixos-hardware.url = "github:nixos/nixos-hardware";
 
-    # nur.url = "github:nix-community/NUR";              # User contributed pkgs and modules
-
     nvfetcher.url = "github:berberman/nvfetcher";
-    nvfetcher.inputs.nixpkgs.follows = "nixos";
+    nvfetcher.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = { self, nixpkgs, home-manager, flake-utils, ... }@inputs:
