@@ -2,7 +2,7 @@
 
 ** Ubuntu
 
-   - https://ubuntu.com/#download
+- https://ubuntu.com/#download
 
 ** Babashka
 
@@ -14,7 +14,7 @@
 
 ** Nix
 
-   - https://nixos.org/download.html
+- https://nixos.org/download.html
 
 #+BEGIN_SRC bash
   sh <(curl -L https://nixos.org/nix/install) --daemon
@@ -22,7 +22,7 @@
 
 ** Prelude
 
-   - https://github.com/bbatsov/prelude
+- https://github.com/bbatsov/prelude
 
 #+BEGIN_SRC bash
   curl -L https://git.io/epre | sh
