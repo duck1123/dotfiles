@@ -81,6 +81,9 @@ in {
       hydrogen
       # i3
       # itch
+
+      jet
+
       # k3d
       k9s
       keepassxc
@@ -104,6 +107,11 @@ in {
       nodejs
 
       # nodejs-16_x
+
+      obs-studio
+
+      obsidian
+
       onlyoffice-bin
       # openjdk
       openjdk17
