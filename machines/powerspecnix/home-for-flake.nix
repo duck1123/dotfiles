@@ -34,6 +34,8 @@ in {
 
     packages = with pkgs; [
       appimage-run
+
+      argocd
       arkade
       babashka
       barrier
@@ -42,6 +44,8 @@ in {
       chromium
       clojure
       curl
+
+      devspace
       discord
       # distrobox
       doctl
@@ -242,8 +246,9 @@ in {
       bindkey -s "\C-x\C-tn" "bbg watch-namespaces\C-j"
       bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
 
+      source <(argocd completion zsh)
       source <(k3d completion zsh)
-      # source <(devspace completion zsh)
+      source <(devspace completion zsh)
       source <(hoard shell-config --shell zsh)
 
       _bb_tasks() {
