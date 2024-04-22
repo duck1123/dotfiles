@@ -50,7 +50,9 @@ in {
       # distrobox
       doctl
       docker
-      # digikam
+
+      digikam
+
       # dunst
       earthly
 
