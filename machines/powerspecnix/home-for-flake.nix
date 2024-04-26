@@ -157,6 +157,7 @@ in {
 
     sessionPath = [
       "$HOME/.arkade/bin:$PATH"
+      "$HOME/.cargo/bin:$PATH"
       "$HOME/.config/yarn/global/node_modules/.bin:$PATH"
       "$HOME/.dotnet:$PATH"
       "$HOME/.local/bin:$PATH"
@@ -241,6 +242,7 @@ in {
       fi # added by Nix installer
 
       export PATH="/home/${username}/.arkade/bin:$PATH"
+      export PATH="/home/${username}/.cargo/bin:$PATH"
 
       # bind hstr to Ctrl-r (for Vi mode check doc)
       bindkey -s "\C-r" "\C-a hstr -- \C-j"
