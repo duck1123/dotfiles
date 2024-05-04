@@ -152,6 +152,9 @@ in {
       # virtualbox
       vlc
       vscode
+
+      wine
+
       zoom-us
     ];
 
