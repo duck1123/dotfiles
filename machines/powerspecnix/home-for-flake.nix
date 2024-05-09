@@ -126,7 +126,7 @@ in {
       plex-media-player
       # nextcloud-24.0.3
       nixfmt-classic
-      nixUnstable
+      # nixUnstable
       nmap
 
       # A decentralized app for code collaboration
