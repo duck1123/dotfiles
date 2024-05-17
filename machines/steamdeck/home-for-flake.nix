@@ -30,7 +30,7 @@ in {
     username = "${username}";
     homeDirectory = "/home/${username}";
 
-    # file.".bb/bb.edn".source = ../../bb.edn;
+    file.".bb/bb.edn".source = ../../bb.edn;
 
     packages = with pkgs; [
       appimage-run
@@ -56,13 +56,13 @@ in {
       # dunst
       # earthly
 
-      # emacs
+      emacs
 
       # extraNodePackages.prettier
       # fish
       # gcc9
       # gimp
-      # git
+      git
       # gitu
       # gnumake
       # go
@@ -171,13 +171,13 @@ in {
   };
 
   programs = {
-    # bash = {
-    #   enable = true;
-    #   profileExtra =
-    #     "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
-    # };
+    bash = {
+      enable = true;
+      profileExtra =
+        "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
+    };
 
-    # direnv.enable = true;
+    direnv.enable = true;
 
     # git = {
     #   enable = true;
