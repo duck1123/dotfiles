@@ -54,6 +54,13 @@
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = {
+        deck = homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+
+          modules =
+            [{ imports = [ ./machines/steamdeck/home-for-flake.nix ]; }];
+        };
+
         duck = homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
 
