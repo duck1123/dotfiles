@@ -37,21 +37,21 @@ in {
 
       # argocd
       # arkade
-      # babashka
-      # barrier
-      # bat
+      babashka
+      barrier
+      bat
       # byobu
       # chromium
       # clojure
       # curl
 
-      # devspace
+      devspace
       # discord
       # distrobox
       # doctl
       # docker
 
-      # digikam
+      digikam
 
       # dunst
       # earthly
@@ -64,7 +64,7 @@ in {
       # gimp
       git
       # gitu
-      # gnumake
+      gnumake
       # go
       # gossip
       # gpa
@@ -78,21 +78,21 @@ in {
       # gnupg
       # gqrx
       # graphviz
-      # guake
+      guake
       # helm
       # heroic
-      # hoard
-      # hstr
-      # htop
+      hoard
+      hstr
+      htop
       # hydrogen
       # i3
       # itch
 
-      # jet
+      jet
 
       # k3d
       # k9s
-      # keepassxc
+      keepassxc
 
       # Peer-to-Peer Chat
       # keet
@@ -110,7 +110,7 @@ in {
       # lutris
 
       # mullvad-browser
-      # neofetch
+      neofetch
 
       # nodejs
 
@@ -127,7 +127,7 @@ in {
       # plex
       # plex-media-player
       # nextcloud-24.0.3
-      # nixfmt-classic
+      nixfmt-classic
       # nixUnstable
       # nmap
 
@@ -179,18 +179,18 @@ in {
 
     direnv.enable = true;
 
-    # git = {
-    #   enable = true;
-    #   userName = "${name}";
-    #   userEmail = "${email}";
-    #   lfs.enable = true;
-    #   signing = {
-    #     signByDefault = false;
-    #     key = gpgKey;
-    #   };
-    # };
+    git = {
+      enable = true;
+      userName = "${name}";
+      userEmail = "${email}";
+      lfs.enable = true;
+      signing = {
+        signByDefault = false;
+        key = gpgKey;
+      };
+    };
 
-    # jq.enable = true;
+    jq.enable = true;
 
     # kdeconnect.enable = true;
 
@@ -206,85 +206,85 @@ in {
     # };
   };
 
-  # programs.zsh = {
-  #   autosuggestion.enable = true;
+  programs.zsh = {
+    autosuggestion.enable = true;
 
-  #   defaultKeymap = "emacs";
-  #   enable = true;
+    defaultKeymap = "emacs";
+    enable = true;
 
-  #   history = {
-  #     expireDuplicatesFirst = true;
-  #     extended = true;
-  #     ignoreDups = true;
-  #   };
+    history = {
+      expireDuplicatesFirst = true;
+      extended = true;
+      ignoreDups = true;
+    };
 
-  #   oh-my-zsh = {
-  #     enable = true;
-  #     theme = "jonathan";
-  #     plugins = [
-  #       "bgnotify"
-  #       "colorize"
-  #       # "command-not-found"
-  #       "compleat"
-  #       # "docker-compose"
-  #       "docker"
-  #       "git"
-  #       "git-extras"
-  #       "history"
-  #       "kubectl"
-  #       "nmap"
-  #       "node"
-  #       "npm"
-  #       "pj"
-  #       "sudo"
-  #       "systemd"
-  #     ];
-  #   };
+    oh-my-zsh = {
+      enable = true;
+      theme = "jonathan";
+      plugins = [
+        "bgnotify"
+        "colorize"
+        # "command-not-found"
+        "compleat"
+        # "docker-compose"
+        "docker"
+        "git"
+        "git-extras"
+        "history"
+        "kubectl"
+        "nmap"
+        "node"
+        "npm"
+        "pj"
+        "sudo"
+        "systemd"
+      ];
+    };
 
-  #   initExtra = ''
-  #     if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
-  #         . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
-  #     fi # added by Nix installer
+    initExtra = ''
+      if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
+          . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
+      fi # added by Nix installer
 
-  #     export PATH="/home/${username}/.arkade/bin:$PATH"
-  #     export PATH="/home/${username}/.cargo/bin:$PATH"
+      # export PATH="/home/${username}/.arkade/bin:$PATH"
+      # export PATH="/home/${username}/.cargo/bin:$PATH"
 
-  #     # bind hstr to Ctrl-r (for Vi mode check doc)
-  #     bindkey -s "\C-r" "\C-a hstr -- \C-j"
+      # bind hstr to Ctrl-r (for Vi mode check doc)
+      bindkey -s "\C-r" "\C-a hstr -- \C-j"
 
-  #     bindkey -s "\C-x\C-tn" "bbg watch-namespaces\C-j"
-  #     bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
+      # bindkey -s "\C-x\C-tn" "bbg watch-namespaces\C-j"
+      # bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
 
-  #     source <(argocd completion zsh)
-  #     source <(k3d completion zsh)
-  #     source <(devspace completion zsh)
-  #     source <(hoard shell-config --shell zsh)
+      # source <(argocd completion zsh)
+      # source <(k3d completion zsh)
+      # source <(devspace completion zsh)
+      source <(hoard shell-config --shell zsh)
 
-  #     _bb_tasks() {
-  #       local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
-  #       compadd -a matches
-  #     }
-  #     compdef _bb_tasks bb
-  #   '';
+      _bb_tasks() {
+        local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
+        compadd -a matches
+      }
+      compdef _bb_tasks bb
+    '';
 
-  #   localVariables.PROJECT_PATHS = [ ~/projects ];
+    localVariables.PROJECT_PATHS = [ ~/projects ];
 
-  #   sessionVariables = {
-  #     EDITOR = "emacsclient -ct";
-  #     HSTR_CONFIG = "hicolor";
-  #   };
+    sessionVariables = {
+      EDITOR = "emacsclient -ct";
+      HSTR_CONFIG = "hicolor";
+    };
 
-  #   shellAliases = {
-  #     d = "devspace";
-  #     dr = "devspace run";
-  #     cat = "bat";
-  #     # dkcp = "docker-compose";
-  #     hh = "hstr";
-  #     bbg = "bb --config ~/.bb/bb.edn";
-  #     psgrep = "ps -ef | grep -v grep | grep ";
-  #     "reload!" = "bbg switch-home && . ~/.zshrc";
-  #   };
-  # };
+    shellAliases = {
+      d = "devspace";
+      dr = "devspace run";
+      cat = "bat";
+      # dkcp = "docker-compose";
+      hh = "hstr";
+      bbg = "bb --config ~/.bb/bb.edn";
+      psgrep = "ps -ef | grep -v grep | grep ";
+      "reload!" = "bbg switch-home && . ~/.zshrc";
+    };
+  };
 
   # dconf.settings = {
   #   "org/gnome/desktop/interface".color-scheme = "prefer-dark";
