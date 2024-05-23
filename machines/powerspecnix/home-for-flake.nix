@@ -132,7 +132,7 @@ in {
       nmap
 
       # A decentralized app for code collaboration
-      # radicle-upstream
+      radicle-node
 
       # rtl-sdr
       # sdrangel
