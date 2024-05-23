@@ -136,8 +136,8 @@
     flatpak.enable = true;
 
     k3s = {
-      # enable = true;
-      enable = false;
+      enable = true;
+      # enable = false;
       role = "server";
       extraFlags = toString [
         # "--kubelet-arg=v=4" # Optionally add additional args to k3s
