@@ -46,7 +46,7 @@ in {
       curl
 
       devspace
-      discord
+      # discord
       # distrobox
       doctl
       docker
@@ -63,7 +63,7 @@ in {
       gcc9
       gimp
       git
-      gitu
+      # gitu
       gnumake
       go
       gossip
@@ -84,7 +84,7 @@ in {
       hoard
       hstr
       htop
-      hydrogen
+      # hydrogen
       # i3
       # itch
 
@@ -95,7 +95,7 @@ in {
       keepassxc
 
       # Peer-to-Peer Chat
-      keet
+      # keet
 
       # khoj
       # kodi
@@ -105,34 +105,34 @@ in {
       kustomize
 
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
-      logseq
+      # logseq
 
       lutris
 
       mullvad-browser
-      neofetch
+      # neofetch
 
       nodejs
 
       # nodejs-16_x
 
-      obs-studio
+      # obs-studio
 
-      obsidian
+      # obsidian
 
       onlyoffice-bin
       # openjdk
       openjdk17
       openlens
       plex
-      plex-media-player
+      # plex-media-player
       # nextcloud-24.0.3
       nixfmt-classic
       # nixUnstable
       nmap
 
       # A decentralized app for code collaboration
-      radicle-node
+      # radicle-node
 
       # rtl-sdr
       # sdrangel
@@ -148,7 +148,7 @@ in {
       # teams
       # thunderbird
       # tilt
-      transmission-gtk
+      # transmission-gtk
       tree
       # ungoogled-chromium
       # virtualbox
@@ -157,7 +157,7 @@ in {
 
       wine
 
-      zoom-us
+      # zoom-us
     ];
 
     sessionPath = [
