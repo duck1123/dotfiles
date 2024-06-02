@@ -27,3 +27,13 @@
 #+BEGIN_SRC bash
   curl -L https://git.io/epre | sh
 #+END_SRC
+
+* Hosts
+
+** Powesrspecnix
+
+[[./hosts/powerspecnixos/configuration.nix][Configuration]]
+
+** Steam Deck
+
+[[./machines/steamdeck/home-for-flake.nix][Home Manager]]

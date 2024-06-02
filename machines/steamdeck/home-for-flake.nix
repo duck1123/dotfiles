@@ -40,8 +40,14 @@ in {
       babashka
       barrier
       bat
+
+      # bottles
+
       # byobu
       # chromium
+
+      # citra
+
       # clojure
       # curl
 
@@ -59,11 +65,12 @@ in {
       emacs
 
       # extraNodePackages.prettier
+      firefox
       # fish
       # gcc9
       # gimp
       git
-      # gitu
+      gitu
       gnumake
       # go
       # gossip
@@ -141,8 +148,8 @@ in {
       # slack
       # sparrow
       # steam
-      # syncthing
-      # tailscale
+      syncthing
+      tailscale
       # tailscale-systray
       # tdesktop
       # teams
@@ -153,9 +160,9 @@ in {
       # ungoogled-chromium
       # virtualbox
       # vlc
-      # vscode
+      vscode
 
-      # wine
+      wine
 
       # zoom-us
     ];
