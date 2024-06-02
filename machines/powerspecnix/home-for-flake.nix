@@ -131,11 +131,14 @@ in {
       # nixUnstable
       nmap
 
+      qFlipper
+
       # A decentralized app for code collaboration
       # radicle-node
 
-      # rtl-sdr
-      # sdrangel
+      rtl-sdr
+      sdrangel
+
       silver-searcher
       simplex-chat-desktop
       # slack

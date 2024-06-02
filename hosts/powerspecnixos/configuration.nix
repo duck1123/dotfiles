@@ -111,6 +111,15 @@
       enableSSHSupport = true;
     };
 
+    nix-ld = {
+      enable = true;
+
+      libraries = with pkgs; [
+        # Add any missing dynamic libraries for unpackaged programs
+        # here, NOT in environment.systemPackages
+      ];
+    };
+
     steam.enable = true;
 
     zsh.enable = true;
@@ -274,7 +283,7 @@
   users.users.duck = {
     isNormalUser = true;
     description = "Duck Nebuchadnezzar";
-    extraGroups = [ "docker" "libvirtd" "networkmanager" "wheel" ];
+    extraGroups = [ "dialout" "docker" "libvirtd" "networkmanager" "wheel" ];
     packages = with pkgs; [ appimage-run emacs firefox ];
   };
 
