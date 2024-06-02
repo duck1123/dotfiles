@@ -11,7 +11,7 @@ commands:
     namespace: dotfiles
     tags:
       - nix
-    command: home-manager switch --flake ~/dotfiles#deck --impure --extra-experimental-features nix-command --extra-experimental-features flakes -b backup
+    command: "home-manager switch --flake ~/dotfiles#deck --impure --extra-experimental-features nix-command --extra-experimental-features flakes -b backup"
     description: Update Steam Deck Home Manager
   - name: update-flakes
     namespace: dotfiles
