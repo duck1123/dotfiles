@@ -30,9 +30,10 @@
 
 * Hosts
 
-** Powesrspecnix
+** Powerspecnix
 
-[[./hosts/powerspecnixos/configuration.nix][Configuration]]
++ [[./hosts/powerspecnixos/configuration.nix][Configuration]]
++ [[./machines/powerspecnix/home-for-flake.nix][Home Manager]]
 
 ** Steam Deck
 
