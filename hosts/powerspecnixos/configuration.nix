@@ -102,6 +102,7 @@
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.chromium.enableWideVine = true;
 
   programs = {
     dconf.enable = true;
