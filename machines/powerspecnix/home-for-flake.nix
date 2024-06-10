@@ -154,7 +154,7 @@ in {
       # teams
       # thunderbird
       # tilt
-      # transmission-gtk
+      transmission-gtk
       tree
       # ungoogled-chromium
       # virtualbox
@@ -163,7 +163,7 @@ in {
 
       wine
 
-      # zoom-us
+      zoom-us
     ];
 
     sessionPath = [
