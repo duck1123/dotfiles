@@ -128,7 +128,7 @@ in {
       # plex-media-player
       # nextcloud-24.0.3
 
-      # nexusmods-app-unfree
+      nexusmods-app
 
       nixfmt-classic
       # nixUnstable
