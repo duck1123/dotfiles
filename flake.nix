@@ -237,6 +237,20 @@
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
       inherit (home-manager.lib) homeManagerConfiguration;
+      widevine = nixpkgs.fetchurl {
+        url = "https://dl.google.com/widevine-cdm/4.10.2252.0-linux-x64.zip";
+        sha256 = "<sha256-hash-of-the-zip-file>";
+      };
+
+      widevine-unzip = nixpkgs.stdenv.mkDerivation {
+        name = "widevine-unzip";
+        src = widevine;
+        buildInputs = [ nixpkgs.unzip ];
+        buildPhase = ''
+          unzip $src -d $out
+        '';
+      };
+
       eachDefaultSystemMap = eachSystemMap defaultSystems;
       identities = rec {
         deck = {
@@ -399,52 +413,56 @@
 
       # Home configurations
       # Accessible via 'home-manager'
-      homeConfigurations =
-        let core = [ stylix.homeModules.stylix zen-browser.homeModules.beta ];
-        in {
-          drenfer = homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit hosts inputs system;
-              host = hosts.vallenpc;
-            };
-            modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home-for-flake.nix ];
+      homeConfigurations = let
+        core = [
+          stylix.homeModules.stylix
+          widevine-unzip
+          zen-browser.homeModules.beta
+        ];
+      in {
+        drenfer = homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = {
+            inherit hosts inputs system;
+            host = hosts.vallenpc;
           };
-
-          deck = homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit hosts inputs system;
-              host = hosts.steamdeck;
-            };
-            modules = core ++ [ ./hosts/steamdeck/home-for-flake.nix ];
-          };
-
-          "duck@powerspecnix" = homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit hosts inputs system;
-              host = hosts.powerspecnix;
-            };
-            modules = core ++ [ ./hosts/powerspecnix/home-for-flake.nix ];
-          };
-
-          "duck@inspernix" = homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit hosts inputs system;
-              host = hosts.inspernix;
-            };
-            modules = core ++ [ ./hosts/inspernix/home-for-flake.nix ];
-          };
+          modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home-for-flake.nix ];
         };
+
+        deck = homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = {
+            inherit hosts inputs system;
+            host = hosts.steamdeck;
+          };
+          modules = core ++ [ ./hosts/steamdeck/home-for-flake.nix ];
+        };
+
+        "duck@powerspecnix" = homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = {
+            inherit hosts inputs system;
+            host = hosts.powerspecnix;
+          };
+          modules = core ++ [ ./hosts/powerspecnix/home-for-flake.nix ];
+        };
+
+        "duck@inspernix" = homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = {
+            inherit hosts inputs system;
+            host = hosts.inspernix;
+          };
+          modules = core ++ [ ./hosts/inspernix/home-for-flake.nix ];
+        };
+      };
 
       nixosConfigurations = {
         inspernix = nixosSystem {
           inherit (hosts.inspernix) system;
           modules = [ ./hosts/inspernix/configuration.nix ];
           specialArgs = {
-            inherit hosts inputs system;
+            inherit hosts inputs system widevine-unzip;
             host = hosts.inspernix;
           };
         };
@@ -452,7 +470,7 @@
           inherit (hosts.powerspecnix) system;
           modules = [ ./hosts/powerspecnix/configuration.nix ];
           specialArgs = {
-            inherit hosts inputs system;
+            inherit hosts inputs system widevine-unzip;
             host = hosts.powerspecnix;
           };
         };
