@@ -1,4 +1,4 @@
-{ inputs, hosts, ... }:
+{ inputs, hosts, widevine-unzip, ... }:
 let
   core = [
     { inherit hosts; }
@@ -6,6 +6,7 @@ let
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
     inputs.stylix.nixosModules.stylix
+    widevine-unzip
     ../../modules/flakeModules
     ./hardware-configuration.nix
     ../../modules/inspernix-base
