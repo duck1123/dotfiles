@@ -1,10 +1,11 @@
-{ inputs, ... }:
+{ inputs, widevine-unzip, ... }:
 let
   core = [
     inputs.disko.nixosModules.disko
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
     inputs.stylix.nixosModules.stylix
+    widevine-unzip
     ./hardware-configuration.nix
     ../../modules/base
     ../../modules/bitcoin
