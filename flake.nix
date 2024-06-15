@@ -241,6 +241,20 @@
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
       inherit (home-manager.lib) homeManagerConfiguration;
+      widevine = nixpkgs.fetchurl {
+        url = "https://dl.google.com/widevine-cdm/4.10.2252.0-linux-x64.zip";
+        sha256 = "<sha256-hash-of-the-zip-file>";
+      };
+
+      widevine-unzip = nixpkgs.stdenv.mkDerivation {
+        name = "widevine-unzip";
+        src = widevine;
+        buildInputs = [ nixpkgs.unzip ];
+        buildPhase = ''
+          unzip $src -d $out
+        '';
+      };
+
       eachDefaultSystemMap = eachSystemMap defaultSystems;
       identities = rec {
         deck = {
@@ -337,6 +351,7 @@
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
             stylix.homeModules.stylix
+            widevine-unzip
             zen-browser.homeModules.beta
             ./hosts/powerspecnix/home-for-flake.nix
           ];
@@ -377,6 +392,7 @@
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
+            widevine-unzip
           ];
           specialArgs = {
             inherit inputs;
