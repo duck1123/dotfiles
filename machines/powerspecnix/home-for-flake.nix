@@ -97,7 +97,7 @@ in {
       keepassxc
 
       # Peer-to-Peer Chat
-      # keet
+      keet
 
       # khoj
       # kodi
