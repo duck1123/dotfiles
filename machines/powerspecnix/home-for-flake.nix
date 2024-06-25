@@ -88,6 +88,8 @@ in {
       # i3
       # itch
 
+      jdk22
+
       jet
 
       # k3d
@@ -122,7 +124,8 @@ in {
 
       onlyoffice-bin
       # openjdk
-      openjdk17
+
+      # openjdk17
       openlens
       plex
       # plex-media-player
