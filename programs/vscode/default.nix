@@ -1,0 +1,1 @@
+{ programs.vscode = { enable = true; }; }
