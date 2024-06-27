@@ -213,6 +213,10 @@ in {
       filetype indent plugin on
       '';
     };
+
+    vscode = {
+      enable = true;
+    };
   };
 
   programs.zsh = {
