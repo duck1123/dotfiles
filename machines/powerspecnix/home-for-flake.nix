@@ -112,10 +112,16 @@ in {
       lutris
 
       mullvad-browser
+
       # neofetch
+      nexusmods-app
+
+      nixfmt-classic
+      # nixUnstable
+
+      nmap
 
       nodejs
-
       # nodejs-16_x
 
       # obs-studio
@@ -130,12 +136,6 @@ in {
       plex
       # plex-media-player
       # nextcloud-24.0.3
-
-      nexusmods-app
-
-      nixfmt-classic
-      # nixUnstable
-      nmap
 
       qFlipper
 
