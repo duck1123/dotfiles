@@ -20,6 +20,8 @@
     # ../../programs/ncmpcpp
     ../../programs/nostr
     ../../programs/nushell
+    ../../programs/python
+    # ../../programs/python/default2.nix
     # ../../programs/radio
     ../../programs/stylix
     # ../../programs/vim
@@ -77,6 +79,7 @@
       nix-tree
       # obsidian
       # onlyoffice-bin
+      # pip3
       playerctl
       plex
       # plex-media-player
