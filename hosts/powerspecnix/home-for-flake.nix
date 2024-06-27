@@ -1,5 +1,20 @@
 { identity, pkgs, ... }:
-let inherit (identity) username;
+let
+  inherit (identity) username;
+
+  widevine = pkgs.fetchurl {
+    url = "https://dl.google.com/widevine-cdm/4.10.2252.0-linux-x64.zip";
+    sha256 = "<sha256-hash-of-the-zip-file>";
+  };
+
+  widevine-unzip = pkgs.stdenv.mkDerivation {
+    name = "widevine-unzip";
+    src = widevine;
+    buildInputs = [ pkgs.unzip ];
+    buildPhase = ''
+      unzip $src -d $out
+    '';
+  };
 in {
   home.stateVersion = "21.11";
 
@@ -143,6 +158,20 @@ in {
     bash.enable = true;
     bat.enable = true;
     btop.enable = true;
+
+    chromium = {
+      enable = true;
+      # extraPackages = [
+      #   (pkgs.runCommand "chromium-with-widevine" {} ''
+      #     mkdir -p $out/lib/chromium
+      #     cp ${widevine-unzip}/libwidevinecdm.so $out/lib/chromium/
+      #   '')
+      # ];
+      # settings = {
+      #   # "enable-widevine" = true;
+      #   # "widevine-path" = "${widevine-unzip}/libwidevinecdm.so";
+      # };
+    };
 
     direnv = {
       enable = true;
