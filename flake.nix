@@ -75,7 +75,7 @@
 
           modules = [
             home-manager.nixosModules.home-manager
-            ./hosts/powerspecnixos/configuration.nix
+            ./machines/powerspecnix/configuration.nix
           ];
           # Make our inputs available to the config (for importing modules)
           specialArgs = { inherit inputs; };
