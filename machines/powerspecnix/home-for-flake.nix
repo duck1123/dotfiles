@@ -79,12 +79,11 @@ in {
       # gqrx
       graphviz
       guake
-      # helm
       heroic
       hoard
       hstr
       htop
-      # hydrogen
+      hydrogen
       # i3
       # itch
 
@@ -160,7 +159,7 @@ in {
       transmission_4-gtk
       tree
       # ungoogled-chromium
-      # virtualbox
+      virtualbox
       vlc
       vscode
 
