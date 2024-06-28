@@ -157,7 +157,7 @@ in {
       # teams
       # thunderbird
       # tilt
-      transmission-gtk
+      transmission_4-gtk
       tree
       # ungoogled-chromium
       # virtualbox
