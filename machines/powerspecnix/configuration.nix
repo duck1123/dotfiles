@@ -115,10 +115,11 @@
     nix-ld = {
       enable = true;
 
-      libraries = with pkgs; [
-        # Add any missing dynamic libraries for unpackaged programs
-        # here, NOT in environment.systemPackages
-      ];
+      libraries = with pkgs;
+        [
+          # Add any missing dynamic libraries for unpackaged programs
+          # here, NOT in environment.systemPackages
+        ];
     };
 
     steam.enable = true;
@@ -198,9 +199,21 @@
               "R7RANTI-7SWMPTI-GDRAGOV-TK42PP3-PL3FHI5-LHGGVN3-PVNRIYO-FX7TAQM";
             autoAcceptFolders = true;
           };
+
+          "steamdeck" = {
+            id =
+              "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX";
+            autoAcceptFolders = true;
+          };
         };
 
         folders = {
+          "Camera" = {
+            label = "Camera";
+            path = "/home/duck/Camera";
+            devices = [ "Pixel" ];
+          };
+
           "keepass" = {
             label = "keepass";
             path = "/home/duck/keepass";
