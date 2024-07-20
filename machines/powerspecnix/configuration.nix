@@ -194,9 +194,15 @@
 
       settings = {
         devices = {
-          "Pixel" = {
+          # "Pixel" = {
+          #   id =
+          #     "R7RANTI-7SWMPTI-GDRAGOV-TK42PP3-PL3FHI5-LHGGVN3-PVNRIYO-FX7TAQM";
+          #   autoAcceptFolders = true;
+          # };
+
+          "Pixel 8" = {
             id =
-              "R7RANTI-7SWMPTI-GDRAGOV-TK42PP3-PL3FHI5-LHGGVN3-PVNRIYO-FX7TAQM";
+              "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
             autoAcceptFolders = true;
           };
 
@@ -211,18 +217,23 @@
           "Camera" = {
             label = "Camera";
             path = "/home/duck/Camera";
-            devices = [ "Pixel" ];
+            devices = [ "Pixel 8" ];
           };
 
           "keepass" = {
             label = "keepass";
             path = "/home/duck/keepass";
-            devices = [ "Pixel" ];
+            devices = [ "Pixel 8" ];
           };
 
           "org-roam" = {
             path = "/home/duck/org-roam";
-            devices = [ "Pixel" ];
+            devices = [ "Pixel 8" ];
+          };
+
+          "steamdeck-renpy" = {
+            path = "/home/duck/.renpy";
+            devices = [ "steamdeck" ];
           };
         };
 
