@@ -144,6 +144,8 @@ in {
       # A decentralized app for code collaboration
       # radicle-node
 
+      restic
+
       rtl-sdr
       sdrangel
 
