@@ -115,7 +115,7 @@ in {
       # neofetch
       # nextcloud-24.0.3
 
-      nexusmods-app
+      # nexusmods-app
 
       nixfmt-classic
       # nixUnstable
