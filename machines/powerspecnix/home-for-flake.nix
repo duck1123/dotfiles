@@ -156,7 +156,7 @@ in {
       tailscale
       # tailscale-systray
       tdesktop
-      # teams
+      teams-for-linux
       # thunderbird
       # tilt
       transmission_4-gtk
