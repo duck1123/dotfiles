@@ -43,6 +43,7 @@ in {
       byobu
       chromium
       clojure
+      cheese
       curl
 
       devspace
@@ -68,10 +69,12 @@ in {
       go
       gossip
       gpa
-      gnome.cheese
+
       # gnome.dconf-editor
-      gnome.gnome-tweaks
+
       gnome-photos
+      gnome-tweaks
+
       gnomeExtensions.appindicator
       gnomeExtensions.gsconnect
       # gnomeExtensions.topicons-plus
