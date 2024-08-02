@@ -43,6 +43,7 @@ in {
       byobu
       chromium
       clojure
+      clojure-lsp
       cheese
       curl
 
