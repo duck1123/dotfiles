@@ -52,6 +52,7 @@ in {
       # distrobox
       doctl
       docker
+      docker-compose
 
       digikam
 
