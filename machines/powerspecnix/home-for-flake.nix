@@ -297,6 +297,7 @@ in {
     sessionVariables = {
       EDITOR = "emacsclient -ct";
       HSTR_CONFIG = "hicolor";
+      SHELL = "/run/current-system/sw/bin/zsh";
     };
 
     shellAliases = {
