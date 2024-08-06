@@ -160,6 +160,10 @@ in {
       simplex-chat-desktop
       # slack
       # sparrow
+
+      # Command line tool for querying Sybase/MSSQL databases
+      sqsh
+
       # steam
       syncthing
       tailscale
