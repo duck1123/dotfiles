@@ -175,7 +175,10 @@ in {
       # tilt
       transmission_4-gtk
       tree
+
       # ungoogled-chromium
+      unzip
+
       virtualbox
       vlc
       vscode
