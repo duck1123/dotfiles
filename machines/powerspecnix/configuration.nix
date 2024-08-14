@@ -211,6 +211,11 @@
               "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX";
             autoAcceptFolders = true;
           };
+
+          "VallenPC" = {
+            id = "TEED77K-QOLTQ37-BL76MFB-LJD46CW-EJ7CZTJ-7GQNEF6-FZAMQRP-BCCRTQ6";
+            autoAcceptFolders = true;
+          };
         };
 
         folders = {
@@ -223,12 +228,16 @@
           "keepass" = {
             label = "keepass";
             path = "/home/duck/keepass";
-            devices = [ "Pixel 8" ];
+            devices = [ "Pixel 8" "VallenPC" ];
           };
 
           "org-roam" = {
             path = "/home/duck/org-roam";
             devices = [ "Pixel 8" ];
+            versioning = {
+              type = "simple";
+              params.keep = "10";
+            };
           };
 
           "steamdeck-renpy" = {
