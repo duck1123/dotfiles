@@ -37,6 +37,10 @@ in {
 
       argocd
       arkade
+
+      # Next generation multi-platform command line experience for Azure
+      azure-cli
+
       babashka
       barrier
       bat
