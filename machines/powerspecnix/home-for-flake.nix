@@ -73,7 +73,7 @@ in {
       # gitu
       gnumake
       go
-      gossip
+      # gossip
       gpa
 
       # gnome.dconf-editor
