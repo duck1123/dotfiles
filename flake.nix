@@ -54,6 +54,13 @@
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = {
+        drenfer = homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+
+          modules =
+            [{ imports = [ ./machines/vavirl-pw0bwnq8/home-for-flake.nix ]; }];
+        };
+
         deck = homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
 
