@@ -48,7 +48,7 @@ in {
 
       # citra
 
-      # clojure
+      clojure
       # curl
 
       devspace
@@ -58,6 +58,7 @@ in {
       # docker
 
       # digikam
+      direnv
 
       # dunst
       # earthly
