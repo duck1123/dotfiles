@@ -39,6 +39,7 @@ in {
       jet
       neofetch
       nixfmt-classic
+      silver-searcher
     ];
   };
 
@@ -108,11 +109,6 @@ in {
       # bind hstr to Ctrl-r (for Vi mode check doc)
       bindkey -s "\C-r" "\C-a hstr -- \C-j"
 
-      # source <(argocd completion zsh)
-      # source <(k3d completion zsh)
-      # source <(devspace completion zsh)
-      source <(hoard shell-config --shell zsh)
-
       _bb_tasks() {
         local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
         compadd -a matches
@@ -135,5 +131,11 @@ in {
       bbg = "bb --config ~/.bb/bb.edn";
       psgrep = "ps -ef | grep -v grep | grep ";
     };
+  };
+
+  xdg = {
+    configFile."nix/nix.conf".text = ''
+      experimental-features = nix-command flakes
+    '';
   };
 }
