@@ -32,7 +32,10 @@
     zsh
   ];
 
-  hardware.pulseaudio.enable = false;
+  hardware = {
+    pulseaudio.enable = false;
+    rtl-sdr.enable = true;
+  };
 
   i18n = {
     # Select internationalisation properties.
@@ -213,7 +216,8 @@
           };
 
           "VallenPC" = {
-            id = "TEED77K-QOLTQ37-BL76MFB-LJD46CW-EJ7CZTJ-7GQNEF6-FZAMQRP-BCCRTQ6";
+            id =
+              "TEED77K-QOLTQ37-BL76MFB-LJD46CW-EJ7CZTJ-7GQNEF6-FZAMQRP-BCCRTQ6";
             autoAcceptFolders = true;
           };
         };
@@ -317,7 +321,8 @@
   users.users.duck = {
     isNormalUser = true;
     description = "Duck Nebuchadnezzar";
-    extraGroups = [ "dialout" "docker" "libvirtd" "networkmanager" "wheel" ];
+    extraGroups =
+      [ "dialout" "docker" "libvirtd" "networkmanager" "plugdev" "wheel" ];
     packages = with pkgs; [ appimage-run emacs firefox ];
   };
 
