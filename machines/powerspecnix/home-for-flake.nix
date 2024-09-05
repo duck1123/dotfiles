@@ -85,7 +85,7 @@ in {
       gnomeExtensions.gsconnect
       # gnomeExtensions.topicons-plus
       gnupg
-      # gqrx
+      gqrx
       graphviz
       guake
       heroic
