@@ -150,13 +150,14 @@
     flatpak.enable = true;
 
     k3s = {
-      enable = true;
-      # enable = false;
+      # enable = true;
+      enable = false;
       role = "server";
       extraFlags = toString [
         # "--kubelet-arg=v=4" # Optionally add additional args to k3s
         # "--disable=traefik@server:0"
         "--disable=traefik"
+        # "--registry-use k3d-myregisty.localtest.me:12345"
       ];
     };
 
