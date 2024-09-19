@@ -118,6 +118,8 @@ in {
       kubectl
       kustomize
 
+      lens
+
       libnotify
 
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
@@ -148,7 +150,6 @@ in {
       # openjdk
 
       # openjdk17
-      openlens
       plex
       # plex-media-player
 
