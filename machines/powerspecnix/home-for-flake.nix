@@ -153,6 +153,9 @@ in {
       plex
       # plex-media-player
 
+      podman-desktop
+      podman-tui
+
       python3
 
       qFlipper
