@@ -558,3 +558,10 @@ Set archives
         (cider-interactive-eval
          (concat "(nextjournal.clerk/show! \"" filename "\")")))))
 #+end_src
+
+** Terraform
+
+#+begin_src emacs-lisp
+  (use-package terraform-mode
+    :ensure t)
+#+end_src
