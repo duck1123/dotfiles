@@ -92,6 +92,8 @@ in {
       gqrx
       graphviz
       guake
+      gum
+
       heroic
       hoard
       hstr
@@ -151,7 +153,7 @@ in {
 
       # openjdk17
       plex
-      # plex-media-player
+      plex-media-player
 
       podman-desktop
       podman-tui
