@@ -55,6 +55,9 @@ in {
       # Universal SQL Client for developers, DBA and analysts. Supports MySQL, PostgreSQL, MariaDB, SQLite, and more
       dbeaver-bin
 
+      devpod
+      devpod-desktop
+
       devspace
       # discord
       # distrobox
