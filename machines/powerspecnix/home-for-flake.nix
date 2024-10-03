@@ -61,7 +61,10 @@ in {
       devspace
       # discord
       # distrobox
+
+      # A command line tool for DigitalOcean services
       doctl
+
       docker
       docker-compose
 
@@ -101,7 +104,10 @@ in {
       hoard
       hstr
       htop
+
+      # Advanced drum machine
       hydrogen
+
       # i3
       # itch
 
@@ -114,7 +120,7 @@ in {
       keepassxc
 
       # Peer-to-Peer Chat
-      keet
+      # keet
 
       # khoj
       # kodi
@@ -158,20 +164,22 @@ in {
       plex
       plex-media-player
 
+      podman
       podman-desktop
       podman-tui
 
       python3
 
-      qFlipper
+      # qFlipper
 
       # A decentralized app for code collaboration
       # radicle-node
 
-      restic
+      # A backup program that is fast, efficient and secure
+      # restic
 
-      rtl-sdr
-      sdrangel
+      # rtl-sdr
+      # sdrangel
 
       silver-searcher
       simplex-chat-desktop
@@ -179,7 +187,7 @@ in {
       # sparrow
 
       # Command line tool for querying Sybase/MSSQL databases
-      sqsh
+      # sqsh
 
       # steam
       syncthing
@@ -196,13 +204,15 @@ in {
       # ungoogled-chromium
       unzip
 
-      virtualbox
+      # virtualbox
       vlc
       vscode
 
       wine
 
-      zoom-us
+      youtube-music
+
+      # zoom-us
     ];
 
     sessionPath = [
