@@ -179,6 +179,9 @@ in {
       # restic
 
       # rtl-sdr
+
+      runme
+
       # sdrangel
 
       silver-searcher
@@ -211,6 +214,8 @@ in {
       wine
 
       youtube-music
+
+      yq
 
       # zoom-us
     ];
@@ -307,6 +312,7 @@ in {
 
       export PATH="/home/${username}/.arkade/bin:$PATH"
       export PATH="/home/${username}/.cargo/bin:$PATH"
+      export PATH="/home/${username}/.local/bin:$PATH"
 
       # bind hstr to Ctrl-r (for Vi mode check doc)
       bindkey -s "\C-r" "\C-a hstr -- \C-j"
