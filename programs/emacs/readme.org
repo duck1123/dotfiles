@@ -14,6 +14,8 @@ Write out the lines saying that this file is auto generated.
 
 Despite that message, this file is /not/ auto generated. Edit away.
 
+Take note: Not every source block is tangled into the resulting file.
+
 * Initial Setup
 
 ** Package Setup
@@ -349,6 +351,8 @@ https://github.com/kubernetes-el/kubernetes-el
 
 ** js2
 
+Support for javascript files
+
 #+begin_src emacs-lisp :tangle no
   ;; (use-package lsp-javascript
   ;;   :ensure t)
@@ -362,6 +366,8 @@ https://github.com/kubernetes-el/kubernetes-el
 #+end_src
 
 ** org
+
+Support for org-mode organization
 
 #+begin_src emacs-lisp
   (use-package org
@@ -428,7 +434,9 @@ https://github.com/kubernetes-el/kubernetes-el
 
 ** org-ql
 
-#+begin_src emacs-lisp :tangle no
+For querying org files faster than org-agenda
+
+#+begin_src emacs-lisp
   (use-package org-ql
     :ensure t
     :after org)
@@ -443,6 +451,8 @@ https://github.com/kubernetes-el/kubernetes-el
 #+end_src
 
 ** org-roam-ui
+
+Webserver for exploring org files
 
 #+begin_src emacs-lisp
   (use-package org-roam-ui
@@ -463,9 +473,17 @@ https://github.com/kubernetes-el/kubernetes-el
 
 ** org-babel
 
+For supporting code in org files
+
+*** Confirmation
+
 #+begin_src emacs-lisp
   (setq org-confirm-babel-evaluate nil)
+#+end_src
 
+*** Supported languages
+
+#+begin_src emacs-lisp
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -473,11 +491,17 @@ https://github.com/kubernetes-el/kubernetes-el
      (clojure . t)))
 #+end_src
 
-** org-babel autosaving
+*** Autosaving
+
+set directory
 
 #+begin_src emacs-lisp
   (setq user-emacs-directory "~/dotfiles/programs/emacs/")
+#+end_src
 
+add tangle function
+
+#+begin_src emacs-lisp
   ;; Automatically tangle our Emacs.org config file when we save it
   (defun efs/org-babel-tangle-config ()
     (message (file-name-directory (buffer-file-name)))
@@ -486,7 +510,11 @@ https://github.com/kubernetes-el/kubernetes-el
       ;; Dynamic scoping to the rescue
       (let ((org-confirm-babel-evaluate nil))
         (org-babel-tangle))))
+#+end_src
 
+register hook
+
+#+begin_src emacs-lisp
   (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 #+end_src
 
@@ -531,7 +559,8 @@ https://github.com/kubernetes-el/kubernetes-el
     (lsp-lens-enable t)
     (lsp-signature-auto-activate t))
 
-  (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+  (use-package helm-lsp
+    :commands helm-lsp-workspace-symbol)
 #+end_src
 
 ** lsp-ui
@@ -547,10 +576,10 @@ https://github.com/kubernetes-el/kubernetes-el
 ** treemacs
 
 #+begin_src emacs-lisp :tangle no
-  ;; (use-package lsp-treemacs
-  ;;   :ensure t
-  ;;   :config
-  ;;   (treemacs-space-between-root-nodes nil))
+  (use-package lsp-treemacs
+    :ensure t
+    :config
+    (treemacs-space-between-root-nodes nil))
 #+end_src
 
 ** clerk

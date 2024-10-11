@@ -212,6 +212,10 @@
   (global-set-key (kbd "C-x n c")     'org-roam-dailies-capture-today)
   (global-set-key (kbd "C-x n f")     'org-roam-node-find))
 
+(use-package org-ql
+  :ensure t
+  :after org)
+
 (use-package org-roam-ui
   :ensure t
   ;; :straight
@@ -269,7 +273,8 @@
   (lsp-lens-enable t)
   (lsp-signature-auto-activate t))
 
-(use-package helm-lsp :commands helm-lsp-workspace-symbol)
+(use-package helm-lsp
+  :commands helm-lsp-workspace-symbol)
 
 (use-package lsp-ui
   :ensure t
