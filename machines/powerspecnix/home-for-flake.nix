@@ -186,7 +186,7 @@ in {
 
       silver-searcher
       simplex-chat-desktop
-      # slack
+      slack
       # sparrow
 
       # Command line tool for querying Sybase/MSSQL databases
