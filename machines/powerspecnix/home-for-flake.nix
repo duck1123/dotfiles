@@ -39,7 +39,7 @@ in {
       arkade
 
       # Next generation multi-platform command line experience for Azure
-      azure-cli
+      # azure-cli
 
       babashka
       barrier
