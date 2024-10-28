@@ -5,6 +5,20 @@ let
   username = "duck";
   email = "duck@kronkltd.net";
   gpgKey = "9564904D297DBF3C";
+  babashkaOverlay = final: prev: {
+    babashka-unwrapped = prev.babashka-unwrapped.overrideAttrs (oldAttrs: rec {
+      version = "1.12.194";
+
+      src = pkgs.fetchurl {
+        url = "https://github.com/babashka/babashka/releases/download/v${version}/babashka-${version}-standalone.jar";
+        sha256 = "sha256-Dx3AANMpmCPH8Zaz8/9FRNRRhcEPnZHXQje47udwwRQ=";
+      };
+
+      doInstallCheck = true;
+    });
+  };
+
+  customPkgs = import <nixpkgs> { overlays = [ babashkaOverlay ]; };
 in {
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
@@ -41,7 +55,7 @@ in {
       # Next generation multi-platform command line experience for Azure
       # azure-cli
 
-      babashka
+      customPkgs.babashka-unwrapped
       barrier
       bat
       byobu
