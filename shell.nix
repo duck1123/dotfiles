@@ -33,6 +33,7 @@ in pkgs.mkShell {
     nixpkgs-fmt
     home-manager
     git
+    kubectl
     sops
     ssh-to-pgp
   ];
