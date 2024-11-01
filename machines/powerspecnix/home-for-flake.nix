@@ -337,6 +337,7 @@ in {
       source <(argocd completion zsh)
       source <(k3d completion zsh)
       source <(devspace completion zsh)
+      source <(runme completion zsh)
       source <(hoard shell-config --shell zsh)
 
       _bb_tasks() {
