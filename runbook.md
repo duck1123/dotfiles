@@ -26,12 +26,12 @@ bb list-secret-keys
 
 ## Update Flakes
 
-```sh {"name":"update-flakes"}
+```sh {"id":"01JBQ87VEQZV4YCB22HYQEHGFS","name":"update-flakes"}
 nix flake update
 ```
 
 ## Switch Home
 
-```sh {"name":"switch-home-powerspecnix"}
+```sh {"id":"01JBQ87VEQZV4YCB22J1ZVN4HG","name":"switch-home-powerspecnix"}
 home-manager switch --flake ${HOME?}/dotfiles#duck --impure
 ```
