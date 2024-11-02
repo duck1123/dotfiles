@@ -35,3 +35,9 @@ nix flake update
 ```sh {"id":"01JBQ87VEQZV4YCB22J1ZVN4HG","name":"switch-home-powerspecnix"}
 home-manager switch --flake ${HOME?}/dotfiles#duck --impure
 ```
+
+## Switch OS
+
+```sh {"id":"01JBQ8FGQ0KTGY9B5CRNM3DHRZ","name":"switch-os-powerspecnix"}
+sudo nixos-rebuild switch --flake /home/duck/dotfiles#nixos
+```
