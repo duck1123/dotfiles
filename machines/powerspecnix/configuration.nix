@@ -161,6 +161,18 @@
       ];
     };
 
+    nfs.server = {
+      enable = true;
+      # Fixed ports for firewall.
+      statdPort = 4000;
+      lockdPort = 4001;
+      mountdPort = 4002;
+
+      exports = ''
+        /mnt/nfs    *(ro,insecure,all_squash)
+      '';
+    };
+
     # Enable the OpenSSH daemon.
     openssh = {
       enable = true;
