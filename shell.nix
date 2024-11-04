@@ -34,6 +34,7 @@ in pkgs.mkShell {
     home-manager
     git
     kubectl
+    kubeseal
     sops
     ssh-to-pgp
   ];
