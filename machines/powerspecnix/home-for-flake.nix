@@ -73,16 +73,29 @@ in {
       devpod-desktop
 
       devspace
+
+      # Domain name server
+      dig
+
+      digikam
+
       # discord
       # distrobox
+
+      # Highly configurable DNS proxy for penetration testers and malware analysts
+      dnschef
+
+      # Simple command line utility to make DNS lookups to the specified server
+      dnslookup
+
+      # Scan for subdomains using brute-force techniques
+      dnsmap
 
       # A command line tool for DigitalOcean services
       doctl
 
       docker
       docker-compose
-
-      digikam
 
       # dunst
       earthly
@@ -134,6 +147,10 @@ in {
 
       # k3d
       k9s
+
+      # Minimalist command line knowledge base manager
+      # kb
+
       keepassxc
 
       # Peer-to-Peer Chat
