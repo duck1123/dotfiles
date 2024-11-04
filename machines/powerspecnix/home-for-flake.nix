@@ -98,6 +98,7 @@ in {
       gnumake
       go
       # gossip
+
       gpa
 
       # gnome.dconf-editor
@@ -109,7 +110,9 @@ in {
       gnomeExtensions.gsconnect
       # gnomeExtensions.topicons-plus
       gnupg
-      gqrx
+
+      # gqrx
+
       graphviz
       guake
       gum
@@ -220,6 +223,9 @@ in {
 
       # ungoogled-chromium
       unzip
+
+      # Create fully functional virtual Kubernetes clusters
+      vcluster
 
       # virtualbox
       vlc
