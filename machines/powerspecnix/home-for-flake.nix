@@ -143,7 +143,7 @@ in {
       # i3
       # itch
 
-      jdk22
+      jdk
 
       jet
 
