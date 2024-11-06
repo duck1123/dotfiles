@@ -122,6 +122,8 @@ in {
       gnomeExtensions.appindicator
       gnomeExtensions.gsconnect
       # gnomeExtensions.topicons-plus
+      gnomeExtensions.tailscale-status
+
       gnupg
 
       # gqrx
@@ -249,6 +251,8 @@ in {
       vscode
 
       wine
+
+      xsel
 
       youtube-music
 
