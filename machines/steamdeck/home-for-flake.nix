@@ -197,6 +197,8 @@ in {
       };
     };
 
+    gpg.enable = true;
+
     jq.enable = true;
 
     # kdeconnect.enable = true;
@@ -222,6 +224,7 @@ in {
     history = {
       expireDuplicatesFirst = true;
       extended = true;
+      ignoreAllDups = true;
       ignoreDups = true;
     };
 
