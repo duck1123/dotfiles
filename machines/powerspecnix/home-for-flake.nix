@@ -174,6 +174,8 @@ in {
 
       lutris
 
+      mr
+
       mullvad-browser
 
       # neofetch
