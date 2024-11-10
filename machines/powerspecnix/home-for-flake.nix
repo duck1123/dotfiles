@@ -407,27 +407,6 @@ in {
     "apps/guake/general".default-shell = "/run/current-system/sw/bin/zsh";
   };
 
-  services = {
-    # barrier = {
-    #   enable = true;
-    #   # client = {
-    #   #   enable = true;
-    #   # };
-    # };
-
-    # gnome3.gnome-keyring.enable = true;
-
-    # dbus = {
-    #   enable = true;
-    #   socketActivated = true;
-    #   packages = [ pkgs.gnome3.dconf ];
-    # };
-
-    # openvscode-server = {
-    #   enable = true;
-    # };
-  };
-
   targets.genericLinux.enable = true;
 
   xdg = {

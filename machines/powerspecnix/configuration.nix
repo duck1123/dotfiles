@@ -156,10 +156,7 @@
       enable = false;
       role = "server";
       extraFlags = toString [
-        # "--kubelet-arg=v=4" # Optionally add additional args to k3s
-        # "--disable=traefik@server:0"
         "--disable=traefik"
-        # "--registry-use k3d-myregisty.localtest.me:12345"
       ];
     };
 
@@ -212,12 +209,6 @@
 
       settings = {
         devices = {
-          # "Pixel" = {
-          #   id =
-          #     "R7RANTI-7SWMPTI-GDRAGOV-TK42PP3-PL3FHI5-LHGGVN3-PVNRIYO-FX7TAQM";
-          #   autoAcceptFolders = true;
-          # };
-
           "Pixel 8" = {
             id =
               "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
@@ -339,6 +330,7 @@
     extraGroups =
       [ "dialout" "docker" "libvirtd" "networkmanager" "plugdev" "wheel" ];
     packages = with pkgs; [ appimage-run emacs firefox ];
+    shell = pkgs.zsh;
   };
 
   virtualisation = {
