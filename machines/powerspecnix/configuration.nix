@@ -298,13 +298,13 @@
         # lightdm.enable = true;
       };
 
-      # windowManager = {
-      #   i3 = {
-      #     enable = true;
-      #     # package = pkgs.i3-gaps;
-      #     # extraPackages = with pkgs; [ i3status i3lock polybar ];
-      #   };
-      # };
+      windowManager = {
+        i3 = {
+          enable = true;
+          package = pkgs.i3-gaps;
+          # extraPackages = with pkgs; [ i3status i3lock polybar ];
+        };
+      };
 
       # Enable touchpad support (enabled default in most desktopManager).
       # libinput.enable = true;
