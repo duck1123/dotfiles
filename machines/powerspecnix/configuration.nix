@@ -147,6 +147,8 @@
       };
     };
 
+    gnome.gnome-keyring.enable = true;
+
     flatpak.enable = true;
 
     k3s = {
