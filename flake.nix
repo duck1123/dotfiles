@@ -89,11 +89,11 @@
         };
       };
 
-      packages = eachDefaultSystemMap (system:
-        import nixpkgs { inherit system; });
+      # packages = eachDefaultSystemMap (system:
+      #   import nixpkgs { inherit system; });
 
-      devShells = eachDefaultSystemMap (system: {
-        default = import ./shell.nix { pkgs = packages.${system}; };
-      });
+      # devShells = eachDefaultSystemMap (system: {
+      #   default = import ./shell.nix { pkgs = packages.${system}; };
+      # });
     };
 }
