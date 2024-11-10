@@ -394,7 +394,7 @@ in {
       hh = "hstr";
       bbg = "bb --config ~/.bb/bb.edn";
       psgrep = "ps -ef | grep -v grep | grep ";
-      r = "runme run";
+      rmr = "runme run";
     };
   };
 
