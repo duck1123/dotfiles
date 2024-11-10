@@ -391,11 +391,10 @@ in {
       d = "devspace";
       dr = "devspace run";
       cat = "bat";
-      # dkcp = "docker-compose";
       hh = "hstr";
       bbg = "bb --config ~/.bb/bb.edn";
       psgrep = "ps -ef | grep -v grep | grep ";
-      "reload!" = "bbg switch-home && . ~/.zshrc";
+      r = "runme run";
     };
   };
 
