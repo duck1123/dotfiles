@@ -5,21 +5,6 @@ let
   username = "duck";
   email = "duck@kronkltd.net";
   gpgKey = "9564904D297DBF3C";
-  babashkaOverlay = final: prev: {
-    babashka-unwrapped = prev.babashka-unwrapped.overrideAttrs (oldAttrs: rec {
-      version = "1.12.194";
-
-      src = pkgs.fetchurl {
-        url =
-          "https://github.com/babashka/babashka/releases/download/v${version}/babashka-${version}-standalone.jar";
-        sha256 = "sha256-Dx3AANMpmCPH8Zaz8/9FRNRRhcEPnZHXQje47udwwRQ=";
-      };
-
-      doInstallCheck = true;
-    });
-  };
-
-  customPkgs = import <nixpkgs> { overlays = [ babashkaOverlay ]; };
 in {
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
@@ -49,19 +34,19 @@ in {
       appimage-run
 
       argocd
-      arkade
+      # arkade
 
       # Next generation multi-platform command line experience for Azure
       # azure-cli
 
-      customPkgs.babashka-unwrapped
+      babashka
       barrier
       bat
       byobu
       chromium
       clojure
       clojure-lsp
-      cheese
+      # cheese
       curl
 
       # Universal SQL Client for developers, DBA and analysts. Supports MySQL, PostgreSQL, MariaDB, SQLite, and more
@@ -81,32 +66,34 @@ in {
       # distrobox
 
       # Highly configurable DNS proxy for penetration testers and malware analysts
-      dnschef
+      # dnschef
 
       # Simple command line utility to make DNS lookups to the specified server
-      dnslookup
+      # dnslookup
 
       # Scan for subdomains using brute-force techniques
-      dnsmap
+      # dnsmap
 
       # A command line tool for DigitalOcean services
-      doctl
+      # doctl
 
       docker
-      docker-compose
+      # docker-compose
 
       # dunst
-      earthly
+      # earthly
 
       emacs
 
       # extraNodePackages.prettier
       # fish
-      gcc9
-      gimp
+      # gcc9
+      # gimp
+
       git
+
       # gitu
-      gnumake
+      # gnumake
       go
       # gossip
 
@@ -172,9 +159,9 @@ in {
 
       lutris
 
-      mr
+      # mr
 
-      mullvad-browser
+      # mullvad-browser
 
       # neofetch
       # nextcloud-24.0.3
@@ -183,6 +170,8 @@ in {
 
       nixfmt-classic
       # nixUnstable
+
+      nh
 
       nmap
 
@@ -193,16 +182,16 @@ in {
 
       # obsidian
 
-      onlyoffice-bin
+      # onlyoffice-bin
       # openjdk
 
       # openjdk17
       plex
-      plex-media-player
+      # plex-media-player
 
-      podman
-      podman-desktop
-      podman-tui
+      # podman
+      # podman-desktop
+      # podman-tui
 
       python3
 
@@ -221,7 +210,7 @@ in {
       # sdrangel
 
       silver-searcher
-      simplex-chat-desktop
+      # simplex-chat-desktop
       slack
       # sparrow
 
@@ -238,13 +227,13 @@ in {
       thunderbird
       # tilt
       transmission_4-gtk
-      tree
+      # tree
 
       # ungoogled-chromium
       unzip
 
       # Create fully functional virtual Kubernetes clusters
-      vcluster
+      # vcluster
 
       # virtualbox
       vlc
@@ -375,7 +364,7 @@ in {
       compdef _bb_tasks bb
     '';
 
-    localVariables.PROJECT_PATHS = [ ~/projects ];
+    localVariables.PROJECT_PATHS = [ /home/${username}/projects ];
 
     sessionVariables = {
       EDITOR = "emacsclient -ct";

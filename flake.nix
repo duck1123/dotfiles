@@ -50,7 +50,7 @@
       };
 
       nixosConfigurations = {
-        nixos = nixosSystem {
+        powerspecnix = nixosSystem {
           system = "x86_64-linux";
 
           modules = [
@@ -62,11 +62,11 @@
         };
       };
 
-      # packages = eachDefaultSystemMap (system:
-      #   import nixpkgs { inherit system; });
+      packages = eachDefaultSystemMap (system:
+        import nixpkgs { inherit system; });
 
-      # devShells = eachDefaultSystemMap (system: {
-      #   default = import ./shell.nix { pkgs = packages.${system}; };
-      # });
+      devShells = eachDefaultSystemMap (system: {
+        default = import ./shell.nix { pkgs = packages.${system}; };
+      });
     };
 }

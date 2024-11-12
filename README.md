@@ -68,6 +68,10 @@ nix flake update
 home-manager switch --flake ${HOME?}/dotfiles#duck --impure
 ```
 
+``` sh {"name":"switch-powerspecnix-home"}
+nh home build . -- --impure
+```
+
 ### Switch OS
 
 ```sh {"id":"01JBQ8FGQ0KTGY9B5CRNM3DHRZ","name":"switch-os-powerspecnix"}
