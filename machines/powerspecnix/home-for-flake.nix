@@ -47,6 +47,8 @@ in {
     file.".bb/bb.edn".source = ../../bb.edn;
 
     packages = with pkgs; [
+      alacritty
+
       appimage-run
 
       argocd

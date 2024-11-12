@@ -76,6 +76,8 @@
         }
       ];
 
+      terminal = "alacritty";
+
       window = { hideEdgeBorders = "smart"; };
     };
   };
