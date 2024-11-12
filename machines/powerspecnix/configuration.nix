@@ -104,8 +104,10 @@
   };
 
   # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.chromium.enableWideVine = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+    chromium.enableWideVine = true;
+  };
 
   programs = {
     dconf.enable = true;
@@ -161,7 +163,7 @@
     };
 
     nfs.server = {
-      enable = true;
+      enable = false;
       # Fixed ports for firewall.
       statdPort = 4000;
       lockdPort = 4001;
@@ -290,6 +292,10 @@
         # gdm.enable = true;
         # lightdm.enable = true;
       };
+
+      # monitorConfig = ''
+      #   xrandr --output HDMI-1 --left-of DP-3
+      # '';
 
       windowManager = {
         i3 = {
