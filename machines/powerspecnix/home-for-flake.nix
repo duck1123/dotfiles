@@ -10,7 +10,8 @@ let
       version = "1.12.194";
 
       src = pkgs.fetchurl {
-        url = "https://github.com/babashka/babashka/releases/download/v${version}/babashka-${version}-standalone.jar";
+        url =
+          "https://github.com/babashka/babashka/releases/download/v${version}/babashka-${version}-standalone.jar";
         sha256 = "sha256-Dx3AANMpmCPH8Zaz8/9FRNRRhcEPnZHXQje47udwwRQ=";
       };
 
@@ -32,11 +33,7 @@ in {
 
   programs.home-manager.enable = true;
 
-  imports = [
-    ../../programs/emacs/default.nix
-    ../../programs/i3/default.nix
-    ../../programs/ncmpcpp/default.nix
-  ];
+  imports = [ ../../programs/emacs ../../programs/i3 ../../programs/ncmpcpp ];
 
   home = {
     # Home Manager needs a bit of information about you and the
@@ -66,7 +63,6 @@ in {
       clojure-lsp
       cheese
       curl
-
 
       # Universal SQL Client for developers, DBA and analysts. Supports MySQL, PostgreSQL, MariaDB, SQLite, and more
       dbeaver-bin
@@ -306,15 +302,13 @@ in {
     vim = {
       enable = true;
       extraConfig = ''
-      syntax on
-      " Wrap gitcommit file types at the appropriate length
-      filetype indent plugin on
+        syntax on
+        " Wrap gitcommit file types at the appropriate length
+        filetype indent plugin on
       '';
     };
 
-    vscode = {
-      enable = true;
-    };
+    vscode = { enable = true; };
   };
 
   programs.zsh = {
