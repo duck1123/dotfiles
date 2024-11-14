@@ -37,6 +37,7 @@ in {
       hstr
       htop
       jet
+      kubectl
       neofetch
       nixfmt-classic
       silver-searcher
