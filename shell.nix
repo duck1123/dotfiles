@@ -5,12 +5,14 @@ pkgs.mkShell {
   sopsPGPKeyDirs = [ "./nixos/secrets/keys" ];
 
   nativeBuildInputs = with pkgs; [
+    nh
     nix
     nixpkgs-fmt
     home-manager
     git
     kubectl
     kubeseal
+    runme
     sops
     ssh-to-pgp
   ];

@@ -40,6 +40,7 @@ in {
       kubectl
       neofetch
       nixfmt-classic
+      runme
       silver-searcher
     ];
   };
