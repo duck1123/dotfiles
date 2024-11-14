@@ -37,6 +37,7 @@ in {
       hstr
       htop
       jet
+      k9s
       kubectl
       neofetch
       nixfmt-classic
