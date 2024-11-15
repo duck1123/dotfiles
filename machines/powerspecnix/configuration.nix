@@ -12,6 +12,7 @@ let
   stylix = import ../../modules/stylix { inherit config inputs pkgs; };
   syncthing = import ../../modules/syncthing { inherit config inputs pkgs; };
   users = import ../../modules/users { inherit config inputs pkgs; };
+  virtualization = import ../../modules/virtualization { inherit config inputs pkgs; };
   core = [
     ./hardware-configuration.nix
     base
@@ -21,6 +22,7 @@ let
     stylix
     syncthing
     users
+    # virtualization
     inputs.home-manager.nixosModules.home-manager
     inputs.stylix.nixosModules.stylix
   ];

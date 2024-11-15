@@ -16,6 +16,7 @@ in {
       "networkmanager"
       "plugdev"
       "realtime"
+      "vboxusers"
       "wheel"
     ];
     packages = with pkgs; [ appimage-run emacs firefox ];

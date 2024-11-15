@@ -131,6 +131,7 @@ in {
       transmission_4-gtk
       # tree
       unzip
+      # virtualbox
       vlc
       vscode
       wine
