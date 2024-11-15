@@ -33,6 +33,9 @@ in {
 
       appimage-run
 
+      # Multi-track hard disk recording software
+      ardour
+
       argocd
       # arkade
 
@@ -43,6 +46,10 @@ in {
       barrier
       bat
       byobu
+
+      # Audio plugin host
+      carla
+
       chromium
       clojure
       clojure-lsp
@@ -154,6 +161,8 @@ in {
 
       libnotify
 
+      lmms
+
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
       # logseq
 
@@ -162,6 +171,8 @@ in {
       # mr
 
       # mullvad-browser
+
+      musescore
 
       # neofetch
       # nextcloud-24.0.3
@@ -202,6 +213,10 @@ in {
       # A decentralized app for code collaboration
       # radicle-node
 
+
+      # Modern tracker-based DAW
+      renoise
+
       # A backup program that is fast, efficient and secure
       # restic
 
@@ -221,6 +236,10 @@ in {
 
       # steam
       syncthing
+
+      # Old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx
+      synthv1
+
       tailscale
       # tailscale-systray
       tdesktop
@@ -237,8 +256,13 @@ in {
       # Create fully functional virtual Kubernetes clusters
       # vcluster
 
+      vcv-rack
+
       # virtualbox
       vlc
+
+      vmpk
+
       vscode
 
       wine
