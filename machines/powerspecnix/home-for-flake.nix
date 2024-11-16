@@ -197,6 +197,8 @@ in {
 
       # qFlipper
 
+      qjackctl
+
       # A decentralized app for code collaboration
       # radicle-node
 

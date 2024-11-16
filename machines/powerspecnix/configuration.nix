@@ -157,9 +157,7 @@
       # enable = true;
       enable = false;
       role = "server";
-      extraFlags = toString [
-        "--disable=traefik"
-      ];
+      extraFlags = toString [ "--disable=traefik" ];
     };
 
     nfs.server = {
@@ -192,6 +190,7 @@
         support32Bit = true;
       };
 
+      jack.enable = true;
       pulse.enable = true;
     };
 
@@ -333,8 +332,15 @@
   users.users.duck = {
     isNormalUser = true;
     description = "Duck Nebuchadnezzar";
-    extraGroups =
-      [ "dialout" "docker" "libvirtd" "networkmanager" "plugdev" "wheel" ];
+    extraGroups = [
+      "dialout"
+      "docker"
+      "jackaudio"
+      "libvirtd"
+      "networkmanager"
+      "plugdev"
+      "wheel"
+    ];
     packages = with pkgs; [ appimage-run emacs firefox ];
     shell = pkgs.zsh;
   };
