@@ -339,6 +339,7 @@
       "libvirtd"
       "networkmanager"
       "plugdev"
+      "realtime"
       "wheel"
     ];
     packages = with pkgs; [ appimage-run emacs firefox ];

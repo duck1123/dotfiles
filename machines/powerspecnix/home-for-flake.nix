@@ -122,6 +122,8 @@ in {
 
       graphviz
       guake
+
+      guitarix
       gum
 
       heroic
@@ -235,6 +237,9 @@ in {
       # sqsh
 
       # steam
+
+      supercollider
+
       syncthing
 
       # Old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx
