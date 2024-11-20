@@ -93,6 +93,9 @@ in {
       emacs
 
       # extraNodePackages.prettier
+
+      ffmpeg
+
       # fish
       # gcc9
       # gimp
@@ -275,6 +278,8 @@ in {
       xsel
 
       youtube-music
+
+      yt-dlp
 
       yq
 
