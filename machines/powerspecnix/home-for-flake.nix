@@ -54,6 +54,9 @@ in {
       clojure
       clojure-lsp
       # cheese
+
+      cubicsdr
+
       curl
 
       # Universal SQL Client for developers, DBA and analysts. Supports MySQL, PostgreSQL, MariaDB, SQLite, and more
@@ -104,6 +107,8 @@ in {
 
       # gitu
       # gnumake
+      gnuradio
+
       go
       # gossip
 
@@ -121,7 +126,7 @@ in {
 
       gnupg
 
-      # gqrx
+      gqrx
 
       graphviz
       guake
@@ -224,11 +229,13 @@ in {
       # A backup program that is fast, efficient and secure
       # restic
 
-      # rtl-sdr
+      rtl-sdr
 
       runme
 
-      # sdrangel
+      sdr-j-fm
+      sdrangel
+      sdrpp
 
       silver-searcher
       # simplex-chat-desktop
