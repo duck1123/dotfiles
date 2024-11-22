@@ -179,7 +179,7 @@ in {
 
       musescore
 
-      # neofetch
+      neofetch
       # nextcloud-24.0.3
 
       # nexusmods-app
