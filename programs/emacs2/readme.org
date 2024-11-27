@@ -1,0 +1,13 @@
+#+title Emacs Personalizations
+
+* commentary
+
+Write out the lines saying that this file is auto generated.
+
+#+begin_src emacs-lisp :tangle t
+  ;;; custom --- Custom code
+  ;;; Commentary: This file is auto-generated. Edit the org file
+
+  ;;; Code:
+#+end_src
+

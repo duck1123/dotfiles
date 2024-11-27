@@ -22,7 +22,8 @@ in {
     # ../../programs/backups
     ../../programs/clojure
     ../../programs/developer
-    ../../programs/emacs
+    # ../../programs/emacs
+    ../../programs/emacs2
     # ../../programs/i3
     # ../../programs/music
     # ../../programs/ncmpcpp
@@ -75,7 +76,7 @@ in {
       # dunst
       # earthly
 
-      emacs
+      # emacs
 
       ffmpeg
 
@@ -270,11 +271,13 @@ in {
     enable = true;
     autoEnable = true;
     image = ./nix-wallpaper-mosaic-blue.png;
-    imageScalingMode = "fit";
     # image = config.lib.stylix.pixel "base0A";
+    imageScalingMode = "fit";
     polarity = "dark";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/materia.yaml";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/evenok-dark.yaml";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/still-alive.yaml";
