@@ -235,6 +235,8 @@ in {
       slack
       # sparrow
 
+      sqlite
+
       # Command line tool for querying Sybase/MSSQL databases
       # sqsh
 
