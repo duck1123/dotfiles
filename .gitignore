@@ -1,5 +1,6 @@
 .clj-kondo
 .lsp
+.portal
 atom.symlink/.apm
 atom.symlink/.node-gyp
 atom.symlink/.storage
