@@ -218,7 +218,6 @@ in {
       # A decentralized app for code collaboration
       # radicle-node
 
-
       # Modern tracker-based DAW
       renoise
 
@@ -303,7 +302,10 @@ in {
         "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
     };
 
-    direnv.enable = true;
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
 
     git = {
       enable = true;
