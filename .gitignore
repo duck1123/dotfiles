@@ -1,4 +1,5 @@
 .clj-kondo
+.direnv
 .lsp
 .portal
 atom.symlink/.apm
