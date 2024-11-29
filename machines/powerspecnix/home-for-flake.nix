@@ -106,7 +106,12 @@ in {
       git
 
       # gitu
+
       # gnumake
+
+      # Modern release of the GNU Privacy Guard, a GPL OpenPGP implementation
+      gnupg
+
       gnuradio
 
       go
