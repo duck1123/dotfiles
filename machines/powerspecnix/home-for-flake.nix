@@ -403,6 +403,7 @@ in {
       bindkey -s "\C-x\C-tn" "bbg watch-namespaces\C-j"
       bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
 
+      source <(argo completion zsh)
       source <(argocd completion zsh)
       source <(k3d completion zsh)
       source <(devspace completion zsh)
