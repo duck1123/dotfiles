@@ -38,13 +38,9 @@ curl -L https://git.io/epre | sh
 
 ## Commands
 
-### Hello World
-
-```sh {"id":"01J9FJ8542CXXDY3FQ8M9CP0GQ","name":"hello"}
-echo "Hello World"
-```
-
 ### List tasks
+
+List all tasks
 
 ```sh {"id":"01J9FJBMKK4X3G3KXBJSKAYT27","name":"tasks"}
 bb tasks
@@ -52,11 +48,15 @@ bb tasks
 
 ### List Secret Keys
 
+List GPG secret keys
+
 ```sh {"id":"01J9FJC4985HK894NR72G3730R","interpreter":"","name":"list-secret-keys"}
 bb list-secret-keys
 ```
 
 ### Update Flakes
+
+Update package lock files
 
 ```sh {"id":"01JBQ87VEQZV4YCB22HYQEHGFS","name":"update-flakes"}
 nix flake update
@@ -64,16 +64,24 @@ nix flake update
 
 ### Switch Home
 
-```sh {"id":"01JBQ87VEQZV4YCB22J1ZVN4HG","name":"switch-home-powerspecnix"}
-home-manager switch --flake ${HOME?}/dotfiles#duck --impure
-```
+Update user-level configuration
 
-``` sh {"name":"switch-powerspecnix-home"}
-nh home build . -- --impure
+```sh {"name":"switch-home"}
+nh home build ${HOME?}/dotfiles -- --impure --show-trace
 ```
 
 ### Switch OS
 
-```sh {"id":"01JBQ8FGQ0KTGY9B5CRNM3DHRZ","name":"switch-os-powerspecnix"}
-sudo nixos-rebuild switch --flake ${HOME?}/dotfiles#nixos
+Update OS configuration
+
+```sh {"name":"switch-os"}
+nh os build ${HOME?}/dotfiles -- --impure --show-trace
+```
+
+### Reboot
+
+Restart the computer
+
+```sh {"name": "reboot"}
+sudo reboot
 ```
