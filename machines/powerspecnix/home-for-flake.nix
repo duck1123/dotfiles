@@ -36,6 +36,7 @@ in {
       # Multi-track hard disk recording software
       ardour
 
+      argo
       argocd
       # arkade
 
