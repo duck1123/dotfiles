@@ -46,6 +46,9 @@ in {
       babashka
       barrier
       bat
+
+      bbin
+
       byobu
 
       # Audio plugin host
