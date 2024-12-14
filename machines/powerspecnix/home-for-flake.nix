@@ -223,6 +223,8 @@ in {
       # podman-desktop
       # podman-tui
 
+      postman
+
       python3
 
       # qFlipper
