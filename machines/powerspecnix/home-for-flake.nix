@@ -170,7 +170,7 @@ in {
       # keet
 
       # khoj
-      # kodi
+      kodi
       # krew
       kubernetes-helm
       kubectl
