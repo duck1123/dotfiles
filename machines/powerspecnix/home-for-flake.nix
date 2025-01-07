@@ -158,7 +158,7 @@ in {
 
       jet
 
-      # k3d
+      k3d
       k9s
 
       # Minimalist command line knowledge base manager
