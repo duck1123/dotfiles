@@ -176,15 +176,18 @@ in {
       kubectl
       kustomize
 
+      # Kubernetes IDE
       lens
 
       libnotify
 
+      # DAW similar to FL Studio (music production software)
       lmms
 
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
       # logseq
 
+      # Open Source gaming platform for GNU/Linux
       lutris
 
       # mr
