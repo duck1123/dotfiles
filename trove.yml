@@ -5,7 +5,7 @@ commands:
     namespace: dotfiles
     tags:
       - nix
-    command: "nh home build ${HOME?}/dotfiles -- --impure --show-trace"
+    command: "nh home switch ${HOME?}/dotfiles -- --impure --show-trace"
     description: Update Home Manager
   - name: switch-steamdeck
     namespace: dotfiles
@@ -23,7 +23,7 @@ commands:
     namespace: dotfiles
     tags:
       - nix
-    command: "nh os build ${HOME?}/dotfiles -- --impure --show-trace"
+    command: "nh os switch ${HOME?}/dotfiles -- --impure --show-trace"
     description: Update the NixOS config
   - name: collect-garbage
     namespace: dotfiles
