@@ -19,6 +19,7 @@ in {
   programs.home-manager.enable = true;
 
   imports = [
+    # ../../programs/backups
     ../../programs/clojure
     ../../programs/developer
     ../../programs/emacs
@@ -164,9 +165,6 @@ in {
 
       # A decentralized app for code collaboration
       # radicle-node
-
-      # A backup program that is fast, efficient and secure
-      # restic
 
       silver-searcher
       # simplex-chat-desktop
