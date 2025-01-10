@@ -26,6 +26,7 @@ in {
     ../../programs/i3
     ../../programs/music
     ../../programs/ncmpcpp
+    ../../programs/nostr
     ../../programs/radio
     ../../programs/zsh
   ];
