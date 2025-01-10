@@ -33,7 +33,6 @@
   ];
 
   hardware = {
-    pulseaudio.enable = false;
     rtl-sdr.enable = true;
   };
 
@@ -201,6 +200,8 @@
 
     # Enable CUPS to print documents.
     printing.enable = true;
+
+    pulseaudio.enable = false;
 
     syncthing = {
       enable = true;
