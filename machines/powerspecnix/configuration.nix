@@ -5,6 +5,72 @@
 { config, pkgs, ... }: {
   imports = [ ./hardware-configuration.nix ];
 
+  specialisation = {
+    budgie = {
+      inheritParentConfig = true;
+      configuration = {
+        services = {
+          xserver = {
+            desktopManager.budgie.enable = true;
+            displayManager.lightdm.enable = true;
+          };
+          displayManager.defaultSession = "budgie-desktop";
+        };
+      };
+    };
+    gnome = {
+      inheritParentConfig = true;
+      configuration = {
+        services = {
+          displayManager = {
+            defaultSession = "gnome";
+            sddm = {
+              enable = true;
+              theme = "ocean";
+              wayland.enable = true;
+            };
+          };
+          xserver = {
+            desktopManager = {
+              gnome.enable = true;
+            };
+          };
+        };
+      };
+    };
+    i3 = {
+      inheritParentConfig = true;
+      configuration = {
+        services = {
+          displayManager.sddm = {
+            enable = true;
+            theme = "ocean";
+            wayland.enable = true;
+          };
+          xserver.windowManager.i3 = {
+            enable = true;
+            package = pkgs.i3-gaps;
+          };
+        };
+      };
+    };
+    plasma6 = {
+      inheritParentConfig = true;
+      configuration = {
+        services = {
+          desktopManager.plasma6.enable = true;
+          displayManager = {
+            sddm = {
+              enable = true;
+              theme = "ocean";
+              wayland.enable = true;
+            };
+          };
+        };
+      };
+    };
+  };
+
   # Bootloader.
   boot = {
     binfmt.registrations.appimage = {
@@ -22,8 +88,6 @@
     };
   };
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
   environment.systemPackages = with pkgs; [
     adwaita-icon-theme
     gnomeExtensions.appindicator
@@ -73,10 +137,6 @@
         ## k3s
         8472
       ];
-
-      # allowedUDPPortRanges = [
-      #   { from = 24800; to = 24800; }
-      # ];
     };
 
     hostName = "powerspecnix"; # Define your hostname.
@@ -121,8 +181,6 @@
 
       libraries = with pkgs;
         [
-          # Add any missing dynamic libraries for unpackaged programs
-          # here, NOT in environment.systemPackages
           alsa-lib
           libGL
           renpy
@@ -137,20 +195,6 @@
   security.rtkit.enable = true;
 
   services = {
-    # emacs.enable = true;
-
-    # desktopManager.plasma6.enable = true;
-
-    displayManager = {
-      defaultSession = "gnome";
-
-      sddm = {
-        enable = true;
-        theme = "ocean";
-        wayland.enable = true;
-      };
-    };
-
     gnome.gnome-keyring.enable = true;
 
     flatpak.enable = true;
@@ -271,45 +315,7 @@
 
     # Configure keymap in X11
     xserver = {
-      # Enable the X11 windowing system.
       enable = true;
-
-      desktopManager = {
-        # enlightenment.enable = true;
-
-        # Enable the GNOME Desktop Environment.
-        gnome.enable = true;
-
-        # phosh.enable = true;
-
-        # plasma5.enable = true;
-        # plasma6.enable = true;
-        # xfce.enable = true;
-        # xterm.enable = false;
-      };
-
-      displayManager = {
-        # defalutSession = "gnome";
-        # defalutSession = "none+i3";
-
-        # gdm.enable = true;
-        # lightdm.enable = true;
-      };
-
-      # monitorConfig = ''
-      #   xrandr --output HDMI-1 --left-of DP-3
-      # '';
-
-      windowManager = {
-        i3 = {
-          enable = true;
-          package = pkgs.i3-gaps;
-          # extraPackages = with pkgs; [ i3status i3lock polybar ];
-        };
-      };
-
-      # Enable touchpad support (enabled default in most desktopManager).
-      # libinput.enable = true;
 
       xkb = {
         layout = "us";
@@ -353,5 +359,10 @@
   virtualisation = {
     docker.enable = true;
     libvirtd.enable = true;
+  };
+
+  xdg.portal = {
+    enable = true;
+    config.common.default = "*";
   };
 }
