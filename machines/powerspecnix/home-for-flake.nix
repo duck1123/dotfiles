@@ -18,7 +18,16 @@ in {
 
   programs.home-manager.enable = true;
 
-  imports = [ ../../programs/emacs ../../programs/i3 ../../programs/ncmpcpp ];
+  imports = [
+    ../../programs/clojure
+    ../../programs/developer
+    ../../programs/emacs
+    ../../programs/i3
+    ../../programs/music
+    ../../programs/ncmpcpp
+    ../../programs/radio
+    ../../programs/zsh
+  ];
 
   home = {
     # Home Manager needs a bit of information about you and the
@@ -33,63 +42,22 @@ in {
 
       appimage-run
 
-      # Multi-track hard disk recording software
-      ardour
 
-      argo
-      argocd
-      # arkade
-
-      # Next generation multi-platform command line experience for Azure
-      # azure-cli
-
-      babashka
       barrier
       bat
 
-      bbin
-
       byobu
 
-      # Audio plugin host
-      carla
+      # chromium
 
-      chromium
-      clojure
-      clojure-lsp
       # cheese
 
-      cubicsdr
-
       curl
-
-      # Universal SQL Client for developers, DBA and analysts. Supports MySQL, PostgreSQL, MariaDB, SQLite, and more
-      dbeaver-bin
-
-      devpod
-      devpod-desktop
-
-      devspace
-
-      # Domain name server
-      dig
 
       digikam
 
       # discord
       # distrobox
-
-      # Highly configurable DNS proxy for penetration testers and malware analysts
-      # dnschef
-
-      # Simple command line utility to make DNS lookups to the specified server
-      # dnslookup
-
-      # Scan for subdomains using brute-force techniques
-      # dnsmap
-
-      # A command line tool for DigitalOcean services
-      # doctl
 
       docker
       # docker-compose
@@ -98,8 +66,6 @@ in {
       # earthly
 
       emacs
-
-      # extraNodePackages.prettier
 
       ffmpeg
 
@@ -111,12 +77,8 @@ in {
 
       # gitu
 
-      # gnumake
-
       # Modern release of the GNU Privacy Guard, a GPL OpenPGP implementation
       gnupg
-
-      gnuradio
 
       go
       # gossip
@@ -135,12 +97,9 @@ in {
 
       gnupg
 
-      gqrx
-
       graphviz
       guake
 
-      guitarix
       gum
 
       heroic
@@ -148,18 +107,11 @@ in {
       hstr
       htop
 
-      # Advanced drum machine
-      hydrogen
-
-      # i3
       # itch
 
       jdk
 
       jet
-
-      k3d
-      k9s
 
       # Minimalist command line knowledge base manager
       # kb
@@ -171,13 +123,6 @@ in {
 
       # khoj
       kodi
-      # krew
-      kubernetes-helm
-      kubectl
-      kustomize
-
-      # Kubernetes IDE
-      lens
 
       libnotify
 
@@ -190,11 +135,7 @@ in {
       # Open Source gaming platform for GNU/Linux
       lutris
 
-      # mr
-
       # mullvad-browser
-
-      musescore
 
       neofetch
       # nextcloud-24.0.3
@@ -202,96 +143,55 @@ in {
       # nexusmods-app
 
       nixfmt-classic
-      # nixUnstable
 
       nh
 
       nmap
 
       nodejs
-      # nodejs-16_x
 
       # obs-studio
 
       # obsidian
 
       # onlyoffice-bin
-      # openjdk
-
-      # openjdk17
       plex
       # plex-media-player
 
-      # podman
-      # podman-desktop
-      # podman-tui
-
       postman
 
-      python3
-
       # qFlipper
-
-      qjackctl
 
       # A decentralized app for code collaboration
       # radicle-node
 
-      # Modern tracker-based DAW
-      renoise
-
       # A backup program that is fast, efficient and secure
       # restic
-
-      rtl-sdr
-
-      runme
-
-      sdr-j-fm
-      sdrangel
-      sdrpp
 
       silver-searcher
       # simplex-chat-desktop
       slack
       # sparrow
 
-      sqlite
-
-      # Command line tool for querying Sybase/MSSQL databases
-      # sqsh
-
-      # steam
-
-      supercollider
-
       syncthing
 
-      # Old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx
-      synthv1
-
       tailscale
-      # tailscale-systray
+
       tdesktop
+
       teams-for-linux
 
       thunderbird
+
       # tilt
+
       transmission_4-gtk
+
       # tree
 
-      # ungoogled-chromium
       unzip
 
-      # Create fully functional virtual Kubernetes clusters
-      # vcluster
-
-      vcv-rack
-
-      # virtualbox
       vlc
-
-      vmpk
 
       vscode
 
@@ -361,89 +261,6 @@ in {
     vscode = { enable = true; };
   };
 
-  programs.zsh = {
-    autosuggestion.enable = true;
-
-    defaultKeymap = "emacs";
-    enable = true;
-
-    history = {
-      expireDuplicatesFirst = true;
-      extended = true;
-      ignoreAllDups = true;
-      ignoreDups = true;
-    };
-
-    oh-my-zsh = {
-      enable = true;
-      theme = "jonathan";
-      plugins = [
-        "bgnotify"
-        "colorize"
-        # "command-not-found"
-        "compleat"
-        # "docker-compose"
-        "docker"
-        "git"
-        "git-extras"
-        "history"
-        "kubectl"
-        "nmap"
-        "node"
-        "npm"
-        "pj"
-        "sudo"
-        "systemd"
-      ];
-    };
-
-    initExtra = ''
-      if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
-          . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
-      fi # added by Nix installer
-
-      export PATH="/home/${username}/.arkade/bin:$PATH"
-      export PATH="/home/${username}/.cargo/bin:$PATH"
-      export PATH="/home/${username}/.local/bin:$PATH"
-
-      # bind hstr to Ctrl-r (for Vi mode check doc)
-      bindkey -s "\C-r" "\C-a hstr -- \C-j"
-
-      bindkey -s "\C-x\C-tn" "bbg watch-namespaces\C-j"
-      bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
-
-      source <(argo completion zsh)
-      source <(argocd completion zsh)
-      source <(k3d completion zsh)
-      source <(devspace completion zsh)
-      source <(runme completion zsh)
-      source <(hoard shell-config --shell zsh)
-
-      _bb_tasks() {
-        local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
-        compadd -a matches
-      }
-      compdef _bb_tasks bb
-    '';
-
-    localVariables.PROJECT_PATHS = [ /home/${username}/projects ];
-
-    sessionVariables = {
-      EDITOR = "emacsclient -ct";
-      HSTR_CONFIG = "hicolor";
-      SHELL = "/run/current-system/sw/bin/zsh";
-    };
-
-    shellAliases = {
-      d = "devspace";
-      dr = "devspace run";
-      cat = "bat";
-      hh = "hstr";
-      bbg = "bb --config ~/.bb/bb.edn";
-      psgrep = "ps -ef | grep -v grep | grep ";
-      rmr = "runme run";
-    };
-  };
 
   dconf.settings = {
     "org/gnome/desktop/interface".color-scheme = "prefer-dark";
