@@ -47,6 +47,8 @@
 
     # mr
 
+    nushell
+
     # openjdk
     # openjdk17
 
