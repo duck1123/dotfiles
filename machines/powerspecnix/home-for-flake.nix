@@ -24,10 +24,10 @@ in {
     ../../programs/developer
     ../../programs/emacs
     ../../programs/i3
-    ../../programs/music
-    ../../programs/ncmpcpp
+    # ../../programs/music
+    # ../../programs/ncmpcpp
     ../../programs/nostr
-    ../../programs/radio
+    # ../../programs/radio
     ../../programs/zsh
   ];
 
@@ -43,7 +43,6 @@ in {
       alacritty
 
       appimage-run
-
 
       barrier
       bat
@@ -85,24 +84,24 @@ in {
       go
       # gossip
 
-      gpa
+      # gpa
 
       # gnome.dconf-editor
 
-      gnome-photos
-      gnome-tweaks
+      # gnome-photos
+      # gnome-tweaks
 
       gnomeExtensions.appindicator
       gnomeExtensions.gsconnect
       # gnomeExtensions.topicons-plus
-      gnomeExtensions.tailscale-status
+      # gnomeExtensions.tailscale-status
 
-      gnupg
+      # gnupg
 
-      graphviz
+      # graphviz
       guake
 
-      gum
+      # gum
 
       heroic
       hoard
@@ -129,7 +128,7 @@ in {
       libnotify
 
       # DAW similar to FL Studio (music production software)
-      lmms
+      # lmms
 
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
       # logseq
@@ -160,7 +159,7 @@ in {
       plex
       # plex-media-player
 
-      postman
+      # postman
 
       # qFlipper
 
@@ -180,11 +179,11 @@ in {
 
       teams-for-linux
 
-      thunderbird
+      # thunderbird
 
       # tilt
 
-      transmission_4-gtk
+      # transmission_4-gtk
 
       # tree
 
@@ -198,11 +197,11 @@ in {
 
       xsel
 
-      youtube-music
+      # youtube-music
 
-      yt-dlp
+      # yt-dlp
 
-      yq
+      # yq
 
       # zoom-us
     ];
@@ -259,7 +258,6 @@ in {
 
     vscode = { enable = true; };
   };
-
 
   dconf.settings = {
     "org/gnome/desktop/interface".color-scheme = "prefer-dark";
