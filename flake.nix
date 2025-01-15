@@ -14,9 +14,11 @@
       # Use system packages list where available
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, flake-utils, stylix, ... }@inputs:
     let
       # inherit (builtins) attrValues;
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
@@ -30,22 +32,28 @@
         drenfer = homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
 
-          modules =
-            [{ imports = [ ./machines/vavirl-pw0bwnq8/home-for-flake.nix ]; }];
+          modules = [
+            stylix.homeManagerModules.stylix
+            { imports = [ ./machines/vavirl-pw0bwnq8/home-for-flake.nix ]; }
+          ];
         };
 
         deck = homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
 
-          modules =
-            [{ imports = [ ./machines/steamdeck/home-for-flake.nix ]; }];
+          modules = [
+            stylix.homeManagerModules.stylix
+            { imports = [ ./machines/steamdeck/home-for-flake.nix ]; }
+          ];
         };
 
         duck = homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
 
-          modules =
-            [{ imports = [ ./machines/powerspecnix/home-for-flake.nix ]; }];
+          modules = [
+            stylix.homeManagerModules.stylix
+            { imports = [ ./machines/powerspecnix/home-for-flake.nix ]; }
+          ];
         };
       };
 
@@ -55,6 +63,7 @@
 
           modules = [
             home-manager.nixosModules.home-manager
+            stylix.nixosModules.stylix
             ./machines/powerspecnix/configuration.nix
           ];
           # Make our inputs available to the config (for importing modules)

@@ -2,22 +2,22 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }: {
+{ config, pkgs, stylix, ... }: {
   imports = [ ./hardware-configuration.nix ];
 
   specialisation = {
-    budgie = {
-      inheritParentConfig = true;
-      configuration = {
-        services = {
-          xserver = {
-            desktopManager.budgie.enable = true;
-            displayManager.lightdm.enable = true;
-          };
-          displayManager.defaultSession = "budgie-desktop";
-        };
-      };
-    };
+    # budgie = {
+    #   inheritParentConfig = true;
+    #   configuration = {
+    #     services = {
+    #       xserver = {
+    #         desktopManager.budgie.enable = true;
+    #         displayManager.lightdm.enable = true;
+    #       };
+    #       displayManager.defaultSession = "budgie-desktop";
+    #     };
+    #   };
+    # };
     gnome = {
       inheritParentConfig = true;
       configuration = {
@@ -34,22 +34,22 @@
         };
       };
     };
-    i3 = {
-      inheritParentConfig = true;
-      configuration = {
-        services = {
-          displayManager.sddm = {
-            enable = true;
-            theme = "ocean";
-            wayland.enable = true;
-          };
-          xserver.windowManager.i3 = {
-            enable = true;
-            package = pkgs.i3-gaps;
-          };
-        };
-      };
-    };
+    # i3 = {
+    #   inheritParentConfig = true;
+    #   configuration = {
+    #     services = {
+    #       displayManager.sddm = {
+    #         enable = true;
+    #         theme = "ocean";
+    #         wayland.enable = true;
+    #       };
+    #       xserver.windowManager.i3 = {
+    #         enable = true;
+    #         package = pkgs.i3-gaps;
+    #       };
+    #     };
+    #   };
+    # };
     plasma6 = {
       inheritParentConfig = true;
       configuration = {
@@ -85,8 +85,8 @@
   };
 
   environment.systemPackages = with pkgs; [
-    adwaita-icon-theme
-    gnomeExtensions.appindicator
+    # adwaita-icon-theme
+    # gnomeExtensions.appindicator
     git
     k3s
     zsh
@@ -315,6 +315,37 @@
 
   # Enable sound with pipewire.
   # sound.enable = true;
+
+  stylix = {
+    enable = true;
+    autoEnable = true;
+    # image = config.lib.stylix.pixel "base0A";
+    image = ./nix-wallpaper-mosaic-blue.png;
+    polarity = "dark";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/evenok-dark.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/still-alive.yaml";
+
+    cursor = {
+      name = "Bibata-Modern-Ice";
+      package = pkgs.bibata-cursors;
+    };
+
+    fonts = {
+      # monospace = {
+      #   package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
+      #   name = "JetBrainsMono Nerd Font Mono";
+      # };
+      sansSerif = {
+        package = pkgs.dejavu_fonts;
+        name = "DejaVu Sans";
+      };
+      serif = {
+        package = pkgs.dejavu_fonts;
+        name = "DejaVu Serif";
+      };
+    };
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

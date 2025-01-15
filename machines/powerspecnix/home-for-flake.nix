@@ -1,4 +1,4 @@
-{ inputs, config, pkgs, ... }:
+{ inputs, config, pkgs, stylix, ... }:
 
 let
   name = "Duck Nebuchadnezzar";
@@ -23,7 +23,7 @@ in {
     ../../programs/clojure
     ../../programs/developer
     ../../programs/emacs
-    ../../programs/i3
+    # ../../programs/i3
     # ../../programs/music
     # ../../programs/ncmpcpp
     ../../programs/nostr
@@ -264,6 +264,40 @@ in {
     };
 
     vscode.enable = true;
+  };
+
+  stylix = {
+    enable = true;
+    autoEnable = true;
+    image = ./nix-wallpaper-mosaic-blue.png;
+    imageScalingMode = "fit";
+    # image = config.lib.stylix.pixel "base0A";
+    polarity = "dark";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/evenok-dark.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/still-alive.yaml";
+
+    cursor = {
+      name = "Bibata-Modern-Ice";
+      package = pkgs.bibata-cursors;
+    };
+
+    fonts = {
+      # monospace = {
+      #   package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
+      #   name = "JetBrainsMono Nerd Font Mono";
+      # };
+      sansSerif = {
+        package = pkgs.dejavu_fonts;
+        name = "DejaVu Sans";
+      };
+      serif = {
+        package = pkgs.dejavu_fonts;
+        name = "DejaVu Serif";
+      };
+    };
   };
 
   targets.genericLinux.enable = true;
