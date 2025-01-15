@@ -31,6 +31,15 @@ in {
     ../../programs/zsh
   ];
 
+  dconf.settings = {
+    "org/gnome/desktop/interface".color-scheme = "prefer-dark";
+
+    "org/gnome/desktop/wm/preferences".button-layout =
+      ":minimize,maximize,close";
+
+    "apps/guake/general".default-shell = "/run/current-system/sw/bin/zsh";
+  };
+
   home = {
     # Home Manager needs a bit of information about you and the
     # paths it should manage.
@@ -243,8 +252,6 @@ in {
 
     jq.enable = true;
 
-    # kdeconnect.enable = true;
-
     tmux.enable = true;
 
     vim = {
@@ -256,16 +263,7 @@ in {
       '';
     };
 
-    vscode = { enable = true; };
-  };
-
-  dconf.settings = {
-    "org/gnome/desktop/interface".color-scheme = "prefer-dark";
-
-    "org/gnome/desktop/wm/preferences".button-layout =
-      ":minimize,maximize,close";
-
-    "apps/guake/general".default-shell = "/run/current-system/sw/bin/zsh";
+    vscode.enable = true;
   };
 
   targets.genericLinux.enable = true;

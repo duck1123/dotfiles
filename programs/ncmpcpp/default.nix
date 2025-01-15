@@ -28,7 +28,8 @@
       # song_status_format = "%t » %a »{ %b » }%y";
       # progressbar_look = "|] ";
       titles_visibility = "no";
-      song_columns_list_format = "(6f)[default]{l} (40)[default]{t|f} (25)[default]{a} (30)[default]{b}";
+      song_columns_list_format =
+        "(6f)[default]{l} (40)[default]{t|f} (25)[default]{a} (30)[default]{b}";
       # Browser
       browser_playlist_prefix = "$2plist »$9 ";
       browser_display_mode = "columns (classic/columns)";

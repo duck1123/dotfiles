@@ -30,11 +30,7 @@
               wayland.enable = true;
             };
           };
-          xserver = {
-            desktopManager = {
-              gnome.enable = true;
-            };
-          };
+          xserver.desktopManager.gnome.enable = true;
         };
       };
     };
@@ -96,9 +92,7 @@
     zsh
   ];
 
-  hardware = {
-    rtl-sdr.enable = true;
-  };
+  hardware.rtl-sdr.enable = true;
 
   i18n = {
     # Select internationalisation properties.
@@ -179,12 +173,7 @@
     nix-ld = {
       enable = true;
 
-      libraries = with pkgs;
-        [
-          alsa-lib
-          libGL
-          renpy
-        ];
+      libraries = with pkgs; [ alsa-lib libGL renpy ];
     };
 
     steam.enable = true;
@@ -305,7 +294,7 @@
           };
         };
 
-        options = { urAccepted = -1; };
+        options.urAccepted = -1;
       };
     };
 
