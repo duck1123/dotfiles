@@ -23,7 +23,7 @@
         transparency = 10;
         padding = 16;
         horizontal_padding = 16;
-        font = "JetBrainsMono Nerd Font 10";
+        # font = "JetBrainsMono Nerd Font 10";
         line_height = 4;
         format = "<b>%s</b>\\n%b";
       };

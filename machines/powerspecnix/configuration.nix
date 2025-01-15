@@ -324,15 +324,18 @@
     autoEnable = true;
     # image = config.lib.stylix.pixel "base0A";
     image = ./nix-wallpaper-mosaic-blue.png;
+    imageScalingMode = "fit";
     polarity = "dark";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/evenok-dark.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-frappe.yaml";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/evenok-dark.yaml";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/still-alive.yaml";
 
-    cursor = {
-      name = "Bibata-Modern-Ice";
-      package = pkgs.bibata-cursors;
-    };
+    # cursor = {
+    #   name = "Bibata-Modern-Ice";
+    #   package = pkgs.bibata-cursors;
+    # };
 
     fonts = {
       # monospace = {

@@ -274,18 +274,19 @@ in {
     # image = config.lib.stylix.pixel "base0A";
     imageScalingMode = "fit";
     polarity = "dark";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/materia.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/evenok-dark.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-frappe.yaml";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/evenok-dark.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/materia.yaml";
+    # base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
     # base16Scheme = "${pkgs.base16-schemes}/share/themes/still-alive.yaml";
 
-    cursor = {
-      name = "Bibata-Modern-Ice";
-      package = pkgs.bibata-cursors;
-    };
+    # cursor = {
+    #   name = "Bibata-Modern-Ice";
+    #   package = pkgs.bibata-cursors;
+    # };
 
     fonts = {
       # monospace = {
