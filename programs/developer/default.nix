@@ -34,6 +34,8 @@
 
     # gnumake
 
+    go
+
     k3d
     k9s
 
@@ -46,6 +48,10 @@
     lens
 
     # mr
+
+    nmap
+
+    nodejs
 
     nushell
 

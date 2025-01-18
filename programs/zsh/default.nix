@@ -42,15 +42,11 @@ in {
           . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
       fi # added by Nix installer
 
-      export PATH="/home/${username}/.arkade/bin:$PATH"
       export PATH="/home/${username}/.cargo/bin:$PATH"
       export PATH="/home/${username}/.local/bin:$PATH"
 
       # bind hstr to Ctrl-r (for Vi mode check doc)
       bindkey -s "\C-r" "\C-a hstr -- \C-j"
-
-      bindkey -s "\C-x\C-tn" "bbg watch-namespaces\C-j"
-      bindkey -s "\C-x\C-tp" "bbg watch-pods\C-j"
 
       source <(argo completion zsh)
       source <(argocd completion zsh)
@@ -66,7 +62,7 @@ in {
       compdef _bb_tasks bb
     '';
 
-    localVariables.PROJECT_PATHS = [ /home/${username}/projects ];
+    localVariables.PROJECT_PATHS = [ "/home/${username}/projects" ];
 
     sessionVariables = {
       EDITOR = "emacsclient -ct";

@@ -24,16 +24,19 @@ in {
     ../../programs/developer
     # ../../programs/emacs
     ../../programs/emacs2
+    ../../programs/gaming
+    ../../programs/gnome
     # ../../programs/i3
     # ../../programs/music
     # ../../programs/ncmpcpp
     ../../programs/nostr
     # ../../programs/radio
+    # ../../programs/vim
     ../../programs/zsh
   ];
 
   dconf.settings = {
-    "org/gnome/desktop/interface".color-scheme = "prefer-dark";
+    # "org/gnome/desktop/interface".color-scheme = "prefer-dark";
 
     "org/gnome/desktop/wm/preferences".button-layout =
       ":minimize,maximize,close";
@@ -51,168 +54,83 @@ in {
 
     packages = with pkgs; [
       alacritty
-
       appimage-run
-
       barrier
       bat
-
       byobu
-
       # chromium
-
       # cheese
-
       curl
-
       digikam
-
       # discord
       # distrobox
-
       docker
       # docker-compose
-
       # dunst
       # earthly
-
       # emacs
-
       ffmpeg
-
       # fish
       # gcc9
       # gimp
-
       git
-
       # gitu
-
       # Modern release of the GNU Privacy Guard, a GPL OpenPGP implementation
       gnupg
-
-      go
-      # gossip
-
       # gpa
-
       # gnome.dconf-editor
-
       # gnome-photos
       # gnome-tweaks
-
-      gnomeExtensions.appindicator
-      gnomeExtensions.gsconnect
-      # gnomeExtensions.topicons-plus
-      # gnomeExtensions.tailscale-status
-
       # gnupg
-
       # graphviz
-      guake
-
       # gum
-
-      heroic
       hoard
       hstr
       htop
-
-      # itch
-
       jdk
-
       jet
-
       # Minimalist command line knowledge base manager
       # kb
-
       keepassxc
-
       # Peer-to-Peer Chat
       # keet
-
       # khoj
       kodi
-
       libnotify
-
-      # DAW similar to FL Studio (music production software)
-      # lmms
-
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
       # logseq
-
-      # Open Source gaming platform for GNU/Linux
-      lutris
-
       # mullvad-browser
-
       neofetch
-      # nextcloud-24.0.3
-
-      # nexusmods-app
-
       nixfmt-classic
-
       nh
-
-      nmap
-
-      nodejs
-
-      # obs-studio
-
       # obsidian
-
       # onlyoffice-bin
       plex
-      # plex-media-player
-
+      plex-media-player
       # postman
-
-      # qFlipper
-
+      qFlipper
       # A decentralized app for code collaboration
       # radicle-node
-
       silver-searcher
       # simplex-chat-desktop
       slack
       # sparrow
-
       syncthing
-
       tailscale
-
       tdesktop
-
       teams-for-linux
-
       # thunderbird
-
       # tilt
-
-      # transmission_4-gtk
-
+      transmission_4-gtk
       # tree
-
       unzip
-
       vlc
-
       vscode
-
       wine
-
       xsel
-
-      # youtube-music
-
+      youtube-music
       # yt-dlp
-
       # yq
-
       # zoom-us
     ];
 
@@ -227,16 +145,25 @@ in {
   };
 
   programs = {
+    alacritty.enable = true;
+
     bash = {
       enable = true;
       profileExtra =
         "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
     };
 
+    bat.enable = true;
+    btop.enable = true;
+
     direnv = {
       enable = true;
       nix-direnv.enable = true;
     };
+
+    eza.enable = true;
+
+    firefox.enable = true;
 
     git = {
       enable = true;
@@ -249,20 +176,18 @@ in {
       };
     };
 
-    gpg.enable = true;
+    # gnome-terminal.enable = true;
 
+    gpg.enable = true;
+    hstr.enable = true;
+    k9s.enable = true;
+    kodi.enable = true;
+
+    mr.enable = true;
     jq.enable = true;
+    nushell.enable = true;
 
     tmux.enable = true;
-
-    vim = {
-      enable = true;
-      extraConfig = ''
-        syntax on
-        " Wrap gitcommit file types at the appropriate length
-        filetype indent plugin on
-      '';
-    };
 
     vscode.enable = true;
   };

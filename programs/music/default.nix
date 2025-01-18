@@ -3,6 +3,8 @@
     # Multi-track hard disk recording software
     ardour
 
+    # obs-studio
+
     # Audio plugin host
     carla
 
@@ -10,6 +12,9 @@
 
     # Advanced drum machine
     hydrogen
+
+    # DAW similar to FL Studio (music production software)
+    # lmms
 
     musescore
 
