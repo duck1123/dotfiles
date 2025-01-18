@@ -37,7 +37,7 @@
 
           modules = [
             stylix.homeManagerModules.stylix
-            { imports = [ ./machines/vavirl-pw0bwnq8/home-for-flake.nix ]; }
+            ./machines/vavirl-pw0bwnq8/home-for-flake.nix
           ];
         };
 
@@ -46,7 +46,7 @@
 
           modules = [
             stylix.homeManagerModules.stylix
-            { imports = [ ./machines/steamdeck/home-for-flake.nix ]; }
+            ./machines/steamdeck/home-for-flake.nix
           ];
         };
 
@@ -55,7 +55,7 @@
 
           modules = [
             stylix.homeManagerModules.stylix
-            { imports = [ ./machines/powerspecnix/home-for-flake.nix ]; }
+            ./machines/powerspecnix/home-for-flake.nix
           ];
         };
       };
