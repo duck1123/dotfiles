@@ -15,10 +15,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    hyprland.url = "github:hyprwm/Hyprland";
+
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, stylix, ... }@inputs:
+  outputs =
+    { self, nixpkgs, flake-utils, home-manager, hyprland, stylix, ... }@inputs:
     let
       # inherit (builtins) attrValues;
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
