@@ -2,7 +2,11 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, stylix, ... }: {
+{ config, pkgs, stylix, ... }:
+let
+  username = "duck";
+  hostname = "powerspecnix";
+in {
   imports = [ ./hardware-configuration.nix ];
 
   specialisation = {
@@ -136,7 +140,7 @@
       ];
     };
 
-    hostName = "powerspecnix"; # Define your hostname.
+    hostName = "${hostname}"; # Define your hostname.
 
     # Enable networking
     networkmanager.enable = true;
@@ -241,9 +245,9 @@
 
     syncthing = {
       enable = true;
-      user = "duck";
-      dataDir = "/home/duck/Documents";
-      configDir = "/home/duck/Documents/.config/syncthing";
+      user = username;
+      dataDir = "/home/${username}/Documents";
+      configDir = "/home/${username}/Documents/.config/syncthing";
       openDefaultPorts = true;
       overrideFolders = true;
       overrideDevices = true;
@@ -272,18 +276,18 @@
         folders = {
           "Camera" = {
             label = "Camera";
-            path = "/home/duck/Camera";
+            path = "/home/${username}/Camera";
             devices = [ "Pixel 8" ];
           };
 
           "keepass" = {
             label = "keepass";
-            path = "/home/duck/keepass";
+            path = "/home/${username}/keepass";
             devices = [ "Pixel 8" "VallenPC" ];
           };
 
           "org-roam" = {
-            path = "/home/duck/org-roam";
+            path = "/home/${username}/org-roam";
             devices = [ "Pixel 8" ];
             versioning = {
               type = "simple";
@@ -292,7 +296,7 @@
           };
 
           "steamdeck-renpy" = {
-            path = "/home/duck/.renpy";
+            path = "/home/${username}/.renpy";
             devices = [ "steamdeck" ];
           };
         };
@@ -365,21 +369,23 @@
   time.timeZone = "America/Detroit";
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.duck = {
-    isNormalUser = true;
-    description = "Duck Nebuchadnezzar";
-    extraGroups = [
-      "dialout"
-      "docker"
-      "jackaudio"
-      "libvirtd"
-      "networkmanager"
-      "plugdev"
-      "realtime"
-      "wheel"
-    ];
-    packages = with pkgs; [ appimage-run emacs firefox ];
-    shell = pkgs.zsh;
+  users.users = {
+    "${username}" = {
+      isNormalUser = true;
+      description = "Duck Nebuchadnezzar";
+      extraGroups = [
+        "dialout"
+        "docker"
+        "jackaudio"
+        "libvirtd"
+        "networkmanager"
+        "plugdev"
+        "realtime"
+        "wheel"
+      ];
+      packages = with pkgs; [ appimage-run emacs firefox ];
+      shell = pkgs.zsh;
+    };
   };
 
   virtualisation = {
