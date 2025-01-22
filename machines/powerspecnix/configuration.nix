@@ -92,7 +92,10 @@
     zsh
   ];
 
-  hardware.rtl-sdr.enable = true;
+  hardware = {
+    flipperzero.enable = true;
+    rtl-sdr.enable = true;
+  };
 
   i18n = {
     # Select internationalisation properties.
