@@ -21,7 +21,7 @@
   };
 
   outputs =
-    { self, nixpkgs, flake-utils, home-manager, hyprland, stylix, ... }@inputs:
+    { flake-utils, home-manager, hyprland, nixpkgs, self, stylix, ... }@inputs:
     let
       # inherit (builtins) attrValues;
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
