@@ -30,6 +30,7 @@ in {
     # ../../programs/music
     # ../../programs/ncmpcpp
     ../../programs/nostr
+    ../../programs/nushell
     # ../../programs/radio
     # ../../programs/vim
     ../../programs/zsh
@@ -60,6 +61,7 @@ in {
       byobu
       # chromium
       # cheese
+      colmena
       curl
       digikam
       # discord
@@ -185,7 +187,6 @@ in {
 
     mr.enable = true;
     jq.enable = true;
-    nushell.enable = true;
 
     tmux.enable = true;
 

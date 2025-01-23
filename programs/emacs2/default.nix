@@ -25,6 +25,8 @@ let
       lsp-ui
       magit
       nix-mode
+      nushell-mode
+      nushell-ts-mode
       nvm
       nyan-mode
       # org
