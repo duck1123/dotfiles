@@ -18,10 +18,11 @@
     hyprland.url = "github:hyprwm/Hyprland";
 
     stylix.url = "github:danth/stylix";
+
+    wezterm.url = "github:wez/wezterm?dir=nix";
   };
 
-  outputs =
-    { flake-utils, home-manager, hyprland, nixpkgs, self, stylix, ... }@inputs:
+  outputs = { flake-utils, home-manager, nixpkgs, self, stylix, ... }@inputs:
     let
       # inherit (builtins) attrValues;
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
@@ -72,8 +73,8 @@
           config = config.duck;
         };
         os = import ./machines/powerspecnix/configuration.nix {
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
           inherit inputs;
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
           config = config.duck;
         };
       };
@@ -97,18 +98,10 @@
         };
       };
 
-      nixosConfigurations = {
-        powerspecnix = nixosSystem {
-          system = "x86_64-linux";
-
-          modules = [
-            # home-manager.nixosModules.home-manager
-            # stylix.nixosModules.stylix
-            powerspecnix.os
-          ];
-          # Make our inputs available to the config (for importing modules)
-          specialArgs = { inherit inputs; };
-        };
+      nixosConfigurations.powerspecnix = nixosSystem {
+        modules = [ powerspecnix.os ];
+        specialArgs = { inherit inputs; };
+        system = "x86_64-linux";
       };
 
       packages =

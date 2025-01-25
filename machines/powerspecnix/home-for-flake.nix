@@ -6,6 +6,7 @@ let
   email = config.email;
   gpgKey = config.gpgKey;
   stylix = inputs.stylix;
+  hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
 in {
   home.stateVersion = "21.11";
 
@@ -19,6 +20,7 @@ in {
     ../../programs/emacs2
     ../../programs/gaming
     ../../programs/gnome
+    hyprland
     # ../../programs/i3
     # ../../programs/music
     # ../../programs/ncmpcpp
