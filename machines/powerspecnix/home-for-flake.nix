@@ -19,7 +19,7 @@ in {
     ../../programs/gaming
     ../../programs/gnome
     hyprland
-    # ../../programs/i3
+    ../../programs/i3
     jujutsu
     # ../../programs/music
     # ../../programs/ncmpcpp
