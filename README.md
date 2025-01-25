@@ -67,7 +67,7 @@ nix flake update
 Update user-level configuration
 
 ```sh {"name":"switch-home"}
-nh home build ${HOME?}/dotfiles -- --impure --show-trace
+nh home switch ${HOME?}/dotfiles -- --impure --show-trace
 ```
 
 ### Switch OS
@@ -75,7 +75,7 @@ nh home build ${HOME?}/dotfiles -- --impure --show-trace
 Update OS configuration
 
 ```sh {"name":"switch-os"}
-nh os build ${HOME?}/dotfiles -- --impure --show-trace
+nh os switch ${HOME?}/dotfiles -- --impure --show-trace
 ```
 
 ### Reboot

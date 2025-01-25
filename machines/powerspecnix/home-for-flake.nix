@@ -53,6 +53,7 @@ in {
       appimage-run
       barrier
       bat
+      brotab
       byobu
       # chromium
       # cheese
@@ -66,6 +67,7 @@ in {
       # dunst
       # earthly
       # emacs
+      fastfetch
       ffmpeg
       # fish
       # gcc9
@@ -80,7 +82,7 @@ in {
       # gnome-tweaks
       # gnupg
       # graphviz
-      # gum
+      gum
       hoard
       hstr
       htop
@@ -98,6 +100,8 @@ in {
       # logseq
       # mullvad-browser
       neofetch
+      nerdfetch
+      nerd-fonts.fira-code
       nixfmt-classic
       nh
       # obsidian
