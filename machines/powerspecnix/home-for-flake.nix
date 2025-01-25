@@ -1,19 +1,12 @@
-{ inputs, config, pkgs, stylix, ... }:
+{ config, inputs, pkgs, ... }:
 
 let
-  name = "Duck Nebuchadnezzar";
-  username = "duck";
-  email = "duck@kronkltd.net";
-  gpgKey = "9564904D297DBF3C";
+  name = config.name;
+  username = config.username;
+  email = config.email;
+  gpgKey = config.gpgKey;
+  stylix = inputs.stylix;
 in {
-  # This value determines the Home Manager release that your
-  # configuration is compatible with. This helps avoid breakage
-  # when a new Home Manager release introduces backwards
-  # incompatible changes.
-  #
-  # You can update Home Manager without changing this value. See
-  # the Home Manager release notes for a list of state version
-  # changes in each release.
   home.stateVersion = "21.11";
 
   programs.home-manager.enable = true;

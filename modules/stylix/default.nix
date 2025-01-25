@@ -1,7 +1,5 @@
-{ inputs, ... }:
-let
-  pkgs = inputs.pkgs;
-  stylix = inputs.stylix;
+{ inputs, pkgs, ... }:
+let stylix = inputs.stylix;
 in {
   stylix = {
     enable = true;

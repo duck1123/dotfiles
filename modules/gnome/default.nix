@@ -1,4 +1,6 @@
-{ pkgs, ... }: {
+{ inputs, ... }:
+let pkgs = inputs.pkgs;
+in {
   services = {
     displayManager = {
       defaultSession = "gnome";

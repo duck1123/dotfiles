@@ -1,4 +1,6 @@
-{ pkgs, ... }: {
+{ inputs, ... }:
+let pkgs = inputs.pkgs;
+in {
   services = {
     desktopManager.plasma6.enable = true;
     displayManager = {

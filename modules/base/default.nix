@@ -1,6 +1,5 @@
-{ config, inputs, ... }:
+{ config, inputs, pkgs, ... }:
 let
-  pkgs = inputs.pkgs;
   username = config.username;
   hostname = config.hostname;
 in {
@@ -156,6 +155,9 @@ in {
       };
     };
   };
+
+  system.stateVersion = "25.05";
+  
   # Set your time zone.
   time.timeZone = "America/Detroit";
 

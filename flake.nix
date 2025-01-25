@@ -28,35 +28,72 @@
       inherit (nixpkgs.lib) nixosSystem;
       inherit (home-manager.lib) homeManagerConfiguration;
       eachDefaultSystemMap = eachSystemMap defaultSystems;
+      config = {
+        deck = {
+          name = "Duck Nebuchadnezzar";
+          username = "deck";
+          email = "duck@kronkltd.net";
+          gpgKey = "9564904D297DBF3C";
+          hostname = "steamdeck";
+        };
+        drenfer = {
+          name = "Daniel E. Renfer";
+          username = "drenfer";
+          email = "drenfer@vallen.com";
+          gpgKey = "9564904D297DBF3C";
+          hostname = "vavirl-pw0bwnq8";
+        };
+        duck = {
+          name = "Duck Nebuchadnezzar";
+          username = "duck";
+          email = "duck@kronkltd.net";
+          gpgKey = "9564904D297DBF3C";
+          hostname = "powerspecnix";
+        };
+      };
+      vavirl-pw0bwnq8 = {
+        home = import ./machines/vavirl-pw0bwnq8/home-for-flake.nix {
+          inherit inputs;
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          config = config.drenfer;
+        };
+      };
+      steamdeck = {
+        home = import ./machines/steamdeck/home-for-flake.nix {
+          inherit inputs;
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          config = config.deck;
+        };
+      };
+      powerspecnix = {
+        home = import ./machines/powerspecnix/home-for-flake.nix {
+          inherit inputs;
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          config = config.duck;
+        };
+        os = import ./machines/powerspecnix/configuration.nix {
+          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          inherit inputs;
+          config = config.duck;
+        };
+      };
     in rec {
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = {
         drenfer = homeManagerConfiguration {
+          modules = [ stylix.homeManagerModules.stylix vavirl-pw0bwnq8.home ];
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-
-          modules = [
-            stylix.homeManagerModules.stylix
-            ./machines/vavirl-pw0bwnq8/home-for-flake.nix
-          ];
         };
 
         deck = homeManagerConfiguration {
+          modules = [ stylix.homeManagerModules.stylix steamdeck.home ];
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-
-          modules = [
-            stylix.homeManagerModules.stylix
-            ./machines/steamdeck/home-for-flake.nix
-          ];
         };
 
         duck = homeManagerConfiguration {
+          modules = [ stylix.homeManagerModules.stylix powerspecnix.home ];
           pkgs = nixpkgs.legacyPackages.x86_64-linux;
-
-          modules = [
-            stylix.homeManagerModules.stylix
-            ./machines/powerspecnix/home-for-flake.nix
-          ];
         };
       };
 
@@ -65,9 +102,9 @@
           system = "x86_64-linux";
 
           modules = [
-            home-manager.nixosModules.home-manager
-            stylix.nixosModules.stylix
-            ./machines/powerspecnix/configuration.nix
+            # home-manager.nixosModules.home-manager
+            # stylix.nixosModules.stylix
+            powerspecnix.os
           ];
           # Make our inputs available to the config (for importing modules)
           specialArgs = { inherit inputs; };

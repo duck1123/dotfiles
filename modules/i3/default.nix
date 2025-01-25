@@ -1,4 +1,4 @@
-{ inputs, ... }: {
+{ inputs, pkgs, ... }: {
   services = {
     displayManager.sddm = {
       enable = true;
@@ -7,7 +7,7 @@
     };
     xserver.windowManager.i3 = {
       enable = true;
-      package = inputs.pkgs.i3-gaps;
+      package = pkgs.i3-gaps;
     };
   };
 }
