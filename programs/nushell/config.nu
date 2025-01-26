@@ -1,3 +1,7 @@
+const NU_LIB_DIRS = [
+  '~/.nix-profile/share/nu_scripts/modules'
+]
+
 # Nushell Config
 $env.config = {
   show_banner: false,
@@ -56,16 +60,63 @@ def wy [
     mpv $"https://youtube.com/watch?v=($video_id)"
 }
 
+# Close tab
+def "browsers tabs close" []: string -> any {
+    xargs brotab close
+}
+
+# Close tab
+def "browsers tabs close-first" [] {
+    browsers tabs list |
+    first |
+    get id |
+    browsers tabs close
+}
+
+# list all tabs
+def "browsers tabs list" [] {
+    bt list |
+    from tsv -n |
+    each {|x|
+      {id: $x.column0, title: $x.column1 url: $x.column2}
+    }
+}
+
+def "from edn" []: string -> any {
+    jet -o json | from json
+}
+
+# Infomation about the active window
+def "hypr active-window" [] {
+    hyprctl activewindow -j | from json
+}
+
+def "hypr binds" [] {
+    hyprctl binds -j | from json
+}
+
+def "hypr workspaces" [] {
+    hyprctl workspaces -j | from json
+}
+
+def "hypr workspaces active" [] {
+    hyprctl activeworkspace -j | from json
+}
+
 # Switch home-manager to latest flake
 def "switch home" [] {
     nh home switch ~/dotfiles -- --impure --show-trace
 }
 
-def "from edn" [] {
-    jet -o json | from json
+# Switch nixos to latest flake
+def "switch os" [] {
+    nh os switch ~/dotfiles -- --impure --show-trace
 }
 
-# Get all open tabs as a table
-def firefox-tabs [] {
-    bt list | from tsv -n | each {|x| {id: $x.column0, title: $x.column1 url: $x.column2}}
-}
+use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu
+use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu
+use ~/.nix-profile/share/nu_scripts/custom-completions/curl/curl-completions.nu
+use ~/.nix-profile/share/nu_scripts/custom-completions/docker/docker-completions.nu
+use ~/.nix-profile/share/nu_scripts/custom-completions/git/git-completions.nu
+use ~/.nix-profile/share/nu_scripts/custom-completions/nix/nix-completions.nu
+use ~/.nix-profile/share/nu_scripts/custom-completions/yarn/yarn-v4-completions.nu

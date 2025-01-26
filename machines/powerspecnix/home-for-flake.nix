@@ -53,6 +53,7 @@ in {
       appimage-run
       barrier
       bat
+      broot
       brotab
       byobu
       # chromium
@@ -95,9 +96,11 @@ in {
       # keet
       # khoj
       kodi
+      kubernix
       libnotify
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
       # logseq
+      mdcat
       # mullvad-browser
       neofetch
       nerdfetch

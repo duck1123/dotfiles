@@ -1,12 +1,15 @@
 { inputs, pkgs, ... }: {
   home.packages = with pkgs; [
+    cascadia-code
     font-awesome
     grim
     hyprshot
     nautilus
+    nerd-fonts.caskaydia-mono
     ncpamixer
     pamixer
     pavucontrol
+    socat
     # rofi-power-menu
     waybar
     wev
@@ -145,43 +148,43 @@
       gestures = { "workspace_swipe" = false; };
 
       bind = [
-        "$mainMod,      A, exec, youtube-music"
-        "$mainMod,      B, exec, firefox"
-        "$mainMod,      C, killactive,"
-        "$mainMod,      E, exec, emacs"
-        # "$mainMod, F, exec, nautilus"
-        "$mainMod,      F, fullscreen,"
-        "$mainMod,      J, togglesplit,"
-        "$mainMod,      M, exit,"
-        "$mainMod,      N, exec, nautilus"
-        "$mainMod,      P, pseudo,"
-        "$mainMod,      R, exec, rofiWindow"
-        "$mainMod,      V, togglefloating,"
-        "$mainMod,      w, exec, wofi --show drun"
-        "$mainMod,                RETURN, exec, kitty"
-        "$mainMod,                   Tab, cyclenext,"
-        "$mainMod,                   Tab, bringactivetotop,"
-        # '', Print, exec, grim -g "$(slurp)" - | wl-copy''
-        "        ,                 Print, exec, hyprshot -m region"
-        ''  SHIFT,                 Print, exec, grim -g "$(slurp)"''
-        "        ,      XF86AudioMicMute, exec, pamixer --default-source -t"
-        "        , XF86MonBrightnessDown, exec, light -U 20"
-        ", XF86MonBrightnessUp, exec, light -A 20"
-        ", XF86AudioMute, exec, pamixer -t"
-        ", XF86AudioLowerVolume, exec, pamixer -d 10"
-        ", XF86AudioRaiseVolume, exec, pamixer -i 10"
-        ", XF86AudioPlay, exec, playerctl play-pause"
-        ", XF86AudioPause, exec, playerctl play-pause"
-        "   $mainMod,         up, movefocus, u"
-        "SUPER_SHIFT,         up, movewindow, u"
-        "   $mainMod,       down, movefocus, d"
-        "SUPER_SHIFT,       down, movewindow, d"
-        "   $mainMod,       left, movefocus, l"
-        "SUPER_SHIFT,       left, movewindow, l"
-        "   $mainMod,      right, movefocus, r"
-        "SUPER_SHIFT,      right, movewindow, r"
-        "   $mainMod,   mouse_up, workspace, e-1"
-        "   $mainMod, mouse_down, workspace, e+1"
+        "   $mainMod,                     A, exec, youtube-music"
+        "   $mainMod,                     B, exec, firefox"
+        "   $mainMod,                     C, killactive,"
+        "   $mainMod,                     D, exec, nautilus"
+        "   $mainMod,                     E, exec, emacs"
+        "   $mainMod,                     F, fullscreen,"
+        "   $mainMod,                     J, togglesplit,"
+        "   $mainMod,                     M, exit,"
+        "   $mainMod,                     N, exec, kitty nu"
+        "   $mainMod,                     P, pseudo,"
+        "   $mainMod,                     R, exec, rofiWindow"
+        "   $mainMod,                     T, exec, teams-for-linux"
+        "   $mainMod,                     V, togglefloating,"
+        "   $mainMod,                     w, exec, wofi --show drun"
+        "   $mainMod,                RETURN, exec, kitty"
+        "   $mainMod,                   Tab, cyclenext,"
+        "   $mainMod,                   Tab, bringactivetotop,"
+        "           ,                 Print, exec, hyprshot -m region"
+        ''     SHIFT,                 Print, exec, grim -g "$(slurp)"''
+        "           ,      XF86AudioMicMute, exec, pamixer --default-source -t"
+        "           , XF86MonBrightnessDown, exec, light -U 20"
+        "           ,   XF86MonBrightnessUp, exec, light -A 20"
+        "           ,         XF86AudioMute, exec, pamixer -t"
+        "           ,  XF86AudioLowerVolume, exec, pamixer -d 10"
+        "           ,  XF86AudioRaiseVolume, exec, pamixer -i 10"
+        "           ,         XF86AudioPlay, exec, playerctl play-pause"
+        "           ,        XF86AudioPause, exec, playerctl play-pause"
+        "   $mainMod,                    up, movefocus, u"
+        "SUPER_SHIFT,                    up, movewindow, u"
+        "   $mainMod,                  down, movefocus, d"
+        "SUPER_SHIFT,                  down, movewindow, d"
+        "   $mainMod,                  left, movefocus, l"
+        "SUPER_SHIFT,                  left, movewindow, l"
+        "   $mainMod,                 right, movefocus, r"
+        "SUPER_SHIFT,                 right, movewindow, r"
+        "   $mainMod,              mouse_up, workspace, e-1"
+        "   $mainMod,            mouse_down, workspace, e+1"
       ] ++ (
         # workspaces
         # binds $mainMod + [shift +] {1..9} to [move to] workspace {1..9}

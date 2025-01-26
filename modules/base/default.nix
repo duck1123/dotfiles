@@ -3,13 +3,7 @@ let
   username = config.username;
   hostname = config.hostname;
 in {
-  environment.systemPackages = with pkgs; [
-    # adwaita-icon-theme
-    # gnomeExtensions.appindicator
-    git
-    k3s
-    zsh
-  ];
+  environment.systemPackages = with pkgs; [ git k3s zsh ];
 
   hardware = {
     flipperzero.enable = true;
@@ -28,23 +22,15 @@ in {
 
         ## k3s
         6443
-        # 2379
-        # 2380
       ];
 
-      allowedUDPPorts = [
-        ## k3s
-        8472
-      ];
+      allowedUDPPorts = [ 8472 ];
     };
 
     hostName = "${hostname}"; # Define your hostname.
 
     # Enable networking
     networkmanager.enable = true;
-
-    # Enables wireless support via wpa_supplicant.
-    # wireless.enable = true;
   };
 
   nix = {
@@ -95,7 +81,7 @@ in {
 
     k3s = {
       # enable = true;
-      enable = false;
+      enable = true;
       role = "server";
       extraFlags = toString [ "--disable=traefik" ];
     };
@@ -157,7 +143,7 @@ in {
   };
 
   system.stateVersion = "25.05";
-  
+
   # Set your time zone.
   time.timeZone = "America/Detroit";
 
