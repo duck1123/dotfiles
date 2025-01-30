@@ -73,7 +73,7 @@ in {
       (menu-bar-mode -1)
       (scroll-bar-mode -1)
       (tool-bar-mode -1)
-      (smartparens-strict-mode +1)
+      (smartparens-global-mode +1)
 
       (defun efs/lsp-mode-setup ()
         (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
