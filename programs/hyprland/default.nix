@@ -31,7 +31,7 @@
           position = "top";
           modules-left = [ "custom/power" "hyprland/workspaces" ];
           modules-center = [ "clock" ];
-          modules-right = [ "cpu" "memory" "pulseaudio" "network" ];
+          modules-right = [ "tray" "cpu" "memory" "pulseaudio" "network" ];
 
           cpu = { format = "<span color='#b4befe'>🖥️ </span>{usage}%"; };
 
@@ -166,7 +166,7 @@
         "   $mainMod,                   Tab, cyclenext,"
         "   $mainMod,                   Tab, bringactivetotop,"
         "           ,                 Print, exec, hyprshot -m region"
-        ''     SHIFT,                 Print, exec, grim -g "$(slurp)"''
+        ''SHIFT,                 Print, exec, grim -g "$(slurp)"''
         "           ,      XF86AudioMicMute, exec, pamixer --default-source -t"
         "           , XF86MonBrightnessDown, exec, light -U 20"
         "           ,   XF86MonBrightnessUp, exec, light -A 20"
