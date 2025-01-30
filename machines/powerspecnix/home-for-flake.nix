@@ -16,8 +16,8 @@ in {
     # ../../programs/backups
     ../../programs/clojure
     ../../programs/developer
-    # ../../programs/emacs
-    ../../programs/emacs2
+    ../../programs/emacs
+    # ../../programs/emacs2
     ../../programs/gaming
     ../../programs/gnome
     hyprland
