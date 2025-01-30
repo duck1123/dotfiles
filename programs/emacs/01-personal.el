@@ -51,6 +51,8 @@
 
 (use-package earthfile-mode :ensure t)
 
+(use-package nushell-mode :ensure t)
+
 (add-to-list 'load-path "~/.emacs.d/personal/ag-and-a-half")
 (require 'ag-and-a-half)
 (defalias 'ag 'ag-and-a-half)
