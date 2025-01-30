@@ -120,3 +120,4 @@ use ~/.nix-profile/share/nu_scripts/custom-completions/docker/docker-completions
 use ~/.nix-profile/share/nu_scripts/custom-completions/git/git-completions.nu
 use ~/.nix-profile/share/nu_scripts/custom-completions/nix/nix-completions.nu
 use ~/.nix-profile/share/nu_scripts/custom-completions/yarn/yarn-v4-completions.nu
+use ~/nushell/pj_command.nu pj

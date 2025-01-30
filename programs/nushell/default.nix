@@ -15,6 +15,8 @@
     nushellPlugins.net
   ];
 
+  home.file."nushell/pj_command.nu".source = ./pj_command.nu;
+
   programs = {
     carapace = {
       enable = true;
