@@ -18,8 +18,6 @@
     hyprland.url = "github:hyprwm/Hyprland";
 
     stylix.url = "github:danth/stylix";
-
-    wezterm.url = "github:wez/wezterm?dir=nix";
   };
 
   outputs = { flake-utils, home-manager, nixpkgs, self, stylix, ... }@inputs:

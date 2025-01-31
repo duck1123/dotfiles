@@ -14,11 +14,9 @@ in {
       hyprlock
       hypridle
       hyprpaper
-      inputs.wezterm.packages.${pkgs.system}.default
-      cool-retro-term
       starship
       helix
-      qutebrowser
+      # qutebrowser
       greetd.tuigreet
       zathura
       mpv
