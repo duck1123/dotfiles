@@ -7,6 +7,7 @@ let
   hyprland = import ../../modules/hyprland { inherit config inputs pkgs; };
   i18n = import ../../modules/i18n { inherit config inputs pkgs; };
   i3 = import ../../modules/i3 { inherit config inputs pkgs; };
+  kubernetes = import ../../modules/kubernetes { inherit config inputs pkgs; };
   plasma6 = import ../../modules/plasma6 { inherit config inputs pkgs; };
   stylix = import ../../modules/stylix { inherit config inputs pkgs; };
   syncthing = import ../../modules/syncthing { inherit config inputs pkgs; };
@@ -16,6 +17,7 @@ let
     base
     boot
     i18n
+    kubernetes
     stylix
     syncthing
     users

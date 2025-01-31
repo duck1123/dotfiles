@@ -3,7 +3,7 @@ let
   username = config.username;
   hostname = config.hostname;
 in {
-  environment.systemPackages = with pkgs; [ git k3s zsh ];
+  environment.systemPackages = with pkgs; [ git zsh ];
 
   hardware = {
     flipperzero.enable = true;
@@ -19,12 +19,7 @@ in {
         24800
         ## Plex Media Server
         32400
-
-        ## k3s
-        6443
       ];
-
-      allowedUDPPorts = [ 8472 ];
     };
 
     hostName = "${hostname}"; # Define your hostname.
@@ -78,13 +73,6 @@ in {
     gnome.gnome-keyring.enable = true;
 
     flatpak.enable = true;
-
-    k3s = {
-      # enable = true;
-      enable = false;
-      role = "server";
-      extraFlags = toString [ "--disable=traefik" ];
-    };
 
     nfs.server = {
       enable = false;
