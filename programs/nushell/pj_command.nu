@@ -1,34 +1,29 @@
-# Define the auto-completion function
+# Project Jump
+
+# Inspired by the oh-my-zsh plugin (https://github.com/ohmyzsh/ohmyzsh/tree/master/plugins/pj)
 
 def "nu-complete pj" [] {
-    let base_dirs = [
-        $"($env.HOME)/projects",
-    ]
-
     # Collect all subdirectories from the base directories
-    $base_dirs
-    | each {|base| ls $base | where type == "dir" | get name }
-    | flatten
+    (($env.PROJECT_PATHS
+      | each {|base| ls $base | where type == "dir" | get name }
+      | flatten)
+      ++ $env.STANDALONE_PROJECTS)
     | path basename
 }
 
+# Project Jump
 export def --env pj [
-    subdir?: string@"nu-complete pj",
+    subdir?: string@"nu-complete pj" # The directory to switch to
 ] {
-  let base_dirs = [
-    $"($env.HOME)/projects",
-  ]
-
-  let target_dir = ($base_dirs
-    | each {|base| $"($base)/($subdir)"}
+  let target_dir = (
+    (($env.PROJECT_PATHS | each {|base| $"($base)/($subdir)"})
+      ++ $env.STANDALONE_PROJECTS)
     | where {|dir| $dir | path exists }
     | first)
 
   if ($target_dir | is-empty) {
     print $"Directory ($subdir) not found in any base directories."
   } else {
-    # overlay use $target_dir
     cd $target_dir
-    # $target_dir
   }
 }

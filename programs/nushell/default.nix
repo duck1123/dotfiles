@@ -26,6 +26,8 @@
     nushell = {
       enable = true;
       configFile.source = ./config.nu;
+      envFile.source = ./env.nu;
+
       extraConfig = ''
         let carapace_completer = {|spans|
           carapace $spans.0 nushell $spans | from json
