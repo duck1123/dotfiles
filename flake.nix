@@ -27,6 +27,8 @@
 
     kubenix.url = "github:hall/kubenix";
 
+    kubenix.url = "github:hall/kubenix";
+
     stylix.url = "github:danth/stylix";
   };
 
