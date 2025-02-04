@@ -25,28 +25,28 @@ let
     inputs.stylix.nixosModules.stylix
   ];
 in {
-  imports = core ++ [ gnome hyprland ];
+  imports = core ++ [ gnome ];
 
-  # specialisation = {
-  #   budgie = {
-  #     inheritParentConfig = false;
-  #     configuration.imports = core ++ [ budgie ];
-  #   };
-  #   # gnome = {
-  #   #   inheritParentConfig = false;
-  #   #   configuration.imports = core ++ [ gnome ];
-  #   # };
-  #   i3 = {
-  #     inheritParentConfig = false;
-  #     configuration.imports = core ++ [ i3 ];
-  #   };
-  #   hyprland = {
-  #     inheritParentConfig = false;
-  #     configuration.imports = core ++ [ hyprland ];
-  #   };
-  #   plasma6 = {
-  #     inheritParentConfig = false;
-  #     configuration.imports = core ++ [ plasma6 ];
-  #   };
-  # };
+  specialisation = {
+    # budgie = {
+    #   inheritParentConfig = false;
+    #   configuration.imports = core ++ [ budgie ];
+    # };
+    # gnome = {
+    #   inheritParentConfig = false;
+    #   configuration.imports = core ++ [ gnome ];
+    # };
+    # i3 = {
+    #   inheritParentConfig = false;
+    #   configuration.imports = core ++ [ i3 ];
+    # };
+    hyprland = {
+      inheritParentConfig = false;
+      configuration.imports = core ++ [ hyprland ];
+    };
+    plasma6 = {
+      inheritParentConfig = false;
+      configuration.imports = core ++ [ plasma6 ];
+    };
+  };
 }
