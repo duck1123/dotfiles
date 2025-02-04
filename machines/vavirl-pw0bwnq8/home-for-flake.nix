@@ -1,10 +1,5 @@
-{ inputs, config, pkgs, ... }:
-
-let
-  name = "Daniel E. Renfer";
-  username = "drenfer";
-  email = "drenfer@vallen.com";
-  gpgKey = "9564904D297DBF3C";
+{ config, inputs, pkgs, ... }:
+let inherit (config) email gpgKey name username;
 in {
   programs.home-manager.enable = true;
 

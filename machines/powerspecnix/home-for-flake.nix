@@ -1,10 +1,7 @@
 { config, inputs, pkgs, ... }:
 
 let
-  name = config.name;
-  username = config.username;
-  email = config.email;
-  gpgKey = config.gpgKey;
+  inherit (config) email gpgKey name username;
   stylix = inputs.stylix;
   hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
 in {
