@@ -113,11 +113,11 @@ def "switch os" [] {
     nh os switch ~/dotfiles -- --impure --show-trace
 }
 
-use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu
-use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu
-use ~/.nix-profile/share/nu_scripts/custom-completions/curl/curl-completions.nu
-use ~/.nix-profile/share/nu_scripts/custom-completions/docker/docker-completions.nu
-use ~/.nix-profile/share/nu_scripts/custom-completions/git/git-completions.nu
-use ~/.nix-profile/share/nu_scripts/custom-completions/nix/nix-completions.nu
-use ~/.nix-profile/share/nu_scripts/custom-completions/yarn/yarn-v4-completions.nu
+use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
+use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu *
+use ~/.nix-profile/share/nu_scripts/custom-completions/curl/curl-completions.nu *
+use ~/.nix-profile/share/nu_scripts/custom-completions/docker/docker-completions.nu *
+use ~/.nix-profile/share/nu_scripts/custom-completions/git/git-completions.nu *
+use ~/.nix-profile/share/nu_scripts/custom-completions/nix/nix-completions.nu *
+use ~/.nix-profile/share/nu_scripts/custom-completions/yarn/yarn-v4-completions.nu *
 use ~/nushell/pj_command.nu pj
