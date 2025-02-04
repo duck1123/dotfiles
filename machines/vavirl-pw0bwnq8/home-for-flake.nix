@@ -4,7 +4,11 @@ in {
   programs.home-manager.enable = true;
 
   imports = [
-    ../../programs/emacs/default.nix
+    ../../programs/clojure
+    ../../programs/developer
+    ../../programs/emacs
+    ../../programs/nushell
+    ../../programs/zsh
   ];
 
   home = {
@@ -18,25 +22,16 @@ in {
     file.".bb/bb.edn".source = ../../bb.edn;
 
     packages = with pkgs; [
-      babashka
+      # apache-airflow
       barrier
       bat
-      clojure
-      devspace
       direnv
-      emacs
       git
       gitu
-      gnumake
-      hoard
-      hstr
       htop
-      jet
-      k9s
-      kubectl
       neofetch
       nixfmt-classic
-      runme
+      nh
       silver-searcher
     ];
   };
@@ -48,7 +43,12 @@ in {
         "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
     };
 
-    direnv.enable = true;
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
+
+    eza.enable = true;
 
     git = {
       enable = true;
@@ -61,74 +61,10 @@ in {
       };
     };
 
+    hstr.enable = true;
     jq.enable = true;
-
     tmux.enable = true;
-  };
-
-  programs.zsh = {
-    autosuggestion.enable = true;
-
-    defaultKeymap = "emacs";
-    enable = true;
-
-    history = {
-      expireDuplicatesFirst = true;
-      extended = true;
-      ignoreDups = true;
-    };
-
-    oh-my-zsh = {
-      enable = true;
-      theme = "jonathan";
-      plugins = [
-        "bgnotify"
-        "colorize"
-        "compleat"
-        "docker"
-        "git"
-        "git-extras"
-        "history"
-        "kubectl"
-        "nmap"
-        "node"
-        "npm"
-        "pj"
-        "sudo"
-        "systemd"
-      ];
-    };
-
-    initExtra = ''
-      if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
-          . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
-      fi # added by Nix installer
-
-      # bind hstr to Ctrl-r (for Vi mode check doc)
-      bindkey -s "\C-r" "\C-a hstr -- \C-j"
-
-      _bb_tasks() {
-        local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
-        compadd -a matches
-      }
-      compdef _bb_tasks bb
-    '';
-
-    localVariables.PROJECT_PATHS = [ ~/projects ];
-
-    sessionVariables = {
-      EDITOR = "emacsclient -ct";
-      HSTR_CONFIG = "hicolor";
-    };
-
-    shellAliases = {
-      d = "devspace";
-      dr = "devspace run";
-      cat = "bat";
-      hh = "hstr";
-      bbg = "bb --config ~/.bb/bb.edn";
-      psgrep = "ps -ef | grep -v grep | grep ";
-    };
+    # vscode.enable = true;
   };
 
   xdg = {

@@ -142,8 +142,8 @@
 (use-package flycheck-clojure
   :ensure t)
 
-(use-package ac-cider
-  :ensure t)
+;; (use-package ac-cider
+;;   :ensure t)
 
 ;; (use-package helm-cider
 ;;   :ensure t)

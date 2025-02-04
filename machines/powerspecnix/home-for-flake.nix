@@ -80,12 +80,11 @@ in {
       # gnome-tweaks
       # gnupg
       # graphviz
-      gum
+      # gum
       hoard
       hstr
       htop
       jdk
-      jet
       # Minimalist command line knowledge base manager
       # kb
       keepassxc
@@ -186,9 +185,7 @@ in {
 
     mr.enable = true;
     jq.enable = true;
-
     tmux.enable = true;
-
     vscode.enable = true;
   };
 

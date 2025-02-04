@@ -34,6 +34,8 @@
 
     # gnumake
 
+    gitu
+
     go
 
     k3d
@@ -45,15 +47,13 @@
     kustomize
 
     # Kubernetes IDE
-    lens
+    # lens
 
     # mr
 
     nmap
 
     nodejs
-
-    nushell
 
     # openjdk
     # openjdk17

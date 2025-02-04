@@ -1,6 +1,8 @@
 { pkgs, ... }:
 let username = "duck";
 in {
+  home.packages = with pkgs; [ hoard hstr ];
+
   programs.zsh = {
     autosuggestion.enable = true;
 
