@@ -103,6 +103,27 @@ def "hypr workspaces active" [] {
     hyprctl activeworkspace -j | from json
 }
 
+def "player get metadata" [] {
+  playerctl metadata
+    | split row --regex "\\n"
+    | each {|row| $row | split column --regex "\\s\\s+" }
+    | each {|row| { $row.column1.0: $row.column2.0 } }
+    | reduce {|a b| $a | merge $b }
+}
+
+def "project clojure deps aliases" [] {
+  (open deps.edn).aliases
+    | columns
+}
+
+def "project earthly tasks" [] {
+  earthly ls
+    | split row "\n"
+    | each {|target| { $target: (bb get-task-args --target $target) }}
+    | reduce {|a b| $a | merge $b }
+    | sort
+}
+
 # Switch home-manager to latest flake
 def "switch home" [] {
     nh home switch ~/dotfiles -- --impure --show-trace
@@ -111,22 +132,6 @@ def "switch home" [] {
 # Switch nixos to latest flake
 def "switch os" [] {
     nh os switch ~/dotfiles -- --impure --show-trace
-}
-
-def "single-truth earthly task-args" [] {
-  earthly ls
-    | split row "\n"
-    | each {|target| { $target: (bb get-task-args --target $target) }}
-    | reduce {|a b| $a | merge $b }
-    | sort
-}
-
-def "player get metadata" [] {
-  playerctl metadata
-    | split row --regex "\\n"
-    | each {|row| $row | split column --regex "\\s\\s+" }
-    | each {|row| { $row.column1.0: $row.column2.0 } }
-    | reduce {|a b| $a | merge $b }
 }
 
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
