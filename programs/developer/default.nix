@@ -30,6 +30,8 @@
     # A command line tool for DigitalOcean services
     # doctl
 
+    earthly
+
     # extraNodePackages.prettier
 
     # gnumake
