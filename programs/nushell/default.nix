@@ -17,6 +17,11 @@
 
   home.file."nushell/bb-completions.nu".source = ./bb-completions.nu;
   home.file."nushell/pj_command.nu".source = ./pj_command.nu;
+  home.file."nushell/nostr_module.nu".source = ./nostr_module.nu;
+  home.file."nushell/me.nu".source = builtins.fetchurl {
+    url = "https://raw.githubusercontent.com/ClipplerBlood/me.nu/09e4ee7fbee6a26cb8dd3041e9da1f4de2c8d119/me.nu";
+    sha256 = "sha256:1l3mhcwl2mvkz9qg3yzgz7xdrkdr4xzxfxj3mhv22knbaca5dacr";
+  };
 
   programs = {
     carapace = {
