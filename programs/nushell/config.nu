@@ -121,6 +121,14 @@ def "single-truth earthly task-args" [] {
     | sort
 }
 
+def "player get metadata" [] {
+  playerctl metadata
+    | split row --regex "\\n"
+    | each {|row| $row | split column --regex "\\s\\s+" }
+    | each {|row| { $row.column1.0: $row.column2.0 } }
+    | reduce {|a b| $a | merge $b }
+}
+
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/curl/curl-completions.nu *

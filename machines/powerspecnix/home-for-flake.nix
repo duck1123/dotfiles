@@ -105,6 +105,7 @@ in {
       nh
       # obsidian
       # onlyoffice-bin
+      playerctl
       plex
       plex-media-player
       # postman
