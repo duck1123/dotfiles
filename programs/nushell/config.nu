@@ -113,6 +113,14 @@ def "switch os" [] {
     nh os switch ~/dotfiles -- --impure --show-trace
 }
 
+def "single-truth earthly task-args" [] {
+  earthly ls
+    | split row "\n"
+    | each {|target| { $target: (bb get-task-args --target $target) }}
+    | reduce {|a b| $a | merge $b }
+    | sort
+}
+
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/curl/curl-completions.nu *
