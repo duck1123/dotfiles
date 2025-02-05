@@ -15,6 +15,7 @@
     nushellPlugins.net
   ];
 
+  home.file."nushell/bb-completions.nu".source = ./bb-completions.nu;
   home.file."nushell/pj_command.nu".source = ./pj_command.nu;
 
   programs = {
