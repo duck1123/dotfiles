@@ -134,6 +134,21 @@ def "switch os" [] {
     nh os switch ~/dotfiles -- --impure --show-trace
 }
 
+def parse-git-config-row [
+  row
+] {
+  $row.column0
+    | split column "="
+    | { $in.0.column1: $in.0.column2 }
+}
+
+def "git-config-data" [] {
+  git config -l
+    | from tsv --noheaders
+    | each {|x| parse-git-config-row $x }
+    | reduce {|a b| $a | merge $b}
+}
+
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/curl/curl-completions.nu *
