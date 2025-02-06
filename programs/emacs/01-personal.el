@@ -29,6 +29,14 @@
    magit
    paredit))
 
+(defun my/helm-projectile-switch-project-to-magit ()
+  "Use `magit-status` instead of the default action when switching projects."
+  (interactive)
+  (let ((projectile-switch-project-action #'magit-status))
+    (helm-projectile-switch-project)))
+
+(global-set-key (kbd "C-c p p") #'my/helm-projectile-switch-project-to-magit)
+
 (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
 
 ;; Use no-littering to automatically set common paths to the new user-emacs-directory

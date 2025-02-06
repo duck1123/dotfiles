@@ -66,6 +66,19 @@ Set archives
      paredit))
 #+end_src
 
+** Helm Projectile
+
+#+begin_src emacs-lisp
+(defun my/helm-projectile-switch-project-to-magit ()
+  "Use `magit-status` instead of the default action when switching projects."
+  (interactive)
+  (let ((projectile-switch-project-action #'magit-status))
+    (helm-projectile-switch-project)))
+
+(global-set-key (kbd "C-c p p") #'my/helm-projectile-switch-project-to-magit)
+#+end_src
+
+
 ** keybindings
 
 #+begin_src emacs-lisp
