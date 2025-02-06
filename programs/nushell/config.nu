@@ -2,35 +2,37 @@ const NU_LIB_DIRS = [
   '~/.nix-profile/share/nu_scripts/modules'
 ]
 
+$env.config.show_banner = false
+
 # Nushell Config
-$env.config = {
-  show_banner: false,
-  edit_mode: emacs,
-  footer_mode: always,
-  table: {
-    mode: rounded,
-    index_mode: always,
-    header_on_separator: true,
-    padding: { left: 2, right: 1 },
-  },
-  completions: {
-    algorithm: prefix,
-    quick: true,
-    case_sensitive: false,
-    external: {
-      enable: true,
-      max_results: 50,
-      completer: { |spans| carapace $spans.0 nushell ...$spans | from json },
-    }
-  },
-  history: {
-    max_size: 10000,
-    file_format: sqlite,
-  },
-  filesize: {
-    metric: true,
-  },
-}
+# $env.config = {
+#   show_banner: false,
+#   edit_mode: emacs,
+#   footer_mode: always,
+#   table: {
+#     mode: rounded,
+#     index_mode: always,
+#     header_on_separator: true,
+#     padding: { left: 2, right: 1 },
+#   },
+#   completions: {
+#     algorithm: prefix,
+#     quick: true,
+#     case_sensitive: false,
+#     external: {
+#       enable: true,
+#       max_results: 50,
+#       completer: { |spans| carapace $spans.0 nushell ...$spans | from json },
+#     }
+#   },
+#   history: {
+#     max_size: 10000,
+#     file_format: sqlite,
+#   },
+#   filesize: {
+#     metric: true,
+#   },
+# }
 
 # Helper functions
 
@@ -126,12 +128,12 @@ def "project earthly tasks" [] {
 
 # Switch home-manager to latest flake
 def "switch home" [] {
-    nh home switch ~/dotfiles -- --impure --show-trace
+  nh home switch ~/dotfiles -- --impure --show-trace
 }
 
 # Switch nixos to latest flake
 def "switch os" [] {
-    nh os switch ~/dotfiles -- --impure --show-trace
+  nh os switch ~/dotfiles -- --impure --show-trace
 }
 
 def parse-git-config-row [
@@ -149,10 +151,26 @@ def "git-config-data" [] {
     | reduce {|a b| $a | merge $b}
 }
 
+def "nostr bookmarks get" [] {
+  algia bm-list --json
+    | from json --objects
+}
+
+def "nostr profile get" [] {
+  algia profile --json
+    | from json
+}
+
+# A stream of random nostr events
 def "nostr stream public" [] {
   algia stream
     | from json --objects
     | each {|event| $event.pubkey + " - " + $event.content}
+}
+
+def "nostr timeline" [] {
+  algia timeline --json
+    | from json --objects
 }
 
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
