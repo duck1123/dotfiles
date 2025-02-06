@@ -149,6 +149,12 @@ def "git-config-data" [] {
     | reduce {|a b| $a | merge $b}
 }
 
+def "nostr stream public" [] {
+  algia stream
+    | from json --objects
+    | each {|event| $event.pubkey + " - " + $event.content}
+}
+
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/curl/curl-completions.nu *
