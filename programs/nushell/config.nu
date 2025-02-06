@@ -133,6 +133,24 @@ def "git-config-data" [] {
     | each {|x| parse-git-config-row $x }
     | reduce {|a b| $a | merge $b}
 }
+
+
+$env.nu_menu_commands = {
+  {
+    description: "Refresh nu"
+    keymap: "r"
+    command: { nu }
+  }
+  {
+    description: "Git Status"
+    keymap: "gs"
+    command: { git status }
+    group: "Git"
+  }
+}
+
+
+
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/curl/curl-completions.nu *
@@ -142,5 +160,5 @@ use ~/.nix-profile/share/nu_scripts/custom-completions/nix/nix-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/yarn/yarn-v4-completions.nu *
 use ~/nushell/bb-completions.nu bb
 use ~/nushell/pj_command.nu pj
-use ~/nushell/me.nu *
+# source ~/nushell/me.nu
 use ~/nushell/nostr_module.nu *
