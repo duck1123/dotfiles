@@ -4,35 +4,7 @@ const NU_LIB_DIRS = [
 
 $env.config.show_banner = false
 
-# Nushell Config
-# $env.config = {
-#   show_banner: false,
-#   edit_mode: emacs,
-#   footer_mode: always,
-#   table: {
-#     mode: rounded,
-#     index_mode: always,
-#     header_on_separator: true,
-#     padding: { left: 2, right: 1 },
-#   },
-#   completions: {
-#     algorithm: prefix,
-#     quick: true,
-#     case_sensitive: false,
-#     external: {
-#       enable: true,
-#       max_results: 50,
-#       completer: { |spans| carapace $spans.0 nushell ...$spans | from json },
-#     }
-#   },
-#   history: {
-#     max_size: 10000,
-#     file_format: sqlite,
-#   },
-#   filesize: {
-#     metric: true,
-#   },
-# }
+# taken from somewhere
 
 # Helper functions
 
@@ -62,7 +34,9 @@ def wy [
     mpv $"https://youtube.com/watch?v=($video_id)"
 }
 
-# Close tab
+# Start original
+
+# Close tab from input
 def "browsers tabs close" []: string -> any {
     xargs brotab close
 }
@@ -75,7 +49,7 @@ def "browsers tabs close-first" [] {
     browsers tabs close
 }
 
-# list all tabs
+# List all browser tabs
 def "browsers tabs list" [] {
     bt list |
     from tsv -n |
@@ -84,6 +58,7 @@ def "browsers tabs list" [] {
     }
 }
 
+# convert input from edn into data
 def "from edn" []: string -> any {
     jet -o json | from json
 }
@@ -93,18 +68,22 @@ def "hypr active-window" [] {
     hyprctl activewindow -j | from json
 }
 
+# Data about current active keybinds
 def "hypr binds" [] {
     hyprctl binds -j | from json
 }
 
+# List all available workspaces
 def "hypr workspaces" [] {
     hyprctl workspaces -j | from json
 }
 
+# Get information about the currently active workspace
 def "hypr workspaces active" [] {
     hyprctl activeworkspace -j | from json
 }
 
+# Get metadata about cureently playing music
 def "player get metadata" [] {
   playerctl metadata
     | split row --regex "\\n"
@@ -113,11 +92,13 @@ def "player get metadata" [] {
     | reduce {|a b| $a | merge $b }
 }
 
+# List all aliases in a clojure deps file
 def "project clojure deps aliases" [] {
   (open deps.edn).aliases
     | columns
 }
 
+# List all tasks in an earthly file
 def "project earthly tasks" [] {
   earthly ls
     | split row "\n"
@@ -136,8 +117,9 @@ def "switch os" [] {
   nh os switch ~/dotfiles -- --impure --show-trace
 }
 
+# Parse a git config row record
 def parse-git-config-row [
-  row
+  row # A row of data from `git config`
 ] {
   $row.column0
     | split column "="
@@ -145,34 +127,12 @@ def parse-git-config-row [
 }
 
 def "git-config-data" [] {
+  # TODO: better wat to do this to avoif column0?
   git config -l
     | from tsv --noheaders
     | each {|x| parse-git-config-row $x }
     | reduce {|a b| $a | merge $b}
 }
-
-def "nostr bookmarks get" [] {
-  algia bm-list --json
-    | from json --objects
-}
-
-def "nostr profile get" [] {
-  algia profile --json
-    | from json
-}
-
-# A stream of random nostr events
-def "nostr stream public" [] {
-  algia stream
-    | from json --objects
-    | each {|event| $event.pubkey + " - " + $event.content}
-}
-
-def "nostr timeline" [] {
-  algia timeline --json
-    | from json --objects
-}
-
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/curl/curl-completions.nu *
@@ -182,3 +142,5 @@ use ~/.nix-profile/share/nu_scripts/custom-completions/nix/nix-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/yarn/yarn-v4-completions.nu *
 use ~/nushell/bb-completions.nu bb
 use ~/nushell/pj_command.nu pj
+use ~/nushell/me.nu *
+use ~/nushell/nostr_module.nu *
