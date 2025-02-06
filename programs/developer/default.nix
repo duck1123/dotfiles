@@ -51,6 +51,8 @@
     # Kubernetes IDE
     # lens
 
+    md-tangle
+
     # mr
 
     nmap

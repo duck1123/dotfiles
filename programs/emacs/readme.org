@@ -61,7 +61,6 @@ Set archives
   (prelude-require-packages
    '(crappy-jsp-mode
      editorconfig
-     helm-projectile
      magit
      paredit))
 #+end_src
@@ -150,6 +149,21 @@ Set archives
     :config
     (setq helm-github-stars-username "duck1123"))
 #+end_src
+
+** Helm Projectile
+
+#+begin_src emacs-lisp
+  (defun my/helm-projectile-switch-project-to-magit ()
+    "Use `magit-status` instead of the default action when switching projects."
+    (interactive)
+    (let ((projectile-switch-project-action #'magit-status))
+      (helm-projectile-switch-project)))
+
+  (use-package helm-projectile
+    :ensure t
+    :bind (("C-c p p" . my/helm-projectile-switch-project-to-magit)))
+#+end_src
+
 
 ** Nix
 
