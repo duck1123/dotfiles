@@ -98,9 +98,18 @@ def "project clojure deps aliases" [] {
     | columns
 }
 
+def "project devspace commands list" [] {
+  (open devspace.yaml).commands
+    | columns
+}
+
 def "project devspace piplines list" [] {
   (open devspace.yaml).pipelines
     | columns
+}
+
+def "project devspace ports list" [] {
+  devspace list ports -o json | from json
 }
 
 def "project devspace vars row parse" [
@@ -150,6 +159,39 @@ def "st runme tasks list" [] {
 def "platform argo app list" [] {
   argocd app list -o json
     | from json
+}
+
+def "platform cluster list" [] {
+  k3d cluster list -o json
+    | from json
+}
+
+def "platform git remote" [] {
+  # git remote -v
+  #   | split row --regex '\n'
+  #   | each {|row|
+  #     $row
+  #       | split column --regex '\t+'
+  #       | first
+  #   }
+  git remote -v
+    | detect columns --no-headers
+    | rename name url type
+}
+
+def "platform nix profile list" [] {
+  nix profile list
+    | split row --regex  '\n\n'
+    | each { |x|
+      $x
+        | split row --regex '\n'
+        | each {|y|
+          $y
+            | split column --regex ':'
+            | { ($in.0.column1 | str trim): ($in.0.column2 | str trim) }
+        }
+        | reduce {|a b| $a | merge $b}
+    }
 }
 
 # Switch home-manager to latest flake
