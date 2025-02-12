@@ -93,6 +93,7 @@ in {
       # khoj
       kodi
       kubernix
+      lens
       libnotify
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
       # logseq
