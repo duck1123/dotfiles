@@ -15,5 +15,6 @@ pkgs.mkShell {
     runme
     sops
     ssh-to-pgp
+    vals
   ];
 }
