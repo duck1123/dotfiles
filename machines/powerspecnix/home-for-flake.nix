@@ -92,6 +92,7 @@ in {
       # keet
       # khoj
       kodi
+      kty
       kubernix
       lens
       libnotify
