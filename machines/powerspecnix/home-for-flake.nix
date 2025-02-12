@@ -98,6 +98,7 @@ in {
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
       # logseq
       mdcat
+      minio-client
       # mullvad-browser
       neofetch
       nerdfetch

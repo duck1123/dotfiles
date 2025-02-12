@@ -179,6 +179,19 @@ def "platform git remote" [] {
     | rename name url type
 }
 
+def "platform minio alias create" [] {
+  let minioAlias = "minio"
+  let minioHost = "https://minio-api.dev.kronkltd.net"
+  let accessKey = $env.MINIO_ACCESS_KEY
+  let secretKey = $env.MINIO_SECRET_KEY
+  mc alias set $minioAlias $minioHost $accessKey $secretKey
+}
+
+def "platform minio alias list" [] {
+  mc alias list --json
+    | from json --objects
+}
+
 def "platform nix profile list" [] {
   nix profile list
     | split row --regex  '\n\n'
