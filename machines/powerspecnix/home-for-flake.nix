@@ -69,6 +69,7 @@ in {
       ffmpeg
       # fish
       # gcc9
+      gg-jj
       # gimp
       git
       # gitu
@@ -85,6 +86,8 @@ in {
       hstr
       htop
       jdk
+      jjui
+      jujutsu
       # Minimalist command line knowledge base manager
       # kb
       keepassxc
@@ -94,6 +97,7 @@ in {
       kodi
       kty
       kubernix
+      # lazyjj
       lens
       libnotify
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
@@ -184,6 +188,12 @@ in {
 
     gpg.enable = true;
     hstr.enable = true;
+
+    jujutsu = {
+      enable = true;
+      settings.user = { inherit name email; };
+    };
+
     k9s.enable = true;
     kodi.enable = true;
 
