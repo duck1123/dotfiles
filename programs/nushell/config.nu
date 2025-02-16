@@ -161,6 +161,11 @@ def "platform argo app list" [] {
     | from json
 }
 
+def "platform argo template list" [] {
+  argo template list --output name
+    | split row --regex '\n'
+}
+
 def "platform cluster list" [] {
   k3d cluster list -o json
     | from json

@@ -17,10 +17,12 @@
 
     hyprland.url = "github:hyprwm/Hyprland";
 
+    kubenix.url = "github:hall/kubenix";
+
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = { flake-utils, home-manager, nixpkgs, self, stylix, ... }@inputs:
+  outputs = { flake-utils, home-manager, kubenix, nixpkgs, self, stylix, ... }@inputs:
     let
       # inherit (builtins) attrValues;
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
