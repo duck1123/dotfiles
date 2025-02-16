@@ -1,4 +1,5 @@
 { inputs, pkgs, ... }: {
+
   home.packages = with pkgs; [
     cascadia-code
     font-awesome
@@ -12,6 +13,7 @@
     socat
     # rofi-power-menu
     waybar
+    waycorner
     wev
     wofi
     wofi-power-menu
@@ -159,6 +161,7 @@
         "   $mainMod,                     N, exec, kitty nu"
         "   $mainMod,                     P, pseudo,"
         "   $mainMod,                     R, exec, rofiWindow"
+        "   $mainMod,                     S, overview:toggle, all"
         "   $mainMod,                     T, exec, teams-for-linux"
         "   $mainMod,                     V, togglefloating,"
         "   $mainMod,                     w, exec, wofi --show drun"
@@ -223,8 +226,11 @@
     };
 
     plugins = [
+      inputs.hyprspace.packages.${pkgs.system}.Hyprspace
       # inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
       # "/absolute/path/to/plugin.so"
     ];
   };
+
+  xdg.configFile."waycorner/config.toml".source = ./waycorner.toml;
 }
