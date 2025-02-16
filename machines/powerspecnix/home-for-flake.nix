@@ -88,6 +88,7 @@ in {
       jdk
       jjui
       jujutsu
+      kakoune
       # Minimalist command line knowledge base manager
       # kb
       keepassxc
