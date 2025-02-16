@@ -4,6 +4,7 @@ let
   inherit (config) email gpgKey name username;
   stylix = inputs.stylix;
   hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
+  jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
 in {
   home.stateVersion = "21.11";
 
@@ -19,6 +20,7 @@ in {
     ../../programs/gnome
     hyprland
     # ../../programs/i3
+    jujutsu
     # ../../programs/music
     # ../../programs/ncmpcpp
     ../../programs/nostr
@@ -69,7 +71,6 @@ in {
       ffmpeg
       # fish
       # gcc9
-      gg-jj
       # gimp
       git
       # gitu
@@ -86,8 +87,6 @@ in {
       hstr
       htop
       jdk
-      jjui
-      jujutsu
       kakoune
       # Minimalist command line knowledge base manager
       # kb
@@ -98,7 +97,6 @@ in {
       kodi
       kty
       kubernix
-      # lazyjj
       lens
       libnotify
       # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
