@@ -37,6 +37,7 @@
       colmena
       # cloudflare-cli
       # cloudflared
+      deskflow
       digikam
       # discord
       distrobox
@@ -58,6 +59,7 @@
       # google-chrome
       # graphviz
       # gum
+      input-leap
       jdk
       # kakoune
       # kb
@@ -87,6 +89,7 @@
       slack
       # sparrow
       syncthing
+      # synergy
       tailscale
       tdesktop
       teams-for-linux
