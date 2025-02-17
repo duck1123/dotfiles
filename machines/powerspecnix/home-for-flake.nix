@@ -59,6 +59,7 @@ in {
       # cheese
       colmena
       curl
+      deskflow
       digikam
       # discord
       # distrobox
@@ -86,6 +87,7 @@ in {
       hoard
       hstr
       htop
+      input-leap
       jdk
       kakoune
       # Minimalist command line knowledge base manager
@@ -123,6 +125,7 @@ in {
       slack
       # sparrow
       syncthing
+      # synergy
       tailscale
       tdesktop
       teams-for-linux
