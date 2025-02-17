@@ -55,6 +55,7 @@ in {
       # cloudflared
 
       curl
+      deskflow
       digikam
       # discord
       distrobox
@@ -80,6 +81,7 @@ in {
       hoard
       hstr
       htop
+      input-leap
       jdk
       # kakoune
       # kb
@@ -116,6 +118,7 @@ in {
       slack
       # sparrow
       syncthing
+      # synergy
       tailscale
       tdesktop
       teams-for-linux
