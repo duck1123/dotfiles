@@ -40,6 +40,8 @@
       url = "github:nix-community/haumea";
     };
 
+    flox.url = "github:flox/flox/v1.3.11";
+
     home-manager = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/home-manager";
