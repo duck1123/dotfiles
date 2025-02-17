@@ -9,6 +9,8 @@
     # Utilities for building our flake
     flake-utils.url = "github:numtide/flake-utils";
 
+    flox.url = "github:flox/flox/v1.3.11";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       # Use system packages list where available
