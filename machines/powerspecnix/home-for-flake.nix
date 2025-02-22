@@ -173,6 +173,10 @@ in {
 
     firefox.enable = true;
 
+    fish = {
+      enable = true;
+    };
+
     git = {
       enable = true;
       userName = "${name}";
