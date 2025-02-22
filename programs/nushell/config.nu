@@ -161,9 +161,31 @@ def "platform argo app list" [] {
     | from json
 }
 
+def "nu-complete platform argo template get" [] {
+  platform argo template list | get name
+}
+
+def "platform argo template get" [
+  templateName: string@"nu-complete platform argo template get"
+] {
+  argo template get $templateName -o json
+    | from json
+}
+
 def "platform argo template list" [] {
-  argo template list --output name
-    | split row --regex '\n'
+  argo template list -A
+    | lines
+    | skip 1
+    | each { str trim | split column --regex '\s\s+' | first }
+    | rename namespace name
+}
+
+def "platform argo workflow list" [] {
+  argo list -A
+    | lines
+    | skip 1
+    | each { str trim | split column --regex '\s\s+' | first }
+    | rename namespace name status age duration priority message
 }
 
 def "platform cluster list" [] {
