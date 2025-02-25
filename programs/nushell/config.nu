@@ -73,6 +73,11 @@ def "hypr binds" [] {
     hyprctl binds -j | from json
 }
 
+def "hypr clients" [] {
+  hyprctl clients -j
+    | from json
+}
+
 # List all available workspaces
 def "hypr workspaces" [] {
     hyprctl workspaces -j | from json
@@ -155,6 +160,15 @@ def "st runme tasks list" [] {
   runme list --json
     | from json
 }
+
+def "nu-complete st runme run" [] {
+  (st runme tasks list)
+    | each { { value: $in.name description: $in.description } }
+}
+
+extern "runme run" [
+  task: string@"nu-complete st runme run"
+]
 
 def "platform argo app list" [] {
   argocd app list -o json
@@ -250,7 +264,8 @@ def parse-git-config-row [
 ] {
   $row.column0
     | split column "="
-    | { $in.0.column1: $in.0.column2 }
+    | first
+    | { ($in.column1 | split column '.' | first): $in.column2 }
 }
 
 def "git-config-data" [] {
@@ -258,7 +273,7 @@ def "git-config-data" [] {
   git config -l
     | from tsv --noheaders
     | each {|x| parse-git-config-row $x }
-    | reduce {|a b| $a | merge $b}
+    | reduce {|a acc| $acc | merge $a}
 }
 
 
@@ -286,6 +301,8 @@ use ~/.nix-profile/share/nu_scripts/custom-completions/git/git-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/nix/nix-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/yarn/yarn-v4-completions.nu *
 use ~/nushell/bb-completions.nu bb
+use ~/nushell/devspace-completions.nu *
+use ~/nushell/earthly-completions.nu *
 use ~/nushell/pj_command.nu pj
 use ~/nushell/nostr_module.nu *
 use kubernetes *

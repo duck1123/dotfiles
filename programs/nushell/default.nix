@@ -17,6 +17,8 @@
   ];
 
   home.file."nushell/bb-completions.nu".source = ./bb-completions.nu;
+  home.file."nushell/devspace-completions.nu".source = ./devspace-completions.nu;
+  home.file."nushell/earthly-completions.nu".source = ./earthly-completions.nu;
   home.file."nushell/pj_command.nu".source = ./pj_command.nu;
   home.file."nushell/nostr_module.nu".source = ./nostr_module.nu;
   home.file."nushell/me.nu".source = builtins.fetchurl {

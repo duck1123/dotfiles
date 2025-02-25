@@ -1,3 +1,13 @@
+def "bb-task-data" [] {
+  let config = open bb.edn
+  $config.tasks
+    | columns
+    | each {|task|
+        let fields = $config.tasks | get $task
+        { name: $task ...$fields }
+      }
+}
+
 export def "bb-task-complete" [] {
   ^bb tasks
     | split row --regex "\\n"
