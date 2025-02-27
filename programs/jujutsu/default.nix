@@ -3,7 +3,7 @@
     gg-jj
     jjui
     jujutsu
-    # lazyjj
+    lazyjj
   ];
 
   programs.jujutsu = {

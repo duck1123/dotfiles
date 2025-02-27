@@ -37,15 +37,16 @@
 
       extraConfig = ''
         let carapace_completer = {|spans|
-          carapace $spans.0 nushell $spans
+          carapace $spans.0 nushell ...$spans
             | from json
             | if ($in | default [] | where value == $"($spans | last)ERR" | is-empty) { $in } else { null }
         }
 
         let fish_completer = {|spans|
-          fish --command $'complete "--do-complete=($spans | str join " ")"'
+          fish --private -i --command $'complete --do-complete "($spans | str join " ")"'
             | from tsv --flexible --noheaders --no-infer
             | rename value description
+            | update cells --columns ["value"] { ansi strip }
         }
 
         # This completer will use carapace by default
@@ -63,13 +64,14 @@
             }
 
           match $spans.0 {
-            # carapace completions are incorrect for nu
-            nu => $fish_completer
-            # fish completes commits and branch names in a nicer way
-            git => $fish_completer
-            # carapace doesn't have completions for asdf
             asdf => $fish_completer
-            # use zoxide completions for zoxide commands
+            argocd => $fish_completer
+            git => $fish_completer
+            jj => $fish_completer
+            k3d => $fish_completer
+            # mc => $fish_completer
+            nu => $fish_completer
+            tailscale => $fish_completer
             _ => $carapace_completer
           } | do $in $spans
         }
