@@ -71,6 +71,7 @@
             git => $fish_completer
             jj => $fish_completer
             k3d => $fish_completer
+            keepassxc-cli => $fish_completer
             # mc => $fish_completer
             nu => $fish_completer
             tailscale => $fish_completer

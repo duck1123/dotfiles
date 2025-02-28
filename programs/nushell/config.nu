@@ -36,6 +36,12 @@ def wy [
 
 # Start original
 
+def "_parse keepassxc data" [] {
+  lines
+    | each { split column ': ' | first | { $in.column1: $in.column2 } }
+    | reduce {|it| merge $it }
+}
+
 # Close tab from input
 def "browsers tabs close" []: string -> any {
     xargs brotab close
@@ -175,10 +181,27 @@ def "platform argo app list" [] {
     | from json
 }
 
+# Read the argocd password from keepass
+def "platform argo password get" [] {
+  let kdbxPath = $"($env.HOME)/keepass/passwords.kdbx"
+  let passPath = "local/argocd.dev.kronkltd.net"
+  keepassxc-cli show $kdbxPath $passPath  -s --all
+    | _parse keepassxc data
+}
+
+# Refresh the argocd login token
+def "platform argo login" [] {
+  let domain = "argocd.dev.kronkltd.net"
+  let username = "admin"
+  let password = (platform argo password get).Password
+  argocd login $domain --username $username --password $password
+}
+
 def "nu-complete platform argo template get" [] {
   platform argo template list | get name
 }
 
+# Fetch an argo template by name
 def "platform argo template get" [
   templateName: string@"nu-complete platform argo template get"
 ] {
@@ -186,6 +209,7 @@ def "platform argo template get" [
     | from json
 }
 
+# List all argo templates
 def "platform argo template list" [] {
   argo template list -A
     | lines
@@ -194,6 +218,7 @@ def "platform argo template list" [] {
     | rename namespace name
 }
 
+# List all workflows
 def "platform argo workflow list" [] {
   argo list -A
     | lines
@@ -202,11 +227,13 @@ def "platform argo workflow list" [] {
     | rename namespace name status age duration priority message
 }
 
+# List all k8s clusters
 def "platform cluster list" [] {
   k3d cluster list -o json
     | from json
 }
 
+# List git remptes for project
 def "platform git remote" [] {
   # git remote -v
   #   | split row --regex '\n'
