@@ -1,6 +1,7 @@
 { config, pkgs, ... }: {
   home.packages = with pkgs; [
     gg-jj
+    jj-fzf
     jjui
     jujutsu
     lazyjj
