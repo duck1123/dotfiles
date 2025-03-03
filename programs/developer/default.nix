@@ -5,7 +5,8 @@
     # arkade
 
     # Next generation multi-platform command line experience for Azure
-    # azure-cli
+    azure-cli
+    azure-cli-extensions.powerbidedicated
 
     # Universal SQL Client for developers, DBA and analysts. Supports MySQL, PostgreSQL, MariaDB, SQLite, and more
     dbeaver-bin
