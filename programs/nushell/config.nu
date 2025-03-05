@@ -296,13 +296,12 @@ def parse-git-config-row [
 }
 
 def "git-config-data" [] {
-  # TODO: better wat to do this to avoif column0?
+  # TODO: better way to do this to avoid column0?
   git config -l
     | from tsv --noheaders
     | each {|x| parse-git-config-row $x }
     | reduce {|a acc| $acc | merge $a}
 }
-
 
 $env.nu_menu_commands = {
   {
