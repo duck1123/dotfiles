@@ -204,7 +204,11 @@ in {
     mr.enable = true;
     jq.enable = true;
     tmux.enable = true;
-    vscode.enable = true;
+
+    vscode = {
+      enable = true;
+      profiles.default.userSettings.vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
+    };
   };
 
   stylix = {
