@@ -228,6 +228,8 @@ in {
     #   package = pkgs.bibata-cursors;
     # };
 
+    targets.emacs.enable = false;
+
     fonts = {
       # monospace = {
       #   package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
