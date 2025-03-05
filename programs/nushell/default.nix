@@ -66,8 +66,11 @@
             }
 
           match $spans.0 {
+            ag => $fish_completer
+            alacritty => $fish_completer
             asdf => $fish_completer
             argocd => $fish_completer
+            az => $fish_completer
             git => $fish_completer
             jj => $fish_completer
             k3d => $fish_completer
