@@ -5,8 +5,8 @@
     # arkade
     (azure-cli.withExtensions [ azure-cli-extensions.powerbidedicated ])
     dbeaver-bin
-    devpod
-    devpod-desktop
+    # devpod
+    # devpod-desktop
     devspace
     dig
     # dnschef
@@ -16,7 +16,7 @@
     earthly
     # extraNodePackages.prettier
     # gnumake
-    gitu
+    # gitu
     go
     k3d
     k9s
@@ -26,7 +26,7 @@
     kubectl
     kustomize
     # lens
-    md-tangle
+    # md-tangle
     # mr
     nixd
     nmap
