@@ -56,6 +56,7 @@
 
     # mr
 
+    nixd
     nmap
 
     nodejs
