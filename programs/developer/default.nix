@@ -3,8 +3,7 @@
     argo
     argocd
     # arkade
-    azure-cli
-    azure-cli-extensions.powerbidedicated
+    (azure-cli.withExtensions [ azure-cli-extensions.powerbidedicated ])
     dbeaver-bin
     devpod
     devpod-desktop
