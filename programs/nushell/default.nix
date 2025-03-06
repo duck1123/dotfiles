@@ -77,6 +77,7 @@
             keepassxc-cli => $fish_completer
             # mc => $fish_completer
             nu => $fish_completer
+            playerctl => $fish_completer
             tailscale => $fish_completer
             _ => $carapace_completer
           } | do $in $spans

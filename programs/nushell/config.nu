@@ -151,32 +151,51 @@ def "project earthly tasks" [] {
     | sort
 }
 
-def "project mssql split result" [] {
-  split row --regex '\n'
-  | skip 2
-  | drop 2
-  | each {|row|
-    $row
-      | split column --regex " "
-      | first
-  }
+# Remove duplicates from history
+def "platform history dedupe" [] {
+  open ~/.config/nushell/history.txt
+    | lines
+    | reverse
+    | uniq
+    | reverse
+    | save -f ~/.config/nushell/history.txt
 }
 
-def "st runme tasks list" [] {
+# Return a command associated with a trove command
+def "project hoard show" [
+  name # The command to show
+] {
+  ((open trove.yml).commands | filter { $in.name == $name }).0.command
+}
+
+# Parse a mssql cli query response
+def "project mssql split result" [] {
+  lines
+    | skip 2
+    | drop 2
+    | each { split column --regex " " | first }
+}
+
+# List all tasks listed in the readme
+def "st runme tasks list" []: nothing -> table<name: string, file: string, first_command: string, description: string, named: bool, run_all: bool> {
   runme list --json
     | from json
 }
 
-def "nu-complete st runme run" [] {
-  (st runme tasks list)
-    | each { { value: $in.name description: $in.description } }
+# completer for runme tasks
+def "nu-complete st runme run" []: nothing -> table<value: string, description: string> {
+  st runme tasks list
+    | select name description
+    | rename value description
 }
 
+# Run commands in readme
 extern "runme run" [
   task: string@"nu-complete st runme run"
 ]
 
-def "platform argo app list" [] {
+# List all argo applications
+def "platform argo app list" []: nothing -> table<metadata: any, spec: any, status: any> {
   argocd app list -o json
     | from json
 }
@@ -197,13 +216,14 @@ def "platform argo login" [] {
   argocd login $domain --username $username --password $password
 }
 
+# Completer for argo workflows templates
 def "nu-complete platform argo template get" [] {
   platform argo template list | get name
 }
 
 # Fetch an argo template by name
 def "platform argo template get" [
-  templateName: string@"nu-complete platform argo template get"
+  templateName: string@"nu-complete platform argo template get" # The template to read
 ] {
   argo template get $templateName -o json
     | from json
@@ -234,6 +254,8 @@ def "platform cluster list" [] {
 }
 
 # List git remptes for project
+#
+# This is likely obsoleted by stanfard git completer
 def "platform git remote" [] {
   # git remote -v
   #   | split row --regex '\n'
@@ -247,6 +269,7 @@ def "platform git remote" [] {
     | rename name url type
 }
 
+# Create a minio alias
 def "platform minio alias create" [] {
   let minioAlias = "minio"
   let minioHost = "https://minio-api.dev.kronkltd.net"
@@ -255,20 +278,20 @@ def "platform minio alias create" [] {
   mc alias set $minioAlias $minioHost $accessKey $secretKey
 }
 
+# List all minio aliases
 def "platform minio alias list" [] {
   mc alias list --json
     | from json --objects
 }
 
+# Get information about nix profiles
 def "platform nix profile list" [] {
   nix profile list
     | split row --regex  '\n\n'
-    | each { |x|
-      $x
-        | split row --regex '\n'
-        | each {|y|
-          $y
-            | split column --regex ':'
+    | each {
+      split row --regex '\n'
+        | each {
+          split column --regex ':'
             | { ($in.0.column1 | str trim): ($in.0.column2 | str trim) }
         }
         | reduce {|a b| $a | merge $b}
@@ -316,8 +339,6 @@ $env.nu_menu_commands = {
     group: "Git"
   }
 }
-
-
 
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu *
