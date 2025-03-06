@@ -12,7 +12,7 @@
     # dnschef
     # dnslookup
     # dnsmap
-    # doctl
+    doctl
     earthly
     # extraNodePackages.prettier
     # gnumake
