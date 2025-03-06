@@ -126,7 +126,7 @@ in {
       tailscale
       tdesktop
       teams-for-linux
-      # thunderbird
+      thunderbird
       # tilt
       transmission_4-gtk
       # tree
