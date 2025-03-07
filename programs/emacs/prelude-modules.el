@@ -98,5 +98,9 @@
 ;;; Misc
 ;; (require 'prelude-erc) ;; A popular Emacs IRC client (useful if you're still into Freenode)
 
+;; (prelude-require-package 'which-key)  ;; Ensure it's installed first
+;; (disable-warning 'prelude-disable-which-key)
+;; (which-key-mode -1)
+
 (provide 'prelude-modules)
 ;;; prelude-modules.el ends here

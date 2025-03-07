@@ -53,6 +53,15 @@ Set archives
   ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
   (setq user-emacs-directory (expand-file-name "~/.cache/emacs/"))
   (setq url-history-file (expand-file-name "url/history" user-emacs-directory))
+  (setq emacs-config-directory (expand-file-name "~/.emacs.d"))
+#+end_src
+
+*** dotfiles source
+
+set directory
+
+#+begin_src emacs-lisp
+  (setq user-emacs-directory "~/dotfiles/programs/emacs/")
 #+end_src
 
 ** prelude packages
@@ -67,16 +76,18 @@ Set archives
 
 ** keybindings
 
+Custom keybindings that do not belong to a mode
+
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
 #+end_src
 
 ** No Littering Mode
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   ;; Use no-littering to automatically set common paths to the new user-emacs-directory
-  ;; (use-package no-littering
-  ;;   :ensure true)
+  (use-package no-littering
+    :ensure true)
 #+end_src
 
 ** Custom file
@@ -102,16 +113,6 @@ Set archives
   (server-start)
 #+end_src
 
-** Which Key
-
-#+BEGIN_SRC emacs-lisp :tangle no
-  (use-package which-key
-    :init (which-key-mode)
-    :diminish which-key-mode
-    :config
-    (setq which-key-idle-delay 0.3))
-#+END_SRC
-
 ** Auto Complete
 
 #+BEGIN_SRC emacs-lisp
@@ -134,7 +135,7 @@ Set archives
 ** AG
 
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/personal/ag-and-a-half")
+  (add-to-list 'load-path (file-name-concat emacs-config-directory "personal/ag-and-a-half"))
   (require 'ag-and-a-half)
   (defalias 'ag 'ag-and-a-half)
 #+end_src
@@ -192,20 +193,26 @@ Set archives
 
 ** SCSS
 
-#+BEGIN_SRC emacs-lisp
+Disabled
+
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package scss-mode
     :ensure t)
 #+END_SRC
 
 ** Docker
 
-#+BEGIN_SRC emacs-lisp
+diasbled
+
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package docker :ensure t)
 #+END_SRC
 
 ** Gradle Mode
 
-#+BEGIN_SRC emacs-lisp
+disabled
+
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package gradle-mode :ensure t)
   (use-package flycheck-gradle :ensure t)
 #+END_SRC
@@ -218,7 +225,9 @@ Set archives
 
 ** Golang
 
-#+BEGIN_SRC emacs-lisp
+disabled
+
+#+BEGIN_SRC emacs-lisp :tangle no
   (use-package go-mode :ensure t)
 #+END_SRC
 
@@ -227,9 +236,6 @@ Set archives
 #+begin_src emacs-lisp
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
-  ;; (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-  ;; (setq tab-width 2)
-  ;; (setq default-tab-width 2)
 #+end_src
 
 ** Magit
@@ -245,24 +251,22 @@ Set archives
     :after magit)
 #+end_src
 
-** Java
-
-#+begin_src emacs-lisp
-  ;; (add-hook 'java-mode-hook
-  ;;           (lambda ()
-  ;;             "Treat Java 1.5 @-style annotations as comments."
-  ;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
-  ;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
-#+end_src
-
 ** JS
 
+*** Flow support
+
+disabled
+
+#+begin_src emacs-lisp :tangle no
 (use-package flycheck-flow
   :ensure t
   :after flycheck)
 
 (use-package company-flow
   :ensure t)
+#+end_src
+
+*** Typescript
 
 #+begin_src emacs-lisp
   (use-package typescript-mode
@@ -271,15 +275,19 @@ Set archives
 
 ** C
 
-#+begin_src emacs-lisp
-  ;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
+disabled
+
+#+begin_src emacs-lisp :tangle no
+  (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
 #+end_src
 
 ** Kubernetes
 
 https://github.com/kubernetes-el/kubernetes-el
 
-#+begin_src emacs-lisp
+Disabled
+
+#+begin_src emacs-lisp :tangle no
   (use-package kubernetes
     :ensure t
     :commands (kubernetes-overview)
@@ -292,19 +300,25 @@ https://github.com/kubernetes-el/kubernetes-el
 
 ** Make
 
-#+begin_src emacs-lisp
+disabled
+
+#+begin_src emacs-lisp :tangle no
   (use-package helm-make :ensure t)
 #+end_src
 
 ** JSP
 
-#+begin_src emacs-lisp
+disabled
+
+#+begin_src emacs-lisp :tangle no
   (add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
 #+end_src
 
 ** Code Formatting
 
 *** Prettier-js
+
+disabled
 
 #+begin_src emacs-lisp :tangle no
   (use-package prettier-js
@@ -320,7 +334,9 @@ https://github.com/kubernetes-el/kubernetes-el
 
 - https://github.com/jscheid/prettier.el
 
-#+begin_src emacs-lisp
+disabled
+
+#+begin_src emacs-lisp :tangle no
   (use-package prettier
     :ensure t)
 #+end_src
@@ -332,31 +348,28 @@ https://github.com/kubernetes-el/kubernetes-el
     :ensure t
     :config
     (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show))
+#+end_src
 
-  (use-package cider
-    :ensure t)
+*** Cider
 
-  (use-package flycheck-clojure
-    :ensure t)
+#+begin_src emacs-lisp
+  (use-package cider :ensure t)
+#+end_src
 
-  ;; (use-package ac-cider
-  ;;   :ensure t)
+*** Flycheck
 
-  ;; (use-package helm-cider
-  ;;   :ensure t)
+#+begin_src emacs-lisp
+  (use-package flycheck-clojure :ensure t)
 
-  (use-package flycheck-clj-kondo
-    :ensure t)
+  (use-package flycheck-clj-kondo :ensure t)
 
   (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
     (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
-
-  ;; (add-hook 'clojure-mode-hook #'subword-mode)
-  ;; (add-hook 'clojure-mode-hook #'paredit-mode)
 #+end_src
 
-
 ** hide-show
+
+disabled
 
 #+begin_src emacs-lisp :tangle no
   (use-package hideshow-org
@@ -368,10 +381,11 @@ https://github.com/kubernetes-el/kubernetes-el
     (add-hook 'nix-mode-hook     (lambda () (hs-org/minor-mode 1))))
 #+end_src
 
-
 ** js2
 
 Support for javascript files
+
+disabled
 
 #+begin_src emacs-lisp :tangle no
   ;; (use-package lsp-javascript
@@ -464,6 +478,8 @@ For querying org files faster than org-agenda
 
 ** org-ai
 
+Disabled
+
 #+begin_src emacs-lisp :tangle no
   (use-package org-ai
     :ensure t
@@ -513,12 +529,6 @@ For supporting code in org files
 
 *** Autosaving
 
-set directory
-
-#+begin_src emacs-lisp
-  (setq user-emacs-directory "~/dotfiles/programs/emacs/")
-#+end_src
-
 add tangle function
 
 #+begin_src emacs-lisp
@@ -541,6 +551,8 @@ register hook
 ** org tempo
 
 - https://github.com/dangom/org-mode/blob/b47dcf43067cd57e2ee3c1f8e4dfea94bca7d14b/lisp/org-tempo.el
+
+disabled
 
 #+begin_src emacs-lisp :tangle no
   (require 'org-tempo)
@@ -573,8 +585,6 @@ register hook
      (lsp-mode . efs/lsp-mode-setup))
     :init
     (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-    :config
-    (lsp-enable-which-key-integration t)
     :custom
     (lsp-lens-enable t)
     (lsp-signature-auto-activate t))
@@ -619,6 +629,5 @@ register hook
 ** Terraform
 
 #+begin_src emacs-lisp
-  (use-package terraform-mode
-    :ensure t)
+  (use-package terraform-mode :ensure t)
 #+end_src

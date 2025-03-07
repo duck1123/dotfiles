@@ -21,6 +21,9 @@
 ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
 (setq user-emacs-directory (expand-file-name "~/.cache/emacs/"))
 (setq url-history-file (expand-file-name "url/history" user-emacs-directory))
+(setq emacs-config-directory (expand-file-name "~/.emacs.d"))
+
+(setq user-emacs-directory "~/dotfiles/programs/emacs/")
 
 (prelude-require-packages
  '(crappy-jsp-mode
@@ -29,10 +32,6 @@
    paredit))
 
 (global-set-key (kbd "C-x C-k")     'kill-this-buffer)
-
-;; Use no-littering to automatically set common paths to the new user-emacs-directory
-;; (use-package no-littering
-;;   :ensure true)
 
 ;; Keep customization settings in a temporary file (thanks Ambrevar!)
 (setq custom-file
@@ -52,7 +51,7 @@
 
 (use-package nushell-mode :ensure t)
 
-(add-to-list 'load-path "~/.emacs.d/personal/ag-and-a-half")
+(add-to-list 'load-path (file-name-concat emacs-config-directory "personal/ag-and-a-half"))
 (require 'ag-and-a-half)
 (defalias 'ag 'ag-and-a-half)
 
@@ -86,23 +85,10 @@
   :init
   (rainbow-delimiters-mode-enable))
 
-(use-package scss-mode
-  :ensure t)
-
-(use-package docker :ensure t)
-
-(use-package gradle-mode :ensure t)
-(use-package flycheck-gradle :ensure t)
-
 (use-package company :ensure t)
-
-(use-package go-mode :ensure t)
 
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
-;; (add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
-;; (setq tab-width 2)
-;; (setq default-tab-width 2)
 
 (use-package magit
   :ensure t
@@ -113,31 +99,7 @@
   :ensure t
   :after magit)
 
-;; (add-hook 'java-mode-hook
-;;           (lambda ()
-;;             "Treat Java 1.5 @-style annotations as comments."
-;;             (setq c-comment-start-regexp "(@|/(/|[*][*]?))")
-;;             (modify-syntax-entry ?@ "< b" java-mode-syntax-table)))
-
 (use-package typescript-mode
-  :ensure t)
-
-;; (add-hook 'c-mode-common-hook (lambda () (c-set-offset 'case-label '+)))
-
-(use-package kubernetes
-  :ensure t
-  :commands (kubernetes-overview)
-  :config
-  (setq kubernetes-poll-frequency 3600
-        kubernetes-redraw-frequency 3600))
-
-(use-package kubernetes-helm :ensure t)
-
-(use-package helm-make :ensure t)
-
-(add-to-list 'auto-mode-alist '("\\.jsp\\'" . crappy-jsp-mode))
-
-(use-package prettier
   :ensure t)
 
 (use-package clojure-mode
@@ -145,26 +107,14 @@
   :config
   (define-key clojure-mode-map (kbd "<M-return>") 'clerk-show))
 
-(use-package cider
-  :ensure t)
+(use-package cider :ensure t)
 
-(use-package flycheck-clojure
-  :ensure t)
+(use-package flycheck-clojure :ensure t)
 
-;; (use-package ac-cider
-;;   :ensure t)
-
-;; (use-package helm-cider
-;;   :ensure t)
-
-(use-package flycheck-clj-kondo
-  :ensure t)
+(use-package flycheck-clj-kondo :ensure t)
 
 (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
   (setq flycheck-checkers (cons checker (delq checker flycheck-checkers))))
-
-;; (add-hook 'clojure-mode-hook #'subword-mode)
-;; (add-hook 'clojure-mode-hook #'paredit-mode)
 
 (use-package org
   :ensure t
@@ -250,8 +200,6 @@
    (python . t)
    (clojure . t)))
 
-(setq user-emacs-directory "~/dotfiles/programs/emacs/")
-
 ;; Automatically tangle our Emacs.org config file when we save it
 (defun efs/org-babel-tangle-config ()
   (message (file-name-directory (buffer-file-name)))
@@ -278,8 +226,6 @@
    (lsp-mode . efs/lsp-mode-setup))
   :init
   (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-  :config
-  (lsp-enable-which-key-integration t)
   :custom
   (lsp-lens-enable t)
   (lsp-signature-auto-activate t))
@@ -293,5 +239,4 @@
   :custom
   (lsp-ui-doc-position 'bottom))
 
-(use-package terraform-mode
-  :ensure t)
+(use-package terraform-mode :ensure t)

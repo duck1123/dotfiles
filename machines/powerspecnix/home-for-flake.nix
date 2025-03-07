@@ -1,8 +1,6 @@
 { config, inputs, pkgs, ... }:
-
 let
   inherit (config) email gpgKey name username;
-  stylix = inputs.stylix;
   hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
   jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
 in {
@@ -14,8 +12,8 @@ in {
     # ../../programs/backups
     ../../programs/clojure
     ../../programs/developer
-    # ../../programs/emacs
-    ../../programs/emacs2
+    ../../programs/emacs
+    # ../../programs/emacs2
     ../../programs/gaming
     ../../programs/gnome
     hyprland
@@ -40,8 +38,6 @@ in {
   };
 
   home = {
-    # Home Manager needs a bit of information about you and the
-    # paths it should manage.
     username = "${username}";
     homeDirectory = "/home/${username}";
 
@@ -74,7 +70,6 @@ in {
       # gimp
       git
       # gitu
-      # Modern release of the GNU Privacy Guard, a GPL OpenPGP implementation
       gnupg
       # gpa
       # gnome.dconf-editor
@@ -88,10 +83,8 @@ in {
       htop
       jdk
       kakoune
-      # Minimalist command line knowledge base manager
       # kb
       keepassxc
-      # Peer-to-Peer Chat
       # keet
       # khoj
       kodi
@@ -99,7 +92,6 @@ in {
       kubernix
       lens
       libnotify
-      # A local-first, non-linear, outliner notebook for organizing and sharing your personal knowledge base
       # logseq
       mdcat
       minio-client
@@ -108,15 +100,15 @@ in {
       nerdfetch
       nerd-fonts.fira-code
       nixfmt-classic
+      nix-tree
       nh
       # obsidian
       # onlyoffice-bin
       playerctl
       plex
-      plex-media-player
+      # plex-media-player
       # postman
       qFlipper
-      # A decentralized app for code collaboration
       # radicle-node
       silver-searcher
       # simplex-chat-desktop

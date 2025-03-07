@@ -240,6 +240,8 @@ in {
       (global-set-key (kbd "C-h f") 'helm-apropos)
       (global-set-key (kbd "C-h r") 'helm-info-emacs)
       (global-set-key (kbd "C-h C-l") 'helm-locate-library)
+      (global-set-key (kbd "C-S-<right>") 'sp-forward-slurp-sexp)
+      (global-set-key (kbd "C-M-s") 'sp-unwrap-sexp)
       ;; (define-key prelude-mode-map (kbd "C-c f") 'helm-recentf)
       (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history)
       (define-key isearch-mode-map (kbd "C-o") 'helm-occur-from-isearch)
