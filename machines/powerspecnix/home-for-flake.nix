@@ -207,7 +207,10 @@ in {
 
     vscode = {
       enable = true;
-      profiles.default.userSettings.vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
+      profiles.default.userSettings = {
+        vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
+        nix.serverPath = "nixd";
+      };
     };
   };
 
