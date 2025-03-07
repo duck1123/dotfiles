@@ -76,6 +76,7 @@ in {
       # gnome-photos
       # gnome-tweaks
       # gnupg
+      google-chrome
       # graphviz
       # gum
       hoard
