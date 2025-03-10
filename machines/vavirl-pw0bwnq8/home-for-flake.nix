@@ -33,6 +33,7 @@ in {
       nixfmt-classic
       nh
       silver-searcher
+      sqlcmd
     ];
   };
 
