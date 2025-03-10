@@ -156,6 +156,7 @@
         "   $mainMod,                     D, exec, nautilus"
         "   $mainMod,                     E, exec, emacs"
         "   $mainMod,                     F, fullscreen,"
+        "   $mainMod,                     G, exec, gossip"
         "   $mainMod,                     J, togglesplit,"
         "   $mainMod,                     M, exit,"
         "   $mainMod,                     N, exec, kitty nu"
