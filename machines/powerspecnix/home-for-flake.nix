@@ -230,6 +230,8 @@ in {
     # };
 
     targets.emacs.enable = false;
+    targets.firefox.profileNames = ["default"];
+    targets.vscode.profileNames = ["default"];
 
     fonts = {
       # monospace = {
