@@ -70,6 +70,7 @@ in {
       # gimp
       git
       # gitu
+      gnumeric
       gnupg
       # gpa
       # gnome.dconf-editor
