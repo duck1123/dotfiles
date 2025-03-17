@@ -6,7 +6,7 @@
     (azure-cli.withExtensions [ azure-cli-extensions.powerbidedicated ])
     databricks-cli
     databricks-sql-cli
-    dbx
+    # dbx
     dbeaver-bin
     # devpod
     # devpod-desktop
