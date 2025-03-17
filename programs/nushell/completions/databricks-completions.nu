@@ -12,6 +12,33 @@ export extern "databricks auth" []
 export extern "databricks bundle" []
 
 export extern "databricks catalogs" []
+export extern "databricks catalogs create" []
+export extern "databricks catalogs delete" []
+export extern "databricks catalogs get" [
+name # The name of the catalog.
+]
+
+export def --wrapped "databricks catalogs list" [
+  --include-browse
+  --output = "json"
+  --help
+  ...rest
+] {
+  let response = ^databricks catalogs list --output $output ...$rest
+
+  if $output == "json" and not $help {
+    $response | from json
+  } else {
+    $response
+  }
+}
+
+export def "nu-complete databricks catalogs name" [] {
+  (databricks catalogs list --include-browse).name
+}
+
+export extern "databricks catalogs update" []
+
 export extern "databricks clean-room-assets" []
 export extern "databricks clean-room-task-runs" []
 export extern "databricks clean-rooms" []
@@ -35,7 +62,17 @@ export extern "databricks experiments" []
 export extern "databricks external-locations" []
 
 export extern "databricks fs" []
+
 export extern "databricks functions" []
+export extern "databricks functions create" []
+export extern "databricks functions delete" []
+export extern "databricks functions get" []
+
+export extern "databricks functions list" [
+  catalogName: string@"nu-complete databricks catalogs name"
+  schemaName: string@"nu-complete databricks schema names"
+]
+export extern "databricks functions update" []
 
 export extern "databricks git-credentials" []
 export extern "databricks global-init-scripts" []
@@ -77,6 +114,18 @@ export extern "databricks libraries install" []
 export extern "databricks libraries uninstal" []
 
 export extern "databricks metastores" []
+export extern "databricks metastores assign" []
+export extern "databricks metastores create" []
+export extern "databricks metastores current" []
+export extern "databricks metastores delete" []
+export extern "databricks metastores get" []
+export extern "databricks metastores list" []
+export extern "databricks metastores summary" []
+export extern "databricks metastores unassign" []
+export extern "databricks metastores update" []
+export extern "databricks metastores update-assignment" []
+
+
 export extern "databricks model-registry" []
 export extern "databricks model-versions" []
 
@@ -112,6 +161,25 @@ export extern "databricks repos" []
 export extern "databricks resource-quotas" []
 
 export extern "databricks schemas" []
+export extern "databricks schemas create" []
+export extern "databricks schemas delete" []
+export extern "databricks schemas get" []
+
+export def --wrapped "databricks schemas list" [
+  catalogName: string@"nu-complete databricks catalogs name"
+  ...rest
+] {
+  ^databricks schemas list $catalogName -o json ...$rest | from json
+}
+
+export def "nu-complete databricks schema names" [
+  context
+] {
+  let words = $context | str trim | split row ' '
+  let catalogName = $words | last
+  (databricks schemas list $catalogName).name
+}
+
 export extern "databricks secrets" []
 export extern "databricks serving-endpoints" []
 export extern "databricks service-principals" []
@@ -142,7 +210,11 @@ export extern "databricks warehouses get" []
 export extern "databricks warehouses get-permission-levels" []
 export extern "databricks warehouses get-permissions" []
 export extern "databricks warehouses get-workspace-warehouse-config" []
-export extern "databricks warehouses list" []
+
+export def "databricks warehouses list" [] {
+  ^databricks warehouses list -o json | from json
+}
+
 export extern "databricks warehouses set-permissions" []
 export extern "databricks warehouses set-workspace-warehouse-contig" []
 export extern "databricks warehouses start" []
@@ -150,5 +222,19 @@ export extern "databricks warehouses stop" []
 export extern "databricks warehouses update-permissions" []
 
 export extern "databricks workspace" []
+export extern "databricks workspace delete" []
+export extern "databricks workspace export" []
+export extern "databricks workspace export-dir" []
+export extern "databricks workspace get-permission-levels" []
+export extern "databricks workspace get-permissions" []
+export extern "databricks workspace get-status" []
+export extern "databricks workspace import" []
+export extern "databricks workspace import-dir" []
+export extern "databricks workspace list" []
+export extern "databricks workspace mkdirs" []
+export extern "databricks workspace set-permissions" []
+export extern "databricks workspace update-permissions" []
+
+
 export extern "databricks workspace-bindings" []
 export extern "databricks workspace-conf" []
