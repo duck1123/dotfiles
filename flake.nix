@@ -22,10 +22,13 @@
 
     kubenix.url = "github:hall/kubenix";
 
+    sops-nix.url = "github:Mic92/sops-nix";
+
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = { flake-utils, home-manager, kubenix, nixpkgs, self, stylix, ... }@inputs:
+  outputs =
+    { flake-utils, home-manager, nixpkgs, sops-nix, stylix, ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
@@ -54,29 +57,26 @@
           hostname = "powerspecnix";
         };
       };
+      pkgs = nixpkgs.legacyPackages.x86_64-linux;
       vavirl-pw0bwnq8 = {
         home = import ./machines/vavirl-pw0bwnq8/home-for-flake.nix {
-          inherit inputs;
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          inherit inputs pkgs;
           config = config.drenfer;
         };
       };
       steamdeck = {
         home = import ./machines/steamdeck/home-for-flake.nix {
-          inherit inputs;
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          inherit inputs pkgs;
           config = config.deck;
         };
       };
       powerspecnix = {
         home = import ./machines/powerspecnix/home-for-flake.nix {
-          inherit inputs;
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          inherit inputs pkgs;
           config = config.duck;
         };
         os = import ./machines/powerspecnix/configuration.nix {
-          inherit inputs;
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
+          inherit inputs pkgs;
           config = config.duck;
         };
       };
@@ -101,7 +101,7 @@
       };
 
       nixosConfigurations.powerspecnix = nixosSystem {
-        modules = [ powerspecnix.os ];
+        modules = [ powerspecnix.os sops-nix.nixosModules.sops ];
         specialArgs = { inherit inputs; };
         system = "x86_64-linux";
       };
@@ -109,8 +109,34 @@
       packages =
         eachDefaultSystemMap (system: import nixpkgs { inherit system; });
 
-      devShells = eachDefaultSystemMap (system: {
-        default = import ./shell.nix { pkgs = packages.${system}; };
-      });
+      devShells = eachDefaultSystemMap (system:
+        let pkgs = import nixpkgs { inherit system; };
+        in {
+          default = pkgs.mkShell {
+            name = "installation-shell";
+
+            # See https://github.com/disassembler/network/blob/c341a3af27611390f13f86d966767ea30c726a92/shell.nix
+            sopsPGPKeyDirs = [ "./nixos/secrets/keys" ];
+
+            buildInputs = with pkgs; [
+              age
+              babashka
+              clojure
+              git
+              pkgs.home-manager
+              keepassxc
+              kubectl
+              nh
+              nix
+              nixpkgs-fmt
+              runme
+              sops
+              ssh-to-age
+              ssh-to-pgp
+              vals
+              wget
+            ];
+          };
+        });
     };
 }
