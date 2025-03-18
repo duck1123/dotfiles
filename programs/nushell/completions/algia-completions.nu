@@ -1,9 +1,16 @@
 # A cli application for nostr
 export extern "algia" []
 
+# show timeline
 export extern "algia timeline" []
+
+# show stream
 export extern "algia stream" []
+
+# post new note
 export extern "algia post" []
+
+# reply to the note
 export extern "algia reply" []
 export extern "algia repost" []
 export extern "algia unrepost" []
