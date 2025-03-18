@@ -2,6 +2,12 @@ const NU_LIB_DIRS = [
   '~/.nix-profile/share/nu_scripts/modules'
 ]
 
+def save_last_dir [] {
+  pwd | save --force ~/.last_dir
+}
+
+# Hook to run before every prompt
+$env.config.hooks.pre_prompt = [{ save_last_dir }]
 $env.config.show_banner = false
 
 # taken from somewhere
@@ -137,6 +143,7 @@ $env.nu_menu_commands = {
     group: "Git"
   }
 }
+
 
 use ~/.nix-profile/share/nu_scripts/custom-completions/bat/bat-completions.nu *
 use ~/.nix-profile/share/nu_scripts/custom-completions/cargo/cargo-completions.nu *

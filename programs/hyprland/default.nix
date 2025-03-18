@@ -153,14 +153,14 @@
         "   $mainMod,                     A, exec, youtube-music"
         "   $mainMod,                     B, exec, firefox"
         "   $mainMod,                     C, killactive,"
-        "   $mainMod,                     D, exec, nautilus"
+        "   $mainMod,                     D, exec, nautilus \$(cat ~/.last_dir 2>/dev/null || echo $HOME)"
         # "   $mainMod,                     E, exec, emacs"
         "   $mainMod,                     E, exec, emacsclient -c -a \"\""
         "   $mainMod,                     F, fullscreen,"
         "   $mainMod,                     G, exec, gossip"
         "   $mainMod,                     J, togglesplit,"
         "   $mainMod,                     M, exit,"
-        "   $mainMod,                     N, exec, kitty nu"
+        "   $mainMod,                     N, exec, kitty --working-directory \"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" nu"
         "   $mainMod,                     P, pseudo,"
         "   $mainMod,                     R, exec, rofiWindow"
         "   $mainMod,                     S, overview:toggle, all"
@@ -213,24 +213,18 @@
       monitor = [ "HDMI-A-1, 1920x1080, 0x0, 1" "DP-3, 1920x1080, 1920x0, 1" ];
 
       windowrule = [
-        # "float,^(kitty)$"
-        # "center,^(kitty)$"
-        # "size 600 500,^(kitty)$"
-
         "float,^(pavucontrol)$"
         "float,^(blueman-manager)$"
 
         "size 934 525,^(mpv)$"
         "float,^(mpv)$"
         "center,^(mpv)$"
-        # "pin,^(firefox)$"
       ];
     };
 
     plugins = [
       inputs.hyprspace.packages.${pkgs.system}.Hyprspace
       # inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
-      # "/absolute/path/to/plugin.so"
     ];
   };
 
