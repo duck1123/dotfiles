@@ -69,6 +69,7 @@
             asdf => $fish_completer
             argocd => $fish_completer
             az => $fish_completer
+            doctl => $fish_completer
             git => $fish_completer
             jj => $fish_completer
             k3d => $fish_completer

@@ -1,24 +1,24 @@
 # List all aliases in a clojure deps file
-def "project clojure deps aliases" [] {
+export def "project clojure deps aliases" [] {
   (open deps.edn).aliases
     | columns
 }
 
-def "project devspace commands list" [] {
+export def "project devspace commands list" [] {
   (open devspace.yaml).commands
     | columns
 }
 
-def "project devspace piplines list" [] {
+export def "project devspace piplines list" [] {
   (open devspace.yaml).pipelines
     | columns
 }
 
-def "project devspace ports list" [] {
+export def "project devspace ports list" [] {
   devspace list ports -o json | from json
 }
 
-def "project devspace vars row parse" [
+export def "project devspace vars row parse" [
   row # row from devspace vars list
 ] {
   ($row | split column '|').0
@@ -28,7 +28,7 @@ def "project devspace vars row parse" [
     }
 }
 
-def "project devspace vars list" [] {
+export def "project devspace vars list" [] {
   devspace list vars
     | split row --regex '\n'
     | drop 1
@@ -38,7 +38,7 @@ def "project devspace vars list" [] {
 }
 
 # List all tasks in an earthly file
-def "project earthly tasks" [] {
+export def "project earthly tasks" [] {
   earthly ls
     | split row "\n"
     | each {|target| { $target: (bb get-task-args --target $target) }}
@@ -47,14 +47,14 @@ def "project earthly tasks" [] {
 }
 
 # Return a command associated with a trove command
-def "project hoard show" [
+export def "project hoard show" [
   name # The command to show
 ] {
   ((open trove.yml).commands | filter { $in.name == $name }).0.command
 }
 
 # Parse a mssql cli query response
-def "project mssql split result" [] {
+export def "project mssql split result" [] {
   lines
     | skip 2
     | drop 2

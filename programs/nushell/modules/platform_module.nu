@@ -1,5 +1,5 @@
 # Remove duplicates from history
-def "platform history dedupe" [] {
+export def "platform history dedupe" [] {
   open ~/.config/nushell/history.txt
     | lines
     | reverse
@@ -9,13 +9,13 @@ def "platform history dedupe" [] {
 }
 
 # List all argo applications
-def "platform argo app list" []: nothing -> table<metadata: any, spec: any, status: any> {
+export def "platform argo app list" []: nothing -> table<metadata: any, spec: any, status: any> {
   argocd app list -o json
     | from json
 }
 
 # Read the argocd password from keepass
-def "platform argo password get" [] {
+export def "platform argo password get" [] {
   let kdbxPath = $"($env.HOME)/keepass/passwords.kdbx"
   let passPath = "local/argocd.dev.kronkltd.net"
   keepassxc-cli show $kdbxPath $passPath  -s --all
@@ -23,7 +23,7 @@ def "platform argo password get" [] {
 }
 
 # Refresh the argocd login token
-def "platform argo login" [] {
+export def "platform argo login" [] {
   let domain = "argocd.dev.kronkltd.net"
   let username = "admin"
   let password = (platform argo password get).Password
@@ -36,7 +36,7 @@ def "nu-complete platform argo template get" [] {
 }
 
 # Fetch an argo template by name
-def "platform argo template get" [
+export def "platform argo template get" [
   templateName: string@"nu-complete platform argo template get" # The template to read
 ] {
   argo template get $templateName -o json
@@ -44,7 +44,7 @@ def "platform argo template get" [
 }
 
 # List all argo templates
-def "platform argo template list" [] {
+export def "platform argo template list" [] {
   argo template list -A
     | lines
     | skip 1
@@ -53,7 +53,7 @@ def "platform argo template list" [] {
 }
 
 # List all workflows
-def "platform argo workflow list" [] {
+export def "platform argo workflow list" [] {
   argo list -A
     | lines
     | skip 1
@@ -62,7 +62,7 @@ def "platform argo workflow list" [] {
 }
 
 # List all k8s clusters
-def "platform cluster list" [] {
+export def "platform cluster list" [] {
   k3d cluster list -o json
     | from json
 }
@@ -70,7 +70,7 @@ def "platform cluster list" [] {
 # List git remptes for project
 #
 # This is likely obsoleted by stanfard git completer
-def "platform git remote" [] {
+export def "platform git remote" [] {
   # git remote -v
   #   | split row --regex '\n'
   #   | each {|row|
@@ -84,7 +84,7 @@ def "platform git remote" [] {
 }
 
 # Create a minio alias
-def "platform minio alias create" [] {
+export def "platform minio alias create" [] {
   let minioAlias = "minio"
   let minioHost = "https://minio-api.dev.kronkltd.net"
   let accessKey = $env.MINIO_ACCESS_KEY
@@ -93,13 +93,13 @@ def "platform minio alias create" [] {
 }
 
 # List all minio aliases
-def "platform minio alias list" [] {
+export def "platform minio alias list" [] {
   mc alias list --json
     | from json --objects
 }
 
 # Get information about nix profiles
-def "platform nix profile list" [] {
+export def "platform nix profile list" [] {
   nix profile list
     | split row --regex  '\n\n'
     | each {
