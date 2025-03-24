@@ -1,5 +1,5 @@
 { config, inputs, pkgs, ... }: {
-  environment.systemPackages = with pkgs; [ k3s nfs-utils ];
+  environment.systemPackages = with pkgs; [ k3s nfs-utils openiscsi ];
 
   networking = {
     firewall = {
@@ -15,6 +15,11 @@
       enable = false;
       role = "server";
       extraFlags = toString [ "--disable=traefik" ];
+    };
+
+    openiscsi = {
+      enable = true;
+      name = "${config.hostname}-initiatorhost";
     };
   };
 }
