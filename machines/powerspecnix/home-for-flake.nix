@@ -69,7 +69,7 @@ in {
       ffmpeg
       # fish
       # gcc9
-      # gimp
+      gimp
       git
       # gitu
       # gnumeric
