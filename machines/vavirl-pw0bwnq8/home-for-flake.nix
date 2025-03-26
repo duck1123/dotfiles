@@ -1,5 +1,7 @@
 { config, inputs, pkgs, ... }:
-let inherit (config) email gpgKey name username;
+let
+  inherit (config) email gpgKey name username;
+  jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
 in {
   programs.home-manager.enable = true;
 
@@ -7,6 +9,7 @@ in {
     ../../programs/clojure
     ../../programs/developer
     ../../programs/emacs
+    jujutsu
     ../../programs/nushell
     ../../programs/zsh
   ];
