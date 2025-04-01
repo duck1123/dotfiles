@@ -21,6 +21,10 @@
     doctl
     earthly
     # extraNodePackages.prettier
+    gh
+    gh-cal
+    gh-dash
+    gh-f
     # gnumake
     # gitu
     go
