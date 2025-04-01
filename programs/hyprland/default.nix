@@ -194,12 +194,11 @@
       monitor = [ "HDMI-A-1, 1920x1080, 0x0, 1" "DP-3, 1920x1080, 1920x0, 1" ];
 
       windowrule = [
-        "float,^(pavucontrol)$"
-        "float,^(blueman-manager)$"
-
-        "size 934 525,^(mpv)$"
-        "float,^(mpv)$"
-        "center,^(mpv)$"
+        "float,class:pavucontrol"
+        "float,class:blueman-manager"
+        "size 934 525,class:mpv"
+        "float,class:mpv"
+        "center,class:mpv"
       ];
     };
   };
