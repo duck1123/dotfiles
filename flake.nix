@@ -20,11 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    hyprspace = {
-      url = "github:KZDKM/Hyprspace";
-      inputs.hyprland.follows = "hyprland";
-    };
-
     kubenix.url = "github:hall/kubenix";
 
     stylix.url = "github:danth/stylix";
@@ -32,7 +27,6 @@
 
   outputs = { flake-utils, home-manager, kubenix, nixpkgs, self, stylix, ... }@inputs:
     let
-      # inherit (builtins) attrValues;
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
       inherit (home-manager.lib) homeManagerConfiguration;

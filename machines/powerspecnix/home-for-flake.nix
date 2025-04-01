@@ -46,14 +46,16 @@ in {
     packages = with pkgs; [
       alacritty
       appimage-run
-      barrier
       bat
-      broot
       brotab
       byobu
       # chromium
       # cheese
       colmena
+
+      # cloudflare-cli
+      cloudflared
+
       curl
       digikam
       # discord
@@ -63,28 +65,28 @@ in {
       # dunst
       # earthly
       # emacs
-      fastfetch
+      # fastfetch
       ffmpeg
       # fish
       # gcc9
       # gimp
       git
       # gitu
-      gnumeric
+      # gnumeric
       gnupg
       # gpa
       # gnome.dconf-editor
       # gnome-photos
       # gnome-tweaks
       # gnupg
-      google-chrome
+      # google-chrome
       # graphviz
       # gum
       hoard
       hstr
       htop
       jdk
-      kakoune
+      # kakoune
       # kb
       keepassxc
       # keet

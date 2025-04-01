@@ -1,5 +1,4 @@
 { inputs, pkgs, ... }: {
-
   home.packages = with pkgs; [
     cascadia-code
     font-awesome
@@ -11,9 +10,7 @@
     pamixer
     pavucontrol
     socat
-    # rofi-power-menu
     waybar
-    waycorner
     wev
     wofi
     wofi-power-menu
@@ -31,24 +28,16 @@
         mainBar = {
           layer = "top";
           position = "top";
-          modules-left = [ "custom/power" "hyprland/workspaces" ];
+          modules-left = [ "hyprland/workspaces" ];
           modules-center = [ "clock" ];
           modules-right = [ "tray" "cpu" "memory" "pulseaudio" "network" ];
 
-          cpu = { format = "<span color='#b4befe'>🖥️ </span>{usage}%"; };
-
-          "custom/power" = {
-            format = "📌";
-            tooltip = false;
-            on-click = "wofi-power-menu";
-          };
+          cpu.format = "<span color='#b4befe'>🖥️ </span>{usage}%";
 
           clock = {
             format = "<span color='#b4befe'>🕒 </span>{:%Y-%m-%d  %H:%M}";
             tooltip = true;
             tooltip-format = "{:%Y-%m-%d %a}";
-            # on-click-middle = "exec default_wallpaper";
-            # on-click-right = "exec wallpaper_random";
           };
 
           memory = {
@@ -87,29 +76,22 @@
 
   services.dunst = {
     enable = true;
-    # iconTheme = {
-    #   name = "Adwaita";
-    #   package = pkgs.gnome3.adwaita-icon-theme;
-    #   size = "16x16";
-    # };
 
-    settings = {
-      global = {
-        monitor = 0;
-        geometry = "600x50-50+65";
-        shrink = "yes";
-        transparency = 10;
-        padding = 16;
-        horizontal_padding = 16;
-        # font = "JetBrainsMono Nerd Font 10";
-        line_height = 4;
-        format = "<b>%s</b>\\n%b";
-      };
+    settings.global = {
+      monitor = 0;
+      geometry = "600x50-50+65";
+      shrink = "yes";
+      transparency = 10;
+      padding = 16;
+      horizontal_padding = 16;
+      # font = "JetBrainsMono Nerd Font 10";
+      line_height = 4;
+      format = "<b>%s</b>\\n%b";
     };
   };
 
   wayland.windowManager.hyprland = {
-    enable = true; # enable Hyprland
+    enable = true;
     settings = {
       "$fileManager" = "nautiulus";
       "$menu" = "wofi --show drun";
@@ -133,7 +115,7 @@
       exec = [ "pkill waybar & sleep 0.5 && waybar" ];
       "exec-once" = [ "hyprctl setcursor Bibata-Modern-Classic 24" "dunst" ];
 
-      decoration = { rounding = 10; };
+      decoration.rounding = 10;
 
       dwindle = {
         pseudotile = "yes";
@@ -147,7 +129,7 @@
         layout = "dwindle";
       };
 
-      gestures = { "workspace_swipe" = false; };
+      gestures."workspace_swipe" = false;
 
       bind = [
         "   $mainMod,                     A, exec, youtube-music"
@@ -163,7 +145,6 @@
         "   $mainMod,                     N, exec, kitty --working-directory \"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" nu"
         "   $mainMod,                     P, pseudo,"
         "   $mainMod,                     R, exec, rofiWindow"
-        "   $mainMod,                     S, overview:toggle, all"
         "   $mainMod,                     T, exec, teams-for-linux"
         "   $mainMod,                     V, togglefloating,"
         "   $mainMod,                     w, exec, wofi --show drun"
@@ -221,12 +202,5 @@
         "center,^(mpv)$"
       ];
     };
-
-    plugins = [
-      inputs.hyprspace.packages.${pkgs.system}.Hyprspace
-      # inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system}.hyprbars
-    ];
   };
-
-  xdg.configFile."waycorner/config.toml".source = ./waycorner.toml;
 }
