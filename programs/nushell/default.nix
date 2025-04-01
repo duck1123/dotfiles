@@ -84,6 +84,12 @@
 
         $env.config.completions.external = { enable: true completer: $external_completer }
         '';
+
+      extraEnv = ''
+        $env.EDITOR = "emacsclient -c -a \'\'";
+        $env.VISUAL = "emacsclient -c -a \'\'";
+      '';
+
       shellAliases = {
         d = "devspace";
         dr = "devspace run";
