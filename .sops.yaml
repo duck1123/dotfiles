@@ -5,7 +5,6 @@
 keys:
   # - &admin_duck 07FB96789934E76A3A442D4236D7F9B5EDBF141B
   # - &admin_duck C2A83A6A267A4F71B2C8FA4D30A24C7B3159CAEE
-  - &admin_duck2 AGE-SECRET-KEY-15N2Y2EDRH9YUYK26WV7G36DQTWCZVSG5DDAK53WPD2KH8UE6DWNQW43GR3
   - &server_powerspecnix age1vks9s5g7p0uhpe4eeregfga6zfcrpuxdjx8x2hwsdwe5hf77l5msxfujpe
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
