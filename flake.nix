@@ -106,9 +106,6 @@
         system = "x86_64-linux";
       };
 
-      packages =
-        eachDefaultSystemMap (system: import nixpkgs { inherit system; });
-
       devShells = eachDefaultSystemMap (system:
         let pkgs = import nixpkgs { inherit system; };
         in {
