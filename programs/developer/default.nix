@@ -1,5 +1,6 @@
 { pkgs, ... }: {
   home.packages = with pkgs; [
+    age
     argo
     argocd
     # arkade
@@ -28,12 +29,15 @@
     # gnumake
     # gitu
     go
+    gum
+    jet
     k3d
     k9s
     kchmviewer
     # krew
     kubernetes-helm
     kubectl
+    kubeseal
     kustomize
     # lens
     # md-tangle
@@ -49,7 +53,10 @@
     # python3
     runme
     sqlite
+    sops
     # sqsh
+    ssh-to-age
+    ssh-to-pgp
     # vcluster
     # virtualbox
   ];
