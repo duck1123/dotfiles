@@ -54,7 +54,7 @@ in {
       colmena
 
       # cloudflare-cli
-      cloudflared
+      # cloudflared
 
       curl
       digikam
