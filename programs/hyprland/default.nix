@@ -137,7 +137,7 @@
         "   $mainMod,                     C, killactive,"
         "   $mainMod,                     D, exec, nautilus \$(cat ~/.last_dir 2>/dev/null || echo $HOME)"
         # "   $mainMod,                     E, exec, emacs"
-        "   $mainMod,                     E, exec, emacsclient -c -a \"\""
+        "   $mainMod,                     E, exec, emacsclient -c -a \"\" --eval \"(magit-status \\\"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\\\")\""
         "   $mainMod,                     F, fullscreen,"
         "   $mainMod,                     G, exec, gossip"
         "   $mainMod,                     J, togglesplit,"
