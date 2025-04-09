@@ -79,6 +79,7 @@
             playerctl => $fish_completer
             sops => $fish_completer
             tailscale => $fish_completer
+            wofi => $fish_completer
             _ => $carapace_completer
           } | do $in $spans
         }
