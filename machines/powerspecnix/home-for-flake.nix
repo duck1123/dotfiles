@@ -103,6 +103,7 @@ in {
       neofetch
       nerdfetch
       nerd-fonts.fira-code
+      networkmanager
       nixfmt-classic
       nix-tree
       nh
