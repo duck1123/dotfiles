@@ -35,3 +35,4 @@ programs/emacs/hgs-cache
 programs/emacs/org-roam.db
 programs/emacs/session*
 programs/emacs/workspace
+.aider*

@@ -209,6 +209,7 @@ in {
       profiles.default.userSettings = {
         vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
         nix.serverPath = "nixd";
+        "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
       };
     };
   };
