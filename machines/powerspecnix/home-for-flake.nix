@@ -44,6 +44,7 @@ in {
     file.".bb/bb.edn".source = ../../bb.edn;
 
     packages = with pkgs; [
+      aider-chat-full
       alacritty
       appimage-run
       bat
