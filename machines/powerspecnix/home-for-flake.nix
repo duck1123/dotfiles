@@ -100,6 +100,7 @@ in {
       # logseq
       mdcat
       minio-client
+      mosh
       # mullvad-browser
       neofetch
       nerdfetch
