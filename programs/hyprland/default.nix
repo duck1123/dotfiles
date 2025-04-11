@@ -113,7 +113,10 @@
       env = [ "XCURSOR_SIZE,24" "HYPRCURSOR_SIZE,24" ];
 
       exec = [ "pkill waybar & sleep 0.5 && waybar" ];
-      "exec-once" = [ "hyprctl setcursor Bibata-Modern-Classic 24" "dunst" ];
+      "exec-once" = [
+        # "hyprctl setcursor Bibata-Modern-Classic 24"
+        "dunst"
+      ];
 
       decoration.rounding = 10;
 
