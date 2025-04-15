@@ -10,6 +10,8 @@
       wrapInterpreterInShell = false;
     };
 
+    kernelModules = [ "dm_crypt" ];
+
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
