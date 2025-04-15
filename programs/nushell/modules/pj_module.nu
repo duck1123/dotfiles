@@ -16,7 +16,7 @@ export def --env pj [
     subdir?: string@"nu-complete pj" # The directory to switch to
 ] {
   let target_dir = (
-    (($env.PROJECT_PATHS | each {|base| $"($base)/($subdir)"})
+    (($env.PROJECT_PATHS | each { $"($in)/($subdir)" })
       ++ $env.STANDALONE_PROJECTS)
     | where {|dir| $dir | path exists }
     | first)

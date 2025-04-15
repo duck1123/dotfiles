@@ -3,6 +3,7 @@ let
   inherit (config) email gpgKey name username;
   hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
   jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
+  zsh = import ../../programs/zsh { inherit config inputs pkgs; };
 in {
   home.stateVersion = "21.11";
 
@@ -25,7 +26,7 @@ in {
     ../../programs/nushell
     # ../../programs/radio
     # ../../programs/vim
-    ../../programs/zsh
+    zsh
   ];
 
   dconf.settings = {

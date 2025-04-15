@@ -2,6 +2,7 @@
 let
   inherit (config) email gpgKey name username;
   jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
+  zsh = import ../../programs/zsh { inherit config inputs pkgs; };
 in {
   programs.home-manager.enable = true;
 
@@ -11,7 +12,7 @@ in {
     ../../programs/emacs
     jujutsu
     ../../programs/nushell
-    ../../programs/zsh
+    zsh
   ];
 
   home = {

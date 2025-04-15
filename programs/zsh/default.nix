@@ -1,5 +1,5 @@
-{ pkgs, ... }:
-let username = "duck";
+{ config, pkgs, ... }:
+let inherit (config) username;
 in {
   home.packages = with pkgs; [ hoard hstr ];
 
