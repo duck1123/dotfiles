@@ -155,7 +155,7 @@
         "   $mainMod,                     U, exec, kitty --working-directory \"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" jjui"
         "   $mainMod,                     V, togglefloating,"
         "   $mainMod,                     w, exec, wofi --show drun"
-        "   $mainMod,                RETURN, exec, kitty"
+        "   $mainMod,                RETURN, exec, kitty --working-directory \"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\""
         "   $mainMod,                   Tab, cyclenext,"
         "   $mainMod,                   Tab, bringactivetotop,"
         "           ,                 Print, exec, hyprshot -m region"
