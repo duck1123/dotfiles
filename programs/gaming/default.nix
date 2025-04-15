@@ -7,7 +7,7 @@
     # Open Source gaming platform for GNU/Linux
     lutris
 
-    nexusmods-app
+    # nexusmods-app
     protontricks
   ];
 }
