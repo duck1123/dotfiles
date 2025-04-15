@@ -1,4 +1,5 @@
-((magit-branch nil)
+((docker-image-rm nil)
+ (magit-branch nil)
  (magit-cherry-pick
   ("--ff")
   nil)
