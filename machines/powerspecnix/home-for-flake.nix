@@ -209,9 +209,19 @@ in {
     vscode = {
       enable = true;
       profiles.default.userSettings = {
-        vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
-        nix.serverPath = "nixd";
+        calva.paredit.defaultKeyMap = "original";
+
+        direnv.restart.automatic = true;
+
+        editor = {
+          renderWhitespace = "trailing";
+          tabSize = 2;
+        };
+
+        files.autoSave = "onFocusChange";
         "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
+        nix.serverPath = "nixd";
+        vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
       };
     };
   };
