@@ -48,6 +48,7 @@ in {
       aider-chat-full
       alacritty
       appimage-run
+      baobab
       bat
       brotab
       byobu
