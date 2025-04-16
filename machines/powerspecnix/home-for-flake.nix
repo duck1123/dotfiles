@@ -44,6 +44,28 @@ in {
 
     file.".bb/bb.edn".source = ../../bb.edn;
 
+    file.".dbt/project.yaml".text = inputs.k3s-fleetops.lib.x86_64-linux.toYAML {
+      inherit pkgs;
+      value = {
+        default = {
+          target = "default-target";
+          outputs = {
+            default-target = {
+              type = "postgres";
+              schema = "schema_identifier";
+              threads = 1;
+            };
+
+            alternate-target = {
+              type = "postgres";
+              schema = "alternate_schema_identifier";
+              threads = 1;
+            };
+          };
+        };
+      };
+    };
+
     packages = with pkgs; [
       aider-chat-full
       alacritty
@@ -60,6 +82,7 @@ in {
       # cloudflared
 
       curl
+      dbt
       digikam
       # discord
       # distrobox
@@ -209,18 +232,15 @@ in {
     vscode = {
       enable = true;
       profiles.default.userSettings = {
-        calva.paredit.defaultKeyMap = "original";
-
-        direnv.restart.automatic = true;
-
-        editor = {
-          renderWhitespace = "trailing";
-          tabSize = 2;
-        };
-
-        files.autoSave = "onFocusChange";
         "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
-        nix.serverPath = "nixd";
+        "calva.paredit.defaultKeyMap" = "original";
+        "direnv.restart.automatic" = true;
+        "editor.renderWhitespace" = "trailing";
+        "editor.tabSize" = 2;
+        "files.autoSave" = "onFocusChange";
+        "nix.enableLanguageServer" = true;
+        "nix.serverPath" = "nixd";
+        "telemetry.feedback.enabled" = false;
         vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
       };
     };
