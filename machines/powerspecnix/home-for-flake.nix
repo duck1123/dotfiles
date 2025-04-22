@@ -44,21 +44,31 @@ in {
 
     file.".bb/bb.edn".source = ../../bb.edn;
 
-    file.".dbt/profiles.yaml".text = inputs.k3s-fleetops.lib.x86_64-linux.toYAML {
+    file.".dbt/profiles.yml".text = inputs.k3s-fleetops.lib.x86_64-linux.toYAML {
       inherit pkgs;
       value = {
         default = {
-          target = "default-target";
+          target = "dev";
           outputs = {
-            default-target = {
+            dev = {
               type = "postgres";
+              host = "localhost";
+              user = "postgres";
+              password = "hunter2";
+              port = 5432;
+              dbname = "st";
               schema = "schema_identifier";
               threads = 1;
             };
 
-            alternate-target = {
+            prod = {
               type = "postgres";
-              schema = "alternate_schema_identifier";
+              host = "localhost";
+              user = "postgres";
+              password = "hunter2";
+              port = 5432;
+              dbname = "prod_st";
+              schema = "schema_identifier";
               threads = 1;
             };
           };
@@ -85,7 +95,7 @@ in {
       dbt
       digikam
       # discord
-      # distrobox
+      distrobox
       docker
       # docker-compose
       # dunst
