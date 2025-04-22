@@ -44,7 +44,7 @@ in {
 
     file.".bb/bb.edn".source = ../../bb.edn;
 
-    file.".dbt/project.yaml".text = inputs.k3s-fleetops.lib.x86_64-linux.toYAML {
+    file.".dbt/profiles.yaml".text = inputs.k3s-fleetops.lib.x86_64-linux.toYAML {
       inherit pkgs;
       value = {
         default = {
