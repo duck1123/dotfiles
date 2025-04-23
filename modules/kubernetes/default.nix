@@ -9,7 +9,7 @@
 
   services = {
     k3s = {
-      enable = true;
+      enable = false;
       role = "server";
       extraFlags = toString [ "--disable=traefik" ];
     };
