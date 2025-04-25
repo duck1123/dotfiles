@@ -77,7 +77,7 @@ in {
     };
 
     packages = with pkgs; [
-      aider-chat-full
+      # aider-chat-full
       alacritty
       appimage-run
       baobab
