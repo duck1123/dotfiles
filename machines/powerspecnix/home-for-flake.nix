@@ -108,7 +108,7 @@ in {
       gimp
       git
       # gitu
-      # gnumeric
+      gnumeric
       gnupg
       # gpa
       # gnome.dconf-editor
