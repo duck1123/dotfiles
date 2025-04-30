@@ -75,6 +75,7 @@
             k3d => $fish_completer
             keepassxc-cli => $fish_completer
             # mc => $fish_completer
+            nix => $fish_completer
             nu => $fish_completer
             playerctl => $fish_completer
             sops => $fish_completer
