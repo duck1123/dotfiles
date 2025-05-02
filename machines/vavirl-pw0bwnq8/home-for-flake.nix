@@ -42,11 +42,7 @@ in {
   };
 
   programs = {
-    bash = {
-      enable = true;
-      profileExtra =
-        "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
-    };
+    bash.enable = true;
 
     direnv = {
       enable = true;

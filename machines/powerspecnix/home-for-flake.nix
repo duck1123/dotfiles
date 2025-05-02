@@ -177,24 +177,14 @@ in {
     ];
 
     sessionPath = [
-      "$HOME/.arkade/bin:$PATH"
       "$HOME/.cargo/bin:$PATH"
-      "$HOME/.config/yarn/global/node_modules/.bin:$PATH"
-      "$HOME/.dotnet:$PATH"
       "$HOME/.local/bin:$PATH"
-      "$HOME/.yarn/bin:$PATH"
     ];
   };
 
   programs = {
     alacritty.enable = true;
-
-    bash = {
-      enable = true;
-      profileExtra =
-        "export NIX_PATH=$HOME/.nix-defexpr/channels:/nix/var/nix/profiles/per-user/root/channels\${NIX_PATH:+:$NIX_PATH}";
-    };
-
+    bash.enable = true;
     bat.enable = true;
     btop.enable = true;
 
