@@ -32,11 +32,19 @@
     "/mnt/data2" = {
       device = "/dev/disk/by-uuid/52b5780d-f617-4793-8355-9eb1490c2324";
       fsType = "ext4";
+      options = [ "discard" "nofail" ];
     };
 
     "/mnt/data3" = {
       device = "/dev/disk/by-uuid/0d256fc5-070b-43c3-a963-04a0ad2843bd";
       fsType = "ext4";
+      options = [ "nofail" ];
+    };
+
+    "/var/lib/longhorn" = {
+      device = "/dev/disk/by-uuid/2f0690ba-8901-4b87-bcca-dfe6ab2ce6c7";
+      fsType = "ext4";
+      options = [ "discard" "nofail" ];
     };
   };
 
