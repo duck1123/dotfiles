@@ -71,7 +71,12 @@
           hostname = "powerspecnix";
         };
       };
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      system = "x86_64-linux";
+      pkgs = import nixpkgs {
+        inherit system;
+        # May the FOSS gods take mercy upon me
+        config.allowUnfree = true;
+      };
       vavirl-pw0bwnq8 = {
         home = import ./machines/vavirl-pw0bwnq8/home-for-flake.nix {
           inherit inputs pkgs;
@@ -99,18 +104,18 @@
       # Accessible via 'home-manager'
       homeConfigurations = {
         drenfer = homeManagerConfiguration {
+          inherit pkgs;
           modules = [ stylix.homeManagerModules.stylix vavirl-pw0bwnq8.home ];
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
         };
 
         deck = homeManagerConfiguration {
+          inherit pkgs;
           modules = [ stylix.homeManagerModules.stylix steamdeck.home ];
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
         };
 
         duck = homeManagerConfiguration {
+          inherit pkgs;
           modules = [ stylix.homeManagerModules.stylix powerspecnix.home ];
-          pkgs = nixpkgs.legacyPackages.x86_64-linux;
         };
       };
 
