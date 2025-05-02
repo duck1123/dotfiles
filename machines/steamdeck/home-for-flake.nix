@@ -96,7 +96,7 @@ in {
         ];
       };
 
-      initExtra = ''
+      initContent = ''
         if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
             . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
         fi # added by Nix installer
