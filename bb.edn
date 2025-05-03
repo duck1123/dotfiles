@@ -150,4 +150,10 @@
   {:task (shell "watch kubectl get namespaces")}
 
   watch-pods
-  {:task (shell "watch kubectl get pods --all-namespaces")}}}
+  {:task (shell "watch kubectl get pods --all-namespaces")}
+
+  wipe-k3s
+  {:doc  "Wipe k3s directories"
+   :task (do
+           (shell "sudo rm -rf /etc/rancher/k3s")
+           (shell "sudo rm -rf /var/lib/rancher/k3s"))}}}
