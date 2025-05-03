@@ -11,7 +11,8 @@
     k3s = {
       enable = true;
       role = "server";
-      extraFlags = toString [ "--disable=traefik" ];
+      extraFlags =
+        toString [ "--cluster-cidr=10.42.0.0/16" "--disable=traefik" ];
     };
 
     openiscsi = {
