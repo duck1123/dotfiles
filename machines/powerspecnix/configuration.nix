@@ -8,6 +8,7 @@ let
   i18n = import ../../modules/i18n { inherit config inputs pkgs; };
   i3 = import ../../modules/i3 { inherit config inputs pkgs; };
   kubernetes = import ../../modules/kubernetes { inherit config inputs pkgs; };
+  nfs = import ../../modules/nfs { inherit config inputs pkgs; };
   plasma6 = import ../../modules/plasma6 { inherit config inputs pkgs; };
   stylix = import ../../modules/stylix { inherit config inputs pkgs; };
   syncthing = import ../../modules/syncthing { inherit config inputs pkgs; };
@@ -19,6 +20,7 @@ let
     boot
     i18n
     kubernetes
+    nfs
     stylix
     syncthing
     users
