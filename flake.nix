@@ -70,6 +70,13 @@
           gpgKey = "9564904D297DBF3C";
           hostname = "powerspecnix";
         };
+        inspernix = {
+          name = "Duck Nebuchadnezzar";
+          username = "duck";
+          email = "duck@kronkltd.net";
+          gpgKey = "9564904D297DBF3C";
+          hostname = "inspernix";
+        };
       };
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -77,6 +84,7 @@
         # May the FOSS gods take mercy upon me
         config.allowUnfree = true;
       };
+
       vavirl-pw0bwnq8 = {
         home = import ./machines/vavirl-pw0bwnq8/home-for-flake.nix {
           inherit inputs pkgs;
@@ -99,6 +107,16 @@
           config = config.duck;
         };
       };
+      inspernix = {
+        home = import ./machines/inspernix/home-for-flake.nix {
+          inherit inputs pkgs;
+          config = config.inspernix;
+        };
+        os = import ./machines/inspernix/configuration.nix {
+          inherit inputs pkgs;
+          config = config.inspernix;
+        };
+      };
     in rec {
       # Home configurations
       # Accessible via 'home-manager'
@@ -113,16 +131,27 @@
           modules = [ stylix.homeManagerModules.stylix steamdeck.home ];
         };
 
-        duck = homeManagerConfiguration {
+        "duck@powerspecnix" = homeManagerConfiguration {
           inherit pkgs;
           modules = [ stylix.homeManagerModules.stylix powerspecnix.home ];
         };
+        "duck@inspernix" = homeManagerConfiguration {
+          inherit pkgs;
+          modules = [ stylix.homeManagerModules.stylix inspernix.home ];
+        };
       };
 
-      nixosConfigurations.powerspecnix = nixosSystem {
-        modules = [ powerspecnix.os sops-nix.nixosModules.sops ];
-        specialArgs = { inherit inputs; };
-        system = "x86_64-linux";
+      nixosConfigurations = {
+        inspernix = nixosSystem {
+          modules = [ inspernix.os sops-nix.nixosModules.sops ];
+          specialArgs = { inherit inputs; };
+          system = "x86_64-linux";
+        };
+        powerspecnix = nixosSystem {
+          modules = [ powerspecnix.os sops-nix.nixosModules.sops ];
+          specialArgs = { inherit inputs; };
+          system = "x86_64-linux";
+        };
       };
 
       devShells = eachDefaultSystemMap (system:

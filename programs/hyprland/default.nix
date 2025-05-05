@@ -30,7 +30,8 @@
           position = "top";
           modules-left = [ "hyprland/workspaces" ];
           modules-center = [ "clock" ];
-          modules-right = [ "tray" "cpu" "memory" "pulseaudio" "network" ];
+          modules-right =
+            [ "battery" "tray" "cpu" "memory" "pulseaudio" "network" ];
 
           cpu.format = "<span color='#b4befe'>🖥️ </span>{usage}%";
 
@@ -138,24 +139,24 @@
         "   $mainMod,                     A, exec, youtube-music"
         "   $mainMod,                     B, exec, firefox"
         "   $mainMod,                     C, killactive,"
-        "   $mainMod,                     D, exec, nautilus \$(cat ~/.last_dir 2>/dev/null || echo $HOME)"
+        "   $mainMod,                     D, exec, nautilus $(cat ~/.last_dir 2>/dev/null || echo $HOME)"
         # "   $mainMod,                     E, exec, emacs"
-        "   $mainMod,                     E, exec, emacsclient -c -a \"\" --eval \"(magit-status \\\"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\\\")\""
+        "   $mainMod,                     E, exec, emacsclient -c -a \"\" --eval \"(magit-status \\\"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\\\")\""
         "   $mainMod,                     F, fullscreen,"
         "   $mainMod,                     G, exec, gossip"
-        "   $mainMod,                     H, exec, kitty --working-directory \"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" htop"
+        "   $mainMod,                     H, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" htop"
         "   $mainMod,                     J, togglesplit,"
-        "   $mainMod,                     K, exec, kitty --working-directory \"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" k9s"
+        "   $mainMod,                     K, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" k9s"
         "   $mainMod,                     L, exec, lens"
         "   $mainMod,                     M, exit,"
-        "   $mainMod,                     N, exec, kitty --working-directory \"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" nu"
+        "   $mainMod,                     N, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" nu"
         "   $mainMod,                     P, pseudo,"
         "   $mainMod,                     R, exec, rofiWindow"
         "   $mainMod,                     T, exec, teams-for-linux"
-        "   $mainMod,                     U, exec, kitty --working-directory \"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" jjui"
+        "   $mainMod,                     U, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" jjui"
         "   $mainMod,                     V, togglefloating,"
         "   $mainMod,                     w, exec, wofi --show drun"
-        "   $mainMod,                RETURN, exec, kitty --working-directory \"\$(cat ~/.last_dir 2>/dev/null || echo $HOME)\""
+        "   $mainMod,                RETURN, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\""
         "   $mainMod,                   Tab, cyclenext,"
         "   $mainMod,                   Tab, bringactivetotop,"
         "           ,                 Print, exec, hyprshot -m region"
