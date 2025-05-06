@@ -46,11 +46,11 @@
 
   switch-home
   {:decription "Update home-manager from flake"
-   :task       (shell "home-manager switch --flake /home/duck/dotfiles#duck --impure")}
+   :task       (shell "nh home switch .")}
 
   switch-os
   {:decription "Update nixos from flake"
-   :task       (shell "sudo nixos-rebuild switch --flake /home/duck/dotfiles#nixos")}
+   :task       (shell "nh os switch .")}
 
   k3d-create-registry
   {:task
