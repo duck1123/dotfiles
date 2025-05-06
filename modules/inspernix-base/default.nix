@@ -1,50 +1,21 @@
 { config, inputs, pkgs, ... }: {
-  networking.hostName = "inspernix";
-  networking.networkmanager.enable = true;
+  environment.systemPackages = with pkgs; [ ];
 
-  time.timeZone = "America/Detroit";
+  networking = {
+    hostName = "inspernix";
+    networkmanager.enable = true;
+  };
 
   nix.extraOptions = ''
     experimental-features = nix-command flakes
   '';
 
-  services = {
-    gnome.gnome-keyring.enable = true;
-
-    tailscale.enable = true;
-    xserver.enable = true;
-
-    # xserver.displayManager.gdm.enable = true;
-    # xserver.desktopManager.gnome.enable = true;
-
-    xserver.xkb = {
-      layout = "us";
-      variant = "";
-    };
-    printing.enable = true;
-
-  };
-
-  hardware.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-
-  users.users.duck = {
-    isNormalUser = true;
-    description = "Duck Nebuchadnezzar";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [ ];
-  };
-
-  programs.firefox.enable = true;
+  nixpkgs.config.allowUnfree = true;
 
   programs = {
     dconf.enable = true;
+
+    firefox.enable = true;
 
     gnupg.agent = {
       enable = true;
@@ -62,7 +33,11 @@
     zsh.enable = true;
   };
 
+  security.rtkit.enable = true;
+
   services = {
+    gnome.gnome-keyring.enable = true;
+
     # Enable the OpenSSH daemon.
     openssh = {
       enable = true;
@@ -73,10 +48,38 @@
       };
     };
 
+    pipewire = {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+    };
+
+    printing.enable = true;
+
+    pulseaudio.enable = false;
+
+    tailscale.enable = true;
+
+    xserver = {
+      enable = true;
+
+
+      xkb = {
+        layout = "us";
+        variant = "";
+      };
+    };
   };
 
-  nixpkgs.config.allowUnfree = true;
-
-  environment.systemPackages = with pkgs; [ ];
   system.stateVersion = "24.11";
+
+  time.timeZone = "America/Detroit";
+
+  users.users.duck = {
+    isNormalUser = true;
+    description = "Duck Nebuchadnezzar";
+    extraGroups = [ "networkmanager" "wheel" ];
+    packages = with pkgs; [ ];
+  };
 }
