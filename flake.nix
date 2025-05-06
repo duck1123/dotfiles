@@ -117,7 +117,10 @@
           config = config.inspernix;
         };
       };
+      machines = { inherit inspernix powerspecnix steamdeck vavirl-pw0bwnq8; };
     in rec {
+      inherit machines;
+
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = {
