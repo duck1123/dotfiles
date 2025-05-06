@@ -3,6 +3,15 @@
              [clojure.edn :as edn]
              [clojure.string :as str])
 
+  build
+  {:depends [build-home build-os]}
+
+  build-home
+  {:task (shell "nh home build .")}
+
+  build-os
+  {:task (shell "nh os build .")}
+
   install-cert-manager
   {:task
    (let [version "1.14.4"
@@ -31,6 +40,9 @@
   {:description "Read windows key from firmware"
    :task
    (shell "sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM")}
+
+  switch
+  {:depends [switch-home switch-os]}
 
   switch-home
   {:decription "Update home-manager from flake"
