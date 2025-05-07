@@ -1,6 +1,7 @@
 { config, inputs, pkgs, ... }:
 let
   inherit (config) email gpgKey name username;
+  git = import ../../programs/git { inherit config inputs pkgs; };
   hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
   jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
   zsh = import ../../programs/zsh { inherit config inputs pkgs; };
@@ -12,10 +13,12 @@ in {
   imports = [
     # ../../programs/backups
     # ../../programs/clojure
+    ../../programs/dconf
     # ../../programs/developer
     # ../../programs/emacs
     ../../programs/emacs2
     # ../../programs/gaming
+    git
     # ../../programs/gnome
     hyprland
     # ../../programs/i3
@@ -24,24 +27,16 @@ in {
     # ../../programs/ncmpcpp
     ../../programs/nostr
     ../../programs/nushell
+    ../../programs/stylix
+    ../../programs/vscode
     # ../../programs/radio
     # ../../programs/vim
     zsh
   ];
 
-  dconf.settings = {
-    "org/gnome/desktop/interface".color-scheme = "prefer-dark";
-
-    "org/gnome/desktop/wm/preferences".button-layout =
-      ":minimize,maximize,close";
-
-    # "apps/guake/general".default-shell = "/run/current-system/sw/bin/zsh";
-  };
-
   home = {
     username = "${username}";
     homeDirectory = "/home/${username}";
-
     file.".bb/bb.edn".source = ../../bb.edn;
 
     packages = with pkgs; [
@@ -52,7 +47,6 @@ in {
       byobu
       cheese
       curl
-      git
       gnupg
       guake
       hoard
@@ -83,35 +77,13 @@ in {
     };
 
     # eza.enable = true;
-
     firefox.enable = true;
-
     fish.enable = true;
-
-    git = {
-      enable = true;
-      userName = "${name}";
-      userEmail = "${email}";
-      lfs.enable = true;
-      signing = {
-        signByDefault = false;
-        key = gpgKey;
-      };
-    };
-
     # gnome-terminal.enable = true;
-
     gpg.enable = true;
     hstr.enable = true;
     jq.enable = true;
-
-    jujutsu = {
-      enable = true;
-      settings.user = { inherit name email; };
-    };
-
     k9s.enable = true;
-
     mr.enable = true;
 
     ssh = {
@@ -119,50 +91,6 @@ in {
       extraConfig = ''
         StrictHostKeyChecking=no
       '';
-    };
-
-    vscode = {
-      enable = true;
-      profiles.default.userSettings = {
-        "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
-        "calva.paredit.defaultKeyMap" = "original";
-        "direnv.restart.automatic" = true;
-        "editor.renderWhitespace" = "trailing";
-        "editor.tabSize" = 2;
-        "files.autoSave" = "onFocusChange";
-        "nix.enableLanguageServer" = true;
-        "nix.serverPath" = "nixd";
-        "telemetry.feedback.enabled" = false;
-        vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
-      };
-    };
-  };
-
-  stylix = {
-    enable = true;
-    autoEnable = true;
-    image = ../powerspecnix/nix-wallpaper-mosaic-blue.png;
-    imageScalingMode = "fit";
-    polarity = "dark";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
-
-    targets.emacs.enable = false;
-    targets.firefox.profileNames = [ "default" ];
-    targets.vscode.profileNames = [ "default" ];
-
-    fonts = {
-      # monospace = {
-      #   package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
-      #   name = "JetBrainsMono Nerd Font Mono";
-      # };
-      sansSerif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Sans";
-      };
-      serif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Serif";
-      };
     };
   };
 

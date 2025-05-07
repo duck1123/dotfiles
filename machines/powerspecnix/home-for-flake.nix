@@ -1,6 +1,7 @@
 { config, inputs, pkgs, ... }:
 let
   inherit (config) email gpgKey name username;
+  git = import ../../programs/git { inherit config inputs pkgs; };
   hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
   jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
   zsh = import ../../programs/zsh { inherit config inputs pkgs; };
@@ -12,10 +13,13 @@ in {
   imports = [
     # ../../programs/backups
     ../../programs/clojure
+    ../../programs/dbt
+    ../../programs/dconf
     ../../programs/developer
     ../../programs/emacs
     # ../../programs/emacs2
     ../../programs/gaming
+    ../../programs/git
     ../../programs/gnome
     hyprland
     # ../../programs/i3
@@ -25,56 +29,16 @@ in {
     ../../programs/nostr
     ../../programs/nushell
     # ../../programs/radio
+    ../../programs/stylix
     # ../../programs/vim
     zsh
   ];
-
-  dconf.settings = {
-    # "org/gnome/desktop/interface".color-scheme = "prefer-dark";
-
-    "org/gnome/desktop/wm/preferences".button-layout =
-      ":minimize,maximize,close";
-
-    "apps/guake/general".default-shell = "/run/current-system/sw/bin/zsh";
-  };
 
   home = {
     username = "${username}";
     homeDirectory = "/home/${username}";
 
     file.".bb/bb.edn".source = ../../bb.edn;
-
-    file.".dbt/profiles.yml".text = inputs.k3s-fleetops.lib.x86_64-linux.toYAML {
-      inherit pkgs;
-      value = {
-        default = {
-          target = "dev";
-          outputs = {
-            dev = {
-              type = "postgres";
-              host = "localhost";
-              user = "postgres";
-              password = "hunter2";
-              port = 5432;
-              dbname = "st";
-              schema = "schema_identifier";
-              threads = 1;
-            };
-
-            prod = {
-              type = "postgres";
-              host = "localhost";
-              user = "postgres";
-              password = "hunter2";
-              port = 5432;
-              dbname = "prod_st";
-              schema = "schema_identifier";
-              threads = 1;
-            };
-          };
-        };
-      };
-    };
 
     packages = with pkgs; [
       # aider-chat-full
@@ -200,26 +164,10 @@ in {
       enable = true;
     };
 
-    git = {
-      enable = true;
-      userName = "${name}";
-      userEmail = "${email}";
-      lfs.enable = true;
-      signing = {
-        signByDefault = false;
-        key = gpgKey;
-      };
-    };
-
     # gnome-terminal.enable = true;
 
     gpg.enable = true;
     hstr.enable = true;
-
-    jujutsu = {
-      enable = true;
-      settings.user = { inherit name email; };
-    };
 
     k9s.enable = true;
     kodi.enable = true;
@@ -245,46 +193,6 @@ in {
     };
   };
 
-  stylix = {
-    enable = true;
-    autoEnable = true;
-    image = ./nix-wallpaper-mosaic-blue.png;
-    # image = config.lib.stylix.pixel "base0A";
-    imageScalingMode = "fit";
-    polarity = "dark";
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-frappe.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/evenok-dark.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/gruvbox-dark-medium.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/materia.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/onedark-dark.yaml";
-    # base16Scheme = "${pkgs.base16-schemes}/share/themes/still-alive.yaml";
-
-    # cursor = {
-    #   name = "Bibata-Modern-Ice";
-    #   package = pkgs.bibata-cursors;
-    # };
-
-    targets.emacs.enable = false;
-    targets.firefox.profileNames = ["default"];
-    targets.vscode.profileNames = ["default"];
-
-    fonts = {
-      # monospace = {
-      #   package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};
-      #   name = "JetBrainsMono Nerd Font Mono";
-      # };
-      sansSerif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Sans";
-      };
-      serif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Serif";
-      };
-    };
-  };
 
   targets.genericLinux.enable = true;
 
