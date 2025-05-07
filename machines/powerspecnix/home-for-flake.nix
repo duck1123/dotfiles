@@ -100,7 +100,6 @@ in {
       # docker-compose
       # dunst
       # earthly
-      # emacs
       # fastfetch
       ffmpeg
       # fish

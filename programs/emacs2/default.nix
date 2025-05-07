@@ -184,11 +184,11 @@ in {
         :init
         (rainbow-delimiters-mode-enable))
 
-      (use-package reformatter
-        :ensure t
-        :config
-        (reformatter-define nix-format :program "nixpkgs-fmt")
-        (add-hook 'nix-mode-hook #'nix-format-on-save-mode))
+      ;; (use-package reformatter
+      ;;   :ensure t
+      ;;   :config
+      ;;   (reformatter-define nix-format :program "nixpkgs-fmt")
+      ;;   (add-hook 'nix-mode-hook #'nix-format-on-save-mode))
 
       (use-package lsp-mode
         :ensure t
