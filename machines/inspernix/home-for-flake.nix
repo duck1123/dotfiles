@@ -56,6 +56,7 @@ in {
       lens
       neofetch
       nerdfetch
+      nixd
       nixfmt-classic
       nh
       silver-searcher
