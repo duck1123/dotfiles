@@ -54,6 +54,7 @@ in {
       htop
       keepassxc
       lens
+      mosh
       neofetch
       nerdfetch
       nixd

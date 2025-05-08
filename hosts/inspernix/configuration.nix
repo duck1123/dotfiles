@@ -14,7 +14,7 @@ let
     boot
     i18n
     stylix
-    syncthing
+    # syncthing
     inputs.home-manager.nixosModules.home-manager
     inputs.stylix.nixosModules.stylix
   ];
