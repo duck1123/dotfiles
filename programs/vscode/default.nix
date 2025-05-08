@@ -11,6 +11,7 @@
       "nix.enableLanguageServer" = true;
       "nix.serverPath" = "nixd";
       "telemetry.feedback.enabled" = false;
+      "telemetry.telemetryLevel" = "off";
       vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
     };
   };
