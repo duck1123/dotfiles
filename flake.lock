@@ -196,6 +196,32 @@
         "type": "github"
       }
     },
+    "extra-container": {
+      "inputs": {
+        "flake-utils": [
+          "nix-bitcoin",
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nix-bitcoin",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1734005403,
+        "narHash": "sha256-vgh3TqfkFdnPxREBedw4MQehIDc3N8YyxBOB45n+AvU=",
+        "owner": "erikarvstedt",
+        "repo": "extra-container",
+        "rev": "f4de6c329b306a9d3a9798a30e060c166f781baa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "erikarvstedt",
+        "ref": "0.13",
+        "repo": "extra-container",
+        "type": "github"
+      }
+    },
     "firefox-gnome-theme": {
       "flake": false,
       "locked": {
@@ -768,6 +794,34 @@
         "type": "github"
       }
     },
+    "nix-bitcoin": {
+      "inputs": {
+        "extra-container": "extra-container",
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "nixpkgs-unstable": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1747465275,
+        "narHash": "sha256-Vpgp7uWpXUmEAirJjj6+et+JC9BZP9GjvS1usv5Wl3A=",
+        "owner": "fort-nix",
+        "repo": "nix-bitcoin",
+        "rev": "1586a34e902706b6834b059c9bd6d80caffce84a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fort-nix",
+        "ref": "release",
+        "repo": "nix-bitcoin",
+        "type": "github"
+      }
+    },
     "nix-fetcher-data": {
       "inputs": {
         "flake-parts": [
@@ -1179,6 +1233,7 @@
         "kubenix": "kubenix",
         "make-shell": "make-shell",
         "mkdocs-flake": "mkdocs-flake",
+        "nix-bitcoin": "nix-bitcoin",
         "nix-fetcher-data": "nix-fetcher-data",
         "nix-github-actions": "nix-github-actions",
         "nix-kube-generators": "nix-kube-generators",
