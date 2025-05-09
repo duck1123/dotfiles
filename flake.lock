@@ -239,6 +239,32 @@
         "type": "github"
       }
     },
+    "extra-container": {
+      "inputs": {
+        "flake-utils": [
+          "nix-bitcoin",
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nix-bitcoin",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1734005403,
+        "narHash": "sha256-vgh3TqfkFdnPxREBedw4MQehIDc3N8YyxBOB45n+AvU=",
+        "owner": "erikarvstedt",
+        "repo": "extra-container",
+        "rev": "f4de6c329b306a9d3a9798a30e060c166f781baa",
+        "type": "github"
+      },
+      "original": {
+        "owner": "erikarvstedt",
+        "ref": "0.13",
+        "repo": "extra-container",
+        "type": "github"
+      }
+    },
     "firefox-gnome-theme": {
       "flake": false,
       "locked": {
@@ -837,6 +863,30 @@
         "type": "github"
       }
     },
+    "nix-bitcoin": {
+      "inputs": {
+        "extra-container": "extra-container",
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": "nixpkgs",
+        "nixpkgs-unstable": "nixpkgs-unstable"
+      },
+      "locked": {
+        "lastModified": 1749652690,
+        "narHash": "sha256-qLwBEXlGY2pLNPhPNpeOE0DNC1luovTYE3ZDPMyMPXc=",
+        "owner": "fort-nix",
+        "repo": "nix-bitcoin",
+        "rev": "ac1344fb6d91e2af219803eaaa67d1d974666156",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fort-nix",
+        "ref": "release",
+        "repo": "nix-bitcoin",
+        "type": "github"
+      }
+    },
     "nix-fetcher-data": {
       "inputs": {
         "flake-parts": [
@@ -1068,16 +1118,16 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1750365781,
-        "narHash": "sha256-XE/lFNhz5lsriMm/yjXkvSZz5DfvKJLUjsS6pP8EC50=",
-        "owner": "nixos",
+        "lastModified": 1749494155,
+        "narHash": "sha256-FG4DEYBpROupu758beabUk9lhrblSf5hnv84v1TLqMc=",
+        "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "08f22084e6085d19bcfb4be30d1ca76ecb96fe54",
+        "rev": "88331c17ba434359491e8d5889cce872464052c2",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable",
+        "owner": "NixOS",
+        "ref": "nixos-25.05",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -1094,6 +1144,38 @@
       "original": {
         "owner": "nix-community",
         "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
+    "nixpkgs-unstable": {
+      "locked": {
+        "lastModified": 1749558678,
+        "narHash": "sha256-DUVAe8E2X2QM0dAnTGlTiqemMqUMMyIeCH7UeNo0g64=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "a12f3a99614894502e73eb816e9e076b0ab05730",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1750365781,
+        "narHash": "sha256-XE/lFNhz5lsriMm/yjXkvSZz5DfvKJLUjsS6pP8EC50=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "08f22084e6085d19bcfb4be30d1ca76ecb96fe54",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
         "type": "github"
       }
     },
@@ -1251,6 +1333,7 @@
         "kubenix": "kubenix",
         "make-shell": "make-shell",
         "mkdocs-flake": "mkdocs-flake",
+        "nix-bitcoin": "nix-bitcoin",
         "nix-fetcher-data": "nix-fetcher-data",
         "nix-github-actions": "nix-github-actions",
         "nix-kube-generators": "nix-kube-generators",
@@ -1258,7 +1341,7 @@
         "nixidy": "nixidy",
         "nixos-anywhere": "nixos-anywhere",
         "nixos-facter-modules": "nixos-facter-modules",
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": "nixpkgs_2",
         "nixpkgs-lib": "nixpkgs-lib",
         "nur": "nur",
         "poetry2nix": "poetry2nix",
