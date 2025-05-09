@@ -201,6 +201,13 @@
       url = "github:cachix/git-hooks.nix";
     };
 
+    nix-bitcoin = {
+      inputs = {
+        flake-utils.follows = "flake-utils";
+      };
+      url = "github:fort-nix/nix-bitcoin/release";
+    };
+
     sops-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:Mic92/sops-nix";
@@ -235,8 +242,8 @@
     };
   };
 
-  outputs = { colmena, disko, flake-utils, home-manager, hyprpanel, nixpkgs
-    , nixos-facter-modules, sops-nix, stylix, zen-browser, ... }@inputs:
+  outputs = { colmena, disko, flake-utils, home-manager, hyprpanel, nix-bitcoin
+    , nixpkgs, nixos-facter-modules, sops-nix, stylix, zen-browser, ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
@@ -308,6 +315,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
+            nix-bitcoin.nixosModules.default
             stylix.homeModules.stylix
             zen-browser.homeModules.beta
             ./hosts/vavirl-pw0bwnq8/home-for-flake.nix
@@ -322,6 +330,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
+            nix-bitcoin.nixosModules.default
             stylix.homeModules.stylix
             zen-browser.homeModules.beta
             ./hosts/steamdeck/home-for-flake.nix
@@ -336,6 +345,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
+            nix-bitcoin.nixosModules.default
             stylix.homeModules.stylix
             zen-browser.homeModules.beta
             ./hosts/powerspecnix/home-for-flake.nix
@@ -350,6 +360,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
+            nix-bitcoin.nixosModules.default
             stylix.homeModules.stylix
             zen-browser.homeModules.beta
             ./hosts/inspernix/home-for-flake.nix
