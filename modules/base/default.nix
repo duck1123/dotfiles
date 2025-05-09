@@ -1,7 +1,6 @@
-{ config, inputs, pkgs, ... }:
+{ config, identity, inputs, pkgs, ... }:
 let
-  username = config.username;
-  hostname = config.hostname;
+  inherit (identity) username hostname;
 in {
   environment.systemPackages = with pkgs; [ git zsh ];
 

@@ -1,8 +1,6 @@
-{ config, inputs, pkgs, ... }:
+{ config, identity, inputs, pkgs, ... }:
 let
-  name = config.name;
-  hostname = config.hostname;
-  username = config.username;
+  inherit (identity) name hostname username;
 in {
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users."${username}" = {

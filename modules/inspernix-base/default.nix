@@ -1,6 +1,4 @@
 { config, inputs, pkgs, ... }: {
-  environment.systemPackages = with pkgs; [ ];
-
   networking = {
     hostName = "inspernix";
     networkmanager.enable = true;

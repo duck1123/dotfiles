@@ -1,10 +1,7 @@
-{ config, inputs, pkgs, ... }:
+{ config, identity, inputs, pkgs, ... }:
 let
-  inherit (config) email gpgKey name username;
-  git = import ../../programs/git { inherit config inputs pkgs; };
-  hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
-  jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
-  zsh = import ../../programs/zsh { inherit config inputs pkgs; };
+  inherit (identity) email gpgKey name username;
+ 
 in {
   home.stateVersion = "21.11";
 
@@ -18,11 +15,11 @@ in {
     # ../../programs/emacs
     ../../programs/emacs2
     # ../../programs/gaming
-    git
+    ../../programs/git
     # ../../programs/gnome
-    hyprland
+    ../../programs/hyprland
     # ../../programs/i3
-    jujutsu
+    ../../programs/jujutsu
     # ../../programs/music
     # ../../programs/ncmpcpp
     ../../programs/nostr
@@ -31,7 +28,7 @@ in {
     ../../programs/vscode
     # ../../programs/radio
     # ../../programs/vim
-    zsh
+    ../../programs/zsh
   ];
 
   home = {

@@ -1,7 +1,6 @@
-{ config, inputs, ... }:
+{ config, identity, inputs, ... }:
 let
-  pkgs = inputs.pkgs;
-  username = config.username;
+  inherit (identity) username;
 in {
   services.syncthing = {
     enable = true;

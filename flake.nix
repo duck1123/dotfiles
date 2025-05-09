@@ -84,75 +84,77 @@
         # May the FOSS gods take mercy upon me
         config.allowUnfree = true;
       };
-
-      vavirl-pw0bwnq8 = {
-        home = import ./hosts/vavirl-pw0bwnq8/home-for-flake.nix {
-          inherit inputs pkgs;
-          config = config.drenfer;
-        };
-      };
-      steamdeck = {
-        home = import ./hosts/steamdeck/home-for-flake.nix {
-          inherit inputs pkgs;
-          config = config.deck;
-        };
-      };
-      powerspecnix = {
-        home = import ./hosts/powerspecnix/home-for-flake.nix {
-          inherit inputs pkgs;
-          config = config.duck;
-        };
-        os = import ./hosts/powerspecnix/configuration.nix {
-          inherit inputs pkgs;
-          config = config.duck;
-        };
-      };
-      inspernix = {
-        home = import ./hosts/inspernix/home-for-flake.nix {
-          inherit inputs pkgs;
-          config = config.inspernix;
-        };
-        os = import ./hosts/inspernix/configuration.nix {
-          inherit inputs pkgs;
-          config = config.inspernix;
-        };
-      };
-      machines = { inherit inspernix powerspecnix steamdeck vavirl-pw0bwnq8; };
     in rec {
-      inherit machines;
-
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = {
         drenfer = homeManagerConfiguration {
           inherit pkgs;
-          modules = [ stylix.homeManagerModules.stylix vavirl-pw0bwnq8.home ];
+          extraSpecialArgs = {
+            inherit inputs;
+            identity = config.drenfer;
+          };
+          modules = [
+            stylix.homeManagerModules.stylix
+            ./hosts/vavirl-pw0bwnq8/home-for-flake.nix
+          ];
         };
 
         deck = homeManagerConfiguration {
           inherit pkgs;
-          modules = [ stylix.homeManagerModules.stylix steamdeck.home ];
+          extraSpecialArgs = {
+            inherit inputs;
+            identity = config.deck;
+          };
+          modules = [
+            stylix.homeManagerModules.stylix
+            ./hosts/steamdeck/home-for-flake.nix
+          ];
         };
 
         "duck@powerspecnix" = homeManagerConfiguration {
           inherit pkgs;
-          modules = [ stylix.homeManagerModules.stylix powerspecnix.home ];
+          extraSpecialArgs = {
+            inherit inputs;
+            identity = config.duck;
+          };
+          modules = [
+            stylix.homeManagerModules.stylix
+            ./hosts/powerspecnix/home-for-flake.nix
+          ];
         };
         "duck@inspernix" = homeManagerConfiguration {
           inherit pkgs;
-          modules = [ stylix.homeManagerModules.stylix inspernix.home ];
+          extraSpecialArgs = {
+            inherit inputs;
+            identity = config.duck;
+          };
+          modules = [
+            stylix.homeManagerModules.stylix
+            ./hosts/inspernix/home-for-flake.nix
+          ];
         };
       };
 
       nixosConfigurations = {
         inspernix = nixosSystem {
-          modules = [ inspernix.os sops-nix.nixosModules.sops ];
-          specialArgs = { inherit inputs; };
+          modules =
+            [ ./hosts/inspernix/configuration.nix sops-nix.nixosModules.sops ];
+          specialArgs = {
+            inherit inputs;
+            identity = config.duck;
+          };
           system = "x86_64-linux";
         };
         powerspecnix = nixosSystem {
-          modules = [ powerspecnix.os sops-nix.nixosModules.sops ];
-          specialArgs = { inherit inputs; };
+          modules = [
+            ./hosts/powerspecnix/configuration.nix
+            sops-nix.nixosModules.sops
+          ];
+          specialArgs = {
+            inherit inputs;
+            identity = config.duck;
+          };
           system = "x86_64-linux";
         };
       };

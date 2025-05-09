@@ -1,6 +1,6 @@
-{ config, ... }: {
+{ identity, ... }: {
   programs = {
-    git = with config; {
+    git = with identity; {
       enable = true;
       userName = "${name}";
       userEmail = "${email}";
@@ -12,7 +12,7 @@
     };
     jujutsu = {
       enable = true;
-      settings.user = { inherit (config) name email; };
+      settings.user = { inherit (identity) name email; };
     };
   };
 }

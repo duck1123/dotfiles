@@ -1,5 +1,5 @@
-{ config, pkgs, ... }:
-let inherit (config) username;
+{ config, identity, pkgs, ... }:
+let inherit (identity) username;
 in {
   home.packages = with pkgs; [ hoard hstr ];
 

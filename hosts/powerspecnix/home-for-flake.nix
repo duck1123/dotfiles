@@ -1,30 +1,24 @@
-{ config, inputs, pkgs, ... }:
-let inherit (config) email gpgKey name username;
+{ identity, pkgs, ... }:
+let inherit (identity) username;
 in {
   home.stateVersion = "21.11";
 
   programs.home-manager.enable = true;
 
-  imports = let
-    dbt = import ../../programs/dbt { inherit config inputs pkgs; };
-    git = import ../../programs/git { inherit config inputs pkgs; };
-    hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
-    jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
-    zsh = import ../../programs/zsh { inherit config inputs pkgs; };
-  in [
+  imports = [
     # ../../programs/backups
     ../../programs/clojure
-    dbt
+    ../../programs/dbt
     ../../programs/dconf
     ../../programs/developer
     ../../programs/emacs
     # ../../programs/emacs2
     ../../programs/gaming
-    git
+    ../../programs/git
     ../../programs/gnome
-    hyprland
+    ../../programs/hyprland
     # ../../programs/i3
-    jujutsu
+    ../../programs/jujutsu
     # ../../programs/music
     # ../../programs/ncmpcpp
     ../../programs/nostr
@@ -32,7 +26,7 @@ in {
     # ../../programs/radio
     ../../programs/stylix
     # ../../programs/vim
-    zsh
+    ../../programs/zsh
   ];
 
   home = {
