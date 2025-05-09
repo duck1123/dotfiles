@@ -168,6 +168,8 @@
       url = "github:cachix/git-hooks.nix";
     };
 
+    nix-bitcoin.url = "github:fort-nix/nix-bitcoin/release";
+
     sops-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:Mic92/sops-nix";
@@ -194,7 +196,7 @@
     };
   };
 
-  outputs = { flake-utils, home-manager, hyprpanel, nixpkgs, sops-nix, stylix
+  outputs = { flake-utils, home-manager, hyprpanel, nix-bitcoin, nixpkgs, sops-nix, stylix
     , ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
@@ -250,6 +252,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
+            nix-bitcoin.nixosModules.default
             stylix.homeManagerModules.stylix
             ./hosts/vavirl-pw0bwnq8/home-for-flake.nix
           ];
@@ -263,6 +266,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
+            nix-bitcoin.nixosModules.default
             stylix.homeManagerModules.stylix
             ./hosts/steamdeck/home-for-flake.nix
           ];
@@ -276,6 +280,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
+            nix-bitcoin.nixosModules.default
             stylix.homeManagerModules.stylix
             ./hosts/powerspecnix/home-for-flake.nix
           ];
@@ -288,6 +293,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
+            nix-bitcoin.nixosModules.default
             stylix.homeManagerModules.stylix
             ./hosts/inspernix/home-for-flake.nix
           ];
