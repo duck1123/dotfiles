@@ -1,25 +1,26 @@
 { config, inputs, pkgs, ... }:
-let
-  inherit (config) email gpgKey name username;
-  git = import ../../programs/git { inherit config inputs pkgs; };
-  hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
-  jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
-  zsh = import ../../programs/zsh { inherit config inputs pkgs; };
+let inherit (config) email gpgKey name username;
 in {
   home.stateVersion = "21.11";
 
   programs.home-manager.enable = true;
 
-  imports = [
+  imports = let
+    dbt = import ../../programs/dbt { inherit config inputs pkgs; };
+    git = import ../../programs/git { inherit config inputs pkgs; };
+    hyprland = import ../../programs/hyprland { inherit config inputs pkgs; };
+    jujutsu = import ../../programs/jujutsu { inherit config inputs pkgs; };
+    zsh = import ../../programs/zsh { inherit config inputs pkgs; };
+  in [
     # ../../programs/backups
     ../../programs/clojure
-    ../../programs/dbt
+    dbt
     ../../programs/dconf
     ../../programs/developer
     ../../programs/emacs
     # ../../programs/emacs2
     ../../programs/gaming
-    ../../programs/git
+    git
     ../../programs/gnome
     hyprland
     # ../../programs/i3
@@ -69,7 +70,6 @@ in {
       # fish
       # gcc9
       gimp
-      git
       # gitu
       gnumeric
       gnupg
@@ -139,10 +139,7 @@ in {
       # zoom-us
     ];
 
-    sessionPath = [
-      "$HOME/.cargo/bin:$PATH"
-      "$HOME/.local/bin:$PATH"
-    ];
+    sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
   };
 
   programs = {
@@ -157,21 +154,13 @@ in {
     };
 
     eza.enable = true;
-
     firefox.enable = true;
-
-    fish = {
-      enable = true;
-    };
-
+    fish.enable = true;
     # gnome-terminal.enable = true;
-
     gpg.enable = true;
     hstr.enable = true;
-
     k9s.enable = true;
     kodi.enable = true;
-
     mr.enable = true;
     jq.enable = true;
     tmux.enable = true;
@@ -192,7 +181,6 @@ in {
       };
     };
   };
-
 
   targets.genericLinux.enable = true;
 
