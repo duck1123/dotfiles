@@ -86,33 +86,33 @@
       };
 
       vavirl-pw0bwnq8 = {
-        home = import ./machines/vavirl-pw0bwnq8/home-for-flake.nix {
+        home = import ./hosts/vavirl-pw0bwnq8/home-for-flake.nix {
           inherit inputs pkgs;
           config = config.drenfer;
         };
       };
       steamdeck = {
-        home = import ./machines/steamdeck/home-for-flake.nix {
+        home = import ./hosts/steamdeck/home-for-flake.nix {
           inherit inputs pkgs;
           config = config.deck;
         };
       };
       powerspecnix = {
-        home = import ./machines/powerspecnix/home-for-flake.nix {
+        home = import ./hosts/powerspecnix/home-for-flake.nix {
           inherit inputs pkgs;
           config = config.duck;
         };
-        os = import ./machines/powerspecnix/configuration.nix {
+        os = import ./hosts/powerspecnix/configuration.nix {
           inherit inputs pkgs;
           config = config.duck;
         };
       };
       inspernix = {
-        home = import ./machines/inspernix/home-for-flake.nix {
+        home = import ./hosts/inspernix/home-for-flake.nix {
           inherit inputs pkgs;
           config = config.inspernix;
         };
-        os = import ./machines/inspernix/configuration.nix {
+        os = import ./hosts/inspernix/configuration.nix {
           inherit inputs pkgs;
           config = config.inspernix;
         };
