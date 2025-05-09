@@ -53,6 +53,7 @@ in {
       hstr
       htop
       keepassxc
+      ladybird
       lens
       mosh
       neofetch
