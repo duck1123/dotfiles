@@ -116,7 +116,7 @@ in {
         compdef _bb_tasks bb
       '';
 
-      localVariables.PROJECT_PATHS = [ ~/projects ];
+      localVariables.PROJECT_PATHS = [ "/home/${username}/projects" ];
 
       sessionVariables = {
         EDITOR = "emacsclient -ct";
