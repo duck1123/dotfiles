@@ -1,4 +1,11 @@
 { config, inputs, pkgs, ... }: {
+  # Configure console font
+  console = {
+    font = "ter-v32n";
+    packages = with pkgs; [ terminus_font ];
+    earlySetup = true;
+  };
+
   networking = {
     hostName = "inspernix";
     networkmanager.enable = true;

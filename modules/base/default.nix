@@ -4,6 +4,13 @@ let
 in {
   environment.systemPackages = with pkgs; [ git zsh ];
 
+  # Configure console font
+  console = {
+    font = "ter-v32n";
+    packages = with pkgs; [ terminus_font ];
+    earlySetup = true;
+  };
+
   hardware = {
     flipperzero.enable = true;
     rtl-sdr.enable = true;
