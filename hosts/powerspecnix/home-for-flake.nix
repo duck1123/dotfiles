@@ -45,6 +45,7 @@ in {
       byobu
       # chromium
       # cheese
+      code-cursor
       colmena
 
       # cloudflare-cli
