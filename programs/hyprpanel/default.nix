@@ -34,6 +34,8 @@
             show_icons = false;
             show_numbered = true;
           };
+
+          transparent = true;
         };
 
         menus = {
