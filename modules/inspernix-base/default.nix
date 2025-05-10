@@ -19,7 +19,6 @@
 
   programs = {
     dconf.enable = true;
-
     firefox.enable = true;
 
     gnupg.agent = {
@@ -29,12 +28,10 @@
 
     nix-ld = {
       enable = true;
-
       libraries = with pkgs; [ alsa-lib libGL renpy ];
     };
 
     steam.enable = true;
-
     zsh.enable = true;
   };
 
@@ -42,11 +39,8 @@
 
   services = {
     gnome.gnome-keyring.enable = true;
+    libinput.enable = true;
 
-    libinput = {
-      enable = true;
-    };
-    
     # Enable the OpenSSH daemon.
     openssh = {
       enable = true;
@@ -65,14 +59,11 @@
     };
 
     printing.enable = true;
-
     pulseaudio.enable = false;
-
     tailscale.enable = true;
 
     xserver = {
       enable = true;
-
 
       xkb = {
         layout = "us";

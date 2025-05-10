@@ -84,7 +84,7 @@
         # May the FOSS gods take mercy upon me
         config.allowUnfree = true;
       };
-    in  {
+    in {
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = {

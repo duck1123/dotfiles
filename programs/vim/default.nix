@@ -1,7 +1,5 @@
 { pkgs, ... }: {
-  home.packages = with pkgs; [
-    neovim
-  ];
+  home.packages = with pkgs; [ neovim ];
 
   programs = {
     vim = {

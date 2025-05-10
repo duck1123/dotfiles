@@ -1,7 +1,5 @@
 { config, identity, inputs, pkgs, ... }:
-let
-  inherit (identity) email gpgKey name username;
- 
+let inherit (identity) email gpgKey name username;
 in {
   home.stateVersion = "21.11";
 

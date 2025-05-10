@@ -20,7 +20,8 @@
   home.file."nushell/modules".source = ./modules;
 
   home.file."nushell/me.nu".source = builtins.fetchurl {
-    url = "https://raw.githubusercontent.com/ClipplerBlood/me.nu/09e4ee7fbee6a26cb8dd3041e9da1f4de2c8d119/me.nu";
+    url =
+      "https://raw.githubusercontent.com/ClipplerBlood/me.nu/09e4ee7fbee6a26cb8dd3041e9da1f4de2c8d119/me.nu";
     sha256 = "sha256:1l3mhcwl2mvkz9qg3yzgz7xdrkdr4xzxfxj3mhv22knbaca5dacr";
   };
 
@@ -86,7 +87,7 @@
         }
 
         $env.config.completions.external = { enable: true completer: $external_completer }
-        '';
+      '';
 
       extraEnv = ''
         $env.EDITOR = "emacsclient -c -a \'\'";
@@ -111,8 +112,9 @@
       settings = {
         add_newline = true;
 
-        format =
-          "$shlvl$username$hostname$kubernetes$git_branch$git_commit$git_state$git_status$directory$nix_shell$jobs\n$cmd_duration$shell$character";
+        format = ''
+          $shlvl$username$hostname$kubernetes$git_branch$git_commit$git_state$git_status$directory$nix_shell$jobs
+          $cmd_duration$shell$character'';
 
         character = {
           success_symbol = "[\\$](bright-green bold)";
@@ -168,7 +170,8 @@
 
         shell = {
           disabled = false;
-          format = "[\\[](bright-purple bold)$indicator[\\]](bright-purple bold)";
+          format =
+            "[\\[](bright-purple bold)$indicator[\\]](bright-purple bold)";
           fish_indicator = "[🐟](bright-blue)";
           nu_indicator = "[Ν](bright-blue)";
           bash_indicator = "[ϐ](bright-blue)";

@@ -1,6 +1,5 @@
 { config, identity, inputs, ... }:
-let
-  inherit (identity) username;
+let inherit (identity) username;
 in {
   services.syncthing = {
     enable = true;
@@ -18,7 +17,6 @@ in {
             "JZHCKZ4-6WQOOMW-VK3J7WZ-LN7O3KU-C6IO3EY-3D4XBDT-P3R73MM-DUARSA3";
           autoAcceptFolders = true;
         };
-
 
         "Pixel 8" = {
           id =
