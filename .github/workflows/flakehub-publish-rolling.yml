@@ -1,0 +1,22 @@
+name: "Publish every Git push to master to FlakeHub"
+on:
+  push:
+    branches:
+      - "master"
+jobs:
+  flakehub-publish:
+    runs-on: "ubuntu-latest"
+    permissions:
+      id-token: "write"
+      contents: "read"
+    steps:
+      - uses: "actions/checkout@v4"
+      - uses: "DeterminateSystems/nix-installer-action@main"
+        with:
+          determinate: true
+      - uses: "DeterminateSystems/flakehub-push@main"
+        with:
+          name: "duck1123/dotfiles"
+          rolling: true
+          visibility: "public"
+          include-output-paths: true
