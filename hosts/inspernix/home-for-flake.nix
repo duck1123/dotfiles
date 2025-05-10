@@ -43,6 +43,7 @@ in {
       brotab
       byobu
       cheese
+      code-cursor
       curl
       gnupg
       guake
