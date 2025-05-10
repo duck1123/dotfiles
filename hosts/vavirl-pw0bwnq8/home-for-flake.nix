@@ -6,6 +6,7 @@ in {
   imports = [
     ../../programs/clojure
     ../../programs/developer
+    ../../programs/dunst
     ../../programs/emacs
     ../../programs/jujutsu
     ../../programs/nushell

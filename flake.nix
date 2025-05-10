@@ -20,6 +20,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    hyprpanel = {
+      url = "github:jas-singhfsu/hyprpanel";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     k3s-fleetops = {
       url = "github:duck1123/k3s-fleetops";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -41,8 +46,8 @@
     };
   };
 
-  outputs =
-    { flake-utils, home-manager, nixpkgs, sops-nix, stylix, ... }@inputs:
+  outputs = { flake-utils, home-manager, hyprpanel, nixpkgs, sops-nix, stylix
+    , ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
@@ -83,6 +88,7 @@
         inherit system;
         # May the FOSS gods take mercy upon me
         config.allowUnfree = true;
+        overlays = [ inputs.hyprpanel.overlay ];
       };
     in {
       # Home configurations
@@ -91,10 +97,11 @@
         drenfer = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs;
+            inherit inputs system;
             identity = config.drenfer;
           };
           modules = [
+            hyprpanel.homeManagerModules.hyprpanel
             stylix.homeManagerModules.stylix
             ./hosts/vavirl-pw0bwnq8/home-for-flake.nix
           ];
@@ -103,10 +110,11 @@
         deck = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs;
+            inherit inputs system;
             identity = config.deck;
           };
           modules = [
+            hyprpanel.homeManagerModules.hyprpanel
             stylix.homeManagerModules.stylix
             ./hosts/steamdeck/home-for-flake.nix
           ];
@@ -115,10 +123,11 @@
         "duck@powerspecnix" = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs;
+            inherit inputs system;
             identity = config.duck;
           };
           modules = [
+            hyprpanel.homeManagerModules.hyprpanel
             stylix.homeManagerModules.stylix
             ./hosts/powerspecnix/home-for-flake.nix
           ];
@@ -126,10 +135,11 @@
         "duck@inspernix" = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs;
+            inherit inputs system;
             identity = config.duck;
           };
           modules = [
+            hyprpanel.homeManagerModules.hyprpanel
             stylix.homeManagerModules.stylix
             ./hosts/inspernix/home-for-flake.nix
           ];

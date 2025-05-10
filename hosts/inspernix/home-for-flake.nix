@@ -9,6 +9,7 @@ in {
     # ../../programs/backups
     # ../../programs/clojure
     ../../programs/dconf
+    ../../programs/dunst
     # ../../programs/developer
     # ../../programs/emacs
     ../../programs/emacs2
@@ -16,6 +17,7 @@ in {
     ../../programs/git
     # ../../programs/gnome
     ../../programs/hyprland
+    ../../programs/hyprpanel
     # ../../programs/i3
     ../../programs/jujutsu
     # ../../programs/music
@@ -26,6 +28,7 @@ in {
     ../../programs/vscode
     # ../../programs/radio
     # ../../programs/vim
+    ../../programs/waybar
     ../../programs/zsh
   ];
 

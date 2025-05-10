@@ -11,12 +11,14 @@ in {
     ../../programs/dbt
     ../../programs/dconf
     ../../programs/developer
+    ../../programs/dunst
     ../../programs/emacs
     # ../../programs/emacs2
     ../../programs/gaming
     ../../programs/git
     ../../programs/gnome
     ../../programs/hyprland
+    ../../programs/hyprpanel
     # ../../programs/i3
     ../../programs/jujutsu
     # ../../programs/music
@@ -26,6 +28,7 @@ in {
     # ../../programs/radio
     ../../programs/stylix
     # ../../programs/vim
+    ../../programs/waybar
     ../../programs/zsh
   ];
 
@@ -58,7 +61,6 @@ in {
       distrobox
       docker
       # docker-compose
-      # dunst
       # earthly
       # fastfetch
       ffmpeg

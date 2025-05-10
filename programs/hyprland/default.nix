@@ -3,6 +3,7 @@
     cascadia-code
     font-awesome
     grim
+    hyprpanel
     hyprshot
     nautilus
     nerd-fonts.caskaydia-mono
@@ -10,7 +11,6 @@
     pamixer
     pavucontrol
     socat
-    waybar
     wev
     wofi
     wofi-power-menu
@@ -18,77 +18,8 @@
 
   programs = {
     kitty.enable = true; # required for the default Hyprland config
-
     rofi.enable = true;
-
-    waybar = {
-      enable = true;
-
-      settings = {
-        mainBar = {
-          layer = "top";
-          position = "top";
-          modules-left = [ "hyprland/workspaces" ];
-          modules-center = [ "clock" ];
-          modules-right =
-            [ "battery" "tray" "cpu" "memory" "pulseaudio" "network" ];
-
-          cpu.format = "<span color='#b4befe'>🖥️ </span>{usage}%";
-
-          clock = {
-            format = "<span color='#b4befe'>🕒 </span>{:%Y-%m-%d  %H:%M}";
-            tooltip = true;
-            tooltip-format = "{:%Y-%m-%d %a}";
-          };
-
-          memory = {
-            interval = 1;
-            format =
-              "<span color='#b4befe'>🧠 </span>{used:0.1f}G/{total:0.1f}G";
-          };
-
-          network = {
-            interface = "wlp3s0";
-            format = "{ifname}";
-            format-wifi = "<span color='#b4befe'>🛜 </span>{essid}";
-            format-ethernet = "{ipaddr}/{cidr} ";
-            format-disconnected = "<span color='#b4befe'> </span>No Network";
-            tooltip = false;
-          };
-
-          pulseaudio = {
-            format = "<span color='#b4befe'>{icon}</span> {volume}%";
-            format-muted = "🔇";
-            tooltip = false;
-            format-icons = {
-              headphone = "🎧";
-              default = [ "🔊" "🔉" "🔈" ];
-            };
-            scroll-step = 1;
-            on-click = "pavucontrol";
-          };
-
-        };
-      };
-    };
-
     wofi.enable = true;
-  };
-
-  services.dunst = {
-    enable = true;
-
-    settings.global = {
-      monitor = 0;
-      geometry = "600x50-50+65";
-      shrink = "yes";
-      transparency = 10;
-      padding = 16;
-      horizontal_padding = 16;
-      # font = "JetBrainsMono Nerd Font 10";
-      line_height = 4;
-      format = "<b>%s</b>\\n%b";
-    };
   };
 
   wayland.windowManager.hyprland = {
@@ -113,11 +44,10 @@
 
       env = [ "XCURSOR_SIZE,24" "HYPRCURSOR_SIZE,24" ];
 
-      exec = [ "pkill waybar & sleep 0.5 && waybar" ];
-      "exec-once" = [
-        # "hyprctl setcursor Bibata-Modern-Classic 24"
-        "dunst"
-      ];
+      exec = [ "hyprpanel" ];
+
+      # FIXME: Set if dunst is enabled
+      # "exec-once" = [ "dunst" ];
 
       decoration.rounding = 10;
 
