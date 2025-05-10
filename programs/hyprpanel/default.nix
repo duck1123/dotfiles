@@ -74,6 +74,8 @@
           buttons = {
             style = "wave";
           };
+
+          transparent = true;
         };
 
         font = {
