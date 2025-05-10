@@ -7,6 +7,7 @@ let
     ../../modules/i18n
     ../../modules/kubernetes
     ../../modules/nfs
+    ../../modules/sddm
     ../../modules/stylix
     ../../modules/syncthing
     ../../modules/users

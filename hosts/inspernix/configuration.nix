@@ -5,6 +5,7 @@ let
     ../../modules/inspernix-base
     ../../modules/boot
     ../../modules/i18n
+    ../../modules/sddm
     ../../modules/stylix
     # ../../modules/syncthing
     inputs.home-manager.nixosModules.home-manager
