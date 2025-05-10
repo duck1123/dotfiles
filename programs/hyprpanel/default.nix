@@ -4,10 +4,6 @@
     enable = true;
     hyprland.enable = true;
     overwrite.enable = true;
-    # Override the final config with an arbitrary set.
-    # Useful for overriding colors in your selected theme.
-    # Default: {}
-    override.theme.bar.menus.text = "#123ABC";
 
     settings = {
       bar = {
@@ -55,13 +51,9 @@
         };
       };
 
-      theme = {
-        bar.transparent = true;
-
-        font = {
-          name = "CaskaydiaCove NF";
-          size = "16px";
-        };
+      theme.font = {
+        name = "CaskaydiaCove NF";
+        size = "12px";
       };
     };
   };
