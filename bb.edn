@@ -22,7 +22,11 @@
      (shell "nix build .#homeConfigurations.deck.activationPackage")
      (shell "nh os build .#nixosConfigurations.inspernix")
      (shell "nh os build .#nixosConfigurations.powerspecnix"))}
-  
+
+  format
+  {:doc "Format all .nix files using nixpkgs-fmt"
+   :task (shell "find . -name '*.nix' -exec nixfmt {} +")}
+
   install-cert-manager
   {:task
    (let [version "1.14.4"
