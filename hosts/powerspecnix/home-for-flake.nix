@@ -8,7 +8,7 @@ in {
   imports = [
     # ../../programs/backups
     ../../programs/clojure
-    ../../programs/dbt
+    # ../../programs/dbt
     ../../programs/dconf
     ../../programs/developer
     ../../programs/dunst
@@ -55,7 +55,6 @@ in {
       # cloudflared
 
       curl
-      dbt
       digikam
       # discord
       distrobox

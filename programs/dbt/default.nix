@@ -1,6 +1,8 @@
-{ inputs, pkgs, ... }: {
-  home.file.".dbt/profiles.yml".text =
-    inputs.k3s-fleetops.lib.x86_64-linux.toYAML {
+{ inputs, pkgs, ... }:
+let inherit (inputs.k3s-fleetops.lib) toYAML;
+in {
+  home = {
+    file.".dbt/profiles.yml".text = toYAML {
       inherit pkgs;
       value = {
         default = {
@@ -31,4 +33,7 @@
         };
       };
     };
+
+    packages = with pkgs; [ dbt ];
+  };
 }
