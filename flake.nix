@@ -4,45 +4,193 @@
   nixConfig.extra-experimental-features = "nix-command flakes";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
+    clj-nix = {
+      inputs = {
+        devshell.follows = "devshell";
+        nix-fetcher-data.follows = "nix-fetcher-data";
+        nixpkgs.follows = "nixpkgs";
+      };
+      url = "github:jlesquembre/clj-nix";
+    };
 
-    # Utilities for building our flake
-    flake-utils.url = "github:numtide/flake-utils";
+    devshell = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:numtide/devshell";
+    };
+
+    flake-compat.url = "github:edolstra/flake-compat";
+
+    flake-parts = {
+      inputs.nixpkgs-lib.follows = "nixpkgs-lib";
+      url = "github:hercules-ci/flake-parts";
+    };
+
+    flake-utils = {
+      inputs.systems.follows = "systems";
+      url = "github:numtide/flake-utils";
+    };
+
+    gitignore = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:hercules-ci/gitignore.nix";
+    };
+
+    haumea = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/haumea";
+    };
 
     home-manager = {
-      url = "github:nix-community/home-manager";
-      # Use system packages list where available
       inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/home-manager";
     };
 
     hyprland = {
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        pre-commit-hooks.follows = "pre-commit-hooks";
+        systems.follows = "systems";
+      };
       url = "github:hyprwm/Hyprland";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     hyprpanel = {
-      url = "github:jas-singhfsu/hyprpanel";
       inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:jas-singhfsu/hyprpanel";
     };
 
     k3s-fleetops = {
+      inputs = {
+        clj-nix.follows = "clj-nix";
+        flake-compat.follows = "flake-compat";
+        flake-parts.follows = "flake-parts";
+        flake-utils.follows = "flake-utils";
+        kubenix.follows = "kubenix";
+        make-shell.follows = "make-shell";
+        mkdocs-flake.follows = "mkdocs-flake";
+        nix-fetcher-data.follows = "nix-fetcher-data";
+        nix-kube-generators.follows = "nix-kube-generators";
+        nixidy.follows = "nixidy";
+        nixhelm.follows = "nixhelm";
+        nixpkgs.follows = "nixpkgs";
+        nixpkgs-lib.follows = "nixpkgs-lib";
+        poetry2nix.follows = "poetry2nix";
+        sops-nix.follows = "sops-nix";
+        systems.follows = "systems";
+      };
       url = "github:duck1123/k3s-fleetops";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     kubenix = {
+      inputs = {
+        flake-compat.follows = "flake-compat";
+        nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
+        treefmt.follows = "treefmt-nix";
+      };
       url = "github:hall/kubenix";
-      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    make-shell = {
+      inputs.flake-compat.follows = "flake-compat";
+      url = "github:nicknovitski/make-shell";
+    };
+
+    mkdocs-flake = {
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        poetry2nix.follows = "poetry2nix";
+      };
+      url = "github:applicative-systems/mkdocs-flake";
+    };
+
+    nix-fetcher-data = {
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
+      url = "github:jlesquembre/nix-fetcher-data";
+    };
+
+    nix-kube-generators.url = "github:farcaller/nix-kube-generators";
+
+    nixhelm = {
+      inputs = {
+        flake-utils.follows = "flake-utils";
+        haumea.follows = "haumea";
+        nix-kube-generators.follows = "nix-kube-generators";
+        nixpkgs.follows = "nixpkgs";
+        poetry2nix.follows = "poetry2nix";
+      };
+      url = "github:farcaller/nixhelm";
+    };
+
+    nixidy = {
+      inputs = {
+        flake-utils.follows = "flake-utils";
+        kubenix.follows = "kubenix";
+        nix-kube-generators.follows = "nix-kube-generators";
+        nixpkgs.follows = "nixpkgs";
+      };
+      url = "github:duck1123/nixidy?ref=feature/chmod";
+    };
+
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    nixpkgs-lib.url = "github:nix-community/nixpkgs.lib";
+
+    nur = {
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+      url = "github:nix-community/NUR";
+    };
+
+    poetry2nix = {
+      inputs = {
+        flake-utils.follows = "flake-utils";
+        nixpkgs.follows = "nixpkgs";
+        systems.follows = "systems";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+      url = "github:nix-community/poetry2nix";
+    };
+
+    pre-commit-hooks = {
+      inputs = {
+        flake-compat.follows = "flake-compat";
+        gitignore.follows = "gitignore";
+        nixpkgs.follows = "nixpkgs";
+      };
+      url = "github:cachix/git-hooks.nix";
     };
 
     sops-nix = {
-      url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:Mic92/sops-nix";
     };
 
     stylix = {
+      inputs = {
+        flake-compat.follows = "flake-compat";
+        flake-utils.follows = "flake-utils";
+        git-hooks.follows = "pre-commit-hooks";
+        home-manager.follows = "home-manager";
+        nixpkgs.follows = "nixpkgs";
+        nur.follows = "nur";
+        systems.follows = "systems";
+      };
       url = "github:danth/stylix";
+    };
+
+    systems.url = "github:nix-systems/default";
+
+    treefmt-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:numtide/treefmt-nix";
     };
   };
 
