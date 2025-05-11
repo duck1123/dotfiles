@@ -418,6 +418,31 @@
         };
       };
 
+      hostConfigurations = {
+        pixel-8 = {
+          os.enable = false;
+          home.enable = false;
+          syncthing = {
+            id = "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
+          };
+        };
+        steamdeck = {
+          os.enable = false;
+          home.enable = true;
+          identity = identities.deck;
+          hostname = "steamdeck";
+          syncthing = {
+            id = "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX"
+          };
+        };
+        work-laptop = {
+          os.enable = false;
+          home.enable = true;
+          identity = identities.drenfer;
+          hostname = "vavirl-pw0bwnq8";
+        };
+      };
+      
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = let
