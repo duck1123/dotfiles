@@ -15,17 +15,23 @@
         workspaces.show_icons = true;
       };
 
-      layout."bar.layouts" = {
-        "0" = {
-          left = [ "dashboard" "workspaces" ];
+      layout."bar.layouts" = let
+        config = {
+          left = [ "dashboard" "workspaces" "windowtitle" ];
           middle = [ "clock" ];
-          right = [ "volume" "media" "systray" "battery" "notifications" ];
+          right = [
+            "volume"
+            "media"
+            "systray"
+            "battery"
+            "network"
+            "bluetooth"
+            "notifications"
+          ];
         };
-        "1" = {
-          left = [ "dashboard" "workspaces" ];
-          middle = [ "clock" ];
-          right = [ "volume" "media" "systray" "battery" "notifications" ];
-        };
+      in {
+        "0" = config;
+        "1" = config;
       };
 
       menus = {
