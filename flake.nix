@@ -13,6 +13,16 @@
       url = "github:jlesquembre/clj-nix";
     };
 
+    colmena = {
+      inputs = {
+        flake-compat.follows = "flake-compat";
+        flake-utils.follows = "flake-utils";
+        nix-github-actions.follows = "nix-github-actions";
+        nixpkgs.follows = "nixpkgs";
+      };
+      url = "github:zhaofengli/colmena";
+    };
+
     devshell = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:numtide/devshell";
@@ -113,6 +123,11 @@
       url = "github:jlesquembre/nix-fetcher-data";
     };
 
+    nix-github-actions = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/nix-github-actions";
+    };
+
     nix-kube-generators.url = "github:farcaller/nix-kube-generators";
 
     nixhelm = {
@@ -152,6 +167,7 @@
     poetry2nix = {
       inputs = {
         flake-utils.follows = "flake-utils";
+        nix-github-actions.follows = "nix-github-actions";
         nixpkgs.follows = "nixpkgs";
         systems.follows = "systems";
         treefmt-nix.follows = "treefmt-nix";
