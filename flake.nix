@@ -28,6 +28,11 @@
       url = "github:numtide/devshell";
     };
 
+    disko = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/disko";
+    };
+
     flake-compat.url = "github:edolstra/flake-compat";
 
     flake-parts = {
@@ -151,6 +156,18 @@
       url = "github:duck1123/nixidy?ref=feature/chmod";
     };
 
+    nixos-anywhere = {
+      inputs = {
+        disko.follows = "disko";
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+        treefmt-nix.follows = "treefmt-nix";
+      };
+      url = "github:nix-community/nixos-anywhere";
+    };
+
+    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
+
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
     nixpkgs-lib.url = "github:nix-community/nixpkgs.lib";
@@ -210,8 +227,8 @@
     };
   };
 
-  outputs = { colmena, flake-utils, home-manager, hyprpanel, nixpkgs, sops-nix
-    , stylix, ... }@inputs:
+  outputs = { colmena, disko, flake-utils, home-manager, hyprpanel, nixpkgs
+    , nixos-facter-modules, sops-nix, stylix, ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
@@ -323,8 +340,11 @@
 
       nixosConfigurations = {
         inspernix = nixosSystem {
-          modules =
-            [ ./hosts/inspernix/configuration.nix sops-nix.nixosModules.sops ];
+          modules = [
+            ./hosts/inspernix/configuration.nix
+            disko.nixosModules.disko
+            sops-nix.nixosModules.sops
+          ];
           specialArgs = {
             inherit inputs;
             identity = config.duck;
@@ -334,6 +354,7 @@
         powerspecnix = nixosSystem {
           modules = [
             ./hosts/powerspecnix/configuration.nix
+            disko.nixosModules.disko
             sops-nix.nixosModules.sops
           ];
           specialArgs = {
