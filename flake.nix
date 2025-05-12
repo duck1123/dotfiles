@@ -210,8 +210,8 @@
     };
   };
 
-  outputs = { flake-utils, home-manager, hyprpanel, nixpkgs, sops-nix, stylix
-    , ... }@inputs:
+  outputs = { colmena, flake-utils, home-manager, hyprpanel, nixpkgs, sops-nix
+    , stylix, ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
@@ -247,6 +247,7 @@
           hostname = "inspernix";
         };
       };
+      defaultTZ = "America/Detroit";
       system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
@@ -255,6 +256,16 @@
         overlays = [ inputs.hyprpanel.overlay ];
       };
     in {
+      colmenaHive = colmena.lib.makeHive {
+        meta.nixpkgs = import nixpkgs { inherit system; };
+
+        piNodeA = {
+          boot.isContainer = true;
+          deployment.targetHost = "pinodea";
+          time.timeZone = defaultTZ;
+        };
+      };
+
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = {
