@@ -1,10 +1,4 @@
-{ identity, pkgs, ... }:
-let inherit (identity) username;
-in {
-  home.stateVersion = "21.11";
-
-  programs.home-manager.enable = true;
-
+{ identity, pkgs, ... }: {
   imports = [
     # ../../programs/backups
     ../../programs/clojure
@@ -32,15 +26,15 @@ in {
     ../../programs/zsh
   ];
 
-  home = {
+  home = let inherit (identity) username;
+  in {
     username = "${username}";
     homeDirectory = "/home/${username}";
-
     file.".bb/bb.edn".source = ../../bb.edn;
 
     packages = with pkgs; [
       # aider-chat-full
-      alacritty
+      # alacritty
       appimage-run
       baobab
       bat
@@ -50,10 +44,8 @@ in {
       # cheese
       code-cursor
       colmena
-
       # cloudflare-cli
       # cloudflared
-
       curl
       digikam
       # discord
@@ -80,28 +72,29 @@ in {
       hoard
       hstr
       htop
-      jdk
+      # jdk
       # kakoune
       # kb
       keepassxc
       # keet
       # khoj
       kodi
-      kty
-      kubernix
+      # kty
+      # kubernix
+      ladybird
       lens
-      libnotify
+      # libnotify
       # logseq
-      mdcat
+      # mdcat
       minio-client
       mosh
       # mullvad-browser
       neofetch
       nerdfetch
-      nerd-fonts.fira-code
-      networkmanager
+      # nerd-fonts.fira-code
+      # networkmanager
       nixfmt-classic
-      nix-tree
+      # nix-tree
       nh
       # obsidian
       # onlyoffice-bin
@@ -109,24 +102,24 @@ in {
       plex
       # plex-media-player
       # postman
-      qFlipper
+      # qFlipper
       # radicle-node
       silver-searcher
       # simplex-chat-desktop
       slack
       # sparrow
-      syncthing
-      tailscale
+      # syncthing
+      # tailscale
       tdesktop
       teams-for-linux
       thunderbird
       # tilt
       transmission_4-gtk
       # tree
-      unzip
+      # unzip
       # virtualbox
       vlc
-      vscode
+      # vscode
       wine
       xsel
       youtube-music
@@ -136,6 +129,7 @@ in {
     ];
 
     sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+    stateVersion = "21.11";
   };
 
   programs = {
@@ -154,6 +148,7 @@ in {
     fish.enable = true;
     # gnome-terminal.enable = true;
     gpg.enable = true;
+    home-manager.enable = true;
     hstr.enable = true;
     k9s.enable = true;
     kodi.enable = true;

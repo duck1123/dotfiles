@@ -1,10 +1,4 @@
-{ config, identity, inputs, pkgs, ... }:
-let inherit (identity) email gpgKey name username;
-in {
-  home.stateVersion = "21.11";
-
-  programs.home-manager.enable = true;
-
+{ identity, pkgs, ... }: {
   imports = [
     # ../../programs/backups
     # ../../programs/clojure
@@ -32,7 +26,8 @@ in {
     ../../programs/zsh
   ];
 
-  home = {
+  home = let inherit (identity) username;
+  in {
     username = "${username}";
     homeDirectory = "/home/${username}";
     file.".bb/bb.edn".source = ../../bb.edn;
@@ -43,7 +38,7 @@ in {
       bat
       brotab
       byobu
-      cheese
+      # cheese
       code-cursor
       curl
       gnupg
@@ -65,6 +60,7 @@ in {
     ];
 
     sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+    stateVersion = "21.11";
   };
 
   programs = {
@@ -83,6 +79,7 @@ in {
     fish.enable = true;
     # gnome-terminal.enable = true;
     gpg.enable = true;
+    home-manager.enable = true;
     hstr.enable = true;
     jq.enable = true;
     k9s.enable = true;
