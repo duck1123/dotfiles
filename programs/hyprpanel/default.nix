@@ -7,8 +7,15 @@
 
     settings = {
       bar = {
+        clock = {
+          format = "%b %d  %I:%M:%S %p";
+        };
         launcher.autoDetectIcon = true;
-        workspaces.show_icons = true;
+        media.show_label = false;
+        workspaces = {
+          show_icons = true;
+          show_numbered = true;
+        };
       };
 
       layout."bar.layouts" = let
@@ -16,12 +23,12 @@
           left = [ "dashboard" "workspaces" "windowtitle" ];
           middle = [ "clock" ];
           right = [
-            "volume"
             "media"
-            "systray"
-            "battery"
             "network"
             "bluetooth"
+            "battery"
+            "systray"
+            "volume"
             "notifications"
           ];
         };
@@ -36,24 +43,41 @@
             military = true;
             hideSeconds = true;
           };
-          weather.unit = "metric";
+
+          weather = {
+            location = "Detroit";
+            unit = "metric";
+
+          };
         };
 
         dashboard = {
-          directories.enabled = false;
+          directories.enabled = true;
+
+          powermenu = {
+            avatar.name = "Duck";
+          };
 
           shortcuts.left.shortcut1 = {
             command = "firefox";
             tooltip = "Firefox";
           };
 
-          stats.enable_gpu = true;
+          stats.enable_gpu = false;
         };
       };
 
-      theme.font = {
-        name = "CaskaydiaCove NF";
-        size = "12px";
+      theme = {
+        bar = {
+          buttons = {
+            style = "wave";
+          };
+        };
+
+        font = {
+          name = "CaskaydiaCove NF";
+          size = "12px";
+        };
       };
     };
   };
