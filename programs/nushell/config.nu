@@ -2,6 +2,8 @@ const NU_LIB_DIRS = [
   '~/.nix-profile/share/nu_scripts/modules'
 ]
 
+const DOTFILES_DIR = "~/dotfiles"
+
 def save_last_dir [] {
   pwd | save --force ~/.last_dir
 }
@@ -104,12 +106,12 @@ extern "runme run" [
 
 # Switch home-manager to latest flake
 def "switch home" [] {
-  nh home switch ~/dotfiles -- --impure --show-trace
+  nh home switch ~/dotfiles  -b backup -- --show-trace
 }
 
 # Switch nixos to latest flake
 def "switch os" [] {
-  nh os switch ~/dotfiles -- --impure --show-trace
+  nh os switch ~/dotfiles -- --show-trace
 }
 
 # Parse a git config row record

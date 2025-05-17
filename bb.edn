@@ -61,7 +61,7 @@
 
   switch-home
   {:decription "Update home-manager from flake"
-   :task       (shell "nh home switch .")}
+   :task       (shell "nh home switch . -b backup")}
 
   switch-os
   {:decription "Update nixos from flake"
