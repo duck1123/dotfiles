@@ -6,14 +6,14 @@
       image = ./nix-wallpaper-mosaic-blue.png;
       imageScalingMode = "fit";
       polarity = "dark";
-      base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
+      # base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
 
       # cursor = {
       #   name = "Bibata-Modern-Ice";
       #   package = pkgs.bibata-cursors;
       # };
 
-      targets.emacs.enable = false;
+      targets.emacs.enable = true;
       targets.firefox.profileNames = [ "default" ];
       targets.vscode.profileNames = [ "default" ];
       targets.zen-browser.profileNames = [ "default" ];
