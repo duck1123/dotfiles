@@ -10,6 +10,7 @@
           ag
           # ac-cider
           auto-complete
+          base16-theme
           cider
           clojure-mode
           color-theme
@@ -298,4 +299,3 @@
     };
   };
 }
-
