@@ -1,14 +1,7 @@
 { config, identity, inputs, pkgs, ... }:
 let inherit (identity) username hostname;
 in {
-  environment.systemPackages = with pkgs; [
-    git
-    gvfs
-    gvfs-mtp
-    gvfs-gphoto2
-    gvfs-afc
-    zsh
-  ];
+  environment.systemPackages = with pkgs; [ git gvfs zsh ];
 
   # Configure console font
   console = {

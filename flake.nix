@@ -176,7 +176,7 @@
     stylix = {
       inputs = {
         flake-compat.follows = "flake-compat";
-        flake-utils.follows = "flake-utils";
+        flake-parts.follows = "flake-parts";
         git-hooks.follows = "pre-commit-hooks";
         home-manager.follows = "home-manager";
         nixpkgs.follows = "nixpkgs";
