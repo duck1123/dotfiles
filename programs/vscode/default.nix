@@ -10,6 +10,7 @@
       "files.autoSave" = "onFocusChange";
       "nix.enableLanguageServer" = true;
       "nix.serverPath" = "nixd";
+      "screencastMode.fontSize" = 64.0;
       "telemetry.feedback.enabled" = false;
       "telemetry.telemetryLevel" = "off";
       vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
