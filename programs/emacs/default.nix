@@ -262,6 +262,6 @@ in {
       ;; enable Helm version of Projectile with replacment commands
       (helm-projectile-on)
     '';
-    package = emacsPackages;
+    # package = emacsPackages;
   };
 }
