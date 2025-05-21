@@ -2,7 +2,7 @@
   home.packages = with pkgs; [
     heroic
 
-    # itch
+    itch
 
     # Open Source gaming platform for GNU/Linux
     lutris
