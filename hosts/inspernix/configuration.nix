@@ -7,7 +7,7 @@ let
     ../../modules/i18n
     ../../modules/sddm
     ../../modules/stylix
-    # ../../modules/syncthing
+    ../../modules/syncthing
     inputs.home-manager.nixosModules.home-manager
     inputs.stylix.nixosModules.stylix
   ];
