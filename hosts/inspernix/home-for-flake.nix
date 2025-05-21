@@ -7,15 +7,15 @@ in {
 
   imports = [
     # ../../programs/backups
-    # ../../programs/clojure
+    ../../programs/clojure
     ../../programs/dconf
     ../../programs/dunst
-    # ../../programs/developer
+    ../../programs/developer
     # ../../programs/emacs
     ../../programs/emacs2
-    # ../../programs/gaming
+    ../../programs/gaming
     ../../programs/git
-    # ../../programs/gnome
+    ../../programs/gnome
     ../../programs/hyprland
     ../../programs/hyprpanel
     # ../../programs/i3
@@ -68,7 +68,7 @@ in {
   };
 
   programs = {
-    # alacritty.enable = true;
+    alacritty.enable = true;
     bash.enable = true;
     bat.enable = true;
     btop.enable = true;
@@ -78,7 +78,7 @@ in {
       nix-direnv.enable = true;
     };
 
-    # eza.enable = true;
+    eza.enable = true;
     firefox.enable = true;
     fish.enable = true;
     # gnome-terminal.enable = true;
