@@ -1,12 +1,7 @@
-{ identity, pkgs, ... }:
-let inherit (identity) username;
-in {
-  home.stateVersion = "21.11";
-
-  programs.home-manager.enable = true;
-
+{ pkgs, ... }: {
   imports = [
     # ../../programs/backups
+    ../../programs/base
     ../../programs/clojure
     # ../../programs/dbt
     ../../programs/dconf
@@ -28,16 +23,12 @@ in {
     # ../../programs/radio
     ../../programs/stylix
     # ../../programs/vim
+    ../../programs/vscode
     ../../programs/waybar
     ../../programs/zsh
   ];
 
   home = {
-    username = "${username}";
-    homeDirectory = "/home/${username}";
-
-    file.".bb/bb.edn".source = ../../bb.edn;
-
     packages = with pkgs; [
       # aider-chat-full
       alacritty
@@ -136,57 +127,5 @@ in {
     ];
 
     sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
-  };
-
-  programs = {
-    alacritty.enable = true;
-    bash.enable = true;
-    bat.enable = true;
-    btop.enable = true;
-
-    direnv = {
-      enable = true;
-      nix-direnv.enable = true;
-    };
-
-    eza.enable = true;
-    firefox.enable = true;
-    fish.enable = true;
-    # gnome-terminal.enable = true;
-    gpg.enable = true;
-    hstr.enable = true;
-    k9s.enable = true;
-    kodi.enable = true;
-    mr.enable = true;
-    jq.enable = true;
-    tmux.enable = true;
-
-    vscode = {
-      enable = true;
-      profiles.default.userSettings = {
-        "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
-        "calva.paredit.defaultKeyMap" = "original";
-        "direnv.restart.automatic" = true;
-        "editor.renderWhitespace" = "trailing";
-        "editor.tabSize" = 2;
-        "files.autoSave" = "onFocusChange";
-        "nix.enableLanguageServer" = true;
-        "nix.serverPath" = "nixd";
-        "telemetry.feedback.enabled" = false;
-        vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
-      };
-    };
-  };
-
-  targets.genericLinux.enable = true;
-
-  xdg = {
-    enable = true;
-
-    configFile."nix/nix.conf".text = ''
-      experimental-features = nix-command flakes
-    '';
-
-    mime.enable = true;
   };
 }
