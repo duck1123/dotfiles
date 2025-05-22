@@ -8,19 +8,17 @@
     nautilus
     nerd-fonts.caskaydia-mono
     ncpamixer
+    nwg-dock-hyprland
+    nwg-drawer
+    nwg-launchers
     pamixer
     pavucontrol
     socat
     wev
     wofi
-    wofi-power-menu
   ];
 
-  programs = {
-    kitty.enable = true; # required for the default Hyprland config
-    rofi.enable = true;
-    wofi.enable = true;
-  };
+  programs.kitty.enable = true;
 
   wayland.windowManager.hyprland = {
     enable = true;
@@ -43,12 +41,7 @@
       };
 
       env = [ "XCURSOR_SIZE,24" "HYPRCURSOR_SIZE,24" ];
-
       exec = [ "hyprpanel" ];
-
-      # FIXME: Set if dunst is enabled
-      # "exec-once" = [ "dunst" ];
-
       decoration.rounding = 10;
 
       dwindle = {
@@ -63,7 +56,7 @@
         layout = "dwindle";
       };
 
-      gestures."workspace_swipe" = false;
+      # gestures."workspace_swipe" = false;
 
       bind = [
         "   $mainMod,                     A, exec, youtube-music"
@@ -85,7 +78,7 @@
         "   $mainMod,                     T, exec, teams-for-linux"
         "   $mainMod,                     U, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" jjui"
         "   $mainMod,                     V, togglefloating,"
-        "   $mainMod,                     w, exec, wofi --show drun"
+        "   $mainMod,                     w, exec, nwg-drawer"
         "   $mainMod,                RETURN, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\""
         "   $mainMod,                   Tab, cyclenext,"
         "   $mainMod,                   Tab, bringactivetotop,"
