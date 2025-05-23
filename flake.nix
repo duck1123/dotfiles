@@ -294,7 +294,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
-            stylix.homeManagerModules.stylix
+            stylix.homeModules.stylix
             ./hosts/vavirl-pw0bwnq8/home-for-flake.nix
           ];
         };
@@ -307,7 +307,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
-            stylix.homeManagerModules.stylix
+            stylix.homeModules.stylix
             ./hosts/steamdeck/home-for-flake.nix
           ];
         };
@@ -320,7 +320,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
-            stylix.homeManagerModules.stylix
+            stylix.homeModules.stylix
             ./hosts/powerspecnix/home-for-flake.nix
           ];
         };
@@ -332,7 +332,7 @@
           };
           modules = [
             hyprpanel.homeManagerModules.hyprpanel
-            stylix.homeManagerModules.stylix
+            stylix.homeModules.stylix
             ./hosts/inspernix/home-for-flake.nix
           ];
         };
