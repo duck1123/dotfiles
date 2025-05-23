@@ -1,6 +1,8 @@
 { ... }: {
-  services = {
-    displayManager.defaultSession = "budgie-desktop";
-    xserver.desktopManager.budgie.enable = true;
+  config = {
+    services = {
+      displayManager.defaultSession = "budgie-desktop";
+      xserver.desktopManager.budgie.enable = true;
+    };
   };
 }
