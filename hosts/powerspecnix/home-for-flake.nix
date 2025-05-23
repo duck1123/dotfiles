@@ -32,20 +32,11 @@
     packages = with pkgs; [
       # aider-chat-full
       alacritty
-      appimage-run
-      baobab
-      bat
-      brotab
-      byobu
       # chromium
       # cheese
-      code-cursor
       colmena
-
       # cloudflare-cli
       # cloudflared
-
-      curl
       digikam
       # discord
       distrobox
@@ -59,7 +50,6 @@
       gimp
       # gitu
       gnumeric
-      gnupg
       # gpa
       # gnome.dconf-editor
       # gnome-photos
@@ -68,32 +58,23 @@
       # google-chrome
       # graphviz
       # gum
-      hoard
-      hstr
-      htop
       jdk
       # kakoune
       # kb
-      keepassxc
       # keet
       # khoj
       kodi
       kty
       kubernix
-      lens
       libnotify
       # logseq
       mdcat
       minio-client
-      mosh
       # mullvad-browser
-      neofetch
       nerdfetch
       nerd-fonts.fira-code
       networkmanager
-      nixfmt-classic
       nix-tree
-      nh
       # obsidian
       # onlyoffice-bin
       playerctl
@@ -102,7 +83,6 @@
       # postman
       qFlipper
       # radicle-node
-      silver-searcher
       # simplex-chat-desktop
       slack
       # sparrow
@@ -120,7 +100,6 @@
       vscode
       wine
       xsel
-      youtube-music
       # yt-dlp
       # yq
       # zoom-us

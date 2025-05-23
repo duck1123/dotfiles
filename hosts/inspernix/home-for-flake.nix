@@ -29,30 +29,11 @@
 
   home = {
     packages = with pkgs; [
-      appimage-run
-      baobab
-      bat
-      brotab
-      byobu
       cheese
-      code-cursor
-      curl
-      gnupg
       guake
-      hoard
-      hstr
-      htop
-      keepassxc
       ladybird
-      lens
-      mosh
-      neofetch
       nerdfetch
       nixd
-      nixfmt-classic
-      nh
-      silver-searcher
-      youtube-music
     ];
 
     sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];

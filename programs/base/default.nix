@@ -1,7 +1,30 @@
-{ identity, ... }: {
+{ identity, pkgs, ... }: {
   home = with identity; {
     file.".bb/bb.edn".source = ../../bb.edn;
     homeDirectory = "/home/${username}";
+
+    packages = with pkgs; [
+      appimage-run
+      baobab
+      bat
+      brotab
+      byobu
+      code-cursor
+      curl
+      gnupg
+      hoard
+      hstr
+      htop
+      keepassxc
+      lens
+      mosh
+      neofetch
+      nh
+      nixfmt-classic
+      silver-searcher
+      youtube-music
+    ];
+
     stateVersion = "21.11";
     username = "${username}";
   };
