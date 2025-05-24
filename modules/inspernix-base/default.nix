@@ -6,6 +6,8 @@
     earlySetup = true;
   };
 
+  environment.systemPackages = with pkgs; [ libgtop wl-clipboard ];
+
   hardware.bluetooth.enable = true;
 
   networking = {
@@ -83,6 +85,7 @@
       pulse.enable = true;
     };
 
+    power-profiles-daemon.enable = true;
     printing.enable = true;
     pulseaudio.enable = false;
     tailscale.enable = true;
