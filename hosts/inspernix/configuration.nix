@@ -1,4 +1,4 @@
-{ inputs, hosts, ... }:
+{ inputs, hosts, pkgs, ... }:
 let
   core = [
     { inherit hosts; }
