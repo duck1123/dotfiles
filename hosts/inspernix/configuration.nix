@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 let
   core = [
     ./hardware-configuration.nix
@@ -12,6 +12,18 @@ let
   ];
 in {
   imports = core ++ [ ../../modules/hyprland ];
+
+  environment.systemPackages = with pkgs; [
+    libgtop
+    wl-clipboard
+  ];
+
+  hardware.bluetooth.enable = true;
+
+  services = {
+    power-profiles-daemon.enable = true;
+    upower.enable = true;
+  };
 
   specialisation.gnome = {
     inheritParentConfig = false;
