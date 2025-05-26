@@ -107,4 +107,8 @@
 
     sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
   };
+
+  home.sessionVariables = {
+    XCURSOR_THEME = "Adwaita"; # Change "Adwaita" to your desired cursor theme
+  };
 }
