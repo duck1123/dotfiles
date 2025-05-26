@@ -5,7 +5,7 @@ in {
     enable = true;
     autoEnable = true;
     # image = config.lib.stylix.pixel "base0A";
-    image = ../../hosts/powerspecnix/nix-wallpaper-mosaic-blue.png;
+    image = ../../programs/stylix/nix-wallpaper-mosaic-blue.png;
     imageScalingMode = "fit";
     polarity = "dark";
     base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
