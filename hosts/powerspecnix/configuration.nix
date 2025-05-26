@@ -20,22 +20,22 @@ in {
   imports = core ++ [ ../../modules/hyprland ];
 
   specialisation = {
-    # budgie = {
-    #   inheritParentConfig = false;
-    #   configuration.imports = core ++ [ ../../modules/budgie ];
-    # };
+    budgie = {
+      inheritParentConfig = false;
+      configuration.imports = core ++ [ ../../modules/budgie ];
+    };
     gnome = {
       inheritParentConfig = false;
       configuration.imports = core ++ [ ../../modules/gnome ];
     };
-    # i3 = {
-    #   inheritParentConfig = false;
-    #   configuration.imports = core ++ [ ../../modules/i3 ];
-    # };
-    # hyprland = {
-    #   inheritParentConfig = false;
-    #   configuration.imports = core ++ [ ../../modules/hyprland ];
-    # };
+    i3 = {
+      inheritParentConfig = false;
+      configuration.imports = core ++ [ ../../modules/i3 ];
+    };
+    hyprland = {
+      inheritParentConfig = false;
+      configuration.imports = core ++ [ ../../modules/hyprland ];
+    };
     plasma6 = {
       inheritParentConfig = false;
       configuration.imports = core ++ [ ../../modules/plasma6 ];
