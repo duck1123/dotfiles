@@ -9,11 +9,13 @@
       bar = {
         clock = {
           format = "%b %d  %I:%M:%S %p";
+          showIcon = false;
         };
         launcher.autoDetectIcon = true;
         media.show_label = false;
+        network.label = false;
         workspaces = {
-          show_icons = true;
+          show_icons = false;
           show_numbered = true;
         };
       };
