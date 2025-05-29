@@ -13,6 +13,9 @@ let
   ];
 in {
   imports = core ++ [ ../../modules/hyprland ];
+
+  hardware.bluetooth.enable = true;
+
   specialisation.gnome = {
     inheritParentConfig = false;
     configuration.imports = core ++ [ ../../modules/gnome ];
