@@ -234,33 +234,39 @@
       inherit (nixpkgs.lib) nixosSystem;
       inherit (home-manager.lib) homeManagerConfiguration;
       eachDefaultSystemMap = eachSystemMap defaultSystems;
-      config = {
+      identities = rec {
         deck = {
-          name = "Duck Nebuchadnezzar";
+          inherit (duck) name email gpgKey;
           username = "deck";
-          email = "duck@kronkltd.net";
-          gpgKey = "9564904D297DBF3C";
-          hostname = "steamdeck";
         };
         drenfer = {
+          inherit (duck) gpgKey;
           name = "Daniel E. Renfer";
           username = "drenfer";
           email = "drenfer@vallen.com";
-          gpgKey = "9564904D297DBF3C";
-          hostname = "vavirl-pw0bwnq8";
         };
         duck = {
           name = "Duck Nebuchadnezzar";
           username = "duck";
           email = "duck@kronkltd.net";
           gpgKey = "9564904D297DBF3C";
+        };
+      };
+      config = {
+        deck = {
+          inherit (identities.deck) email gpgKey name username;
+          hostname = "steamdeck";
+        };
+        drenfer = {
+          inherit (identities.drenfer) email gpgKey name username;
+          hostname = "vavirl-pw0bwnq8";
+        };
+        duck = {
+          inherit (identities.duck) email gpgKey name username;
           hostname = "powerspecnix";
         };
         inspernix = {
-          name = "Duck Nebuchadnezzar";
-          username = "duck";
-          email = "duck@kronkltd.net";
-          gpgKey = "9564904D297DBF3C";
+          inherit (identities.duck) email gpgKey name username;
           hostname = "inspernix";
         };
       };
