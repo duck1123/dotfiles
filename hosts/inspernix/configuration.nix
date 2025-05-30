@@ -13,8 +13,8 @@ let
   ];
 in {
   imports = core ++ [ ../../modules/hyprland ];
-
   hardware.bluetooth.enable = true;
+  services.upower.enable = true;
 
   specialisation.gnome = {
     inheritParentConfig = false;
