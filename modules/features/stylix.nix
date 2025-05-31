@@ -76,6 +76,11 @@ in
           #   package = pkgs.bibata-cursors;
           # };
 
+          # icon = {
+          #   name= "Adwaita";
+          #   package = pkgs.adwaita-icon-theme;
+          # };
+
           targets.emacs.enable = false;
           targets.firefox.profileNames = [ "default" ];
           targets.hyprland.enable = true; # Re-enabled so stylix processes the wallpaper - hyprland module will override the config
