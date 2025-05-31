@@ -24,6 +24,7 @@
           homeDirectory = "/home/${username}";
 
           packages = with pkgs; [
+            adwaita-icon-theme
             # aider-chat-full
             appimage-run
             baobab
@@ -46,6 +47,7 @@
             # graphviz
             # gum
             fastfetch
+            hicolor-icon-theme
             hstr
             htop
             keepassxc
