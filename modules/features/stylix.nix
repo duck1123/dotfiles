@@ -81,6 +81,11 @@ in
           #   package = pkgs.bibata-cursors;
           # };
 
+          # icon = {
+          #   name= "Adwaita";
+          #   package = pkgs.adwaita-icon-theme;
+          # };
+
           targets.firefox.profileNames = [ "default" ];
           targets.hyprland.enable = false;
           targets.vscode.profileNames = [ "default" ];
