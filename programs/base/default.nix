@@ -4,6 +4,7 @@
     homeDirectory = "/home/${username}";
 
     packages = with pkgs; [
+      adwaita-icon-theme
       appimage-run
       baobab
       bat
@@ -12,6 +13,7 @@
       code-cursor
       curl
       gnupg
+      hicolor-icon-theme
       hoard
       hstr
       htop
