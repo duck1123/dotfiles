@@ -20,4 +20,9 @@
       name = "${identity.hostname}-initiatorhost";
     };
   };
+
+  system.activationScripts.makeUsrBinSymlinks = ''
+    mkdir -p /usr/bin
+    ln -sf ${pkgs.openiscsi}/bin/iscsiadm /usr/bin/iscsiadm
+  '';
 }
