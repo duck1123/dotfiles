@@ -12,6 +12,7 @@
           homeDirectory = "/home/${username}";
 
           packages = with pkgs; [
+            adwaita-icon-theme
             # aider-chat-full
             appimage-run
             baobab
@@ -33,6 +34,7 @@
             # google-chrome
             # graphviz
             # gum
+            hicolor-icon-theme
             hstr
             htop
             keepassxc
