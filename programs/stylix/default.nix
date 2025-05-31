@@ -12,6 +12,11 @@
     #   package = pkgs.bibata-cursors;
     # };
 
+    # icon = {
+    #   name= "Adwaita";
+    #   package = pkgs.adwaita-icon-theme;
+    # };
+
     targets.emacs.enable = false;
     targets.firefox.profileNames = [ "default" ];
     targets.vscode.profileNames = [ "default" ];
