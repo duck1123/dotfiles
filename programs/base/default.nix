@@ -40,6 +40,7 @@ in {
     homeDirectory = "/home/${username}";
 
     packages = with pkgs; [
+      adwaita-icon-theme
       # aider-chat-full
       appimage-run
       baobab
@@ -61,6 +62,7 @@ in {
       # google-chrome
       # graphviz
       # gum
+      hicolor-icon-theme
       hstr
       htop
       keepassxc
