@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ ... }:
 let
   core = [
     ./hardware-configuration.nix
@@ -13,7 +13,6 @@ let
     ../../modules/syncthing
     ../../modules/users
     # ../../modules/virtualization
-    inputs.stylix.nixosModules.stylix
   ];
 in {
   imports = core ++ [ ../../modules/hyprland ];
