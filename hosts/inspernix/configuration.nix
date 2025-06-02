@@ -13,11 +13,15 @@ let
     ../../modules/stylix
     ../../modules/syncthing
   ];
-in {
-  imports = core ++ [ ../../modules/hyprland ];
-
-  specialisation.gnome = {
+  mkSpecialisation = module: {
     inheritParentConfig = false;
-    configuration.imports = core ++ [ ../../modules/gnome ];
+    configuration.imports = core ++ [ module ];
   };
+  specialisations = {
+    hyprland = mkSpecialisation ../../modules/hyprland;
+    gnome = mkSpecialisation ../../modules/gnome;
+  };
+in {
+  imports = specialisations.hyprland.configuration.imports;
+  specialisation.gnome = specialisations.gnome;
 }

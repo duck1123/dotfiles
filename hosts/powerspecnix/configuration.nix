@@ -18,29 +18,18 @@ let
     ../../modules/users
     # ../../modules/virtualization
   ];
-in {
-  imports = core ++ [ ../../modules/hyprland ];
-
-  specialisation = {
-    budgie = {
-      inheritParentConfig = false;
-      configuration.imports = core ++ [ ../../modules/budgie ];
-    };
-    gnome = {
-      inheritParentConfig = false;
-      configuration.imports = core ++ [ ../../modules/gnome ];
-    };
-    i3 = {
-      inheritParentConfig = false;
-      configuration.imports = core ++ [ ../../modules/i3 ];
-    };
-    hyprland = {
-      inheritParentConfig = false;
-      configuration.imports = core ++ [ ../../modules/hyprland ];
-    };
-    plasma6 = {
-      inheritParentConfig = false;
-      configuration.imports = core ++ [ ../../modules/plasma6 ];
-    };
+  mkSpecialisation = module: {
+    inheritParentConfig = false;
+    configuration.imports = core ++ [ module ];
   };
+  specialisations = {
+    budgie = mkSpecialisation ../../modules/budgie;
+    hyprland = mkSpecialisation ../../modules/hyprland;
+    gnome = mkSpecialisation ../../modules/gnome;
+    i3 = mkSpecialisation ../../modules/i3;
+    plasma6 = mkSpecialisation ../../modules/plasma6;
+  };
+in {
+  imports = specialisations.hyprland.configuration.imports;
+  specialisation = { inherit (specialisations) budgie gnome i3 plasma6; };
 }
