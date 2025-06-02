@@ -364,6 +364,7 @@
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
+            stylix.nixosModules.stylix
           ];
           specialArgs = {
             inherit inputs;
@@ -377,6 +378,7 @@
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
+            stylix.nixosModules.stylix
           ];
           specialArgs = {
             inherit inputs;
