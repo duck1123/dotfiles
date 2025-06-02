@@ -6,6 +6,8 @@
     earlySetup = true;
   };
 
+  hardware.bluetooth.enable = true;
+
   networking = {
     hostName = "inspernix";
     networkmanager.enable = true;
@@ -61,6 +63,8 @@
     printing.enable = true;
     pulseaudio.enable = false;
     tailscale.enable = true;
+
+    upower.enable = true;
 
     xserver = {
       enable = true;
