@@ -330,6 +330,7 @@
             ./hosts/powerspecnix/home-for-flake.nix
           ];
         };
+
         "duck@inspernix" = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
@@ -349,6 +350,7 @@
           modules = [
             ./hosts/inspernix/configuration.nix
             disko.nixosModules.disko
+            home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
           ];
           specialArgs = {
@@ -361,6 +363,7 @@
           modules = [
             ./hosts/powerspecnix/configuration.nix
             disko.nixosModules.disko
+            home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
           ];
           specialArgs = {

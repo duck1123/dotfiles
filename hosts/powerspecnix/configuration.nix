@@ -1,4 +1,4 @@
-{ config, inputs, pkgs, ... }:
+{ inputs, ... }:
 let
   core = [
     ./hardware-configuration.nix
@@ -13,7 +13,6 @@ let
     ../../modules/syncthing
     ../../modules/users
     # ../../modules/virtualization
-    inputs.home-manager.nixosModules.home-manager
     inputs.stylix.nixosModules.stylix
   ];
 in {

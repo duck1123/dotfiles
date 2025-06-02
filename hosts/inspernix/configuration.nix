@@ -8,7 +8,6 @@ let
     ../../modules/sddm
     ../../modules/stylix
     ../../modules/syncthing
-    inputs.home-manager.nixosModules.home-manager
     inputs.stylix.nixosModules.stylix
   ];
 in {
