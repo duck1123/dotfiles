@@ -7,7 +7,11 @@
   {:depends [build-home build-os]}
 
   build-home
-  {:task (shell "nh home build .")}
+  {:task
+   (let [cmd "nh home build ."]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd)
+     ) }
 
   build-os
   {:task (shell "nh os build .")}
