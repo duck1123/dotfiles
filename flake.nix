@@ -309,13 +309,12 @@
 
         pixel8 = {
           inherit system;
+          android.enable = true;
+          hostname = "pixel8";
           id =
             "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
           identity = identities.duck;
           name = "Pixel 8";
-          hostname = "pixel8";
-
-          android.enable = true;
 
           syncthing = {
             camera.enable = true;
@@ -327,12 +326,13 @@
 
         powerspecnix = {
           inherit system;
+
+          features.radio.enable = true;
+          hostname = "powerspecnix";
           id =
             "JZHCKZ4-6WQOOMW-VK3J7WZ-LN7O3KU-C6IO3EY-3D4XBDT-P3R73MM-DUARSA3";
           identity = identities.duck;
           name = "powerspecnix";
-          hostname = "powerspecnix";
-
           nixos.enable = true;
 
           syncthing = {

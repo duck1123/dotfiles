@@ -20,7 +20,7 @@
     # ../../programs/ncmpcpp
     ../../programs/nostr
     ../../programs/nushell
-    # ../../programs/radio
+    ../../programs/radio
     ../../programs/stylix
     # ../../programs/vim
     ../../programs/vscode

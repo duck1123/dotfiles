@@ -21,7 +21,7 @@
     ../../programs/nushell
     ../../programs/stylix
     ../../programs/vscode
-    # ../../programs/radio
+    ../../programs/radio
     # ../../programs/vim
     ../../programs/waybar
     ../../programs/zsh
