@@ -314,6 +314,14 @@
         };
       };
 
+      # formatter = forAllSystems (
+      #   system: let
+      #     pkgs = nixpkgs.legacyPackages.${system};
+      #   in
+      #     pkgs.alejandra
+      # );
+
+      
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = {
