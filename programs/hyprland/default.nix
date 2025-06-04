@@ -79,6 +79,7 @@
         "   $mainMod,                     U, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" jjui"
         "   $mainMod,                     V, togglefloating,"
         "   $mainMod,                     w, exec, nwg-drawer"
+        "   $mainMod,                 SPACE, exec, nwg-drawer"
         "   $mainMod,                RETURN, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\""
         "   $mainMod,                   Tab, cyclenext,"
         "   $mainMod,                   Tab, bringactivetotop,"
