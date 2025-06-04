@@ -1,6 +1,10 @@
-{ ... }:
+{ inputs, ... }:
 let
   core = [
+    inputs.disko.nixosModules.disko
+    inputs.home-manager.nixosModules.home-manager
+    inputs.sops-nix.nixosModules.sops
+    inputs.stylix.nixosModules.stylix
     ./hardware-configuration.nix
     ../../modules/base
     ../../modules/bitcoin

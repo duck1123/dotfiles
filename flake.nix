@@ -235,8 +235,8 @@
     };
   };
 
-  outputs = { colmena, disko, flake-utils, home-manager, hyprpanel, nixpkgs
-    , nixos-facter-modules, sops-nix, stylix, zen-browser, ... }@inputs:
+  outputs = { colmena, flake-utils, home-manager, hyprpanel, nixpkgs, stylix
+    , zen-browser, ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
@@ -359,13 +359,7 @@
 
       nixosConfigurations = {
         inspernix = nixosSystem {
-          modules = [
-            ./hosts/inspernix/configuration.nix
-            disko.nixosModules.disko
-            home-manager.nixosModules.home-manager
-            sops-nix.nixosModules.sops
-            stylix.nixosModules.stylix
-          ];
+          modules = [ ./hosts/inspernix/configuration.nix ];
           specialArgs = {
             inherit inputs;
             identity = config.duck;
@@ -373,13 +367,7 @@
           system = "x86_64-linux";
         };
         powerspecnix = nixosSystem {
-          modules = [
-            ./hosts/powerspecnix/configuration.nix
-            disko.nixosModules.disko
-            home-manager.nixosModules.home-manager
-            sops-nix.nixosModules.sops
-            stylix.nixosModules.stylix
-          ];
+          modules = [ ./hosts/powerspecnix/configuration.nix ];
           specialArgs = {
             inherit inputs;
             identity = config.duck;
