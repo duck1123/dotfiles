@@ -60,7 +60,7 @@
 
       bind = [
         "   $mainMod,                     A, exec, youtube-music"
-        "   $mainMod,                     B, exec, firefox"
+        "   $mainMod,                     B, exec, zen"
         "   $mainMod,                     C, killactive,"
         "   $mainMod,                     D, exec, nautilus $(cat ~/.last_dir 2>/dev/null || echo $HOME)"
         # "   $mainMod,                     E, exec, emacs"
