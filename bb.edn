@@ -16,10 +16,10 @@
   {:doc "Build all targets"
    :task
    (do
-     (shell "nix build .#homeConfigurations.duck@inspernix.activationPackage")
-     (shell "nix build .#homeConfigurations.duck@powerspecnix.activationPackage")
-     (shell "nix build .#homeConfigurations.drenfer.activationPackage")
-     (shell "nix build .#homeConfigurations.deck.activationPackage")
+     (shell "nh home build .#homeConfigurations.duck@inspernix.activationPackage")
+     (shell "nh home build .#homeConfigurations.duck@powerspecnix.activationPackage")
+     (shell "nh home build .#homeConfigurations.drenfer.activationPackage")
+     (shell "nh home build .#homeConfigurations.deck.activationPackage")
      (shell "nh os build .#nixosConfigurations.inspernix")
      (shell "nh os build .#nixosConfigurations.powerspecnix"))}
 
