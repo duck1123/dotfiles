@@ -4,6 +4,19 @@
   nixConfig.extra-experimental-features = "nix-command flakes";
 
   inputs = {
+    ags = {
+      inputs = {
+        astal.follows = "astal";
+        nixpkgs.follows = "nixpkgs";
+      };
+      url = "github:aylur/ags";
+    };
+
+    astal = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:aylur/astal";
+    };
+
     clj-nix = {
       inputs = {
         devshell.follows = "devshell";
@@ -70,7 +83,11 @@
     };
 
     hyprpanel = {
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        ags.follows = "ags";
+        astal.follows = "astal";
+        nixpkgs.follows = "nixpkgs";
+      };
       url = "github:jas-singhfsu/hyprpanel";
     };
 
