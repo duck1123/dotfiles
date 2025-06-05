@@ -294,6 +294,14 @@
           inherit (identities.duck) email gpgKey name username;
           hostname = "inspernix";
         };
+        hosts =
+          if config ? _module && config._module ? args && config._module.args ? hosts then
+            let h = config._module.args.hosts;
+            in builtins.trace "DEBUG: hosts = ${builtins.toJSON h}" (
+              if h ? pixel8 then h
+              else throw "The host 'pixel8' must be present in the hosts attrset!"
+            )
+          else {};
       };
       defaultTZ = "America/Detroit";
       system = "x86_64-linux";
@@ -303,7 +311,9 @@
         config.allowUnfree = true;
         overlays = [ inputs.hyprpanel.overlay ];
       };
-    in {
+    in rec {
+      imports = [ ./modules/flakeModules ];
+
       colmenaHive = colmena.lib.makeHive {
         meta.nixpkgs = import nixpkgs { inherit system; };
 
@@ -314,13 +324,124 @@
         };
       };
 
+      hosts = {
+        inspernix = {
+          id =
+            "OWMQLRL-CD5VB7H-A3T436E-6XT4H66-6XRF22Y-MQXMNAU-DFRNGOV-ADSKFAV";
+          # identity = identities.duck;
+          # name = "inspernix";
+
+          # features = {
+          #   backups.enable = false;
+          #   clojure.enable = false;
+          #   dbt.enable = false;
+          #   dconf.enable = false;
+          #   developer.enable = false;
+          #   emacs.enable = false;
+          #   emacs2.enable = true;
+          #   radio.enable = false;
+          #   kubernetes = {
+          #     client = {
+          #       enable = true;
+          #     };
+          #     server = {
+          #       enable = false;
+          #     };
+          #   };
+          #   nfs.enable = false;
+          #   stylix.enable = true;
+          #   virtualization.enable = false;
+          # };
+
+          # nixos = {
+          #   enable = true;
+          #   budgie.enable = false;
+          #   gnome.enable = false;
+          #   hyprland.enable = false;
+          #   i3.enable = false;
+          #   plasma6.enable = false;
+          # };
+
+          # syncthing = {
+          #   camera.enable = false;
+          #   keepass.enable = true;
+          #   org-roam.enable = true;
+          #   renpy.enable = true;
+          # };
+        };
+        pixel8 = {
+          id =
+            "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
+          # identity = identities.duck;
+          # name = "Pixel 8";
+
+          # android.enable = true;
+
+          # syncthing = {
+          #   camera.enable = true;
+          #   keepass.enable = true;
+          #   org-roam.enable = true;
+          #   renpy.enable = false;
+          # };
+        };
+        powerspecnix = {
+          id =
+            "JZHCKZ4-6WQOOMW-VK3J7WZ-LN7O3KU-C6IO3EY-3D4XBDT-P3R73MM-DUARSA3";
+          # identity = identities.duck;
+          # name = "powerspecnix";
+
+          # nixos.enable = true;
+
+          # syncthing = {
+          #   camera.enable = true;
+          #   keepass.enable = true;
+          #   org-roam.enable = true;
+          #   renpy.enable = true;
+          # };
+        };
+        steamdeck = {
+          id =
+            "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX";
+          # identity = identities.deck;
+          # name = "steamdeck";
+
+          # home-manager.enable = true;
+          # nixos.enable = false;
+
+          # syncthing = {
+          #   camera.enable = false;
+          #   keepass.enable = true;
+          #   org-roam.enable = false;
+          #   renpy.enable = true;
+          # };
+        };
+        vallenpc = {
+          id =
+            "TEED77K-QOLTQ37-BL76MFB-LJD46CW-EJ7CZTJ-7GQNEF6-FZAMQRP-BCCRTQ6";
+          # identity = identities.drenfer;
+          # name = "VallenPC";
+
+          # hostname = "vavirl-pw0bwnq8";
+
+          # home-manager.enable = true;
+          # nixos.enable = false;
+
+          # syncthing = {
+          #   camera.enable = false;
+          #   keepass.enable = true;
+          #   org-roam.enable = false;
+          #   renpy.enable = false;
+          # };
+        };
+      };
+
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations = {
         drenfer = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs system;
+            inherit hosts inputs system;
             identity = config.drenfer;
           };
           modules = [
@@ -334,7 +455,7 @@
         deck = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs system;
+            inherit hosts inputs system;
             identity = config.deck;
           };
           modules = [
@@ -348,7 +469,7 @@
         "duck@powerspecnix" = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs system;
+            inherit hosts inputs system;
             identity = config.duck;
           };
           modules = [
@@ -362,7 +483,7 @@
         "duck@inspernix" = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs system;
+            inherit hosts inputs system;
             identity = config.duck;
           };
           modules = [
@@ -378,7 +499,7 @@
         inspernix = nixosSystem {
           modules = [ ./hosts/inspernix/configuration.nix ];
           specialArgs = {
-            inherit inputs;
+            inherit hosts inputs system;
             identity = config.duck;
           };
           system = "x86_64-linux";
@@ -386,7 +507,7 @@
         powerspecnix = nixosSystem {
           modules = [ ./hosts/powerspecnix/configuration.nix ];
           specialArgs = {
-            inherit inputs;
+            inherit hosts inputs system;
             identity = config.duck;
           };
           system = "x86_64-linux";
@@ -406,6 +527,7 @@
               age
               babashka
               clojure
+              pkgs.colmena
               git
               pkgs.home-manager
               keepassxc
@@ -422,5 +544,6 @@
             ];
           };
         });
+
     };
 }
