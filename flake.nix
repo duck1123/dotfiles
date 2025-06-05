@@ -277,24 +277,6 @@
           gpgKey = "9564904D297DBF3C";
         };
       };
-      config = {
-        deck = {
-          inherit (identities.deck) email gpgKey name username;
-          hostname = "steamdeck";
-        };
-        drenfer = {
-          inherit (identities.drenfer) email gpgKey name username;
-          hostname = "vavirl-pw0bwnq8";
-        };
-        duck = {
-          inherit (identities.duck) email gpgKey name username;
-          hostname = "powerspecnix";
-        };
-        inspernix = {
-          inherit (identities.duck) email gpgKey name username;
-          hostname = "inspernix";
-        };
-      };
       defaultTZ = "America/Detroit";
       system = "x86_64-linux";
       pkgs = import nixpkgs {
@@ -303,7 +285,129 @@
         config.allowUnfree = true;
         overlays = [ inputs.hyprpanel.overlay ];
       };
-    in {
+      hosts = {
+        inspernix = {
+          inherit system;
+          id =
+            "OWMQLRL-CD5VB7H-A3T436E-6XT4H66-6XRF22Y-MQXMNAU-DFRNGOV-ADSKFAV";
+          identity = identities.duck;
+          name = "inspernix";
+          hostname = "inspernix";
+
+          features = {
+            backups.enable = false;
+            clojure.enable = false;
+            dbt.enable = false;
+            dconf.enable = false;
+            developer.enable = false;
+            emacs.enable = false;
+            emacs2.enable = true;
+            radio.enable = false;
+            kubernetes = {
+              client.enable = true;
+              server.enable = false;
+            };
+            nfs.enable = false;
+            stylix.enable = true;
+            virtualization.enable = false;
+          };
+
+          nixos = {
+            enable = true;
+            budgie.enable = false;
+            gnome.enable = false;
+            hyprland.enable = false;
+            i3.enable = false;
+            plasma6.enable = false;
+          };
+
+          syncthing = {
+            camera.enable = false;
+            keepass.enable = true;
+            org-roam.enable = true;
+            renpy.enable = true;
+          };
+        };
+
+        pixel8 = {
+          inherit system;
+          id =
+            "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
+          identity = identities.duck;
+          name = "Pixel 8";
+          hostname = "pixel8";
+
+          android.enable = true;
+
+          syncthing = {
+            camera.enable = true;
+            keepass.enable = true;
+            org-roam.enable = true;
+            renpy.enable = false;
+          };
+        };
+
+        powerspecnix = {
+          inherit system;
+          id =
+            "JZHCKZ4-6WQOOMW-VK3J7WZ-LN7O3KU-C6IO3EY-3D4XBDT-P3R73MM-DUARSA3";
+          identity = identities.duck;
+          name = "powerspecnix";
+          hostname = "powerspecnix";
+
+          nixos.enable = true;
+
+          syncthing = {
+            camera.enable = true;
+            keepass.enable = true;
+            org-roam.enable = true;
+            renpy.enable = true;
+          };
+        };
+
+        steamdeck = {
+          inherit system;
+          id =
+            "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX";
+          identity = identities.deck;
+          name = "steamdeck";
+          hostname = "steamdeck";
+
+          home-manager.enable = true;
+          nixos.enable = false;
+
+          syncthing = {
+            camera.enable = false;
+            keepass.enable = true;
+            org-roam.enable = false;
+            renpy.enable = true;
+          };
+        };
+
+        vallenpc = {
+          inherit system;
+          id =
+            "TEED77K-QOLTQ37-BL76MFB-LJD46CW-EJ7CZTJ-7GQNEF6-FZAMQRP-BCCRTQ6";
+          identity = identities.drenfer;
+          name = "VallenPC";
+          hostname = "vavirl-pw0bwnq8";
+
+          home-manager.enable = true;
+          nixos.enable = false;
+
+          syncthing = {
+            camera.enable = false;
+            keepass.enable = true;
+            org-roam.enable = false;
+            renpy.enable = false;
+          };
+        };
+      };
+
+    in rec {
+      inherit hosts;
+      imports = [ ./modules/flakeModules ];
+
       colmenaHive = colmena.lib.makeHive {
         meta.nixpkgs = import nixpkgs { inherit system; };
 
@@ -316,80 +420,66 @@
 
       # Home configurations
       # Accessible via 'home-manager'
-      homeConfigurations = {
+      homeConfigurations = let
+        core = [
+          hyprpanel.homeManagerModules.hyprpanel
+          stylix.homeModules.stylix
+          zen-browser.homeModules.beta
+        ];
+      in {
         drenfer = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs system;
-            identity = config.drenfer;
+            inherit hosts inputs system;
+            host = hosts.vallenpc;
           };
-          modules = [
-            hyprpanel.homeManagerModules.hyprpanel
-            stylix.homeModules.stylix
-            zen-browser.homeModules.beta
-            ./hosts/vavirl-pw0bwnq8/home-for-flake.nix
-          ];
+          modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home-for-flake.nix ];
         };
 
         deck = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs system;
-            identity = config.deck;
+            inherit hosts inputs system;
+            host = hosts.steamdeck;
           };
-          modules = [
-            hyprpanel.homeManagerModules.hyprpanel
-            stylix.homeModules.stylix
-            zen-browser.homeModules.beta
-            ./hosts/steamdeck/home-for-flake.nix
-          ];
+          modules = core ++ [ ./hosts/steamdeck/home-for-flake.nix ];
         };
 
         "duck@powerspecnix" = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs system;
-            identity = config.duck;
+            inherit hosts inputs system;
+            host = hosts.powerspecnix;
           };
-          modules = [
-            hyprpanel.homeManagerModules.hyprpanel
-            stylix.homeModules.stylix
-            zen-browser.homeModules.beta
-            ./hosts/powerspecnix/home-for-flake.nix
-          ];
+          modules = core ++ [ ./hosts/powerspecnix/home-for-flake.nix ];
         };
 
         "duck@inspernix" = homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit inputs system;
-            identity = config.duck;
+            inherit hosts inputs system;
+            host = hosts.inspernix;
           };
-          modules = [
-            hyprpanel.homeManagerModules.hyprpanel
-            stylix.homeModules.stylix
-            zen-browser.homeModules.beta
-            ./hosts/inspernix/home-for-flake.nix
-          ];
+          modules = core ++ [ ./hosts/inspernix/home-for-flake.nix ];
         };
       };
 
       nixosConfigurations = {
         inspernix = nixosSystem {
+          inherit (hosts.inspernix) system;
           modules = [ ./hosts/inspernix/configuration.nix ];
           specialArgs = {
-            inherit inputs;
-            identity = config.duck;
+            inherit hosts inputs system;
+            host = hosts.inspernix;
           };
-          system = "x86_64-linux";
         };
         powerspecnix = nixosSystem {
+          inherit (hosts.powerspecnix) system;
           modules = [ ./hosts/powerspecnix/configuration.nix ];
           specialArgs = {
-            inherit inputs;
-            identity = config.duck;
+            inherit hosts inputs system;
+            host = hosts.powerspecnix;
           };
-          system = "x86_64-linux";
         };
       };
 
@@ -406,6 +496,7 @@
               age
               babashka
               clojure
+              pkgs.colmena
               git
               pkgs.home-manager
               keepassxc

@@ -1,77 +1,83 @@
-{ config, identity, inputs, ... }:
-let inherit (identity) username;
+{ config, host, hosts, ... }:
+let inherit (host.identity) username;
 in {
-  services.syncthing = {
-    enable = true;
-    user = username;
-    dataDir = "/home/${username}/Documents";
-    configDir = "/home/${username}/Documents/.config/syncthing";
-    openDefaultPorts = true;
-    overrideFolders = false;
-    overrideDevices = true;
+  config = {
+    assertions = [{
+      # assertion = config.hosts ? pixel8;
+      assertion = config ? hosts;
+      message = "The host 'pixel8' must be present in the hosts attrset!";
+    }];
 
-    settings = {
-      devices = {
-        "powerspecnix" = {
-          id =
-            "JZHCKZ4-6WQOOMW-VK3J7WZ-LN7O3KU-C6IO3EY-3D4XBDT-P3R73MM-DUARSA3";
-          autoAcceptFolders = true;
-        };
+    hosts = hosts;
 
-        "Pixel 8" = {
-          id =
-            "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
-          autoAcceptFolders = true;
-        };
+    services.syncthing = {
+      enable = true;
+      user = username;
+      dataDir = "/home/${username}/Documents";
+      configDir = "/home/${username}/Documents/.config/syncthing";
+      openDefaultPorts = true;
+      overrideFolders = false;
+      overrideDevices = true;
 
-        "steamdeck" = {
-          id =
-            "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX";
-          autoAcceptFolders = true;
-        };
+      settings = with hosts; {
+        devices = {
+          ${powerspecnix.name} = {
+            id = powerspecnix.id;
+            autoAcceptFolders = true;
+          };
 
-        "VallenPC" = {
-          id =
-            "TEED77K-QOLTQ37-BL76MFB-LJD46CW-EJ7CZTJ-7GQNEF6-FZAMQRP-BCCRTQ6";
-          autoAcceptFolders = true;
-        };
+          ${pixel8.name}  = {
+            id = pixel8.id;
+            autoAcceptFolders = true;
+          };
 
-        "inspernix" = {
-          id =
-            "OWMQLRL-CD5VB7H-A3T436E-6XT4H66-6XRF22Y-MQXMNAU-DFRNGOV-ADSKFAV";
-          autoAcceptFolders = true;
-        };
-      };
+          "steamdeck" = {
+            id = steamdeck.id;
+            autoAcceptFolders = true;
+          };
 
-      folders = {
-        "Camera" = {
-          label = "Camera";
-          path = "/home/${username}/Camera";
-          devices = [ "Pixel 8" "powerspecnix" "inspernix" ];
-        };
+          "VallenPC" = {
+            id = hosts.vallenpc.id;
+            autoAcceptFolders = true;
+          };
 
-        "keepass" = {
-          label = "keepass";
-          path = "/home/${username}/keepass";
-          devices = [ "Pixel 8" "VallenPC" "inspernix" "powerspecnix" ];
-        };
-
-        "org-roam" = {
-          path = "/home/${username}/org-roam";
-          devices = [ "Pixel 8" "inspernix" "powerspecnix" ];
-          versioning = {
-            type = "simple";
-            params.keep = "10";
+          "inspernix" = {
+            id = hosts.inspernix.id;
+            autoAcceptFolders = true;
           };
         };
 
-        "steamdeck-renpy" = {
-          path = "/home/${username}/.renpy";
-          devices = [ "steamdeck" "powerspecnix" ];
-        };
-      };
+        folders = {
+          "Camera" = {
+            label = "Camera";
+            path = "/home/${username}/Camera";
+            devices = [ "Pixel 8" "powerspecnix" "inspernix" ];
+          };
 
-      options.urAccepted = -1;
+          "keepass" = {
+            label = "keepass";
+            path = "/home/${username}/keepass";
+            devices = [ "Pixel 8" "VallenPC" "inspernix" "powerspecnix" ];
+          };
+
+          "org-roam" = {
+            path = "/home/${username}/org-roam";
+            devices = [ "Pixel 8" "inspernix" "powerspecnix" ];
+            versioning = {
+              type = "simple";
+              params.keep = "10";
+            };
+          };
+
+          "steamdeck-renpy" = {
+            path = "/home/${username}/.renpy";
+            devices = [ "steamdeck" "powerspecnix" ];
+          };
+        };
+
+        options.urAccepted = -1;
+      };
     };
+
   };
 }

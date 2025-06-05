@@ -10,7 +10,7 @@
   {:task (shell "nh home build .")}
 
   build-os
-  {:task (shell "nh os build .")}
+  {:task (shell "nh os build . -- --show-trace")}
 
   ci
   {:doc "Build all targets"
