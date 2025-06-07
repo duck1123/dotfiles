@@ -12,7 +12,7 @@ in {
 
     settings = {
       devices = {
-        "powespecnix" = {
+        "powerspecnix" = {
           id =
             "JZHCKZ4-6WQOOMW-VK3J7WZ-LN7O3KU-C6IO3EY-3D4XBDT-P3R73MM-DUARSA3";
           autoAcceptFolders = true;
@@ -47,18 +47,18 @@ in {
         "Camera" = {
           label = "Camera";
           path = "/home/${username}/Camera";
-          devices = [ "Pixel 8" "powespecnix" "inspernix" ];
+          devices = [ "Pixel 8" "powerspecnix" "inspernix" ];
         };
 
         "keepass" = {
           label = "keepass";
           path = "/home/${username}/keepass";
-          devices = [ "Pixel 8" "VallenPC" "inspernix" "powespecnix" ];
+          devices = [ "Pixel 8" "VallenPC" "inspernix" "powerspecnix" ];
         };
 
         "org-roam" = {
           path = "/home/${username}/org-roam";
-          devices = [ "Pixel 8" "inspernix" "powespecnix" ];
+          devices = [ "Pixel 8" "inspernix" "powerspecnix" ];
           versioning = {
             type = "simple";
             params.keep = "10";
@@ -67,7 +67,7 @@ in {
 
         "steamdeck-renpy" = {
           path = "/home/${username}/.renpy";
-          devices = [ "steamdeck" "powespecnix" ];
+          devices = [ "steamdeck" "powerspecnix" ];
         };
       };
 
