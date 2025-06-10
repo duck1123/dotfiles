@@ -10,9 +10,5 @@
         key = gpgKey;
       };
     };
-    jujutsu = {
-      enable = true;
-      settings.user = { inherit (identity) name email; };
-    };
   };
 }
