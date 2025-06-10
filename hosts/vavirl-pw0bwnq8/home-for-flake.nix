@@ -4,12 +4,16 @@ in {
   programs.home-manager.enable = true;
 
   imports = [
+    # ../../programs/base
     ../../programs/clojure
     ../../programs/developer
     # ../../programs/dunst
     ../../programs/emacs
+    ../../programs/git
     ../../programs/jujutsu
     ../../programs/nushell
+    ../../programs/stylix
+    ../../programs/vscode
     ../../programs/zsh
   ];
 
@@ -48,18 +52,6 @@ in {
     };
 
     eza.enable = true;
-
-    git = {
-      enable = true;
-      userName = "${name}";
-      userEmail = "${email}";
-      lfs.enable = true;
-      signing = {
-        signByDefault = false;
-        key = gpgKey;
-      };
-    };
-
     hstr.enable = true;
     jq.enable = true;
     tmux.enable = true;
