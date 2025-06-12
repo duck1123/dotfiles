@@ -1,14 +1,8 @@
-{ config, host, hosts, ... }:
+{ host, hosts, ... }:
 let inherit (host.identity) username;
 in {
   config = {
-    assertions = [{
-      # assertion = config.hosts ? pixel8;
-      assertion = config ? hosts;
-      message = "The host 'pixel8' must be present in the hosts attrset!";
-    }];
-
-    hosts = hosts;
+    inherit hosts;
 
     services.syncthing = {
       enable = true;
