@@ -38,7 +38,7 @@
       # cloudflare-cli
       # cloudflared
       digikam
-      # discord
+      discord
       distrobox
       docker
       # docker-compose
