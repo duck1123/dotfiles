@@ -28,7 +28,7 @@
   ];
 
   home = {
-    packages = with pkgs; [ cheese ladybird nerdfetch nixd ];
+    packages = with pkgs; [ cheese discord ladybird nerdfetch nixd ];
     sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
   };
 }
