@@ -1,5 +1,5 @@
-{ config, identity, inputs, pkgs, ... }:
-let inherit (identity) username hostname;
+{ host, pkgs, ... }:
+let inherit (host) hostname;
 in {
   environment.systemPackages = with pkgs; [ git gvfs zsh ];
 
