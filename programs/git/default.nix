@@ -1,6 +1,8 @@
-{ identity, ... }: {
+{ host, ... }:
+let inherit (host.identity) email gpgKey name;
+in {
   programs = {
-    git = with identity; {
+    git = {
       enable = true;
       userName = "${name}";
       userEmail = "${email}";
@@ -12,7 +14,7 @@
     };
     jujutsu = {
       enable = true;
-      settings.user = { inherit (identity) name email; };
+      settings.user = { inherit name email; };
     };
   };
 }

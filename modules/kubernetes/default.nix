@@ -1,4 +1,4 @@
-{ config, identity, inputs, pkgs, ... }: {
+{ host, pkgs, ... }: {
   environment.systemPackages = with pkgs; [ k3s nfs-utils openiscsi ];
 
   networking.firewall = {
@@ -17,7 +17,7 @@
 
     openiscsi = {
       enable = true;
-      name = "${identity.hostname}-initiatorhost";
+      name = "${host.hostname}-initiatorhost";
     };
   };
 

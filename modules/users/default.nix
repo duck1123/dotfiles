@@ -1,5 +1,5 @@
-{ config, identity, inputs, pkgs, ... }:
-let inherit (identity) name hostname username;
+{ host, pkgs, ... }:
+let inherit (host.identity) name username;
 in {
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users."${username}" = {

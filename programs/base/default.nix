@@ -1,5 +1,7 @@
-{ identity, pkgs, ... }: {
-  home = with identity; {
+{ host, pkgs, ... }:
+let inherit (host.identity) username;
+in {
+  home = {
     file.".bb/bb.edn".source = ../../bb.edn;
     homeDirectory = "/home/${username}";
 
