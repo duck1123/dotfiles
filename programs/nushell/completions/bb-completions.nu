@@ -8,16 +8,24 @@ def "bb-task-data" [] {
       }
 }
 
-export def "bb-task-complete" [] {
+export def "nu-complete bb" [] {
   ^bb tasks
     | split row --regex "\\n"
     | skip 2
-    | each {|row| $row | split row --regex "\\s\\s+" }
-    | each {|row| { value: $row.0 description: (if ($row | length) > 1 {$row | get 1} else {""}) } }
-}
-
-def "nu-complete bb" [] {
-  (bb-task-complete)
+    | each { split row --regex "\\s+" }
+    | each {|row|
+        {
+          value: $row.0
+          description:
+            (
+              if ($row | length) > 1 {
+                $row | skip 1 | str join " "
+              } else {
+                ""
+              }
+            )
+        }
+      }
 }
 
 # Babashka
