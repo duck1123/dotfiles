@@ -68,7 +68,11 @@ in {
     nix-ld = {
       enable = true;
 
-      libraries = with pkgs; [ alsa-lib libGL renpy ];
+      libraries = with pkgs; [
+        alsa-lib
+        libGL
+        # renpy
+      ];
     };
 
     steam.enable = true;
