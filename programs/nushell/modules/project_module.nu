@@ -50,7 +50,7 @@ export def "project earthly tasks" [] {
 export def "project hoard show" [
   name # The command to show
 ] {
-  ((open trove.yml).commands | filter { $in.name == $name }).0.command
+  ((open trove.yml).commands | where { $in.name == $name }).0.command
 }
 
 # Parse a mssql cli query response
