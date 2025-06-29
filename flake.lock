@@ -1,29 +1,5 @@
 {
   "nodes": {
-    "ags": {
-      "inputs": {
-        "astal": [
-          "astal"
-        ],
-        "gnim": "gnim",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1751192975,
-        "narHash": "sha256-X2WQxQZX9aktyaFQW94a4eCO0BYkLm9FZr9dyjVS7Sg=",
-        "owner": "aylur",
-        "repo": "ags",
-        "rev": "74cdd7eabf0884a7d5ba0b300849891a7e89697e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "aylur",
-        "repo": "ags",
-        "type": "github"
-      }
-    },
     "aquamarine": {
       "inputs": {
         "hyprutils": [
@@ -54,26 +30,6 @@
       "original": {
         "owner": "hyprwm",
         "repo": "aquamarine",
-        "type": "github"
-      }
-    },
-    "astal": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1751126708,
-        "narHash": "sha256-AodIKw7TmI7rHVcOfEsO82stupMYIMVQeLAUQfVxnkU=",
-        "owner": "aylur",
-        "repo": "astal",
-        "rev": "ac90f09385a2295da9fdc108aaba4a317aaeacc7",
-        "type": "github"
-      },
-      "original": {
-        "owner": "aylur",
-        "repo": "astal",
         "type": "github"
       }
     },
@@ -347,22 +303,6 @@
         "type": "github"
       }
     },
-    "gnim": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1751120710,
-        "narHash": "sha256-sT1ILM8m1QG8CeMmqLHhW/8T/MzUq3JL9jO3V7FMa4w=",
-        "owner": "aylur",
-        "repo": "gnim",
-        "rev": "5d2b734be452e2819f3a7313dbb34fa43c23e5d9",
-        "type": "github"
-      },
-      "original": {
-        "owner": "aylur",
-        "repo": "gnim",
-        "type": "github"
-      }
-    },
     "gnome-shell": {
       "flake": false,
       "locked": {
@@ -632,32 +572,6 @@
       "original": {
         "owner": "hyprwm",
         "repo": "hyprlang",
-        "type": "github"
-      }
-    },
-    "hyprpanel": {
-      "inputs": {
-        "ags": [
-          "ags"
-        ],
-        "astal": [
-          "astal"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1751087867,
-        "narHash": "sha256-DFPuZLYopXRmqfu9IQn8RVBbxaPXIbyW0PXUFrfbJ9k=",
-        "owner": "jas-singhfsu",
-        "repo": "hyprpanel",
-        "rev": "d4895922de7c0908218557f252e4f8778da60fe2",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jas-singhfsu",
-        "repo": "hyprpanel",
         "type": "github"
       }
     },
@@ -1127,11 +1041,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1751218034,
-        "narHash": "sha256-6XOdQezO1SHz2AtDQkM1IDT+SNtpoMNdOXm3R8tspZI=",
+        "lastModified": 1751215589,
+        "narHash": "sha256-OuslP9TYgdKMxzkAP/hzL+/EJVBmWC9xJHChkcMEc2o=",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "1809d2679f5dcfb912020b3fec6223f4a69c4b74",
+        "rev": "5dbc773ff9d9b771324829fd26b17ca66b5c0402",
         "type": "github"
       },
       "original": {
@@ -1250,8 +1164,6 @@
     },
     "root": {
       "inputs": {
-        "ags": "ags",
-        "astal": "astal",
         "clj-nix": "clj-nix",
         "colmena": "colmena",
         "devshell": "devshell",
@@ -1263,7 +1175,6 @@
         "haumea": "haumea",
         "home-manager": "home-manager",
         "hyprland": "hyprland",
-        "hyprpanel": "hyprpanel",
         "k3s-fleetops": "k3s-fleetops",
         "kubenix": "kubenix",
         "make-shell": "make-shell",

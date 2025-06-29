@@ -4,19 +4,6 @@
   nixConfig.extra-experimental-features = "nix-command flakes";
 
   inputs = {
-    ags = {
-      inputs = {
-        astal.follows = "astal";
-        nixpkgs.follows = "nixpkgs";
-      };
-      url = "github:aylur/ags";
-    };
-
-    astal = {
-      inputs.nixpkgs.follows = "nixpkgs";
-      url = "github:aylur/astal";
-    };
-
     clj-nix = {
       inputs = {
         devshell.follows = "devshell";
@@ -80,15 +67,6 @@
         systems.follows = "systems";
       };
       url = "github:hyprwm/Hyprland";
-    };
-
-    hyprpanel = {
-      inputs = {
-        ags.follows = "ags";
-        astal.follows = "astal";
-        nixpkgs.follows = "nixpkgs";
-      };
-      url = "github:jas-singhfsu/hyprpanel";
     };
 
     k3s-fleetops = {
@@ -252,8 +230,8 @@
     };
   };
 
-  outputs = { colmena, flake-utils, home-manager, hyprpanel, nixpkgs, stylix
-    , zen-browser, ... }@inputs:
+  outputs = { colmena, flake-utils, home-manager, nixpkgs, stylix, zen-browser
+    , ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
@@ -283,7 +261,7 @@
         inherit system;
         # May the FOSS gods take mercy upon me
         config.allowUnfree = true;
-        overlays = [ inputs.hyprpanel.overlay ];
+        overlays = [ ];
       };
       hosts = {
         inspernix = {
@@ -420,49 +398,45 @@
 
       # Home configurations
       # Accessible via 'home-manager'
-      homeConfigurations = let
-        core = [
-          hyprpanel.homeManagerModules.hyprpanel
-          stylix.homeModules.stylix
-          zen-browser.homeModules.beta
-        ];
-      in {
-        drenfer = homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit hosts inputs system;
-            host = hosts.vallenpc;
+      homeConfigurations =
+        let core = [ stylix.homeModules.stylix zen-browser.homeModules.beta ];
+        in {
+          drenfer = homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit hosts inputs system;
+              host = hosts.vallenpc;
+            };
+            modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home-for-flake.nix ];
           };
-          modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home-for-flake.nix ];
-        };
 
-        deck = homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit hosts inputs system;
-            host = hosts.steamdeck;
+          deck = homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit hosts inputs system;
+              host = hosts.steamdeck;
+            };
+            modules = core ++ [ ./hosts/steamdeck/home-for-flake.nix ];
           };
-          modules = core ++ [ ./hosts/steamdeck/home-for-flake.nix ];
-        };
 
-        "duck@powerspecnix" = homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit hosts inputs system;
-            host = hosts.powerspecnix;
+          "duck@powerspecnix" = homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit hosts inputs system;
+              host = hosts.powerspecnix;
+            };
+            modules = core ++ [ ./hosts/powerspecnix/home-for-flake.nix ];
           };
-          modules = core ++ [ ./hosts/powerspecnix/home-for-flake.nix ];
-        };
 
-        "duck@inspernix" = homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit hosts inputs system;
-            host = hosts.inspernix;
+          "duck@inspernix" = homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit hosts inputs system;
+              host = hosts.inspernix;
+            };
+            modules = core ++ [ ./hosts/inspernix/home-for-flake.nix ];
           };
-          modules = core ++ [ ./hosts/inspernix/home-for-flake.nix ];
         };
-      };
 
       nixosConfigurations = {
         inspernix = nixosSystem {

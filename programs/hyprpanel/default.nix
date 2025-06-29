@@ -2,8 +2,6 @@
   # https://github.com/Jas-SinghFSU/HyprPanel/blob/master/nix/module.nix
   programs.hyprpanel = {
     enable = true;
-    hyprland.enable = true;
-    overwrite.enable = true;
 
     settings = {
       bar = {
