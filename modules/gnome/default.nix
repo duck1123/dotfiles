@@ -1,6 +1,6 @@
 { ... }: {
   services = {
+    desktopManager.gnome.enable = true;
     displayManager.defaultSession = "gnome";
-    xserver.desktopManager.gnome.enable = true;
   };
 }
