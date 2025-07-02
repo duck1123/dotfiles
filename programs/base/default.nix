@@ -8,6 +8,7 @@ in {
     ../dbt
     ../dconf
     ../developer
+    ../docker
     ../dunst
     ../emacs
     ../emacs-prelude
