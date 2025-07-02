@@ -281,6 +281,7 @@
             dbt.enable = false;
             dconf.enable = false;
             developer.enable = false;
+            docker.enable = true;
             emacs.enable = false;
             emacs2.enable = true;
             radio.enable = false;
@@ -335,8 +336,9 @@
           inherit system;
 
           features = {
-            radio.enable = true;
+            docker.enable = true;
             hyprpanel.enable = true;
+            radio.enable = true;
             waybar.enable = false;
           };
 

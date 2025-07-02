@@ -10,6 +10,7 @@ let
     ./hardware-configuration.nix
     ../../modules/inspernix-base
     ../../modules/boot
+    ../../modules/docker
     ../../modules/i18n
     ../../modules/sddm
     ../../modules/stylix

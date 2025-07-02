@@ -6,7 +6,8 @@
     # ../../programs/dbt
     ../../programs/dconf
     ../../programs/developer
-    # ../../programs/dunst
+    ../../programs/docker
+    ../../programs/dunst
     ../../programs/emacs
     # ../../programs/emacs2
     ../../programs/gaming
