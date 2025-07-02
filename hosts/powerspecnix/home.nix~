@@ -6,10 +6,9 @@
     # ../../programs/dbt
     ../../programs/dconf
     ../../programs/developer
-    ../../programs/docker
     # ../../programs/dunst
-    ../../programs/emacs
-    # ../../programs/emacs-prelude
+    # ../../programs/emacs
+    ../../programs/emacs2
     ../../programs/gaming
     ../../programs/git
     ../../programs/gnome

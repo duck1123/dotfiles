@@ -279,6 +279,7 @@
             dbt.enable = false;
             dconf.enable = false;
             developer.enable = false;
+            docker.enable = true;
             emacs.enable = true;
             emacs-prelude.enable = false;
             radio.enable = false;
@@ -335,8 +336,9 @@
 
           features = {
             clojure.enable = true;
-            radio.enable = true;
+            docker.enable = true;
             hyprpanel.enable = true;
+            radio.enable = true;
             waybar.enable = false;
             nfs.enable = true;
           };
