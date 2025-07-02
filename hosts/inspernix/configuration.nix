@@ -11,6 +11,7 @@ let
     ../../modules/inspernix-base
     ../../modules/bitcoin
     ../../modules/boot
+    ../../modules/docker
     ../../modules/i18n
     ../../modules/sddm
     ../../modules/stylix

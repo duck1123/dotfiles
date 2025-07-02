@@ -280,6 +280,7 @@
             dbt.enable = false;
             dconf.enable = false;
             developer.enable = false;
+            docker.enable = true;
             dunst.enable = false;
             emacs.enable = true;
             emacs-prelude.enable = false;
@@ -488,6 +489,7 @@
             dbt.enable = false;
             dconf.enable = false;
             developer.enable = true;
+            docker.enable = true;
             dunst.enable = false;
             emacs.enable = true;
             emacs-prelude.enable = false;
