@@ -80,10 +80,8 @@
     k3s-fleetops = {
       inputs = {
         clj-nix.follows = "clj-nix";
-        flake-compat.follows = "flake-compat";
         flake-parts.follows = "flake-parts";
         flake-utils.follows = "flake-utils";
-        kubenix.follows = "kubenix";
         make-shell.follows = "make-shell";
         mkdocs-flake.follows = "mkdocs-flake";
         nix-fetcher-data.follows = "nix-fetcher-data";
@@ -152,7 +150,6 @@
     nixidy = {
       inputs = {
         flake-utils.follows = "flake-utils";
-        kubenix.follows = "kubenix";
         nix-kube-generators.follows = "nix-kube-generators";
         nixpkgs.follows = "nixpkgs";
       };
@@ -179,7 +176,6 @@
       inputs = {
         flake-parts.follows = "flake-parts";
         nixpkgs.follows = "nixpkgs";
-        treefmt-nix.follows = "treefmt-nix";
       };
       url = "github:nix-community/NUR";
     };
@@ -211,10 +207,7 @@
 
     stylix = {
       inputs = {
-        flake-compat.follows = "flake-compat";
         flake-parts.follows = "flake-parts";
-        git-hooks.follows = "pre-commit-hooks";
-        home-manager.follows = "home-manager";
         nixpkgs.follows = "nixpkgs";
         nur.follows = "nur";
         systems.follows = "systems";

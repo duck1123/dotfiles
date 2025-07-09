@@ -9,11 +9,11 @@
     nushellPlugins.formats
     nushellPlugins.polars
     nushellPlugins.gstat
-    nushellPlugins.units
+    # nushellPlugins.units
     nushellPlugins.query
-    nushellPlugins.dbus
+    # nushellPlugins.dbus
     nushellPlugins.skim
-    nushellPlugins.net
+    # nushellPlugins.net
   ];
 
   home.file."nushell/completions".source = ./completions;
