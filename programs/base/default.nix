@@ -78,9 +78,9 @@ in {
   xdg = {
     enable = true;
 
-    configFile."nix/nix.conf".text = ''
-      experimental-features = nix-command flakes
-    '';
+    # configFile."nix/nix.conf".text = ''
+    #   experimental-features = nix-command flakes
+    # '';
 
     mime.enable = true;
   };
