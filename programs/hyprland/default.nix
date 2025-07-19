@@ -41,7 +41,6 @@
       };
 
       env = [ "XCURSOR_SIZE,24" "HYPRCURSOR_SIZE,24" ];
-      exec = [ "hyprpanel" ];
       decoration.rounding = 10;
 
       dwindle = {
