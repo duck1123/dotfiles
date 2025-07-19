@@ -4,7 +4,7 @@
     ../../programs/base
     ../../programs/clojure
     ../../programs/dconf
-    ../../programs/dunst
+    # ../../programs/dunst
     ../../programs/developer
     # ../../programs/emacs
     ../../programs/emacs2
