@@ -292,6 +292,7 @@
             nfs.enable = false;
             stylix.enable = true;
             virtualization.enable = false;
+            waybar.enable = false;
           };
 
           nixos = {
@@ -334,6 +335,7 @@
           features = {
             radio.enable = true;
             hyprpanel.enable = false;
+            waybar.enable = true;
           };
 
           hostname = "powerspecnix";
