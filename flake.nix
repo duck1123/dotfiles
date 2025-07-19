@@ -282,10 +282,13 @@
             emacs.enable = false;
             emacs2.enable = true;
             radio.enable = false;
+
             kubernetes = {
               client.enable = true;
               server.enable = false;
             };
+
+            hyprpanel.enable = true;
             nfs.enable = false;
             stylix.enable = true;
             virtualization.enable = false;
@@ -328,7 +331,11 @@
         powerspecnix = {
           inherit system;
 
-          features.radio.enable = true;
+          features = {
+            radio.enable = true;
+            hyprpanel.enable = false;
+          };
+
           hostname = "powerspecnix";
           id =
             "JZHCKZ4-6WQOOMW-VK3J7WZ-LN7O3KU-C6IO3EY-3D4XBDT-P3R73MM-DUARSA3";
