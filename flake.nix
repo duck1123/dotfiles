@@ -334,8 +334,8 @@
 
           features = {
             radio.enable = true;
-            hyprpanel.enable = false;
-            waybar.enable = true;
+            hyprpanel.enable = true;
+            waybar.enable = false;
           };
 
           hostname = "powerspecnix";

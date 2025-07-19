@@ -6,7 +6,7 @@
     hyprpanel
     hyprshot
     nautilus
-    nerd-fonts.caskaydia-mono
+    # nerd-fonts.caskaydia-mono
     ncpamixer
     nwg-dock-hyprland
     nwg-drawer
@@ -41,6 +41,11 @@
       };
 
       env = [ "XCURSOR_SIZE,24" "HYPRCURSOR_SIZE,24" ];
+      exec = [
+
+        # "hyprpanel"
+        # "waybar"
+      ];
       decoration.rounding = 10;
 
       dwindle = {

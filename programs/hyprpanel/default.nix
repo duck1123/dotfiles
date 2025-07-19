@@ -11,16 +11,8 @@
             showIcon = false;
           };
           launcher.autoDetectIcon = true;
-          media.show_label = false;
-          network.label = false;
-          workspaces = {
-            show_icons = false;
-            show_numbered = true;
-          };
-        };
 
-        layout."bar.layouts" = let
-          config = {
+          layouts."*" = {
             left = [ "dashboard" "workspaces" "windowtitle" ];
             middle = [ "clock" ];
             right = [
@@ -32,10 +24,16 @@
               "volume"
               "notifications"
             ];
+
           };
-        in {
-          "0" = config;
-          "1" = config;
+
+          media.show_label = false;
+          network.label = false;
+
+          workspaces = {
+            show_icons = false;
+            show_numbered = true;
+          };
         };
 
         menus = {

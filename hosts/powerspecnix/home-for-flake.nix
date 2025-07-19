@@ -72,7 +72,7 @@
       minio-client
       # mullvad-browser
       nerdfetch
-      nerd-fonts.fira-code
+      # nerd-fonts.fira-code
       networkmanager
       nix-tree
       # obsidian
