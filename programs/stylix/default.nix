@@ -15,6 +15,7 @@
     targets.emacs.enable = false;
     targets.firefox.profileNames = [ "default" ];
     targets.vscode.profileNames = [ "default" ];
+    targets.zen-browser.profileNames = [ "default" ];
 
     fonts = {
       # monospace = {
