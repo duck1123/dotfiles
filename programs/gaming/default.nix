@@ -9,5 +9,7 @@
 
     # nexusmods-app
     protontricks
+
+    satisfactorymodmanager
   ];
 }
