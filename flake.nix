@@ -342,7 +342,7 @@
 
           hostname = "powerspecnix";
           id =
-            "JZHCKZ4-6WQOOMW-VK3J7WZ-LN7O3KU-C6IO3EY-3D4XBDT-P3R73MM-DUARSA3";
+            "UFCCQLJ-3EKBVCQ-O5CNVM5-ERJQAQG-JWKQRPU-7FOZHPG-VMEOMKJ-KZSUFQK";
           identity = identities.duck;
           name = "powerspecnix";
           nixos.enable = true;

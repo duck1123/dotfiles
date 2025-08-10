@@ -20,12 +20,12 @@
 
   fileSystems = {
     "/" = {
-      device = "/dev/disk/by-uuid/a48d382d-207b-42ed-848f-035d1dd393a6";
+      device = "/dev/disk/by-uuid/e8d6b0eb-28dd-424c-bffb-52eafaeec27f";
       fsType = "ext4";
     };
 
     "/boot" = {
-      device = "/dev/disk/by-uuid/8EF3-6790";
+      device = "/dev/disk/by-uuid/4D62-CC29";
       fsType = "vfat";
     };
 
