@@ -64,10 +64,24 @@ nix flake update
 
 ### Switch Home
 
+#### NH
+
 Update user-level configuration
 
 ```sh {"name":"switch-home"}
 nh home switch ${HOME?}/dotfiles -- --impure --show-trace
+```
+
+#### Babashka
+
+```sh
+bb switch-home
+```
+
+#### Nushell
+
+```nushell
+switch home
 ```
 
 ### Switch OS
