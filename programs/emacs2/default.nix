@@ -41,10 +41,12 @@ let
       scss-mode
       smartparens
       terraform-mode
+      tree-sitter
       # use-package
       which-key
       # windmove
       windswap
+      yaml-mode
     ]);
 in {
   programs.emacs = {
