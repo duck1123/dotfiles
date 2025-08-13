@@ -12,7 +12,7 @@ let
     ../../modules/bitcoin
     ../../modules/boot
     ../../modules/i18n
-    ../../modules/kubernetes
+    # ../../modules/kubernetes
     ../../modules/nfs
     ../../modules/sddm
     ../../modules/stylix
