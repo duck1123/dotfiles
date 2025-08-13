@@ -14,7 +14,6 @@ in {
       code-cursor
       curl
       gnupg
-      hoard
       hstr
       htop
       keepassxc

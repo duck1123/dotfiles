@@ -1,7 +1,7 @@
 { host, pkgs, ... }:
 let inherit (host.identity) username;
 in {
-  home.packages = with pkgs; [ hoard hstr ];
+  home.packages = with pkgs; [ hstr ];
 
   programs.zsh = {
     autosuggestion.enable = true;
@@ -55,7 +55,6 @@ in {
       source <(k3d completion zsh)
       source <(devspace completion zsh)
       source <(runme completion zsh)
-      source <(hoard shell-config --shell zsh)
 
       _bb_tasks() {
         local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)

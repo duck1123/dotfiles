@@ -46,13 +46,6 @@ export def "project earthly tasks" [] {
     | sort
 }
 
-# Return a command associated with a trove command
-export def "project hoard show" [
-  name # The command to show
-] {
-  ((open trove.yml).commands | where { $in.name == $name }).0.command
-}
-
 # Parse a mssql cli query response
 export def "project mssql split result" [] {
   lines
