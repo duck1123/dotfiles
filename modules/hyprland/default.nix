@@ -9,18 +9,12 @@ in {
 
     systemPackages = with pkgs; [
       pyprland
-      hyprpicker
       hyprcursor
       hyprlock
       hypridle
-      hyprpaper
       starship
-      helix
-      # qutebrowser
-      greetd.tuigreet
+      tuigreet
       zathura
-      mpv
-      imv
     ];
   };
 
