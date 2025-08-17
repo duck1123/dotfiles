@@ -14,6 +14,7 @@ let
     ../../modules/i18n
     ../../modules/kubernetes
     ../../modules/nfs
+    ../../modules/network
     ../../modules/sddm
     ../../modules/stylix
     ../../modules/syncthing

@@ -14,6 +14,7 @@ let
     ../../modules/sddm
     ../../modules/stylix
     ../../modules/syncthing
+    ../../modules/network
   ];
   mkSpecialisation = module: {
     inheritParentConfig = false;

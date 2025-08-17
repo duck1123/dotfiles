@@ -291,7 +291,7 @@
             };
 
             hyprpanel.enable = true;
-            nfs.enable = false;
+            nfs.enable = true;
             stylix.enable = true;
             virtualization.enable = false;
             waybar.enable = false;
@@ -338,6 +338,7 @@
             radio.enable = true;
             hyprpanel.enable = true;
             waybar.enable = false;
+            nfs.enable = true;
           };
 
           hostname = "powerspecnix";

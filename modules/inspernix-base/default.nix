@@ -63,8 +63,16 @@
   security.rtkit.enable = true;
 
   services = {
+    avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+    };
+
     gnome.gnome-keyring.enable = true;
+    gvfs.enable = true;
     libinput.enable = true;
+    nfs.client.enable = true;
 
     # Enable the OpenSSH daemon.
     openssh = {
@@ -109,4 +117,11 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [ ];
   };
+
+  # Add network file sharing packages
+  environment.systemPackages = with pkgs; [
+    gvfs
+    nfs-utils
+    cifs-utils
+  ];
 }
