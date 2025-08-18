@@ -1,6 +1,6 @@
 { pkgs, ... }: {
   imports = [
-    # ../../programs/backups
+    ../../programs/backups
     ../../programs/base
     ../../programs/clojure
     # ../../programs/dbt
