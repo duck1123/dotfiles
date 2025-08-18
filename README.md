@@ -22,10 +22,23 @@ bash < <(curl -s https://raw.githubusercontent.com/babashka/babashka/master/inst
 
 ### Nix
 
-- https://nixos.org/download.html
+#### Install Nix
 
-```sh
+Recommended install from https://nixos.org/download/
+
+Note: This will request sudo
+
+```sh {"name":"install-nix"}
 sh <(curl -L https://nixos.org/nix/install) --daemon
+```
+
+#### Enable "Experimental" features
+
+Flakes support requires a feature flag to be set still.
+
+```sh {"name":"set-nix-conf"}
+mkdir -p ~/.config/nix
+echo "experimental-features = nix-command flakes" > ~/.config/nix/nix.conf
 ```
 
 ### Prelude
