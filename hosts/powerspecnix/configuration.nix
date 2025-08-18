@@ -9,7 +9,7 @@ let
     ../../modules/flakeModules
     ./hardware-configuration.nix
     ../../modules/base
-    ../../modules/bitcoin
+    # ../../modules/bitcoin
     ../../modules/boot
     ../../modules/i18n
     ../../modules/kubernetes
