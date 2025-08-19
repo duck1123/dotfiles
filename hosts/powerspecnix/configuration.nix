@@ -11,8 +11,11 @@ let
     ../../modules/base
     # ../../modules/bitcoin
     ../../modules/boot
+    ../../modules/common
+    ../../modules/font
     ../../modules/i18n
     ../../modules/kubernetes
+    ../../modules/nix
     ../../modules/nfs
     ../../modules/network
     ../../modules/sddm
