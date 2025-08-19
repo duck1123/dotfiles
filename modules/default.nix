@@ -4,6 +4,7 @@
     ./bitcoin
     ./bluetooth
     ./boot
+    ./common
     ./docker
     ./flakeModules
     ./font
