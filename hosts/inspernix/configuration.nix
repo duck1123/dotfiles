@@ -11,7 +11,10 @@ let
     ../../modules/inspernix-base
     ../../modules/bitcoin
     ../../modules/boot
+    ../../modules/common
+    ../../modules/font
     ../../modules/i18n
+    ../../modules/nix
     ../../modules/sddm
     ../../modules/stylix
     ../../modules/syncthing
