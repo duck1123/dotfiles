@@ -21,11 +21,6 @@
     cifs-utils
   ];
 
-  # Enable NFS client support
-  # Note: NFS client is enabled by default in modern NixOS
-  # If you need specific NFS client configuration, use:
-  # services.nfs.client.enable = true;
-
   # Open necessary firewall ports for network discovery
   networking.firewall = {
     allowedUDPPorts = [
