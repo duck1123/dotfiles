@@ -420,7 +420,7 @@
               inherit hosts inputs system;
               host = hosts.vallenpc;
             };
-            modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home-for-flake.nix ];
+            modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home.nix ];
           };
 
           deck = homeManagerConfiguration {
@@ -429,7 +429,7 @@
               inherit hosts inputs system;
               host = hosts.steamdeck;
             };
-            modules = core ++ [ ./hosts/steamdeck/home-for-flake.nix ];
+            modules = core ++ [ ./hosts/steamdeck/home.nix ];
           };
 
           "duck@powerspecnix" = homeManagerConfiguration {
@@ -438,7 +438,7 @@
               inherit hosts inputs system;
               host = hosts.powerspecnix;
             };
-            modules = core ++ [ ./hosts/powerspecnix/home-for-flake.nix ];
+            modules = core ++ [ ./hosts/powerspecnix/home.nix ];
           };
 
           "duck@inspernix" = homeManagerConfiguration {
@@ -447,7 +447,7 @@
               inherit hosts inputs system;
               host = hosts.inspernix;
             };
-            modules = core ++ [ ./hosts/inspernix/home-for-flake.nix ];
+            modules = core ++ [ ./hosts/inspernix/home.nix ];
           };
         };
 
