@@ -3,10 +3,8 @@
 
   nixConfig = {
     extra-experimental-features = "nix-command flakes";
-    extra-substituters = [
-      "https://duck1123.cachix.org"
-      "https://nix-community.cachix.org"
-    ];
+    extra-substituters =
+      [ "https://duck1123.cachix.org" "https://nix-community.cachix.org" ];
     extra-trusted-public-keys = [
       "duck1123.cachix.org-1:Cj3r3BH7Xuy0zFWy8V/VIB3F7+Gi1m9HB302E9UGV3E="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
@@ -277,7 +275,7 @@
 
           features = {
             backups.enable = false;
-            clojure.enable = false;
+            clojure.enable = true;
             dbt.enable = false;
             dconf.enable = false;
             developer.enable = false;
@@ -317,6 +315,7 @@
         pixel8 = {
           inherit system;
           android.enable = true;
+          features.clojure.enable = false;
           hostname = "pixel8";
           id =
             "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
@@ -335,6 +334,7 @@
           inherit system;
 
           features = {
+            clojure.enable = true;
             radio.enable = true;
             hyprpanel.enable = true;
             waybar.enable = false;
@@ -367,6 +367,8 @@
           home-manager.enable = true;
           nixos.enable = false;
 
+          features.clojure.enable = false;
+
           syncthing = {
             camera.enable = false;
             keepass.enable = true;
@@ -385,6 +387,8 @@
 
           home-manager.enable = true;
           nixos.enable = false;
+
+          features.clojure.enable = false;
 
           syncthing = {
             camera.enable = false;
