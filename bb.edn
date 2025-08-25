@@ -4,33 +4,104 @@
              [clojure.string :as str])
 
   build
-  {:depends [build-home build-os]}
+  {:doc     "Build the current configurations"
+   :depends [build-home build-os]}
+
+  build-all
+  {:doc     "build all configurations"
+   :depends [build-all-home build-all-os]}
+
+  build-all-home
+  {:doc     "Build all home configurations"
+   :depends [build-home-inspernix build-home-nasnix build-home-powerspecnix
+             build-home-steamdeck build-home-vallen]}
+
+  build-all-os
+  {:doc     "Build all nixos configurations"
+   :depends [build-os-inspernix build-os-nasnix build-os-powerspecnix]}
 
   build-home
-  {:task (shell "nh home build .")}
+  {:doc  "Build the current home configuration"
+   :task (shell "nh home build .")}
+
+  build-home-inspernix
+  {:task
+   (let [trace? false
+         cmd    "nh home build .#homeConfigurations.duck@inspernix.activationPackage"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
+
+  build-home-nasnix
+  {:task
+   (let [trace? false
+         cmd    "nh home build .#homeConfigurations.duck@nasnix.activationPackage"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
+
+  build-home-powerspecnix
+  {:task
+   (let [trace? false
+         cmd    "nh home build .#homeConfigurations.duck@powerspecnix.activationPackage"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
+
+  build-home-steamdeck
+  {:task
+   (let [trace? false
+         cmd    "nh home build .#homeConfigurations.deck.activationPackage"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
+
+  build-home-vallen
+  {:task
+   (let [trace? false
+         cmd    "nh home build .#homeConfigurations.drenfer.activationPackage"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
 
   build-os
   {:task (shell "nh os build .")}
+
+  build-os-inspernix
+  {:task
+   (let [trace? false
+         cmd    "nh os build .#nixosConfigurations.inspernix"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
+
+  build-os-nasnix
+  {:task
+   (let [trace? false
+         cmd    "nh os build .#nixosConfigurations.nasnix"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
+
+  build-os-powerspecnix
+  {:task
+   (let [trace? false
+         cmd    "nh os build .#nixosConfigurations.powerspecnix"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
 
   check
   {:doc  "Run validation on the project"
    :task (shell "nix flake check")}
 
   ci
-  {:doc "Build all targets"
-   :depends [check]
-   :task
-   (let [show-trace? false
-         cmds        ["nh home build .#homeConfigurations.duck@inspernix.activationPackage"
-                      "nh home build .#homeConfigurations.duck@powerspecnix.activationPackage"
-                      "nh home build .#homeConfigurations.drenfer.activationPackage"
-                      "nh home build .#homeConfigurations.deck.activationPackage"
-                      "nh os build .#nixosConfigurations.inspernix"
-                      "nh os build .#nixosConfigurations.powerspecnix"]]
-     (doseq [cmd cmds]
-       (let [cmd (str cmd (when show-trace? " -- --show-trace"))]
-         (binding [*out* *err*] (println cmd))
-         (shell cmd))))}
+  {:doc     "Build all targets"
+   :depends [check build-home-inspernix build-home-nasnix build-home-powerspecnix
+             build-home-steamdeck build-home-vallen
+             build-os-inspernix
+             build-os-nasnix
+             build-os-powerspecnix]}
 
   format
   {:doc  "Format all .nix files using nixpkgs-fmt"
@@ -113,13 +184,16 @@
    :task        (shell "k3d cluster delete k3s-default")}
 
   k3d-start
-  {:task (shell "k3d cluster start")}
+  {:doc "Start the k3s cluster"
+   :task (shell "k3d cluster start")}
 
   k3d-stop
-  {:task (shell "k3d cluster stop")}
+  {:doc "Stop the k3s cluster"
+   :task (shell "k3d cluster stop")}
 
   install-argocd
-  {:task
+  {:doc "Install ArgoCD into the current cluster"
+   :task
    (do
      (println "Installing argocd")
      (let [dry-run? false

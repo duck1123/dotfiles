@@ -6,16 +6,16 @@ let
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
     inputs.stylix.nixosModules.stylix
-    ../../modules/flakeModules
     ./hardware-configuration.nix
-    ../../modules/inspernix-base
     ../../modules/bitcoin
     ../../modules/boot
+    ../../modules/flakeModules
+    ../../modules/inspernix-base
     ../../modules/i18n
+    ../../modules/network
     ../../modules/sddm
     ../../modules/stylix
     ../../modules/syncthing
-    ../../modules/network
   ];
   mkSpecialisation = module: {
     inheritParentConfig = false;
