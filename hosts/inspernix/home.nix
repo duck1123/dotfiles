@@ -6,8 +6,8 @@
     ../../programs/dconf
     # ../../programs/dunst
     ../../programs/developer
-    # ../../programs/emacs
-    ../../programs/emacs2
+    ../../programs/emacs
+    # ../../programs/emacs-prelude
     ../../programs/gaming
     ../../programs/git
     ../../programs/gnome

@@ -279,8 +279,8 @@
             dbt.enable = false;
             dconf.enable = false;
             developer.enable = false;
-            emacs.enable = false;
-            emacs2.enable = true;
+            emacs.enable = true;
+            emacs-prelude.enable = false;
             radio.enable = false;
 
             kubernetes = {

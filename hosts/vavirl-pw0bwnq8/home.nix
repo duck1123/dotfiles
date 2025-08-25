@@ -7,7 +7,7 @@ in {
     ../../programs/clojure
     ../../programs/developer
     # ../../programs/dunst
-    ../../programs/emacs
+    ../../programs/emacs-prelude
     ../../programs/jujutsu
     ../../programs/nushell
     ../../programs/zsh
