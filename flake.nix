@@ -653,7 +653,7 @@
             virtualization.enable = false;
             vscode.enable = false;
             waybar.enable = false;
-            zsh.enable = false;
+            zsh.enable = true;
           };
 
           id =
