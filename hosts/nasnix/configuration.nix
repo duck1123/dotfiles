@@ -10,7 +10,7 @@ let
     ../../modules/bitcoin
     ../../modules/boot
     ../../modules/flakeModules
-    ../../modules/inspernix-base
+    ./base.nix
     ../../modules/i18n
     ../../modules/network
     ../../modules/sddm
