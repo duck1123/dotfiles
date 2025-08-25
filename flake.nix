@@ -616,10 +616,10 @@
           features = {
             backups.enable = false;
             bitcoin.enable = false;
-            clojure.enable = false;
-            dbt.enable = false;
+            clojure.enable = true;
+            dbt.enable = true;
             dconf.enable = false;
-            developer.enable = false;
+            developer.enable = true;
             dunst.enable = false;
             emacs.enable = true;
             emacs-prelude.enable = false;
@@ -634,7 +634,7 @@
             jujutsu.enable = true;
             media.enable = false;
             ncmpcpp.enable = false;
-            nushell.enable = false;
+            nushell.enable = true;
             office.enable = false;
             pictures.enable = false;
             stylix.enable = true;
