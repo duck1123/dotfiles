@@ -12,19 +12,28 @@
   build-os
   {:task (shell "nh os build .")}
 
+  check
+  {:doc  "Run validation on the project"
+   :task (shell "nix flake check")}
+
   ci
   {:doc "Build all targets"
+   :depends [check]
    :task
-   (do
-     (shell "nh home build .#homeConfigurations.duck@inspernix.activationPackage")
-     (shell "nh home build .#homeConfigurations.duck@powerspecnix.activationPackage")
-     (shell "nh home build .#homeConfigurations.drenfer.activationPackage")
-     (shell "nh home build .#homeConfigurations.deck.activationPackage")
-     (shell "nh os build .#nixosConfigurations.inspernix")
-     (shell "nh os build .#nixosConfigurations.powerspecnix"))}
+   (let [show-trace? false
+         cmds        ["nh home build .#homeConfigurations.duck@inspernix.activationPackage"
+                      "nh home build .#homeConfigurations.duck@powerspecnix.activationPackage"
+                      "nh home build .#homeConfigurations.drenfer.activationPackage"
+                      "nh home build .#homeConfigurations.deck.activationPackage"
+                      "nh os build .#nixosConfigurations.inspernix"
+                      "nh os build .#nixosConfigurations.powerspecnix"]]
+     (doseq [cmd cmds]
+       (let [cmd (str cmd (when show-trace? " -- --show-trace"))]
+         (binding [*out* *err*] (println cmd))
+         (shell cmd))))}
 
   format
-  {:doc "Format all .nix files using nixpkgs-fmt"
+  {:doc  "Format all .nix files using nixpkgs-fmt"
    :task (shell "find . -name '*.nix' -exec nixfmt {} +")}
 
   install-cert-manager
