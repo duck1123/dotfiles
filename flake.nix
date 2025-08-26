@@ -341,7 +341,7 @@
         nasnix = {
           inherit system;
           id =
-            "OWMQLRL-CD5VB7H-A3T436E-6XT4H66-6XRF22Y-MQXMNAU-DFRNGOV-ADSKXXX";
+            "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
           identity = identities.duck;
           name = "nasnix";
           hostname = "nasnix";
