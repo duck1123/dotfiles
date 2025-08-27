@@ -13,8 +13,12 @@
     kernelModules = [ "dm_crypt" ];
 
     loader = {
-      efi.canTouchEfiVariables = true;
-      systemd-boot.enable = true;
+      efi.canTouchEfiVariables = false;
+      grub = {
+        enable = true;
+        device = "/dev/vda";
+        useOSProber = true;
+      };
     };
 
     plymouth.enable = true;

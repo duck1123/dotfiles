@@ -13,7 +13,7 @@ let
     ./base.nix
     ../../modules/i18n
     ../../modules/network
-    ../../modules/sddm
+    # ../../modules/sddm
     ../../modules/stylix
     ../../modules/syncthing
   ];
@@ -22,10 +22,15 @@ let
     configuration.imports = core ++ [ module ];
   };
   specialisations = {
+    budgie = mkSpecialisation ../../modules/budgie;
     hyprland = mkSpecialisation ../../modules/hyprland;
     gnome = mkSpecialisation ../../modules/gnome;
+    plasma6 = mkSpecialisation ../../modules/plasma6;
   };
 in {
-  imports = specialisations.hyprland.configuration.imports;
+  imports = specialisations.budgie.configuration.imports;
   specialisation.gnome = specialisations.gnome;
+  specialisation.budgie = specialisations.budgie;
+  # specialisation.hyprland = specialisations.hyprland;
+  # specialisation.plasma6 = specialisations.plasma6;
 }

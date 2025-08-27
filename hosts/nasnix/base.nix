@@ -1,10 +1,10 @@
 { config, inputs, pkgs, ... }: {
-  # # Configure console font
-  # console = {
-  #   font = "ter-v32n";
-  #   packages = with pkgs; [ terminus_font ];
-  #   earlySetup = true;
-  # };
+  # Configure console font
+  console = {
+    font = "ter-v32n";
+    packages = with pkgs; [ terminus_font ];
+    earlySetup = true;
+  };
 
   # hardware.bluetooth.enable = true;
 
@@ -18,22 +18,28 @@
       experimental-features = nix-command flakes
     '';
 
-    # gc = {
-    #   automatic = true;
-    #   options = "--delete-older-than 14d";
-    # };
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 14d";
+    };
 
-    # optimise.automatic = true;
+    optimise.automatic = true;
 
-    # settings = {
-    #   auto-optimise-store = true;
-    #   experimental-features = [ "nix-command" "flakes" ];
-    #   substituters = [ "https://hyprland.cachix.org" ];
-    #   trusted-public-keys = [
-    #     "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-    #   ];
-    #   trusted-users = [ "root" "duck" ];
-    # };
+    settings = {
+      auto-optimise-store = true;
+      experimental-features = [ "nix-command" "flakes" ];
+      substituters = [
+        "https://duck1123.cachix.org"
+        "https://nix-community.cachix.org"
+        "https://hyprland.cachix.org"
+      ];
+      trusted-public-keys = [
+        "duck1123.cachix.org-1:Cj3r3BH7Xuy0zFWy8V/VIB3F7+Gi1m9HB302E9UGV3E="
+        "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+        "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      ];
+      trusted-users = [ "root" "duck" ];
+    };
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -57,7 +63,7 @@
     # };
 
     # steam.enable = true;
-    # zsh.enable = true;
+    zsh.enable = true;
   };
 
   security.rtkit.enable = true;
@@ -74,14 +80,14 @@
     # libinput.enable = true;
 
     # Enable the OpenSSH daemon.
-    # openssh = {
-    #   enable = true;
+    openssh = {
+      enable = true;
 
-    #   settings = {
-    #     KbdInteractiveAuthentication = false;
-    #     PasswordAuthentication = false;
-    #   };
-    # };
+      # settings = {
+      #   KbdInteractiveAuthentication = false;
+      #   PasswordAuthentication = false;
+      # };
+    };
 
     # pipewire = {
     #   enable = true;
@@ -92,7 +98,7 @@
 
     # printing.enable = true;
     # pulseaudio.enable = false;
-    # tailscale.enable = true;
+    tailscale.enable = true;
 
     # upower.enable = true;
 
@@ -119,9 +125,9 @@
   };
 
   # Add network file sharing packages
-  # environment.systemPackages = with pkgs; [
-  #   gvfs
-  #   nfs-utils
-  #   cifs-utils
-  # ];
+  environment.systemPackages = with pkgs; [
+    gvfs
+    nfs-utils
+    cifs-utils
+  ];
 }
