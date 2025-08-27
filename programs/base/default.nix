@@ -105,13 +105,6 @@ in {
     mr.enable = true;
     jq.enable = true;
 
-    ssh = {
-      enable = true;
-      extraConfig = ''
-        StrictHostKeyChecking=no
-      '';
-    };
-
     tmux.enable = true;
 
     zen-browser = {
