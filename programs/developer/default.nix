@@ -5,12 +5,6 @@
       argo
       argocd
       # arkade
-      (azure-cli.withExtensions [
-        azure-cli-extensions.azure-devops
-        azure-cli-extensions.powerbidedicated
-      ])
-      databricks-cli
-      databricks-sql-cli
       # dbx
       dbeaver-bin
       # devpod
