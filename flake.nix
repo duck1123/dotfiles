@@ -788,6 +788,7 @@
               nh
               nix
               nixpkgs-fmt
+              nmap
               runme
               sops
               ssh-to-age
