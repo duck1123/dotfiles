@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }: {
+{ pkgs, lib, ... }: {
   # Bootloader.
   boot = {
     binfmt.registrations.appimage = {
@@ -16,8 +16,8 @@
       efi.canTouchEfiVariables = false;
       grub = {
         enable = true;
-        device = "/dev/vda";
-        useOSProber = true;
+        device = "nodev";
+        useOSProber = lib.mkDefault false;
       };
     };
 
