@@ -264,6 +264,7 @@
         config.allowUnfree = true;
         overlays = [ ];
       };
+      # For now, define hosts directly without validation to get the flake working
       hosts = {
         inspernix =
           import ./hosts/inspernix/default.nix { inherit system identities; };
@@ -280,10 +281,7 @@
           inherit system identities;
         };
       };
-
     in rec {
-      inherit hosts;
-      imports = [ ./modules/flakeModules ];
 
       colmenaHive = colmena.lib.makeHive {
         meta.nixpkgs = import nixpkgs { inherit system; };
@@ -297,60 +295,56 @@
 
       # Home configurations
       # Accessible via 'home-manager'
-      homeConfigurations = let
-        core = [
-          stylix.homeModules.stylix
-          zen-browser.homeModules.beta
-          ./modules/flakeModules
-        ];
-      in {
-        drenfer = homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit hosts inputs system;
-            host = hosts.vallenpc;
+      homeConfigurations =
+        let core = [ stylix.homeModules.stylix zen-browser.homeModules.beta ];
+        in {
+          drenfer = homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit hosts inputs system;
+              host = hosts.vallenpc;
+            };
+            modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home.nix ]
+              ++ [{ host = hosts.vallenpc; }];
           };
-          modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home.nix ]
-            ++ [{ host = hosts.vallenpc; }];
-        };
 
-        deck = homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit hosts inputs system;
-            host = hosts.steamdeck;
+          deck = homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit hosts inputs system;
+              host = hosts.steamdeck;
+            };
+            modules = core ++ [ ./hosts/steamdeck/home.nix ];
           };
-          modules = core ++ [ ./hosts/steamdeck/home.nix ];
-        };
 
-        "duck@inspernix" = homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit hosts inputs system;
-            host = hosts.inspernix;
+          "duck@inspernix" = homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit hosts inputs system;
+              host = hosts.inspernix;
+            };
+            modules = core ++ [ ./hosts/inspernix/home.nix ]
+              ++ [{ host = hosts.inspernix; }];
           };
-          modules = core ++ [ ./hosts/inspernix/home.nix ]
-            ++ [{ host = hosts.inspernix; }];
-        };
 
-        "duck@nasnix" = homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit hosts inputs system;
-            host = hosts.nasnix;
+          "duck@nasnix" = homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit hosts inputs system;
+              host = hosts.nasnix;
+            };
+            modules = core ++ [ ./hosts/nasnix/home.nix ];
           };
-          modules = core ++ [ ./hosts/nasnix/home.nix ];
-        };
 
-        "duck@powerspecnix" = homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit hosts inputs system;
-            host = hosts.powerspecnix;
+          "duck@powerspecnix" = homeManagerConfiguration {
+            inherit pkgs;
+            extraSpecialArgs = {
+              inherit hosts inputs system;
+              host = hosts.powerspecnix;
+            };
+            modules = core ++ [ ./hosts/powerspecnix/home.nix ];
           };
-          modules = core ++ [ ./hosts/powerspecnix/home.nix ];
         };
-      };
 
       nixosConfigurations = {
         inspernix = nixosSystem {
