@@ -118,9 +118,5 @@
   };
 
   # Add network file sharing packages
-  environment.systemPackages = with pkgs; [
-    gvfs
-    nfs-utils
-    cifs-utils
-  ];
+  environment.systemPackages = with pkgs; [ gvfs nfs-utils cifs-utils ];
 }

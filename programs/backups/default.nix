@@ -1,8 +1,3 @@
 { pkgs, ... }: {
-  home.packages = with pkgs; [
-    borgmatic
-    deja-dup
-    duplicati
-    restic
-  ];
+  home.packages = with pkgs; [ borgmatic deja-dup duplicati restic ];
 }
