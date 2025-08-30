@@ -22,7 +22,7 @@
 
   build-home
   {:doc  "Build the current home configuration"
-   :task (shell "nh home build .")}
+   :task (shell "nh home build . -- --show-trace")}
 
   build-home-inspernix
   {:task
