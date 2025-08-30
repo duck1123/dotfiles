@@ -14,7 +14,7 @@ in {
     host = mkOption {
       type = hostSubmodule;
       description = "The host";
-      default = {};
+      default = { };
     };
 
     hosts = mkOption {
