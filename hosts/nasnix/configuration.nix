@@ -13,6 +13,7 @@ let
     ./base.nix
     ../../modules/i18n
     ../../modules/kubernetes
+    ../../modules/media
     ../../modules/network
     # ../../modules/sddm
     ../../modules/stylix
