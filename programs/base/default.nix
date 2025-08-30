@@ -3,6 +3,7 @@ let inherit (host.identity) username;
 in {
   imports = [
     ../backups
+    ../chm
     ../clojure
     ../dbt
     ../dconf

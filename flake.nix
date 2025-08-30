@@ -276,6 +276,7 @@
           features = {
             backups.enable = false;
             bitcoin.enable = false;
+            chm.enable = false;
             clojure.enable = true;
             dbt.enable = false;
             dconf.enable = false;
@@ -349,6 +350,7 @@
           features = {
             backups.enable = false;
             bitcoin.enable = false;
+            chm.enable = false;
             clojure.enable = false;
             dbt.enable = false;
             dconf.enable = false;
@@ -418,6 +420,7 @@
           features = {
             backups.enable = false;
             bitcoin.enable = false;
+            chm.enable = false;
             clojure.enable = false;
             dbt.enable = false;
             dconf.enable = false;
@@ -484,6 +487,7 @@
           features = {
             backups.enable = true;
             bitcoin.enable = false;
+            chm.enable = false;
             clojure.enable = true;
             dbt.enable = false;
             dconf.enable = false;
@@ -550,6 +554,7 @@
           features = {
             backups.enable = false;
             bitcoin.enable = false;
+            chm.enable = false;
             clojure.enable = false;
             dbt.enable = false;
             dconf.enable = false;
@@ -616,6 +621,7 @@
           features = {
             backups.enable = false;
             bitcoin.enable = false;
+            chm.enable = false;
             clojure.enable = true;
             dbt.enable = true;
             dconf.enable = false;

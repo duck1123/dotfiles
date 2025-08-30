@@ -37,7 +37,6 @@
       jet
       k3d
       k9s
-      kchmviewer
       # krew
       kubernetes-helm
       kubectl
