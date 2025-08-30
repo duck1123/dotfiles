@@ -2,8 +2,11 @@
 # Home configurations
 # Accessible via 'home-manager'
 let
-  core =
-    [ inputs.stylix.homeModules.stylix inputs.zen-browser.homeModules.beta ];
+  core = [
+    inputs.stylix.homeModules.stylix
+    inputs.zen-browser.homeModules.beta
+    ../modules/flakeModules
+  ];
   inherit (inputs.home-manager.lib) homeManagerConfiguration;
 in {
   drenfer = homeManagerConfiguration {
