@@ -354,7 +354,7 @@
             clojure.enable = false;
             dbt.enable = false;
             dconf.enable = false;
-            developer.enable = false;
+            developer.enable = true;
             dunst.enable = false;
             emacs.enable = true;
             emacs-prelude.enable = false;
