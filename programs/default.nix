@@ -1,1 +1,37 @@
-{ ... }: { imports = [ ./base ]; }
+{ ... }: {
+  imports = [
+    ./backups
+    ./base
+    ./chm
+    ./clojure
+    ./dbt
+    ./dconf
+    ./developer
+    ./dunst
+    ./emacs
+    ./emacs-prelude
+    ./email
+    ./flipper
+    ./gaming
+    ./git
+    ./gnome
+    ./hyprland
+    ./hyprpanel
+    ./i3
+    ./java
+    ./jujutsu
+    ./media
+    ./music
+    ./ncmpcpp
+    ./nostr
+    ./nushell
+    ./office
+    ./pictures
+    ./radio
+    ./stylix
+    ./vim
+    ./vscode
+    ./waybar
+    ./zsh
+  ];
+}
