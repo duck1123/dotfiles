@@ -20,7 +20,7 @@ in {
             autoAcceptFolders = true;
           };
 
-          ${pixel8.name}  = {
+          ${pixel8.name} = {
             id = pixel8.id;
             autoAcceptFolders = true;
           };
