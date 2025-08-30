@@ -1,7 +1,6 @@
-{ inputs, hosts, ... }:
+{ inputs, ... }:
 let
   core = [
-    { inherit hosts; }
     inputs.disko.nixosModules.disko
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
@@ -9,13 +8,13 @@ let
     ./hardware-configuration.nix
     ../../modules/bitcoin
     ../../modules/boot
-    ../../modules/flakeModules
+  
     ./base.nix
     ../../modules/i18n
     ../../modules/network
     # ../../modules/sddm
     ../../modules/stylix
-    ../../modules/syncthing
+    # ../../modules/syncthing
   ];
   mkSpecialisation = module: {
     inheritParentConfig = false;

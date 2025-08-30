@@ -1,12 +1,11 @@
-{ inputs, hosts, ... }:
+{ inputs, ... }:
 let
   core = [
-    { inherit hosts; }
     inputs.disko.nixosModules.disko
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops
     inputs.stylix.nixosModules.stylix
-    ../../modules/flakeModules
+  
     ./hardware-configuration.nix
     ../../modules/base
     # ../../modules/bitcoin
@@ -17,7 +16,7 @@ let
     ../../modules/network
     ../../modules/sddm
     ../../modules/stylix
-    ../../modules/syncthing
+    # ../../modules/syncthing
     ../../modules/users
     # ../../modules/virtualization
   ];

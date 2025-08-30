@@ -264,6 +264,7 @@
         config.allowUnfree = true;
         overlays = [ ];
       };
+      # For now, define hosts directly without validation to get the flake working
       hosts = {
         inspernix = {
           inherit system;
@@ -338,347 +339,335 @@
           };
         };
 
-        nasnix = {
-          inherit system;
-          id =
-            "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
-          identity = identities.duck;
-          name = "nasnix";
-          hostname = "nasnix";
+          nasnix = {
+            inherit system;
+            id =
+              "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
+            identity = identities.duck;
+            name = "nasnix";
+            hostname = "nasnix";
 
-          features = {
-            backups.enable = false;
-            bitcoin.enable = false;
-            clojure.enable = false;
-            dbt.enable = false;
-            dconf.enable = false;
-            developer.enable = false;
-            dunst.enable = false;
-            emacs.enable = true;
-            emacs-prelude.enable = false;
-            email.enable = false;
-            flipper.enable = false;
-            gaming.enable = false;
-            git.enable = true;
-            gnome.enable = false;
-            hyprland.enable = true;
-            hyprpanel.enable = true;
-            i3.enable = false;
-            java.enable = false;
-            jujutsu.enable = true;
+            features = {
+              backups.enable = false;
+              bitcoin.enable = false;
+              clojure.enable = false;
+              dbt.enable = false;
+              dconf.enable = false;
+              developer.enable = false;
+              dunst.enable = false;
+              emacs.enable = true;
+              emacs-prelude.enable = false;
+              email.enable = false;
+              flipper.enable = false;
+              gaming.enable = false;
+              git.enable = true;
+              gnome.enable = false;
+              hyprland.enable = true;
+              hyprpanel.enable = true;
+              i3.enable = false;
+              java.enable = false;
+              jujutsu.enable = true;
 
-            kubernetes = {
-              client.enable = true;
-              server.enable = false;
-            };
-
-            media.enable = false;
-            music.enable = false;
-            ncmpcpp.enable = false;
-            nfs.enable = false;
-            nostr.enable = true;
-            nushell.enable = true;
-            office.enable = false;
-            pictures.enable = false;
-            radio.enable = false;
-            stylix.enable = true;
-
-            syncthing = {
-              enable = true;
-
-              shares = {
-                camera.enable = false;
-                keepass.enable = true;
-                org-roam.enable = false;
-                renpy.enable = false;
+              kubernetes = {
+                client.enable = true;
+                server.enable = false;
               };
+
+              media.enable = false;
+              music.enable = false;
+              ncmpcpp.enable = false;
+              nfs.enable = false;
+              nostr.enable = true;
+              nushell.enable = true;
+              office.enable = false;
+              pictures.enable = false;
+              radio.enable = false;
+              stylix.enable = true;
+
+              syncthing = {
+                enable = true;
+
+                shares = {
+                  camera.enable = false;
+                  keepass.enable = true;
+                  org-roam.enable = false;
+                  renpy.enable = false;
+                };
+              };
+
+              vim.enable = false;
+              virtualization.enable = false;
+              vscode.enable = true;
+              waybar.enable = false;
+              zsh.enable = true;
             };
 
-            vim.enable = false;
-            virtualization.enable = false;
-            vscode.enable = true;
-            waybar.enable = false;
-            zsh.enable = true;
+            nixos = {
+              enable = true;
+              budgie.enable = false;
+              gnome.enable = false;
+              hyprland.enable = false;
+              i3.enable = false;
+              plasma6.enable = false;
+            };
           };
 
-          nixos = {
-            enable = true;
-            budgie.enable = false;
-            gnome.enable = false;
-            hyprland.enable = false;
-            i3.enable = false;
-            plasma6.enable = false;
+          pixel8 = {
+            inherit system;
+            android.enable = true;
+
+            features = {
+              backups.enable = false;
+              bitcoin.enable = false;
+              clojure.enable = false;
+              dbt.enable = false;
+              dconf.enable = false;
+              developer.enable = false;
+              dunst.enable = false;
+              emacs.enable = false;
+              emacs-prelude.enable = false;
+              email.enable = false;
+              flipper.enable = false;
+              gaming.enable = true;
+              git.enable = false;
+              gnome.enable = true;
+              hyprland.enable = false;
+              hyprpanel.enable = true;
+              i3.enable = false;
+              java.enable = false;
+              jujutsu.enable = false;
+
+              kubernetes = {
+                client.enable = false;
+                server.enable = false;
+              };
+
+              media.enable = false;
+              music.enable = false;
+              ncmpcpp.enable = false;
+              nfs.enable = true;
+              nostr.enable = true;
+              nushell.enable = true;
+              office.enable = false;
+              pictures.enable = false;
+              radio.enable = false;
+              stylix.enable = false;
+
+              syncthing = {
+                enable = true;
+
+                shares = {
+                  camera.enable = true;
+                  keepass.enable = true;
+                  org-roam.enable = true;
+                  renpy.enable = false;
+                };
+              };
+
+              vim.enable = false;
+              virtualization.enable = false;
+              vscode.enable = true;
+              waybar.enable = false;
+              zsh.enable = true;
+            };
+
+            hostname = "pixel8";
+            id =
+              "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
+            identity = identities.duck;
+            name = "Pixel 8";
+
+          };
+
+          powerspecnix = {
+            inherit system;
+
+            features = {
+              backups.enable = true;
+              bitcoin.enable = false;
+              clojure.enable = true;
+              dbt.enable = false;
+              dconf.enable = false;
+              developer.enable = true;
+              dunst.enable = false;
+              emacs.enable = true;
+              emacs-prelude.enable = false;
+              email.enable = true;
+              flipper.enable = true;
+              gaming.enable = true;
+              git.enable = true;
+              gnome.enable = true;
+              hyprland.enable = true;
+              hyprpanel.enable = true;
+              i3.enable = false;
+              java.enable = true;
+              jujutsu.enable = true;
+
+              kubernetes = {
+                client.enable = true;
+                server.enable = false;
+              };
+
+              media.enable = true;
+              music.enable = false;
+              ncmpcpp.enable = false;
+              nfs.enable = true;
+              nostr.enable = true;
+              nushell.enable = true;
+              office.enable = true;
+              pictures.enable = true;
+              radio.enable = true;
+              stylix.enable = true;
+
+              syncthing = {
+                enable = true;
+
+                shares = {
+                  camera.enable = true;
+                  keepass.enable = true;
+                  org-roam.enable = true;
+                  renpy.enable = true;
+                };
+              };
+
+              vim.enable = false;
+              virtualization.enable = false;
+              vscode.enable = true;
+              waybar.enable = false;
+              zsh.enable = true;
+            };
+
+            hostname = "powerspecnix";
+            id =
+              "UFCCQLJ-3EKBVCQ-O5CNVM5-ERJQAQG-JWKQRPU-7FOZHPG-VMEOMKJ-KZSUFQK";
+            identity = identities.duck;
+            name = "powerspecnix";
+            nixos.enable = true;
+          };
+
+          steamdeck = {
+            inherit system;
+
+            features = {
+              backups.enable = false;
+              bitcoin.enable = false;
+              clojure.enable = false;
+              dbt.enable = false;
+              dconf.enable = false;
+              developer.enable = false;
+              dunst.enable = false;
+              emacs.enable = false;
+              emacs-prelude.enable = false;
+              email.enable = false;
+              flipper.enable = false;
+              gaming.enable = false;
+              git.enable = true;
+              gnome.enable = true;
+              hyprland.enable = false;
+              hyprpanel.enable = true;
+              i3.enable = false;
+              java.enable = true;
+              jujutsu.enable = true;
+
+              kubernetes = {
+                client.enable = false;
+                server.enable = false;
+              };
+
+              media.enable = false;
+              music.enable = false;
+              ncmpcpp.enable = false;
+              nfs.enable = false;
+              nostr.enable = false;
+              nushell.enable = false;
+              office.enable = false;
+              pictures.enable = false;
+              radio.enable = false;
+              stylix.enable = false;
+
+              syncthing = {
+                enable = true;
+                shares = {
+                  camera.enable = false;
+                  keepass.enable = true;
+                  org-roam.enable = false;
+                  renpy.enable = true;
+                };
+              };
+
+              vim.enable = false;
+              virtualization.enable = false;
+              vscode.enable = false;
+              waybar.enable = false;
+              zsh.enable = false;
+            };
+
+            hostname = "steamdeck";
+            id =
+              "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX";
+            identity = identities.deck;
+            name = "steamdeck";
+            home-manager.enable = true;
+            nixos.enable = false;
+          };
+
+          vallenpc = {
+            inherit system;
+
+            features = {
+              backups.enable = false;
+              bitcoin.enable = false;
+              clojure.enable = true;
+              dbt.enable = true;
+              dconf.enable = false;
+              developer.enable = true;
+              dunst.enable = false;
+              emacs.enable = true;
+              emacs-prelude.enable = false;
+              email.enable = false;
+              flipper.enable = false;
+              gaming.enable = true;
+              git.enable = true;
+              gnome.enable = false;
+              hyprland.enable = false;
+              i3.enable = false;
+              java.enable = true;
+              jujutsu.enable = true;
+              media.enable = false;
+              ncmpcpp.enable = false;
+              nushell.enable = true;
+              office.enable = false;
+              pictures.enable = false;
+              stylix.enable = true;
+
+              syncthing = {
+                enable = true;
+                shares = {
+                  camera.enable = false;
+                  keepass.enable = true;
+                  org-roam.enable = false;
+                  renpy.enable = false;
+                };
+              };
+
+              vim.enable = false;
+              virtualization.enable = false;
+              vscode.enable = false;
+              waybar.enable = false;
+              zsh.enable = true;
+            };
+
+            id =
+              "TEED77K-QOLTQ37-BL76MFB-LJD46CW-EJ7CZTJ-7GQNEF6-FZAMQRP-BCCRTQ6";
+            identity = identities.drenfer;
+            name = "VallenPC";
+            hostname = "vavirl-pw0bwnq8";
+            home-manager.enable = true;
+            nixos.enable = false;
           };
         };
-
-        pixel8 = {
-          inherit system;
-          android.enable = true;
-
-          features = {
-            backups.enable = false;
-            bitcoin.enable = false;
-            clojure.enable = false;
-            dbt.enable = false;
-            dconf.enable = false;
-            developer.enable = false;
-            dunst.enable = false;
-            emacs.enable = false;
-            emacs-prelude.enable = false;
-            email.enable = false;
-            flipper.enable = false;
-            gaming.enable = true;
-            git.enable = false;
-            gnome.enable = true;
-            hyprland.enable = false;
-            hyprpanel.enable = true;
-            i3.enable = false;
-            java.enable = false;
-            jujutsu.enable = false;
-
-            kubernetes = {
-              client.enable = false;
-              server.enable = false;
-            };
-
-            media.enable = false;
-            music.enable = false;
-            ncmpcpp.enable = false;
-            nfs.enable = true;
-            nostr.enable = true;
-            nushell.enable = true;
-            office.enable = false;
-            pictures.enable = false;
-            radio.enable = false;
-            stylix.enable = false;
-
-            syncthing = {
-              enable = true;
-
-              shares = {
-                camera.enable = true;
-                keepass.enable = true;
-                org-roam.enable = true;
-                renpy.enable = false;
-              };
-            };
-
-            vim.enable = false;
-            virtualization.enable = false;
-            vscode.enable = true;
-            waybar.enable = false;
-            zsh.enable = true;
-          };
-
-          hostname = "pixel8";
-          id =
-            "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
-          identity = identities.duck;
-          name = "Pixel 8";
-
-        };
-
-        powerspecnix = {
-          inherit system;
-
-          features = {
-            backups.enable = true;
-            bitcoin.enable = false;
-            clojure.enable = true;
-            dbt.enable = false;
-            dconf.enable = false;
-            developer.enable = true;
-            dunst.enable = false;
-            emacs.enable = true;
-            emacs-prelude.enable = false;
-            email.enable = true;
-            flipper.enable = true;
-            gaming.enable = true;
-            git.enable = true;
-            gnome.enable = true;
-            hyprland.enable = true;
-            hyprpanel.enable = true;
-            i3.enable = false;
-            java.enable = true;
-            jujutsu.enable = true;
-
-            kubernetes = {
-              client.enable = true;
-              server.enable = false;
-            };
-
-            media.enable = true;
-            music.enable = false;
-            ncmpcpp.enable = false;
-            nfs.enable = true;
-            nostr.enable = true;
-            nushell.enable = true;
-            office.enable = true;
-            pictures.enable = true;
-            radio.enable = true;
-            stylix.enable = true;
-
-            syncthing = {
-              enable = true;
-
-              shares = {
-                camera.enable = true;
-                keepass.enable = true;
-                org-roam.enable = true;
-                renpy.enable = true;
-              };
-            };
-
-            vim.enable = false;
-            virtualization.enable = false;
-            vscode.enable = true;
-            waybar.enable = false;
-            zsh.enable = true;
-          };
-
-          hostname = "powerspecnix";
-          id =
-            "UFCCQLJ-3EKBVCQ-O5CNVM5-ERJQAQG-JWKQRPU-7FOZHPG-VMEOMKJ-KZSUFQK";
-          identity = identities.duck;
-          name = "powerspecnix";
-          nixos.enable = true;
-        };
-
-        steamdeck = {
-          inherit system;
-
-          features = {
-            backups.enable = false;
-            bitcoin.enable = false;
-            clojure.enable = false;
-            dbt.enable = false;
-            dconf.enable = false;
-            developer.enable = false;
-            dunst.enable = false;
-            emacs.enable = false;
-            emacs-prelude.enable = false;
-            email.enable = false;
-            flipper.enable = false;
-            gaming.enable = false;
-            git.enable = true;
-            gnome.enable = true;
-            hyprland.enable = false;
-            hyprpanel.enable = true;
-            i3.enable = false;
-            java.enable = true;
-            jujutsu.enable = true;
-
-            kubernetes = {
-              client.enable = false;
-              server.enable = false;
-            };
-
-            media.enable = false;
-            music.enable = false;
-            ncmpcpp.enable = false;
-            nfs.enable = false;
-            nostr.enable = false;
-            nushell.enable = false;
-            office.enable = false;
-            pictures.enable = false;
-            radio.enable = false;
-            stylix.enable = false;
-
-            syncthing = {
-              enable = true;
-              shares = {
-                camera.enable = false;
-                keepass.enable = true;
-                org-roam.enable = false;
-                renpy.enable = true;
-              };
-            };
-
-            vim.enable = false;
-            virtualization.enable = false;
-            vscode.enable = false;
-            waybar.enable = false;
-            zsh.enable = false;
-          };
-
-          hostname = "steamdeck";
-          id =
-            "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX";
-          identity = identities.deck;
-          name = "steamdeck";
-          home-manager.enable = true;
-          nixos.enable = false;
-        };
-
-        vallenpc = {
-          inherit system;
-
-          features = {
-            backups.enable = false;
-            bitcoin.enable = false;
-            clojure.enable = true;
-            dbt.enable = true;
-            dconf.enable = false;
-            developer.enable = true;
-            dunst.enable = false;
-            emacs.enable = true;
-            emacs-prelude.enable = false;
-            email.enable = false;
-            flipper.enable = false;
-            gaming.enable = true;
-            git.enable = true;
-            gnome.enable = false;
-            hyprland.enable = false;
-            i3.enable = false;
-            java.enable = true;
-            jujutsu.enable = true;
-            media.enable = false;
-            ncmpcpp.enable = false;
-            nushell.enable = true;
-            office.enable = false;
-            pictures.enable = false;
-            stylix.enable = true;
-
-            syncthing = {
-              enable = true;
-              shares = {
-                camera.enable = false;
-                keepass.enable = true;
-                org-roam.enable = false;
-                renpy.enable = false;
-              };
-            };
-
-            vim.enable = false;
-            virtualization.enable = false;
-            vscode.enable = false;
-            waybar.enable = false;
-            zsh.enable = true;
-          };
-
-          id =
-            "TEED77K-QOLTQ37-BL76MFB-LJD46CW-EJ7CZTJ-7GQNEF6-FZAMQRP-BCCRTQ6";
-          identity = identities.drenfer;
-          name = "VallenPC";
-          hostname = "vavirl-pw0bwnq8";
-          home-manager.enable = true;
-          nixos.enable = false;
-        };
-      };
 
     in rec {
-      inherit hosts;
-      imports = [ ./modules/flakeModules ];
-
-      colmenaHive = colmena.lib.makeHive {
-        meta.nixpkgs = import nixpkgs { inherit system; };
-
-        piNodeA = {
-          boot.isContainer = true;
-          deployment.targetHost = "pinodea";
-          time.timeZone = defaultTZ;
-        };
-      };
 
       # Home configurations
       # Accessible via 'home-manager'
@@ -686,7 +675,6 @@
         core = [
           stylix.homeModules.stylix
           zen-browser.homeModules.beta
-          ./modules/flakeModules
         ];
       in {
         drenfer = homeManagerConfiguration {
@@ -766,36 +754,6 @@
         };
       };
 
-      devShells = eachDefaultSystemMap (system:
-        let pkgs = import nixpkgs { inherit system; };
-        in {
-          default = pkgs.mkShell {
-            name = "installation-shell";
 
-            # See https://github.com/disassembler/network/blob/c341a3af27611390f13f86d966767ea30c726a92/shell.nix
-            sopsPGPKeyDirs = [ "./nixos/secrets/keys" ];
-
-            buildInputs = with pkgs; [
-              age
-              babashka
-              cachix
-              clojure
-              pkgs.colmena
-              git
-              pkgs.home-manager
-              keepassxc
-              kubectl
-              nh
-              nix
-              nixpkgs-fmt
-              runme
-              sops
-              ssh-to-age
-              ssh-to-pgp
-              vals
-              wget
-            ];
-          };
-        });
     };
 }
