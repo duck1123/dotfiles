@@ -351,7 +351,7 @@
             backups.enable = false;
             bitcoin.enable = false;
             chm.enable = false;
-            clojure.enable = false;
+            clojure.enable = true;
             dbt.enable = false;
             dconf.enable = false;
             developer.enable = true;
@@ -374,7 +374,7 @@
               server.enable = true;
             };
 
-            media.enable = false;
+            media.enable = true;
             music.enable = false;
             ncmpcpp.enable = false;
             nfs.enable = false;

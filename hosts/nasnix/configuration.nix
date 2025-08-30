@@ -12,6 +12,7 @@ let
     ../../modules/flakeModules
     ./base.nix
     ../../modules/i18n
+    ../../modules/kubernetes
     ../../modules/network
     # ../../modules/sddm
     ../../modules/stylix
