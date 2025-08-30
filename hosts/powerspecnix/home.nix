@@ -18,7 +18,7 @@
       kty
       libnotify
       # logseq
-      mdcat
+      # mdcat
       minio-client
       # mullvad-browser
       # nerd-fonts.fira-code
