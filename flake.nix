@@ -371,7 +371,7 @@
 
             kubernetes = {
               client.enable = true;
-              server.enable = false;
+              server.enable = true;
             };
 
             media.enable = false;
