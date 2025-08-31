@@ -62,52 +62,271 @@
 
         # gestures."workspace_swipe" = false;
 
-        bind = [
-          "   $mainMod,                     A, exec, youtube-music"
-          "   $mainMod,                     B, exec, zen"
-          "   $mainMod,                     C, killactive,"
-          "   $mainMod,                     D, exec, nautilus $(cat ~/.last_dir 2>/dev/null || echo $HOME)"
-          # "   $mainMod,                     E, exec, emacs"
-          "   $mainMod,                     E, exec, emacsclient -c -a \"\" --eval \"(magit-status \\\"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\\\")\""
-          "   $mainMod,                     F, fullscreen,"
-          "   $mainMod,                     G, exec, gossip"
-          "   $mainMod,                     H, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" htop"
-          "   $mainMod,                     J, togglesplit,"
-          "   $mainMod,                     K, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" k9s"
-          "   $mainMod,                     L, exec, lens"
-          "   $mainMod,                     M, exit,"
-          "   $mainMod,                     N, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" nu"
-          "   $mainMod,                     P, pseudo,"
-          "   $mainMod,                     R, exec, rofiWindow"
-          "   $mainMod,                     T, exec, teams-for-linux"
-          "   $mainMod,                     U, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" jjui"
-          "   $mainMod,                     V, togglefloating,"
-          "   $mainMod,                     w, exec, nwg-drawer"
-          "   $mainMod,                 SPACE, exec, nwg-drawer"
-          "   $mainMod,                RETURN, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\""
-          "   $mainMod,                   Tab, cyclenext,"
-          "   $mainMod,                   Tab, bringactivetotop,"
-          "           ,                 Print, exec, hyprshot -m region"
-          ''SHIFT,                 Print, exec, grim -g "$(slurp)"''
-          "           ,      XF86AudioMicMute, exec, pamixer --default-source -t"
-          "           , XF86MonBrightnessDown, exec, light -U 20"
-          "           ,   XF86MonBrightnessUp, exec, light -A 20"
-          "           ,         XF86AudioMute, exec, pamixer -t"
-          "           ,  XF86AudioLowerVolume, exec, pamixer -d 5"
-          "           ,  XF86AudioRaiseVolume, exec, pamixer -i 5"
-          "           ,         XF86AudioPlay, exec, playerctl play-pause"
-          "           ,        XF86AudioPause, exec, playerctl play-pause"
-          "   $mainMod,                    up, movefocus, u"
-          "SUPER_SHIFT,                    up, movewindow, u"
-          "   $mainMod,                  down, movefocus, d"
-          "SUPER_SHIFT,                  down, movewindow, d"
-          "   $mainMod,                  left, movefocus, l"
-          "SUPER_SHIFT,                  left, movewindow, l"
-          "   $mainMod,                 right, movefocus, r"
-          "SUPER_SHIFT,                 right, movewindow, r"
-          "   $mainMod,              mouse_up, workspace, e-1"
-          "   $mainMod,            mouse_down, workspace, e+1"
-        ] ++ (
+        bind = (map (x: "${x.mod},${x.key},${x.command},${x.arg}") [
+          # Letter key bindings (sorted by key)
+          {
+            mod = "$mainMod";
+            key = "a";
+            command = "exec";
+            arg = "youtube-music";
+          }
+          {
+            mod = "$mainMod";
+            key = "b";
+            command = "exec";
+            arg = "zen";
+          }
+          {
+            mod = "$mainMod";
+            key = "c";
+            command = "killactive";
+            arg = "";
+          }
+          {
+            mod = "$mainMod";
+            key = "d";
+            command = "exec";
+            arg = ''nautilus "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
+          }
+          {
+            mod = "$mainMod";
+            key = "e";
+            command = "exec";
+            arg = ''
+              emacsclient -c -a "" --eval "(magit-status \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\")"'';
+          }
+          {
+            mod = "$mainMod";
+            key = "f";
+            command = "fullscreen";
+            arg = "";
+          }
+          {
+            mod = "$mainMod";
+            key = "g";
+            command = "exec";
+            arg = "gossip";
+          }
+          {
+            mod = "$mainMod";
+            key = "h";
+            command = "exec";
+            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" htop'';
+          }
+          {
+            mod = "$mainMod";
+            key = "j";
+            command = "togglesplit";
+            arg = "";
+          }
+          {
+            mod = "$mainMod";
+            key = "k";
+            command = "exec";
+            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" k9s'';
+          }
+          {
+            mod = "$mainMod";
+            key = "l";
+            command = "exec";
+            arg = "lens";
+          }
+          {
+            mod = "$mainMod";
+            key = "m";
+            command = "exit";
+            arg = "";
+          }
+          {
+            mod = "$mainMod";
+            key = "n";
+            command = "exec";
+            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" nu'';
+          }
+          {
+            mod = "$mainMod";
+            key = "p";
+            command = "pseudo";
+            arg = "";
+          }
+          {
+            mod = "$mainMod";
+            key = "r";
+            command = "exec";
+            arg = "rofiWindow";
+          }
+          {
+            mod = "$mainMod";
+            key = "t";
+            command = "exec";
+            arg = "teams-for-linux";
+          }
+          {
+            mod = "$mainMod";
+            key = "u";
+            command = "exec";
+            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" jjui'';
+          }
+          {
+            mod = "$mainMod";
+            key = "v";
+            command = "togglefloating";
+            arg = "";
+          }
+          {
+            mod = "$mainMod";
+            key = "w";
+            command = "exec";
+            arg = "nwg-drawer";
+          }
+          # Direction key bindings
+          {
+            mod = "$mainMod";
+            key = "down";
+            command = "movefocus";
+            arg = "d";
+          }
+          {
+            mod = "SUPER_SHIFT";
+            key = "down";
+            command = "movewindow";
+            arg = "d";
+          }
+          {
+            mod = "$mainMod";
+            key = "left";
+            command = "movefocus";
+            arg = "l";
+          }
+          {
+            mod = "SUPER_SHIFT";
+            key = "left";
+            command = "movewindow";
+            arg = "l";
+          }
+          {
+            mod = "$mainMod";
+            key = "right";
+            command = "movefocus";
+            arg = "r";
+          }
+          {
+            mod = "SUPER_SHIFT";
+            key = "right";
+            command = "movewindow";
+            arg = "r";
+          }
+          {
+            mod = "$mainMod";
+            key = "up";
+            command = "movefocus";
+            arg = "u";
+          }
+          {
+            mod = "SUPER_SHIFT";
+            key = "up";
+            command = "movewindow";
+            arg = "u";
+          }
+          # Special key bindings
+          {
+            mod = "$mainMod";
+            key = "mouse_down";
+            command = "workspace";
+            arg = "e+1";
+          }
+          {
+            mod = "$mainMod";
+            key = "mouse_up";
+            command = "workspace";
+            arg = "e-1";
+          }
+          {
+            mod = "";
+            key = "Print";
+            command = "exec";
+            arg = "hyprshot -m region";
+          }
+          {
+            mod = "SHIFT";
+            key = "Print";
+            command = "exec";
+            arg = ''grim -g "$(slurp)"'';
+          }
+          {
+            mod = "$mainMod";
+            key = "RETURN";
+            command = "exec";
+            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
+          }
+          {
+            mod = "$mainMod";
+            key = "SPACE";
+            command = "exec";
+            arg = "nwg-drawer";
+          }
+          {
+            mod = "$mainMod";
+            key = "Tab";
+            command = "cyclenext";
+            arg = "";
+          }
+          {
+            mod = "$mainMod";
+            key = "Tab";
+            command = "bringactivetotop";
+            arg = "";
+          }
+          # Media keys
+          {
+            mod = "";
+            key = "XF86AudioLowerVolume";
+            command = "exec";
+            arg = "pamixer -d 5";
+          }
+          {
+            mod = "";
+            key = "XF86AudioMicMute";
+            command = "exec";
+            arg = "pamixer --default-source -t";
+          }
+          {
+            mod = "";
+            key = "XF86AudioMute";
+            command = "exec";
+            arg = "pamixer -t";
+          }
+          {
+            mod = "";
+            key = "XF86AudioPause";
+            command = "exec";
+            arg = "playerctl play-pause";
+          }
+          {
+            mod = "";
+            key = "XF86AudioPlay";
+            command = "exec";
+            arg = "playerctl play-pause";
+          }
+          {
+            mod = "";
+            key = "XF86AudioRaiseVolume";
+            command = "exec";
+            arg = "pamixer -i 5";
+          }
+          {
+            mod = "";
+            key = "XF86MonBrightnessDown";
+            command = "exec";
+            arg = "light -U 20";
+          }
+          {
+            mod = "";
+            key = "XF86MonBrightnessUp";
+            command = "exec";
+            arg = "light -A 20";
+          }
+        ]) ++ (
           # workspaces
           # binds $mainMod + [shift +] {1..9} to [move to] workspace {1..9}
           builtins.concatLists (builtins.genList (i:
@@ -119,14 +338,35 @@
               }"
             ]) 9));
 
-        bindm = [
-          "$mainMod, mouse:272, movewindow"
-          "     ALT, mouse:272, resizewindow"
-          "$mainMod, mouse:273, resizewindow"
-          "        , mouse:275, movewindow"
-          "        , mouse:276, resizewindow"
-        ];
+        bindm = (map (x: "${x.mod},${x.key},${x.command}") [
+          {
+            mod = "$mainMod";
+            key = "mouse:272";
+            command = "movewindow";
+          }
+          {
+            mod = "ALT";
+            key = "mouse:272";
+            command = "resizewindow";
+          }
+          {
+            mod = "$mainMod";
+            key = "mouse:273";
+            command = "resizewindow";
+          }
+          {
+            mod = "";
+            key = "mouse:275";
+            command = "movewindow";
+          }
+          {
+            mod = "";
+            key = "mouse:276";
+            command = "resizewindow";
+          }
+        ]);
 
+        # FIXME: This is environment specific
         monitor =
           [ "HDMI-A-1, 1920x1080, 0x0, 1" "DP-3, 1920x1080, 1920x0, 1" ];
 
