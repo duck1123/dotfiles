@@ -12,6 +12,13 @@
     fsType = "ext4";
   };
 
+  # Add NFS mount for Videos share
+  fileSystems."/mnt/videos" = {
+    device = "192.168.0.29:/volume1/Videos";
+    fsType = "nfs";
+    options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
+  };
+
   swapDevices = [ ];
   networking.useDHCP = lib.mkDefault true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
