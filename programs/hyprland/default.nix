@@ -63,14 +63,6 @@
         # gestures."workspace_swipe" = false;
 
         bind = [
-          "   $mainMod,                     A, exec, youtube-music"
-          "   $mainMod,                     B, exec, zen"
-          "   $mainMod,                     C, killactive,"
-          "   $mainMod,                     D, exec, nautilus $(cat ~/.last_dir 2>/dev/null || echo $HOME)"
-          # "   $mainMod,                     E, exec, emacs"
-          "   $mainMod,                     E, exec, emacsclient -c -a \"\" --eval \"(magit-status \\\"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\\\")\""
-          "   $mainMod,                     F, fullscreen,"
-          "   $mainMod,                     G, exec, gossip"
           "   $mainMod,                     H, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" htop"
           "   $mainMod,                     J, togglesplit,"
           "   $mainMod,                     K, exec, kitty --working-directory \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\" k9s"
@@ -107,7 +99,51 @@
           "SUPER_SHIFT,                 right, movewindow, r"
           "   $mainMod,              mouse_up, workspace, e-1"
           "   $mainMod,            mouse_down, workspace, e+1"
-        ] ++ (
+        ] ++ (map (x: "${x.mod},${x.key},${x.command},${x.arg}") [
+          {
+            mod = "$mainMod";
+            key = "a";
+            command = "exec";
+            arg = "youtube-music";
+          }
+          {
+            mod = "$mainMod";
+            key = "b";
+            command = "exec";
+            arg = "zen";
+          }
+          {
+            mod = "$mainMod";
+            key = "c";
+            command = "killactive";
+            arg = "";
+          }
+          {
+            mod = "$mainMod";
+            key = "d";
+            command = "exec";
+            arg = ''nautilus "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
+          }
+          {
+            mod = "$mainMod";
+            key = "e";
+            command = "exec";
+            arg = ''
+              emacsclient -c -a "" --eval "(magit-status \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\")"'';
+          }
+          {
+            mod = "$mainMod";
+            key = "f";
+            command = "fullscreen";
+            arg = "";
+          }
+          {
+            mod = "$mainMod";
+            key = "g";
+            command = "exec";
+            arg = "gossip";
+          }
+        ]) ++ (
           # workspaces
           # binds $mainMod + [shift +] {1..9} to [move to] workspace {1..9}
           builtins.concatLists (builtins.genList (i:
