@@ -69,24 +69,31 @@
   security.rtkit.enable = true;
 
   services = {
-    # avahi = {
-    #   enable = true;
-    #   nssmdns4 = true;
-    #   openFirewall = true;
-    # };
+    avahi = {
+      enable = true;
+      nssmdns4 = true;
+      openFirewall = true;
+    };
 
     # gnome.gnome-keyring.enable = true;
-    # gvfs.enable = true;
+    gvfs.enable = true;
+
+    # Enable Samba client for Windows/SMB shares
+    samba = {
+      enable = true;
+      securityType = "user";
+    };
+
     # libinput.enable = true;
 
     # Enable the OpenSSH daemon.
     openssh = {
       enable = true;
 
-      # settings = {
-      #   KbdInteractiveAuthentication = false;
-      #   PasswordAuthentication = false;
-      # };
+      settings = {
+        KbdInteractiveAuthentication = false;
+        PasswordAuthentication = false;
+      };
     };
 
     # pipewire = {
@@ -110,20 +117,19 @@
         variant = "";
       };
     };
-
   };
 
-  system.stateVersion = "24.11";
+  system.stateVersion = "25.05";
 
   time.timeZone = "America/Detroit";
 
   users.users.duck = {
     isNormalUser = true;
     description = "Duck Nebuchadnezzar";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "samba" ];
     packages = with pkgs; [ ];
   };
 
   # Add network file sharing packages
-  environment.systemPackages = with pkgs; [ gvfs nfs-utils cifs-utils ];
+  environment.systemPackages = with pkgs; [ gvfs nfs-utils cifs-utils samba ];
 }
