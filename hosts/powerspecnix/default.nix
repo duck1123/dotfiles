@@ -2,7 +2,7 @@
   inherit system;
 
   features = {
-    backups.enable = true;
+    backups.enable = false;
     bitcoin.enable = false;
     chm.enable = false;
     clojure.enable = true;
@@ -13,7 +13,7 @@
     emacs.enable = true;
     emacs-prelude.enable = false;
     email.enable = true;
-    flipper.enable = true;
+    flipper.enable = false;
     gaming.enable = true;
     git.enable = true;
     gnome.enable = true;
@@ -36,7 +36,7 @@
     nushell.enable = true;
     office.enable = true;
     pictures.enable = true;
-    radio.enable = true;
+    radio.enable = false;
     stylix.enable = true;
 
     syncthing = {
