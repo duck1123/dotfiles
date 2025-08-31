@@ -7,7 +7,6 @@
       hyprpanel
       hyprshot
       nautilus
-      # nerd-fonts.caskaydia-mono
       ncpamixer
       nwg-dock-hyprland
       nwg-drawer

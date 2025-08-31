@@ -1,11 +1,4 @@
 { pkgs, ... }: {
-  # Configure console font
-  console = {
-    font = "ter-v32n";
-    packages = with pkgs; [ terminus_font ];
-    earlySetup = true;
-  };
-
   hardware.bluetooth.enable = true;
 
   networking = {

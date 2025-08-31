@@ -2,6 +2,7 @@
   imports = [
     ./bitcoin
     ./boot
+    ./font
     ./i18n
     ./kubernetes
     ./media

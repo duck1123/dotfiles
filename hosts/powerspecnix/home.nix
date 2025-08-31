@@ -21,7 +21,6 @@
       # mdcat
       minio-client
       # mullvad-browser
-      # nerd-fonts.fira-code
       networkmanager
       nix-tree
       # obsidian

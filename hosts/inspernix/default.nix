@@ -17,6 +17,7 @@
     emacs.enable = true;
     emacs-prelude.enable = false;
     email.enable = false;
+    font.enable = true;
     gaming.enable = true;
     git.enable = true;
     gnome.enable = true;
