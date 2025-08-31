@@ -28,7 +28,11 @@
       server.enable = false;
     };
 
-    media.enable = false;
+    media = {
+      enable = false;
+      server.enable = false;
+    };
+
     music.enable = false;
     ncmpcpp.enable = false;
     nfs.enable = false;

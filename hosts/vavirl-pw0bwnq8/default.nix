@@ -21,7 +21,12 @@
     i3.enable = false;
     java.enable = true;
     jujutsu.enable = true;
-    media.enable = false;
+
+    media = {
+      enable = false;
+      server.enable = false;
+    };
+
     ncmpcpp.enable = false;
     nushell.enable = true;
     office.enable = false;

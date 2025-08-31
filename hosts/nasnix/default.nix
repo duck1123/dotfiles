@@ -32,7 +32,11 @@
       server.enable = true;
     };
 
-    media.enable = true;
+    media = {
+      enable = true;
+      server.enable = true;
+    };
+
     music.enable = false;
     ncmpcpp.enable = false;
     nfs.enable = false;
