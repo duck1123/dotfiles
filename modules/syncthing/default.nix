@@ -1,10 +1,9 @@
-{ host, hosts, ... }:
-let inherit (host.identity) username;
-in {
-  config = {
+{ host, hosts, lib, ... }: {
+  config = lib.mkIf host.features.syncthing.enable {
     inherit hosts;
 
-    services.syncthing = {
+    services.syncthing = let inherit (host.identity) username;
+    in {
       enable = true;
       user = username;
       dataDir = "/home/${username}/Documents";

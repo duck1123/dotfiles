@@ -42,6 +42,7 @@
     office.enable = false;
     pictures.enable = false;
     radio.enable = false;
+    sddm.enable = true;
     stylix.enable = false;
 
     syncthing = {

@@ -31,6 +31,7 @@
     nushell.enable = true;
     office.enable = false;
     pictures.enable = false;
+    sddm.enable = true;
     stylix.enable = true;
 
     syncthing = {
