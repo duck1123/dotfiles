@@ -81,7 +81,14 @@
     # Enable Samba client for Windows/SMB shares
     samba = {
       enable = true;
-      securityType = "user";
+      settings = {
+        global = {
+          security = "user";
+          "client min protocol" = "SMB2";
+          "client max protocol" = "SMB3";
+          "workgroup" = "WORKGROUP";
+        };
+      };
     };
 
     # libinput.enable = true;
