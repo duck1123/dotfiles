@@ -1,4 +1,4 @@
-{ config, inputs, pkgs, ... }: {
+{ pkgs, ... }: {
   # Configure console font
   console = {
     font = "ter-v32n";
@@ -114,7 +114,7 @@
     isNormalUser = true;
     description = "Duck Nebuchadnezzar";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [ ];
+    packages = [ ];
   };
 
   # Add network file sharing packages

@@ -1,4 +1,4 @@
-{ config, pkgs, ... }: {
+{ pkgs, ... }: {
   # Enable network discovery and file sharing services
   services = {
     # GVFS - Virtual filesystem layer for GNOME

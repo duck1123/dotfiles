@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ lib, ... }:
 with lib;
 let
   hostSubmodule = types.submodule {

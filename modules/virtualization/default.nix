@@ -1,9 +1,5 @@
-{ config, inputs, ... }:
-let
-  pkgs = inputs.pkgs;
-  username = config.username;
-in {
-  # environment.systemPackages = with pkgs; [ virtualbox ];
+{ host, ... }: {
+  users.extraGroups.vboxusers.members = [ host.identity.username ];
 
   virtualisation.virtualbox.host = {
     addNetworkInterface = false;
@@ -11,6 +7,4 @@ in {
     enableExtensionPack = true;
     enableKvm = true;
   };
-
-  users.extraGroups.vboxusers.members = [ username ];
 }
