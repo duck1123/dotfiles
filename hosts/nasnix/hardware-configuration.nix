@@ -14,7 +14,7 @@
 
   # Add NFS mount for Videos share
   fileSystems."/mnt/videos" = {
-    device = "192.168.0.29:/volume1/Videos";
+    device = "192.168.0.124:/volume1/Videos";
     fsType = "nfs";
     options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
   };
