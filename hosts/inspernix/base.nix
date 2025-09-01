@@ -23,15 +23,6 @@
   services = {
     gnome.gnome-keyring.enable = true;
     printing.enable = true;
-
-    xserver = {
-      enable = true;
-
-      xkb = {
-        layout = "us";
-        variant = "";
-      };
-    };
   };
 
   system.stateVersion = "24.11";

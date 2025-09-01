@@ -56,6 +56,7 @@
     virtualization.enable = false;
     vscode.enable = false;
     waybar.enable = false;
+    xserver.enable = false;
     zsh.enable = true;
   };
 

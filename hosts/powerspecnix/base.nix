@@ -36,16 +36,6 @@
     plex.enable = true;
     printing.enable = true;
     udev.packages = with pkgs; [ gnome-settings-daemon ];
-
-    # Configure keymap in X11
-    xserver = {
-      enable = true;
-
-      xkb = {
-        layout = "us";
-        variant = "";
-      };
-    };
   };
 
   system.stateVersion = "25.05";
@@ -56,10 +46,5 @@
   virtualisation = {
     docker.enable = true;
     libvirtd.enable = true;
-  };
-
-  xdg.portal = {
-    enable = true;
-    config.common.default = "*";
   };
 }

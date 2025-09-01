@@ -20,5 +20,6 @@
     ./touch
     ./users
     ./virtualization
+    ./xserver
   ];
 }
