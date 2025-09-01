@@ -22,8 +22,6 @@
     zsh.enable = true;
   };
 
-  security.rtkit.enable = true;
-
   services = {
     gnome.gnome-keyring.enable = true;
     libinput.enable = true;
@@ -38,15 +36,7 @@
       };
     };
 
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
-    };
-
     printing.enable = true;
-    pulseaudio.enable = false;
     tailscale.enable = true;
 
     upower.enable = true;
@@ -71,7 +61,4 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = [ ];
   };
-
-  # Add network file sharing packages
-  environment.systemPackages = with pkgs; [ gvfs nfs-utils cifs-utils ];
 }

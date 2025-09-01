@@ -34,6 +34,7 @@
     office.enable = false;
     pictures.enable = false;
     sddm.enable = true;
+    sound.enable = true;
     stylix.enable = true;
 
     syncthing = {

@@ -10,6 +10,7 @@
     ./network
     ./nix
     ./sddm
+    ./sound
     ./stylix
     ./syncthing
     ./users

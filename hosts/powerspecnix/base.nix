@@ -30,8 +30,6 @@
     zsh.enable = true;
   };
 
-  security.rtkit.enable = true;
-
   services = {
     gnome.gnome-keyring.enable = true;
 
@@ -47,24 +45,10 @@
       };
     };
 
-    pipewire = {
-      enable = true;
-
-      alsa = {
-        enable = true;
-        support32Bit = true;
-      };
-
-      jack.enable = true;
-      pulse.enable = true;
-    };
-
     plex.enable = true;
 
     # Enable CUPS to print documents.
     printing.enable = true;
-
-    pulseaudio.enable = false;
 
     tailscale.enable = true;
 

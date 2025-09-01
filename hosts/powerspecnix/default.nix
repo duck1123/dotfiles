@@ -45,6 +45,7 @@
     pictures.enable = true;
     radio.enable = false;
     sddm.enable = true;
+    sound.enable = true;
     stylix.enable = true;
 
     syncthing = {
