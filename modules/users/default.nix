@@ -13,6 +13,7 @@ in {
       "networkmanager"
       "plugdev"
       "realtime"
+      "samba"
       "vboxusers"
       "wheel"
     ];

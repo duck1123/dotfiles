@@ -49,15 +49,6 @@
   };
 
   system.stateVersion = "25.05";
-
   time.timeZone = "America/Detroit";
-
-  users.users.duck = {
-    isNormalUser = true;
-    description = "Duck Nebuchadnezzar";
-    extraGroups = [ "networkmanager" "wheel" "samba" ];
-    packages = [ ];
-  };
-
   environment.systemPackages = with pkgs; [ samba ];
 }

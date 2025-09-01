@@ -37,11 +37,4 @@
   system.stateVersion = "24.11";
 
   time.timeZone = "America/Detroit";
-
-  users.users.duck = {
-    isNormalUser = true;
-    description = "Duck Nebuchadnezzar";
-    extraGroups = [ "networkmanager" "wheel" ];
-    packages = [ ];
-  };
 }
