@@ -1,5 +1,6 @@
 { ... }: {
   imports = [
+    ./battery
     ./bitcoin
     ./bluetooth
     ./boot

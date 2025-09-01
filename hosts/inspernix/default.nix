@@ -7,6 +7,7 @@
 
   features = {
     backups.enable = false;
+    battery.enable = true;
     bitcoin.enable = false;
     bluetooth.enable = true;
     chm.enable = false;

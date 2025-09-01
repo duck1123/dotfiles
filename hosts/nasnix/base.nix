@@ -37,7 +37,6 @@
     };
 
     # printing.enable = true;
-    # upower.enable = true;
 
     xserver = {
       enable = true;

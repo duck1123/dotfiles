@@ -23,7 +23,6 @@
   services = {
     gnome.gnome-keyring.enable = true;
     printing.enable = true;
-    upower.enable = true;
 
     xserver = {
       enable = true;
