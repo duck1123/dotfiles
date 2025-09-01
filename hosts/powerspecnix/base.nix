@@ -34,17 +34,6 @@
     gnome.gnome-keyring.enable = true;
 
     flatpak.enable = true;
-
-    # Enable the OpenSSH daemon.
-    openssh = {
-      enable = true;
-
-      settings = {
-        KbdInteractiveAuthentication = false;
-        PasswordAuthentication = false;
-      };
-    };
-
     plex.enable = true;
     printing.enable = true;
     udev.packages = with pkgs; [ gnome-settings-daemon ];

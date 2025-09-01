@@ -35,6 +35,7 @@
     pictures.enable = false;
     sddm.enable = true;
     sound.enable = true;
+    ssh.enable = false;
     stylix.enable = true;
 
     syncthing = {

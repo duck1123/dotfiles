@@ -46,6 +46,7 @@
     radio.enable = false;
     sddm.enable = true;
     sound.enable = true;
+    ssh.enable = true;
     stylix.enable = true;
 
     syncthing = {

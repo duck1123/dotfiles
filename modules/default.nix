@@ -11,6 +11,7 @@
     ./nix
     ./sddm
     ./sound
+    ./ssh
     ./stylix
     ./syncthing
     ./tailscale
