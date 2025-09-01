@@ -1,6 +1,7 @@
 { ... }: {
   imports = [
     ./bitcoin
+    ./bluetooth
     ./boot
     ./font
     ./gaming

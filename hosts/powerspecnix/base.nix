@@ -2,7 +2,6 @@
   environment.systemPackages = with pkgs; [ git zsh ];
 
   hardware = {
-    bluetooth.enable = true;
     flipperzero.enable = true;
     rtl-sdr.enable = true;
   };

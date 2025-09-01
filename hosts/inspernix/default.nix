@@ -8,6 +8,7 @@
   features = {
     backups.enable = false;
     bitcoin.enable = false;
+    bluetooth.enable = true;
     chm.enable = false;
     clojure.enable = true;
     dbt.enable = false;
