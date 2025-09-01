@@ -1,5 +1,5 @@
 { pkgs, ... }: {
-  environment.systemPackages = with pkgs; [ git zsh ];
+  environment.systemPackages = with pkgs; [ git ];
 
   hardware = {
     flipperzero.enable = true;
@@ -25,8 +25,6 @@
         # renpy
       ];
     };
-
-    zsh.enable = true;
   };
 
   services = {

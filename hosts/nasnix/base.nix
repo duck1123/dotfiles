@@ -16,8 +16,6 @@
     #     # renpy
     #   ];
     # };
-
-    zsh.enable = true;
   };
 
   services = {

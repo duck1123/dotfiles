@@ -21,5 +21,6 @@
     ./users
     ./virtualization
     ./xserver
+    ./zsh
   ];
 }
