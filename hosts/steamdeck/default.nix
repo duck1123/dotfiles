@@ -11,6 +11,7 @@
     dbt.enable = false;
     dconf.enable = false;
     developer.enable = false;
+    docker.enable = false;
     dunst.enable = false;
     emacs.enable = false;
     emacs-prelude.enable = false;

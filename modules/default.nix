@@ -4,6 +4,7 @@
     ./bitcoin
     ./bluetooth
     ./boot
+    ./docker
     ./font
     ./gaming
     ./i18n
