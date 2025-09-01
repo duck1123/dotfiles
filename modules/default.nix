@@ -3,6 +3,7 @@
     ./bitcoin
     ./boot
     ./font
+    ./gaming
     ./i18n
     ./kubernetes
     ./media

@@ -16,7 +16,7 @@
     email.enable = false;
     flipper.enable = false;
     font.enable = false;
-    gaming.enable = true;
+    gaming.enable = false;
     git.enable = false;
     gnome.enable = true;
     hyprland.enable = false;
