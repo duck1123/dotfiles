@@ -4,7 +4,6 @@
       gnomeExtensions.appindicator
       gnomeExtensions.gsconnect
       # gnomeExtensions.topicons-plus
-      # gnomeExtensions.tailscale-status
       guake
     ];
   };

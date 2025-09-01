@@ -49,8 +49,6 @@
     };
 
     # printing.enable = true;
-    tailscale.enable = true;
-
     # upower.enable = true;
 
     xserver = {

@@ -46,12 +46,7 @@
     };
 
     plex.enable = true;
-
-    # Enable CUPS to print documents.
     printing.enable = true;
-
-    tailscale.enable = true;
-
     udev.packages = with pkgs; [ gnome-settings-daemon ];
 
     # Configure keymap in X11

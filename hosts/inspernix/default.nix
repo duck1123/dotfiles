@@ -63,6 +63,7 @@
       };
     };
 
+    tailscale.enable = true;
     touch.enable = true;
     vim.enable = false;
     virtualization.enable = false;
