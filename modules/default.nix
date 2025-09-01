@@ -7,6 +7,7 @@
     ./kubernetes
     ./media
     ./network
+    ./nix
     ./sddm
     ./stylix
     ./syncthing

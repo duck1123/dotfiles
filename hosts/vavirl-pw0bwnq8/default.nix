@@ -29,6 +29,7 @@
     };
 
     ncmpcpp.enable = false;
+    nix.enable = true;
     nushell.enable = true;
     office.enable = false;
     pictures.enable = false;

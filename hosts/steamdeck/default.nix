@@ -37,6 +37,7 @@
     music.enable = false;
     ncmpcpp.enable = false;
     nfs.enable = false;
+    nix.enable = true;
     nostr.enable = false;
     nushell.enable = false;
     office.enable = false;
