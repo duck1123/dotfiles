@@ -24,7 +24,6 @@
 
   services = {
     gnome.gnome-keyring.enable = true;
-    libinput.enable = true;
 
     # Enable the OpenSSH daemon.
     openssh = {

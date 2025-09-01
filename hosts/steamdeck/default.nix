@@ -57,6 +57,7 @@
       };
     };
 
+    touch.enable = true;
     vim.enable = false;
     virtualization.enable = false;
     vscode.enable = false;

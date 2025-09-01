@@ -13,6 +13,7 @@
     ./sound
     ./stylix
     ./syncthing
+    ./touch
     ./users
     ./virtualization
   ];
