@@ -1,11 +1,6 @@
 { pkgs, ... }: {
   hardware.bluetooth.enable = true;
 
-  networking = {
-    hostName = "inspernix";
-    networkmanager.enable = true;
-  };
-
   programs = {
     dconf.enable = true;
     firefox.enable = true;
@@ -30,14 +25,7 @@
   security.rtkit.enable = true;
 
   services = {
-    avahi = {
-      enable = true;
-      nssmdns4 = true;
-      openFirewall = true;
-    };
-
     gnome.gnome-keyring.enable = true;
-    gvfs.enable = true;
     libinput.enable = true;
 
     # Enable the OpenSSH daemon.

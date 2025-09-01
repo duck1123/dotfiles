@@ -37,6 +37,7 @@
 
     music.enable = false;
     ncmpcpp.enable = false;
+    network.enable = false;
     nfs.enable = true;
     nix.enable = true;
     nostr.enable = true;

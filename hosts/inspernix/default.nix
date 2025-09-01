@@ -40,6 +40,7 @@
 
     music.enable = false;
     ncmpcpp.enable = false;
+    network.enable = true;
     nfs.enable = true;
     nix.enable = true;
     nostr.enable = true;

@@ -1,11 +1,6 @@
 { pkgs, ... }: {
   # hardware.bluetooth.enable = true;
 
-  networking = {
-    hostName = "nasnix";
-    networkmanager.enable = true;
-  };
-
   programs = {
     # dconf.enable = true;
     # firefox.enable = true;
@@ -30,14 +25,7 @@
   security.rtkit.enable = true;
 
   services = {
-    avahi = {
-      enable = true;
-      nssmdns4 = true;
-      openFirewall = true;
-    };
-
     # gnome.gnome-keyring.enable = true;
-    gvfs.enable = true;
 
     # Enable Samba client for Windows/SMB shares
     samba = {
@@ -98,6 +86,5 @@
     packages = [ ];
   };
 
-  # Add network file sharing packages
-  environment.systemPackages = with pkgs; [ gvfs nfs-utils cifs-utils samba ];
+  environment.systemPackages = with pkgs; [ samba ];
 }

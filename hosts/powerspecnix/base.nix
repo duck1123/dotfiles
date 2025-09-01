@@ -1,30 +1,10 @@
-{ host, pkgs, ... }:
-let inherit (host) hostname;
-in {
-  environment.systemPackages = with pkgs; [ git gvfs zsh ];
+{ pkgs, ... }: {
+  environment.systemPackages = with pkgs; [ git zsh ];
 
   hardware = {
     bluetooth.enable = true;
     flipperzero.enable = true;
     rtl-sdr.enable = true;
-  };
-
-  networking = {
-    firewall = {
-      enable = false;
-
-      allowedTCPPorts = [
-        ## barrier port
-        24800
-        ## Plex Media Server
-        32400
-      ];
-    };
-
-    hostName = "${hostname}"; # Define your hostname.
-
-    # Enable networking
-    networkmanager.enable = true;
   };
 
   nixpkgs.config.chromium.enableWideVine = true;
@@ -54,8 +34,6 @@ in {
 
   services = {
     gnome.gnome-keyring.enable = true;
-
-    gvfs.enable = true;
 
     flatpak.enable = true;
 
