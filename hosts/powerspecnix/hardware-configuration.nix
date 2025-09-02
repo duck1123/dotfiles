@@ -28,6 +28,12 @@
       device = "/dev/disk/by-uuid/4D62-CC29";
       fsType = "vfat";
     };
+
+    "/mnt/data3" = {
+      device = "/dev/disk/by-uuid/0d256fc5-070b-43c3-a963-04a0ad2843bd";
+      fsType = "ext4";
+      options = [ "nofail" ];
+    };
   };
 
   hardware.cpu.amd.updateMicrocode =
