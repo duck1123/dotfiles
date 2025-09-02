@@ -1,4 +1,6 @@
 { pkgs, ... }: {
+  boot.efiBoot = true;
+
   programs = {
     dconf.enable = true;
     firefox.enable = true;
