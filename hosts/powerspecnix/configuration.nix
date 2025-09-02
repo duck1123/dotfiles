@@ -1,7 +1,13 @@
 { inputs, hosts, ... }:
 let
   core = [
-    { inherit hosts; }
+    {
+      inherit hosts;
+      boot.loader = {
+        systemd-boot.enable = true;
+        efi.canTouchEfiVariables = true;
+      };
+    }
     inputs.disko.nixosModules.disko
     inputs.home-manager.nixosModules.home-manager
     inputs.sops-nix.nixosModules.sops

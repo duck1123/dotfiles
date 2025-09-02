@@ -11,16 +11,6 @@
     };
 
     kernelModules = [ "dm_crypt" ];
-
-    loader = {
-      efi.canTouchEfiVariables = false;
-      grub = {
-        enable = true;
-        device = "nodev";
-        useOSProber = lib.mkDefault false;
-      };
-    };
-
     plymouth.enable = true;
   };
 }
