@@ -247,7 +247,7 @@
           inherit (duck) gpgKey;
           name = "Daniel E. Renfer";
           username = "drenfer";
-          email = "drenfer@vallen.com";
+          email = "daniel.renfer@vallen.com";
         };
         duck = {
           name = "Duck Nebuchadnezzar";
