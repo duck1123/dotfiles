@@ -2,7 +2,7 @@
   config = lib.mkIf host.features.bitcoin.enable {
     services.bitcoind.main = {
       enable = true;
-      dataDir = "/mnt/data3/bitcoin/bitcoind";
+      # dataDir = "/mnt/data3/bitcoin/bitcoind";
     };
   };
 }
