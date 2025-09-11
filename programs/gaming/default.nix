@@ -6,7 +6,7 @@
       lutris
       # nexusmods-app
       protontricks
-      # satisfactorymodmanager
+      satisfactorymodmanager
     ];
   };
 }
