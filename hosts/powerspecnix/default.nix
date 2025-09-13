@@ -40,7 +40,7 @@
     music.enable = false;
     ncmpcpp.enable = false;
     network.enable = true;
-    nfs.enable = true;
+    nfs.enable = false;
     nix.enable = true;
     nostr.enable = true;
     nushell.enable = true;
