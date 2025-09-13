@@ -200,6 +200,11 @@
       url = "github:cachix/git-hooks.nix";
     };
 
+    sddm-sugar-candy-nix = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "gitlab:Zhaith-Izaliel/sddm-sugar-candy-nix";
+    };
+
     sops-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:Mic92/sops-nix";

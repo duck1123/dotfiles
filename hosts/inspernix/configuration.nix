@@ -8,9 +8,12 @@ let
         systemd-boot.enable = true;
         efi.canTouchEfiVariables = true;
       };
+
+      nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
     }
     inputs.disko.nixosModules.disko
     inputs.home-manager.nixosModules.home-manager
+    inputs.sddm-sugar-candy-nix.nixosModules.default
     inputs.sops-nix.nixosModules.sops
     inputs.stylix.nixosModules.stylix
     ./base.nix
