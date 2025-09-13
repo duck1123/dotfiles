@@ -9,10 +9,10 @@
         # Multi-track hard disk recording software
         ardour
 
-        # obs-studio
+        obs-studio
 
         # Audio plugin host
-        carla
+        # carla
 
         guitarix
 
@@ -20,9 +20,9 @@
         hydrogen
 
         # DAW similar to FL Studio (music production software)
-        # lmms
+        lmms
 
-        musescore
+        # musescore
 
         qjackctl
 
@@ -34,7 +34,7 @@
         # Old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx
         synthv1
 
-        # vcv-rack
+        vcv-rack
 
         # Virtual MIDI Piano Keyboard
         vmpk
@@ -42,4 +42,3 @@
     };
   };
 }
-
