@@ -31,9 +31,9 @@ let
   };
 in {
   imports = specialisations.budgie.configuration.imports;
-  specialisation = {
-    inherit (specialisations)
-    # budgie
-      gnome hyprland plasma6;
-  };
+  # specialisation = {
+  #   inherit (specialisations)
+  #   # budgie
+  #     gnome hyprland plasma6;
+  # };
 }

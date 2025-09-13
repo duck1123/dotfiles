@@ -32,8 +32,8 @@ in {
   imports = specialisations.hyprland.configuration.imports;
   specialisation = {
     inherit (specialisations)
-      budgie gnome i3
-      # hyprland
-      plasma6;
+      budgie
+      # gnome i3 hyprland plasma6
+    ;
   };
 }
