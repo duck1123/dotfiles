@@ -36,7 +36,8 @@ in {
       neofetch
       nixfmt-classic
       syncthing
-      tailscale
+      tailscale.overrideAttrs
+      (oldAttrs: { doCheck = false; })
       vscode
       wine
     ];

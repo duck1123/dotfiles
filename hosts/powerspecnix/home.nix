@@ -29,7 +29,6 @@
       # postman
       # sparrow
       syncthing
-      tailscale
       tdesktop
       # tilt
       transmission_4-gtk
