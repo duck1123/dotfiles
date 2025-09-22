@@ -3,10 +3,7 @@ let
   core = [
     {
       inherit hosts;
-      boot.loader = {
-        systemd-boot.enable = true;
-        efi.canTouchEfiVariables = true;
-      };
+      boot.efiBoot = true;
 
       nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
     }
