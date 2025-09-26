@@ -8,6 +8,7 @@ in {
     };
 
     systemPackages = with pkgs; [
+      file-roller
       pyprland
       hyprcursor
       hyprlock
