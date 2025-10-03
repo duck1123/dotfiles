@@ -83,7 +83,6 @@
         flake-parts.follows = "flake-parts";
         flake-utils.follows = "flake-utils";
         make-shell.follows = "make-shell";
-        mkdocs-flake.follows = "mkdocs-flake";
         nix-fetcher-data.follows = "nix-fetcher-data";
         nix-kube-generators.follows = "nix-kube-generators";
         nixidy.follows = "nixidy";
@@ -110,15 +109,6 @@
     make-shell = {
       inputs.flake-compat.follows = "flake-compat";
       url = "github:nicknovitski/make-shell";
-    };
-
-    mkdocs-flake = {
-      inputs = {
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-        poetry2nix.follows = "poetry2nix";
-      };
-      url = "github:applicative-systems/mkdocs-flake";
     };
 
     nix-fetcher-data = {
