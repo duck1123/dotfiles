@@ -2,8 +2,8 @@
 # and may be overwritten by future invocations.  Please make changes
 # to /etc/nixos/configuration.nix instead.
 { config, lib, modulesPath, ... }:
-
-{
+let nas-ip = "192.168.0.124";
+in {
   imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
   boot = {
@@ -29,10 +29,34 @@
       fsType = "vfat";
     };
 
+    "/mnt/books" = {
+      device = "${nas-ip}:/volume1/Books";
+      fsType = "nfs";
+      options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
+    };
+
     "/mnt/data3" = {
       device = "/dev/disk/by-uuid/0d256fc5-070b-43c3-a963-04a0ad2843bd";
       fsType = "ext4";
       options = [ "nofail" ];
+    };
+
+    "/mnt/downloads" = {
+      device = "${nas-ip}:/volume1/Downloads";
+      fsType = "nfs";
+      options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
+    };
+
+    "/mnt/music" = {
+      device = "${nas-ip}:/volume1/Music";
+      fsType = "nfs";
+      options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
+    };
+
+    "/mnt/videos" = {
+      device = "${nas-ip}:/volume1/Videos";
+      fsType = "nfs";
+      options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
     };
   };
 
