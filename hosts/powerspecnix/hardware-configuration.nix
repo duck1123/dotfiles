@@ -50,7 +50,7 @@ in {
     "/mnt/music" = {
       device = "${nas-ip}:/volume1/Music";
       fsType = "nfs";
-      options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
+      options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
     };
 
     "/mnt/videos" = {
