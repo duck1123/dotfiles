@@ -56,6 +56,8 @@ in
             };
           };
         };
+
+        targets.sddm.enable = false;
       };
     };
 
