@@ -3,6 +3,7 @@
     stylix = {
       enable = true;
       autoEnable = true;
+      targets.sddm.enable = false;
       # image = config.lib.stylix.pixel "base0A";
       image = ../../programs/stylix/nix-wallpaper-mosaic-blue.png;
       imageScalingMode = "fit";
