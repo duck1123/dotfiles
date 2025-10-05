@@ -10,7 +10,7 @@ let
         useOSProber = true;
       };
 
-      nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
+      nixpkgs.overlays = [ ];
     }
     inputs.home-manager.nixosModules.home-manager
     inputs.sddm-sugar-candy-nix.nixosModules.default
