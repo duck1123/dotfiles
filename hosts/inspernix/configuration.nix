@@ -5,7 +5,7 @@ let
       inherit hosts;
       boot.efiBoot = true;
 
-      nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
+      nixpkgs.overlays = [ ];
     }
     inputs.disko.nixosModules.disko
     inputs.home-manager.nixosModules.home-manager
