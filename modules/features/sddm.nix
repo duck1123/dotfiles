@@ -14,8 +14,12 @@
         services.displayManager.sddm = {
           enable = true;
           wayland.enable = true;
-          package = pkgs.libsForQt5.sddm;
-          extraPackages = with pkgs; [ libsForQt5.qtgraphicaleffects ];
+          package = pkgs.kdePackages.sddm;
+          extraPackages = with pkgs; [
+            qt6.qtdeclarative
+            qt6.qtsvg
+            qt6.qt5compat
+          ];
           sugarCandyNix = {
             enable = false;
             settings = {
