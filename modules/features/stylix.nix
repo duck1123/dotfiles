@@ -34,6 +34,8 @@ in {
             name = "DejaVu Serif";
           };
         };
+
+        targets.sddm.enable = false;
       };
     };
   };
