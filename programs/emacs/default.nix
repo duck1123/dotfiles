@@ -87,6 +87,10 @@
         (use-package auto-complete :ensure t)
         (use-package cider :ensure t)
         (use-package clojure-mode :ensure t)
+
+        (color-theme-initialize)
+        (color-theme-hober)
+
         (use-package company :ensure t)
         (use-package earthfile-mode :ensure t)
 
