@@ -94,6 +94,11 @@
         (use-package company :ensure t)
         (use-package earthfile-mode :ensure t)
 
+        (use-package editorconfig
+          :ensure t
+          :config
+          (editorconfig-mode 1))
+
         (use-package flycheck
           :ensure t)
 
