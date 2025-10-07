@@ -200,6 +200,7 @@
            (clojure-mode . lsp)
            (clojurescript-mode . lsp)
            (clojurec-mode . 'lsp)
+           (nix-mode . 'lsp)
            (lsp-mode . efs/lsp-mode-setup))
           :init
           (setq lsp-keymap-prefix "C-c l"
