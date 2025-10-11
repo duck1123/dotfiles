@@ -12,13 +12,13 @@ _: {
       config = lib.mkIf config.host.features.sddm.enable {
         services.displayManager.sddm = {
           enable = true;
-          wayland.enable = true;
           package = pkgs.kdePackages.sddm;
-          extraPackages = with pkgs; [
-            qt6.qtdeclarative
-            qt6.qtsvg
-            qt6.qt5compat
-          ];
+
+          settings.Theme = {
+            Current = "sddm-sugar-candy-nix";
+            ThemeDir = "/run/current-system/sw/share/sddm/themes";
+          };
+
           sugarCandyNix = {
             enable = false;
             settings = {
@@ -29,6 +29,9 @@ _: {
               PartialBlur = true;
             };
           };
+
+          theme = lib.mkForce "sddm-sugar-candy-nix";
+          wayland.enable = true;
         };
       };
     };
