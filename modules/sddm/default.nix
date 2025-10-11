@@ -4,7 +4,13 @@
       enable = true;
       wayland.enable = true;
       package = pkgs.kdePackages.sddm;
-      extraPackages = with pkgs; [ qt6.qtdeclarative qt6.qtsvg qt6.qt5compat ];
+      theme = lib.mkForce "sddm-sugar-candy-nix";
+      settings = {
+        Theme = {
+          Current = "sddm-sugar-candy-nix";
+          ThemeDir = "/run/current-system/sw/share/sddm/themes";
+        };
+      };
       sugarCandyNix = {
         enable = true;
         settings = {
