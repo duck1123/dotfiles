@@ -32,7 +32,7 @@ in {
     "/mnt/books" = {
       device = "${nas-ip}:/volume1/Books";
       fsType = "nfs";
-      options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
+      options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
     };
 
     "/mnt/data3" = {
@@ -44,7 +44,7 @@ in {
     "/mnt/downloads" = {
       device = "${nas-ip}:/volume1/Downloads";
       fsType = "nfs";
-      options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
+      options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
     };
 
     "/mnt/music" = {
@@ -56,7 +56,7 @@ in {
     "/mnt/videos" = {
       device = "${nas-ip}:/volume1/Videos";
       fsType = "nfs";
-      options = [ "nfsvers=3" "ro" "hard" "timeo=600" "retrans=2" "_netdev" ];
+      options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
     };
   };
 
