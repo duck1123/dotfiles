@@ -5,7 +5,7 @@
       algia
 
       # Desktop client for nostr, an open social media protocol
-      gossip
+      # gossip
 
       # Command-line tool for Nostr things
       nak
