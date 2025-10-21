@@ -6,7 +6,7 @@
       nushell
       nu_scripts
       nufmt
-      nushellPlugins.highlight
+      # nushellPlugins.highlight
       nushellPlugins.formats
       nushellPlugins.polars
       nushellPlugins.gstat
