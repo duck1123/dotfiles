@@ -344,30 +344,35 @@
                 }"
               ]) 9));
 
-          bindm = (map (x: "${x.mod},${x.key},${x.command}") [
+          bindm = let
+            left-click = "mouse:272";
+            right-click = "mouse:273";
+            back-thumb = "mouse:275";
+            front-thumb = "mouse:276";
+          in (map (x: "${x.mod},${x.key},${x.command}") [
             {
               mod = "$mainMod";
-              key = "mouse:272";
+              key = left-click;
               command = "movewindow";
             }
             {
               mod = "ALT";
-              key = "mouse:272";
+              key = left-click;
               command = "resizewindow";
             }
             {
               mod = "$mainMod";
-              key = "mouse:273";
+              key = right-click;
               command = "resizewindow";
             }
             {
               mod = "";
-              key = "mouse:275";
+              key = back-thumb;
               command = "movewindow";
             }
             {
               mod = "";
-              key = "mouse:276";
+              key = front-thumb;
               command = "resizewindow";
             }
           ]);
