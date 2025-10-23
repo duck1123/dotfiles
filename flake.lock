@@ -308,6 +308,26 @@
         "type": "github"
       }
     },
+    "hexecute": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1762892536,
+        "narHash": "sha256-+P18RfBLIt7i6fx3on6z3uUOdxm5OKVAJre60MylUeg=",
+        "owner": "ThatOtherAndrew",
+        "repo": "Hexecute",
+        "rev": "0f3701d2896e7492a34176f3816241461487641c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ThatOtherAndrew",
+        "repo": "Hexecute",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -1036,6 +1056,7 @@
         "flake-utils": "flake-utils",
         "gitignore": "gitignore",
         "haumea": "haumea",
+        "hexecute": "hexecute",
         "home-manager": "home-manager",
         "hyprland": "hyprland",
         "import-tree": "import-tree",
