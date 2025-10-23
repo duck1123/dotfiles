@@ -1,9 +1,10 @@
-{ host, lib, pkgs, ... }: {
+{ host, inputs, lib, pkgs, ... }: {
   config = lib.mkIf host.features.hyprland.enable {
     home.packages = with pkgs; [
       cascadia-code
       font-awesome
       grim
+      inputs.hexecute.packages.${pkgs.system}.default
       hyprpanel
       hyprshot
       nautilus
