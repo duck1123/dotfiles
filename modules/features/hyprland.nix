@@ -10,6 +10,7 @@
   flake.modules.homeManager.hyprland =
     {
       config,
+      inputs,
       lib,
       pkgs,
       ...
@@ -25,6 +26,7 @@
           cascadia-code
           font-awesome
           grim
+          inputs.hexecute.packages.${pkgs.system}.default
           hyprpanel
           hyprpaper
           hyprshot
