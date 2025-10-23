@@ -2,7 +2,8 @@
   config = lib.mkIf host.features.jujutsu.enable {
     home.packages = with pkgs; [
       # gg-jj jj-fzf
-      jjui jujutsu
+      jjui
+      jujutsu
       # lazyjj
     ];
 

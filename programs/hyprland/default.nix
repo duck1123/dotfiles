@@ -111,7 +111,8 @@
             mod = "$mainMod";
             key = "h";
             command = "exec";
-            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" htop'';
+            arg = ''
+              kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" htop'';
           }
           {
             mod = "$mainMod";
@@ -123,7 +124,8 @@
             mod = "$mainMod";
             key = "k";
             command = "exec";
-            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" k9s'';
+            arg = ''
+              kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" k9s'';
           }
           {
             mod = "$mainMod";
@@ -141,7 +143,8 @@
             mod = "$mainMod";
             key = "n";
             command = "exec";
-            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" nu'';
+            arg = ''
+              kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" nu'';
           }
           {
             mod = "$mainMod";
@@ -165,7 +168,8 @@
             mod = "$mainMod";
             key = "u";
             command = "exec";
-            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" jjui'';
+            arg = ''
+              kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" jjui'';
           }
           {
             mod = "$mainMod";
@@ -257,7 +261,8 @@
             mod = "$mainMod";
             key = "RETURN";
             command = "exec";
-            arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
+            arg = ''
+              kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
           }
           {
             mod = "$mainMod";
