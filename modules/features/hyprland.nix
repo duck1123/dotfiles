@@ -3,7 +3,7 @@
     let inherit (inputs.self.types.generic) simpleFeature;
     in simpleFeature { inherit inputs lib; } "hyprland feature";
 
-  flake.modules.homeManager.hyprland = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.hyprland = { config, inputs, lib, pkgs, ... }:
     let
       # Get wallpaper path from stylix - stylix processes the image and stores it in config.stylix.image
       # This will be the Nix store path to the processed wallpaper
@@ -14,6 +14,7 @@
         cascadia-code
         font-awesome
         grim
+        inputs.hexecute.packages.${pkgs.system}.default
         hyprpanel
         hyprpaper
         hyprshot
