@@ -321,6 +321,26 @@
         "type": "github"
       }
     },
+    "hexecute": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1782142426,
+        "narHash": "sha256-8003XFGgXUGE47ttuAVXT0MtIXrbggTppzTcnMHZDxA=",
+        "owner": "ThatOtherAndrew",
+        "repo": "Hexecute",
+        "rev": "80dbfa930a3fd0a3b08a6cad154b0173c94db64d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ThatOtherAndrew",
+        "repo": "Hexecute",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -1063,6 +1083,7 @@
         "flake-compat": "flake-compat",
         "flake-parts": "flake-parts",
         "flake-utils": "flake-utils",
+        "hexecute": "hexecute",
         "home-manager": "home-manager",
         "hyprland": "hyprland",
         "import-tree": "import-tree",

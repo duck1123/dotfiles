@@ -34,6 +34,11 @@
       url = "github:numtide/flake-utils";
     };
 
+    hexecute = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:ThatOtherAndrew/Hexecute";
+    };
+
     home-manager = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/home-manager";
