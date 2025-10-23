@@ -8,13 +8,20 @@
     simpleFeature { inherit inputs lib; } "hyprland feature";
 
   flake.modules.homeManager.hyprland =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      inputs,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       config = lib.mkIf config.host.features.hyprland.enable {
         home.packages = with pkgs; [
           cascadia-code
           font-awesome
           grim
+          inputs.hexecute.packages.${pkgs.system}.default
           hyprpanel
           hyprpaper
           hyprshot
