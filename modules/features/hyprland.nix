@@ -10,6 +10,7 @@
   flake.modules.homeManager.hyprland =
     {
       config,
+      inputs,
       lib,
       pkgs,
       ...
@@ -22,6 +23,7 @@
           grim
           hyprpaper
           hyprshot
+          inputs.hexecute.packages.${pkgs.system}.default
           jq
           nautilus
           ncpamixer
