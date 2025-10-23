@@ -10,6 +10,7 @@
       # devpod
       # devpod-desktop
       devspace
+      devenv
       dig
       # dnschef
       # dnslookup
