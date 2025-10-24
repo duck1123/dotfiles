@@ -169,4 +169,4 @@ use ~/nushell/modules/pj_module.nu *
 use ~/nushell/modules/platform_module.nu *
 use ~/nushell/modules/project_module.nu *
 
-use kubernetes *
+# use kubernetes *
