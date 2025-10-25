@@ -37,7 +37,7 @@
       server.enable = false;
     };
 
-    music.enable = true;
+    music.enable = false;
     ncmpcpp.enable = false;
     network.enable = true;
     nfs.enable = false;
@@ -45,7 +45,7 @@
     nostr.enable = true;
     nushell.enable = true;
     office.enable = true;
-    pictures.enable = true;
+    pictures.enable = false;
     radio.enable = false;
     sddm.enable = true;
     sound.enable = true;
