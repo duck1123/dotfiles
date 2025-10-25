@@ -213,7 +213,7 @@
       homeConfigurations =
         import ./homeConfigurations { inherit hosts inputs pkgs system; };
       nixosConfigurations =
-        import ./nixosConfigurations { inherit hosts inputs system; };
+        import ./nixosConfigurations { inherit hosts identities inputs system; };
       devShells = import ./devShells { inherit inputs; };
     in devShells // {
       inherit homeConfigurations nixosConfigurations;
