@@ -1,6 +1,4 @@
-{ hosts, inputs, pkgs, system, ... }:
-# Home configurations
-# Accessible via 'home-manager'
+{ hosts, identities, inputs, pkgs, system, ... }:
 let
   core =
     [ inputs.stylix.homeModules.stylix inputs.zen-browser.homeModules.beta ];
@@ -9,7 +7,7 @@ in {
   drenfer = homeManagerConfiguration {
     inherit pkgs;
     extraSpecialArgs = {
-      inherit hosts inputs system;
+      inherit hosts identities inputs system;
       host = hosts.vallenpc;
     };
     modules = core ++ [ ../hosts/vavirl-pw0bwnq8/home.nix ];
@@ -18,7 +16,7 @@ in {
   deck = homeManagerConfiguration {
     inherit pkgs;
     extraSpecialArgs = {
-      inherit hosts inputs system;
+      inherit hosts identities inputs system;
       host = hosts.steamdeck;
     };
     modules = core ++ [ ../hosts/steamdeck/home.nix ];
@@ -36,7 +34,7 @@ in {
   "duck@nasnix" = homeManagerConfiguration {
     inherit pkgs;
     extraSpecialArgs = {
-      inherit hosts inputs system;
+      inherit hosts identities inputs system;
       host = hosts.nasnix;
     };
     modules = core ++ [ ../hosts/nasnix/home.nix ];
@@ -45,7 +43,7 @@ in {
   "duck@powerspecnix" = homeManagerConfiguration {
     inherit pkgs;
     extraSpecialArgs = {
-      inherit hosts inputs system;
+      inherit hosts identities inputs system;
       host = hosts.powerspecnix;
     };
     modules = core ++ [ ../hosts/powerspecnix/home.nix ];
