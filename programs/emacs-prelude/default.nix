@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.emacs-prelude.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable emacs-prelude";
+    };
+  };
+
   config = lib.mkIf host.features.emacs-prelude.enable {
     home = {
       file = {

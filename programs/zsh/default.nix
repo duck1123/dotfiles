@@ -1,4 +1,13 @@
 { host, lib, pkgs, ... }: {
+
+  options = {
+    features.zsh.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable zsh";
+    };
+  };
+
   config = let inherit (host.identity) username;
   in lib.mkIf host.features.zsh.enable {
     home.packages = with pkgs; [ hstr ];

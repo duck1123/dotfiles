@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.nushell.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable nushell";
+    };
+  };
+
   config = lib.mkIf host.features.nushell.enable {
     home.packages = with pkgs; [
       carapace

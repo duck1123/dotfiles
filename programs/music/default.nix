@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.music.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable music";
+    };
+  };
+
   config = lib.mkIf host.features.music.enable {
     home.packages = with pkgs; [
       # Multi-track hard disk recording software

@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.network.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable network";
+    };
+  };
+
   config = lib.mkIf host.features.network.enable {
     environment.systemPackages = with pkgs; [ gvfs nfs-utils cifs-utils ];
 

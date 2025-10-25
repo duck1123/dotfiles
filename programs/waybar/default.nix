@@ -1,4 +1,12 @@
 { host, lib, ... }: {
+  options = {
+    features.waybar.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable waybar";
+    };
+  };
+
   config = lib.mkIf host.features.waybar.enable {
     programs.waybar = {
       enable = true;

@@ -1,4 +1,12 @@
 { pkgs, lib, ... }: {
+  options = {
+    features.boot.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable boot";
+    };
+  };
+
   # Bootloader.
   boot = {
     binfmt.registrations.appimage = {

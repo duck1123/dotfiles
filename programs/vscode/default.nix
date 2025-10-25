@@ -1,4 +1,12 @@
 { host, lib, ... }: {
+  options = {
+    features.vscode.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable vscode";
+    };
+  };
+
   config = lib.mkIf host.features.vscode.enable {
     programs.vscode = {
       enable = true;

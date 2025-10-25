@@ -1,4 +1,12 @@
 { host, hosts, lib, ... }: {
+  options = {
+    features.syncthing.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable syncthing";
+    };
+  };
+
   config = lib.mkIf host.features.syncthing.enable {
     inherit hosts;
 

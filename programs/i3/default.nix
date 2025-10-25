@@ -1,4 +1,12 @@
 { host, lib, ... }: {
+  options = {
+    features.i3.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable i3";
+    };
+  };
+
   config = lib.mkIf host.features.i3.enable {
     programs.i3status-rust = { enable = true; };
 

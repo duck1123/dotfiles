@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.developer.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable developer";
+    };
+  };
+
   config = lib.mkIf host.features.developer.enable {
     home.packages = with pkgs; [
       age

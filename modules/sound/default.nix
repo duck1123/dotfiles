@@ -1,4 +1,12 @@
 { host, lib, ... }: {
+  options = {
+    features.sound.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable sound";
+    };
+  };
+
   config = lib.mkIf host.features.sound.enable {
     security.rtkit.enable = true;
 

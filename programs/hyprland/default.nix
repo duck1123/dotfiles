@@ -1,4 +1,13 @@
 { host, lib, pkgs, ... }: {
+
+  options = {
+    features.hyprland.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable hyprland";
+    };
+  };
+
   config = lib.mkIf host.features.hyprland.enable {
     home.packages = with pkgs; [
       cascadia-code

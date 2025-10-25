@@ -1,4 +1,12 @@
 { host, lib, ... }: {
+  options = {
+    features.hyprpanel.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable hyprpanel";
+    };
+  };
+
   config = lib.mkIf host.features.hyprpanel.enable {
     # https://github.com/Jas-SinghFSU/HyprPanel/blob/master/nix/module.nix
     programs.hyprpanel = {

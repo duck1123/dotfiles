@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.stylix.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable stylix";
+    };
+  };
+
   config = lib.mkIf host.features.stylix.enable {
     stylix = {
       enable = true;

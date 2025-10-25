@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.font.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable font";
+    };
+  };
+
   config = lib.mkIf host.features.font.enable {
     # Configure console font
     console = {
@@ -7,14 +15,7 @@
       earlySetup = true;
     };
 
-    fonts.packages = with pkgs;
-      [
-        # nerd-fonts.adwaita-mono
-        # nerd-fonts.atkynson-mono
-        # nerd-fonts.caskaydia-mono
-        # nerd-fonts.fira-code
-        # nerd-fonts.inconsolata
-      ] ++ builtins.filter lib.attrsets.isDerivation
+    fonts.packages = builtins.filter lib.attrsets.isDerivation
       (builtins.attrValues pkgs.nerd-fonts);
   };
 }

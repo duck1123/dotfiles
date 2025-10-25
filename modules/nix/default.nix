@@ -1,4 +1,12 @@
 { host, lib, ... }: {
+  options = {
+    features.nix.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable nix";
+    };
+  };
+
   config = lib.mkIf host.features.nix.enable {
     nix = {
       extraOptions = ''

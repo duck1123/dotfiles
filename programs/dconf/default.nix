@@ -1,4 +1,12 @@
 { host, lib, ... }: {
+  options = {
+    features.dconf.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable dconf";
+    };
+  };
+
   config = lib.mkIf host.features.dconf.enable {
     dconf.settings = {
       "org/gnome/desktop/interface".color-scheme = "prefer-dark";

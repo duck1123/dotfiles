@@ -1,4 +1,12 @@
-{ host, lib, pkgs, ... }: {
+{ host, lib, ... }: {
+  options = {
+    features.sddm.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable sddm";
+    };
+  };
+
   config = lib.mkIf host.features.sddm.enable {
     services.displayManager.sddm = {
       enable = true;

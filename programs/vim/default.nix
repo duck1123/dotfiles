@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.vim.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable vim";
+    };
+  };
+
   config = lib.mkIf host.features.vim.enable {
     home.packages = with pkgs; [ neovim ];
 

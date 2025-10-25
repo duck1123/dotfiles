@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.nostr.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable nostr";
+    };
+  };
+
   config = lib.mkIf host.features.nostr.enable {
     home.packages = with pkgs; [
       # CLI application for nostr

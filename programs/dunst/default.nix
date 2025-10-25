@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.dunst.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable dunst";
+    };
+  };
+
   config = lib.mkIf host.features.dunst.enable {
     home.packages = with pkgs; [ dunst ];
 

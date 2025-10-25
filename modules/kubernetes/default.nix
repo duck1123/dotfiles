@@ -1,4 +1,12 @@
 { host, lib, pkgs, ... }: {
+  options = {
+    features.kubernetes.enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable kubernetes";
+    };
+  };
+
   config = lib.mkIf host.features.kubernetes.server.enable {
     environment.systemPackages = with pkgs; [ k3s nfs-utils openiscsi ];
 
