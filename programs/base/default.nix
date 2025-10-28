@@ -102,7 +102,6 @@ in {
     home-manager.enable = true;
     hstr.enable = true;
     k9s.enable = true;
-    kodi.enable = true;
     mr.enable = true;
     jq.enable = true;
 
