@@ -19,7 +19,6 @@ let
     ./base.nix
     ./hardware-configuration.nix
     ../../modules
-    ../../modules/flakeModules
   ];
   mkSpecialisation = module: {
     inheritParentConfig = false;

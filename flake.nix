@@ -275,11 +275,7 @@
           inherit system identities;
         };
       };
-
-    in rec {
-      inherit hosts;
-      imports = [ ./modules/flakeModules ];
-
+    in {
       colmenaHive = colmena.lib.makeHive {
         meta.nixpkgs = import nixpkgs { inherit system; };
 
