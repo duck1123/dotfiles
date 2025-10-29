@@ -7,10 +7,7 @@
 
         lfs.enable = true;
 
-        settings = {
-          user.name = "${name}";
-          user.email = "${email}";
-        };
+        settings.user = { inherit email name; };
 
         signing = {
           signByDefault = false;

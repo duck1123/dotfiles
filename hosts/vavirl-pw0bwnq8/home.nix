@@ -52,10 +52,7 @@ in {
       enable = true;
       lfs.enable = true;
 
-      settings = {
-        userName = "${name}";
-        userEmail = "${email}";
-      };
+      settings.user = { inherit email name; };
 
       signing = {
         signByDefault = false;
