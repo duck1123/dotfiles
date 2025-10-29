@@ -25,7 +25,6 @@ in {
 
     packages = with pkgs; [
       # apache-airflow
-      barrier
       bat
       direnv
       git

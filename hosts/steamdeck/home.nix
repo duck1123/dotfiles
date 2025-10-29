@@ -19,7 +19,6 @@ in {
     packages = with pkgs; [
       appimage-run
       babashka
-      barrier
       bat
       devspace
       digikam

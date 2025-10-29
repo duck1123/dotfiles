@@ -7,7 +7,6 @@
         allowedTCPPorts = [
           139 # NetBIOS
           445 # SMB
-          24800 # barrier port
           32400 # Plex Media Server
         ];
 
