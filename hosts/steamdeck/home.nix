@@ -48,9 +48,13 @@ in {
 
     git = {
       enable = true;
-      userName = "${name}";
-      userEmail = "${email}";
       lfs.enable = true;
+
+      settings = {
+        userName = "${name}";
+        userEmail = "${email}";
+      };
+
       signing = {
         signByDefault = false;
         key = gpgKey;
