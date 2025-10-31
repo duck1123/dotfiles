@@ -245,7 +245,6 @@
         overlays = [ ];
       };
       hosts = import ./hosts { inherit identities system; };
-    in {
       colmenaHive = colmena.lib.makeHive {
         meta.nixpkgs = import nixpkgs { inherit system; };
 
@@ -255,7 +254,6 @@
           time.timeZone = defaultTZ;
         };
       };
-
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations =
@@ -335,7 +333,6 @@
           };
         };
       };
-
       devShells = eachDefaultSystemMap (system:
         let pkgs = import nixpkgs { inherit system; };
         in {
@@ -369,5 +366,7 @@
             ];
           };
         });
+    in {
+      inherit colmenaHive devShells homeConfigurations nixosConfigurations;
     };
 }
