@@ -197,60 +197,26 @@
     };
   };
 
-  outputs = { flake-utils, nixpkgs, ... }@inputs:
+  outputs = inputs:
     let
-      inherit (flake-utils.lib) eachSystemMap defaultSystems;
-      eachDefaultSystemMap = eachSystemMap defaultSystems;
       identities = import ./identities.nix { };
       system = "x86_64-linux";
-      pkgs = import nixpkgs {
+      pkgs = import inputs.nixpkgs {
         inherit system;
         # May the FOSS gods take mercy upon me
         config.allowUnfree = true;
         overlays = [ ];
       };
       hosts = import ./hosts { inherit identities system; };
-
       homeConfigurations =
         import ./homeConfigurations { inherit hosts inputs pkgs system; };
-
       nixosConfigurations =
         import ./nixosConfigurations { inherit hosts inputs system; };
+      devShells = import ./devShells { inherit inputs; };
+    in devShells // {
+      inherit homeConfigurations nixosConfigurations;
 
-      devShells = eachDefaultSystemMap (system:
-        let pkgs = import nixpkgs { inherit system; };
-        in {
-          default = pkgs.mkShell {
-            name = "installation-shell";
-
-            # See https://github.com/disassembler/network/blob/c341a3af27611390f13f86d966767ea30c726a92/shell.nix
-            sopsPGPKeyDirs = [ "./nixos/secrets/keys" ];
-
-            buildInputs = with pkgs; [
-              age
-              babashka
-              cachix
-              clojure
-              pkgs.colmena
-              emacs
-              git
-              pkgs.home-manager
-              keepassxc
-              kubectl
-              nh
-              nix
-              nixpkgs-fmt
-              nmap
-              runme
-              sops
-              ssh-to-age
-              ssh-to-pgp
-              vals
-              wget
-            ];
-          };
-        });
-    in {
-      inherit devShells homeConfigurations nixosConfigurations;
+      # FIXME: Can't use `nix shell` without this.
+      packages.${system}.default = pkgs.cowsay;
     };
 }
