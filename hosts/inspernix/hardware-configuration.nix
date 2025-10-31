@@ -24,29 +24,29 @@ in {
       options = [ "fmask=0077" "dmask=0077" ];
     };
 
-    "/mnt/books" = {
-      device = "${nas-ip}:/volume1/Books";
-      fsType = "nfs";
-      options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
-    };
+    # "/mnt/books" = {
+    #   device = "${nas-ip}:/volume1/Books";
+    #   fsType = "nfs";
+    #   options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+    # };
 
-    "/mnt/downloads" = {
-      device = "${nas-ip}:/volume1/Downloads";
-      fsType = "nfs";
-      options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
-    };
+    # "/mnt/downloads" = {
+    #   device = "${nas-ip}:/volume1/Downloads";
+    #   fsType = "nfs";
+    #   options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+    # };
 
-    "/mnt/music" = {
-      device = "${nas-ip}:/volume1/Music";
-      fsType = "nfs";
-      options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
-    };
+    # "/mnt/music" = {
+    #   device = "${nas-ip}:/volume1/Music";
+    #   fsType = "nfs";
+    #   options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+    # };
 
-    "/mnt/videos" = {
-      device = "${nas-ip}:/volume1/Videos";
-      fsType = "nfs";
-      options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
-    };
+    # "/mnt/videos" = {
+    #   device = "${nas-ip}:/volume1/Videos";
+    #   fsType = "nfs";
+    #   options = [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+    # };
   };
 
   swapDevices =
