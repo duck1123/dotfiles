@@ -21,16 +21,6 @@
       url = "github:jlesquembre/clj-nix";
     };
 
-    colmena = {
-      inputs = {
-        flake-compat.follows = "flake-compat";
-        flake-utils.follows = "flake-utils";
-        nix-github-actions.follows = "nix-github-actions";
-        nixpkgs.follows = "nixpkgs";
-      };
-      url = "github:zhaofengli/colmena";
-    };
-
     devshell = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:numtide/devshell";
@@ -121,11 +111,6 @@
       url = "github:jlesquembre/nix-fetcher-data";
     };
 
-    nix-github-actions = {
-      inputs.nixpkgs.follows = "nixpkgs";
-      url = "github:nix-community/nix-github-actions";
-    };
-
     nix-kube-generators.url = "github:farcaller/nix-kube-generators";
 
     nixhelm = {
@@ -175,7 +160,6 @@
     poetry2nix = {
       inputs = {
         flake-utils.follows = "flake-utils";
-        nix-github-actions.follows = "nix-github-actions";
         nixpkgs.follows = "nixpkgs";
         systems.follows = "systems";
         treefmt-nix.follows = "treefmt-nix";
@@ -228,12 +212,11 @@
     };
   };
 
-  outputs = { colmena, flake-utils, nixpkgs, ... }@inputs:
+  outputs = { flake-utils, nixpkgs, ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       eachDefaultSystemMap = eachSystemMap defaultSystems;
       identities = import ./identities.nix { };
-      defaultTZ = "America/Detroit";
       system = "x86_64-linux";
       pkgs = import nixpkgs {
         inherit system;
@@ -242,15 +225,6 @@
         overlays = [ ];
       };
       hosts = import ./hosts { inherit identities system; };
-      colmenaHive = colmena.lib.makeHive {
-        meta.nixpkgs = import nixpkgs { inherit system; };
-
-        piNodeA = {
-          boot.isContainer = true;
-          deployment.targetHost = "pinodea";
-          time.timeZone = defaultTZ;
-        };
-      };
 
       homeConfigurations =
         import ./homeConfigurations { inherit hosts inputs pkgs system; };
@@ -292,6 +266,6 @@
           };
         });
     in {
-      inherit colmenaHive devShells homeConfigurations nixosConfigurations;
+      inherit devShells homeConfigurations nixosConfigurations;
     };
 }

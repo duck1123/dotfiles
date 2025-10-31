@@ -127,36 +127,6 @@
         "type": "github"
       }
     },
-    "colmena": {
-      "inputs": {
-        "flake-compat": [
-          "flake-compat"
-        ],
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "nix-github-actions": [
-          "nix-github-actions"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "stable": "stable"
-      },
-      "locked": {
-        "lastModified": 1755272288,
-        "narHash": "sha256-ypTPb2eKcOBbOoyvPV0j4ZOXs4kayo73/2KI456QnE0=",
-        "owner": "zhaofengli",
-        "repo": "colmena",
-        "rev": "5bf4ce6a24adba74a5184f4a9bef01d545a09473",
-        "type": "github"
-      },
-      "original": {
-        "owner": "zhaofengli",
-        "repo": "colmena",
-        "type": "github"
-      }
-    },
     "devshell": {
       "inputs": {
         "nixpkgs": [
@@ -789,6 +759,7 @@
     "nix-github-actions": {
       "inputs": {
         "nixpkgs": [
+          "poetry2nix",
           "nixpkgs"
         ]
       },
@@ -1063,9 +1034,7 @@
         "flake-utils": [
           "flake-utils"
         ],
-        "nix-github-actions": [
-          "nix-github-actions"
-        ],
+        "nix-github-actions": "nix-github-actions",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -1119,7 +1088,6 @@
     "root": {
       "inputs": {
         "clj-nix": "clj-nix",
-        "colmena": "colmena",
         "devshell": "devshell",
         "disko": "disko",
         "flake-compat": "flake-compat",
@@ -1134,7 +1102,6 @@
         "kubenix": "kubenix",
         "make-shell": "make-shell",
         "nix-fetcher-data": "nix-fetcher-data",
-        "nix-github-actions": "nix-github-actions",
         "nix-kube-generators": "nix-kube-generators",
         "nixhelm": "nixhelm",
         "nixidy": "nixidy",
@@ -1191,22 +1158,6 @@
       "original": {
         "owner": "Mic92",
         "repo": "sops-nix",
-        "type": "github"
-      }
-    },
-    "stable": {
-      "locked": {
-        "lastModified": 1750133334,
-        "narHash": "sha256-urV51uWH7fVnhIvsZIELIYalMYsyr2FCalvlRTzqWRw=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "36ab78dab7da2e4e27911007033713bab534187b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-25.05",
-        "repo": "nixpkgs",
         "type": "github"
       }
     },
