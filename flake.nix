@@ -26,11 +26,6 @@
       url = "github:numtide/devshell";
     };
 
-    disko = {
-      inputs.nixpkgs.follows = "nixpkgs";
-      url = "github:nix-community/disko";
-    };
-
     flake-compat.url = "github:edolstra/flake-compat";
 
     flake-parts = {
@@ -131,16 +126,6 @@
         nixpkgs.follows = "nixpkgs";
       };
       url = "github:duck1123/nixidy?ref=feature/chmod";
-    };
-
-    nixos-anywhere = {
-      inputs = {
-        disko.follows = "disko";
-        flake-parts.follows = "flake-parts";
-        nixpkgs.follows = "nixpkgs";
-        treefmt-nix.follows = "treefmt-nix";
-      };
-      url = "github:nix-community/nixos-anywhere";
     };
 
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
