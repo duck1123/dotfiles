@@ -244,22 +244,7 @@
         config.allowUnfree = true;
         overlays = [ ];
       };
-      hosts = {
-        inspernix =
-          import ./hosts/inspernix/default.nix { inherit system identities; };
-        nasnix =
-          import ./hosts/nasnix/default.nix { inherit system identities; };
-        pixel8 =
-          import ./hosts/pixel8/default.nix { inherit system identities; };
-        powerspecnix = import ./hosts/powerspecnix/default.nix {
-          inherit system identities;
-        };
-        steamdeck =
-          import ./hosts/steamdeck/default.nix { inherit system identities; };
-        vallenpc = import ./hosts/vavirl-pw0bwnq8/default.nix {
-          inherit system identities;
-        };
-      };
+      hosts = import ./hosts { inherit identities system; };
     in {
       colmenaHive = colmena.lib.makeHive {
         meta.nixpkgs = import nixpkgs { inherit system; };
