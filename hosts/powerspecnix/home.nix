@@ -29,7 +29,7 @@
       # postman
       # sparrow
       syncthing
-      tdesktop
+      telegram-desktop
       # tilt
       transmission_4-gtk
       # tree

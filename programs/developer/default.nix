@@ -2,7 +2,7 @@
   config = lib.mkIf host.features.developer.enable {
     home.packages = with pkgs; [
       age
-      argo
+      argo-workflows
       argocd
       # arkade
       # dbx
