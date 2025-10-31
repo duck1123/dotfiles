@@ -231,7 +231,6 @@
   outputs = { colmena, flake-utils, nixpkgs, ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
-      inherit (nixpkgs.lib) nixosSystem;
       eachDefaultSystemMap = eachSystemMap defaultSystems;
       identities = import ./identities.nix { };
       defaultTZ = "America/Detroit";
@@ -252,39 +251,13 @@
           time.timeZone = defaultTZ;
         };
       };
-      # Home configurations
-      # Accessible via 'home-manager'
+
       homeConfigurations =
         import ./homeConfigurations { inherit hosts inputs pkgs system; };
 
-      nixosConfigurations = {
-        inspernix = nixosSystem {
-          inherit (hosts.inspernix) system;
-          modules = [ ./hosts/inspernix/configuration.nix ];
-          specialArgs = {
-            inherit hosts inputs system;
-            host = hosts.inspernix;
-          };
-        };
+      nixosConfigurations =
+        import ./nixosConfigurations { inherit hosts inputs system; };
 
-        nasnix = nixosSystem {
-          inherit (hosts.inspernix) system;
-          modules = [ ./hosts/nasnix/configuration.nix ];
-          specialArgs = {
-            inherit hosts inputs system;
-            host = hosts.nasnix;
-          };
-        };
-
-        powerspecnix = nixosSystem {
-          inherit (hosts.powerspecnix) system;
-          modules = [ ./hosts/powerspecnix/configuration.nix ];
-          specialArgs = {
-            inherit hosts inputs system;
-            host = hosts.powerspecnix;
-          };
-        };
-      };
       devShells = eachDefaultSystemMap (system:
         let pkgs = import nixpkgs { inherit system; };
         in {

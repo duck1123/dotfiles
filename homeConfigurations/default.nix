@@ -1,9 +1,10 @@
 { hosts, inputs, pkgs, system, ... }:
+# Home configurations
+# Accessible via 'home-manager'
 let
   core =
     [ inputs.stylix.homeModules.stylix inputs.zen-browser.homeModules.beta ];
   inherit (inputs.home-manager.lib) homeManagerConfiguration;
-
 in {
   drenfer = homeManagerConfiguration {
     inherit pkgs;
