@@ -1,19 +1,23 @@
-{ ... }:
-let
-  hosts = import ../../../hosts/default.nix { };
-  host = hosts.nasnix;
+{ config, ... }:
+let loadHosts = config: import ../../../hosts/default.nix { inherit config; };
 in {
-  flake.modules.homeManager.nasnix = { pkgs, ... }: {
-    inherit host hosts;
-
-    home = {
-      packages = with pkgs; [ nerdfetch ];
-      sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
-    };
-  };
-
-  flake.modules.nixos.nasnix = { inputs, pkgs, ... }:
+  flake.modules.homeManager.nasnix = { pkgs, config, ... }:
     let
+      hosts = loadHosts config;
+      host = hosts.nasnix;
+    in {
+      inherit host hosts;
+
+      home = {
+        packages = with pkgs; [ nerdfetch ];
+        sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+      };
+    };
+
+  flake.modules.nixos.nasnix = { inputs, pkgs, config, ... }:
+    let
+      hosts = loadHosts config;
+      host = hosts.nasnix;
       core = [
         {
           inherit host hosts;

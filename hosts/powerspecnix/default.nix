@@ -1,4 +1,4 @@
-{ system, identities, ... }: {
+{ config, system, ... }: {
   inherit system;
 
   features = {
@@ -77,7 +77,7 @@
 
   hostname = "powerspecnix";
   id = "UFCCQLJ-3EKBVCQ-O5CNVM5-ERJQAQG-JWKQRPU-7FOZHPG-VMEOMKJ-KZSUFQK";
-  identity = identities.duck;
+  identity = config.identities.duck;
   name = "powerspecnix";
   nixos.enable = true;
 }

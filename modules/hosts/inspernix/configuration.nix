@@ -1,19 +1,23 @@
-{ ... }:
-let
-  hosts = import ../../../hosts/default.nix { };
-  host = hosts.inspernix;
+{ config, ... }:
+let loadHosts = config: import ../../../hosts/default.nix { inherit config; };
 in {
-  flake.modules.homeManager.inspernix = { pkgs, ... }: {
-    inherit host hosts;
-
-    home = {
-      packages = with pkgs; [ cheese discord nerdfetch ];
-      sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
-    };
-  };
-
-  flake.modules.nixos.inspernix = { inputs, pkgs, ... }:
+  flake.modules.homeManager.inspernix = { pkgs, config, ... }:
     let
+      hosts = loadHosts config;
+      host = hosts.inspernix;
+    in {
+      inherit host hosts;
+
+      home = {
+        packages = with pkgs; [ cheese discord nerdfetch ];
+        sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+      };
+    };
+
+  flake.modules.nixos.inspernix = { inputs, pkgs, config, ... }:
+    let
+      hosts = loadHosts config;
+      host = hosts.inspernix;
       core = [
         {
           inherit host hosts;

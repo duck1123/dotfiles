@@ -1,12 +1,10 @@
-{ ... }:
-let
-  identities = import ../identities.nix { };
-  system = "x86_64-linux";
+{ config, ... }:
+let system = "x86_64-linux";
 in {
-  inspernix = import ./inspernix { inherit system identities; };
-  nasnix = import ./nasnix { inherit system identities; };
-  pixel8 = import ./pixel8 { inherit system identities; };
-  powerspecnix = import ./powerspecnix { inherit system identities; };
-  steamdeck = import ./steamdeck { inherit system identities; };
-  vavirl-pw0bwnq8 = import ./vavirl-pw0bwnq8 { inherit system identities; };
+  inspernix = import ./inspernix { inherit config system; };
+  nasnix = import ./nasnix { inherit config system; };
+  pixel8 = import ./pixel8 { inherit config system; };
+  powerspecnix = import ./powerspecnix { inherit config system; };
+  steamdeck = import ./steamdeck { inherit config system; };
+  vavirl-pw0bwnq8 = import ./vavirl-pw0bwnq8 { inherit config system; };
 }

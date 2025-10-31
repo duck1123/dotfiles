@@ -1,7 +1,7 @@
-{ system, identities, ... }: {
+{ config, system, ... }: {
   inherit system;
   id = "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
-  identity = identities.duck;
+  identity = config.identities.duck;
   name = "nasnix";
   hostname = "nasnix";
 

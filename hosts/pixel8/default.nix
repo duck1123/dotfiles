@@ -1,4 +1,4 @@
-{ system, identities, ... }: {
+{ config, system, ... }: {
   inherit system;
   android.enable = true;
 
@@ -78,6 +78,6 @@
 
   hostname = "pixel8";
   id = "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
-  identity = identities.duck;
+  identity = config.identities.duck;
   name = "Pixel 8";
 }

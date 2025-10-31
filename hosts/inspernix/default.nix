@@ -1,7 +1,7 @@
-{ system, identities, ... }: {
+{ config, system, ... }: {
   inherit system;
   id = "OWMQLRL-CD5VB7H-A3T436E-6XT4H66-6XRF22Y-MQXMNAU-DFRNGOV-ADSKFAV";
-  identity = identities.duck;
+  identity = config.identities.duck;
   name = "inspernix";
   hostname = "inspernix";
 

@@ -1,10 +1,10 @@
 { ... }:
-let
-  hosts = import ../../../hosts/default.nix { };
-  host = hosts.steamdeck;
+let loadHosts = config: import ../../../hosts/default.nix { inherit config; };
 in {
-  flake.modules.homeManager.steamdeck = { pkgs, ... }:
+  flake.modules.homeManager.steamdeck = { pkgs, config, ... }:
     let
+      hosts = loadHosts config;
+      host = hosts.steamdeck;
       name = "Duck Nebuchadnezzar";
       username = "deck";
       email = "duck@kronkltd.net";

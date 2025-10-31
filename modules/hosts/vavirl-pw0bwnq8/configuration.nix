@@ -1,10 +1,11 @@
 { ... }:
-let
-  hosts = import ../../../hosts/default.nix { };
-  host = hosts.vavirl-pw0bwnq8;
+let loadHosts = config: import ../../../hosts/default.nix { inherit config; };
 in {
   flake.modules.homeManager.vavirl-pw0bwnq8 = { config, pkgs, ... }:
-    let inherit (config.host.identity) email gpgKey name username;
+    let
+      hosts = loadHosts config;
+      host = hosts.vavirl-pw0bwnq8;
+      inherit (config.host.identity) email gpgKey name username;
     in {
       inherit host hosts;
 

@@ -1,4 +1,4 @@
-{ system, identities, ... }: {
+{ config, system, ... }: {
   inherit system;
 
   features = {
@@ -64,7 +64,7 @@
   };
 
   id = "TEED77K-QOLTQ37-BL76MFB-LJD46CW-EJ7CZTJ-7GQNEF6-FZAMQRP-BCCRTQ6";
-  identity = identities.drenfer;
+  identity = config.identities.drenfer;
   name = "VallenPC";
   hostname = "vavirl-pw0bwnq8";
   home-manager.enable = true;

@@ -1,57 +1,61 @@
 { ... }:
-let
-  hosts = import ../../../hosts/default.nix { };
-  host = hosts.powerspecnix;
+let loadHosts = config: import ../../../hosts/default.nix { inherit config; };
 in {
-  flake.modules.homeManager.powerspecnix = { pkgs, ... }: {
-    inherit host hosts;
-
-    home = {
-      packages = with pkgs; [
-        alacritty
-        colmena
-        discord
-        distrobox
-        docker
-        # fastfetch
-        ffmpeg
-        # gitu
-        # kakoune
-        # kb
-        # keet
-        # khoj
-        kty
-        libnotify
-        # logseq
-        # mdcat
-        minio-client
-        # mullvad-browser
-        networkmanager
-        nix-tree
-        # obsidian
-        # onlyoffice-bin
-        playerctl
-        # postman
-        # sparrow
-        syncthing
-        telegram-desktop
-        # tilt
-        transmission_4-gtk
-        # tree
-        unzip
-        # virtualbox
-        vscode
-        wine
-        xsel
-        # yq
-      ];
-
-      sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
-    };
-  };
-
-  flake.modules.nixos.powerspecnix = { inputs, pkgs, ... }:
+  flake.modules.homeManager.powerspecnix = { pkgs, config, ... }:
     let
+      hosts = loadHosts config;
+      host = hosts.powerspecnix;
+    in {
+      inherit host hosts;
+
+      home = {
+        packages = with pkgs; [
+          alacritty
+          colmena
+          discord
+          distrobox
+          docker
+          # fastfetch
+          ffmpeg
+          # gitu
+          # kakoune
+          # kb
+          # keet
+          # khoj
+          kty
+          libnotify
+          # logseq
+          # mdcat
+          minio-client
+          # mullvad-browser
+          networkmanager
+          nix-tree
+          # obsidian
+          # onlyoffice-bin
+          playerctl
+          # postman
+          # sparrow
+          syncthing
+          telegram-desktop
+          # tilt
+          transmission_4-gtk
+          # tree
+          unzip
+          # virtualbox
+          vscode
+          wine
+          xsel
+          # yq
+        ];
+
+        sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+      };
+    };
+
+  flake.modules.nixos.powerspecnix = { inputs, pkgs, config, ... }:
+    let
+      hosts = loadHosts config;
+      host = hosts.powerspecnix;
       core = [
         {
           inherit host hosts;
