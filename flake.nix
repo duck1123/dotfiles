@@ -1,5 +1,5 @@
 {
-  description = "home-manager config";
+  description = "Duck's system configuration";
 
   nixConfig = {
     extra-experimental-features = "nix-command flakes";
