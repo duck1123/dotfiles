@@ -228,12 +228,10 @@
     };
   };
 
-  outputs = { colmena, flake-utils, home-manager, nixpkgs, stylix, zen-browser
-    , ... }@inputs:
+  outputs = { colmena, flake-utils, nixpkgs, ... }@inputs:
     let
       inherit (flake-utils.lib) eachSystemMap defaultSystems;
       inherit (nixpkgs.lib) nixosSystem;
-      inherit (home-manager.lib) homeManagerConfiguration;
       eachDefaultSystemMap = eachSystemMap defaultSystems;
       identities = import ./identities.nix { };
       defaultTZ = "America/Detroit";
@@ -257,53 +255,7 @@
       # Home configurations
       # Accessible via 'home-manager'
       homeConfigurations =
-        let core = [ stylix.homeModules.stylix zen-browser.homeModules.beta ];
-        in {
-          drenfer = homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit hosts inputs system;
-              host = hosts.vallenpc;
-            };
-            modules = core ++ [ ./hosts/vavirl-pw0bwnq8/home.nix ];
-          };
-
-          deck = homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit hosts inputs system;
-              host = hosts.steamdeck;
-            };
-            modules = core ++ [ ./hosts/steamdeck/home.nix ];
-          };
-
-          "duck@inspernix" = homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit hosts inputs system;
-              host = hosts.inspernix;
-            };
-            modules = core ++ [ ./hosts/inspernix/home.nix ];
-          };
-
-          "duck@nasnix" = homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit hosts inputs system;
-              host = hosts.nasnix;
-            };
-            modules = core ++ [ ./hosts/nasnix/home.nix ];
-          };
-
-          "duck@powerspecnix" = homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit hosts inputs system;
-              host = hosts.powerspecnix;
-            };
-            modules = core ++ [ ./hosts/powerspecnix/home.nix ];
-          };
-        };
+        import ./homeConfigurations { inherit hosts inputs pkgs system; };
 
       nixosConfigurations = {
         inspernix = nixosSystem {
