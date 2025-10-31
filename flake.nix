@@ -28,6 +28,8 @@
 
     flake-compat.url = "github:edolstra/flake-compat";
 
+    flake-file.url = "github:vic/flake-file";
+
     flake-parts = {
       inputs.nixpkgs-lib.follows = "nixpkgs-lib";
       url = "github:hercules-ci/flake-parts";
