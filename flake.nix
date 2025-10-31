@@ -235,24 +235,7 @@
       inherit (nixpkgs.lib) nixosSystem;
       inherit (home-manager.lib) homeManagerConfiguration;
       eachDefaultSystemMap = eachSystemMap defaultSystems;
-      identities = rec {
-        deck = {
-          inherit (duck) name email gpgKey;
-          username = "deck";
-        };
-        drenfer = {
-          inherit (duck) gpgKey;
-          name = "Daniel E. Renfer";
-          username = "drenfer";
-          email = "daniel.renfer@vallen.com";
-        };
-        duck = {
-          name = "Duck Nebuchadnezzar";
-          username = "duck";
-          email = "duck@kronkltd.net";
-          gpgKey = "9564904D297DBF3C";
-        };
-      };
+      identities = import ./identities.nix { };
       defaultTZ = "America/Detroit";
       system = "x86_64-linux";
       pkgs = import nixpkgs {
