@@ -17,7 +17,7 @@ let
     inputs.stylix.nixosModules.stylix
     ./base.nix
     ./hardware-configuration.nix
-    ../../modules
+    ../../nixosModules
   ];
   mkSpecialisation = module: {
     inheritParentConfig = false;
