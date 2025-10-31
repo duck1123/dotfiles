@@ -77,6 +77,8 @@
       url = "github:hyprwm/Hyprland";
     };
 
+    import-tree.url = "github:vic/import-tree";
+
     k3s-fleetops = {
       inputs = {
         clj-nix.follows = "clj-nix";
