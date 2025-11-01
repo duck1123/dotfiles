@@ -1,4 +1,4 @@
-{ hosts, inputs, system, ... }:
+{ hosts, inputs, ... }:
 let inherit (inputs.nixpkgs.lib) nixosSystem;
 in {
   inspernix = nixosSystem {
