@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.jujutsu.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.jujutsu.enable {
     home.packages = with pkgs; [
       # gg-jj jj-fzf
       jjui
@@ -9,7 +9,7 @@
 
     programs.jujutsu = {
       enable = true;
-      settings.user = { inherit (host.identity) email name; };
+      settings.user = { inherit (config.host.identity) email name; };
     };
   };
 }

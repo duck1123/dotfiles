@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.hyprpanel.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.hyprpanel.enable {
     # https://github.com/Jas-SinghFSU/HyprPanel/blob/master/nix/module.nix
     programs.hyprpanel = {
       enable = true;

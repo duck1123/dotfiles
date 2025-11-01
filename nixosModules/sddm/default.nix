@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.sddm.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.sddm.enable {
     services.displayManager.sddm = {
       enable = true;
       wayland.enable = true;

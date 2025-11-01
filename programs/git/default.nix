@@ -1,6 +1,6 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.git.enable {
-    programs = let inherit (host.identity) email gpgKey name;
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.git.enable {
+    programs = let inherit (config.host.identity) email gpgKey name;
     in {
       git = {
         enable = true;

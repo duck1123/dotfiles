@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.chm.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.chm.enable {
     home.packages = with pkgs; [ kchmviewer ];
   };
 }

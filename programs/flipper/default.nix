@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.flipper.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.flipper.enable {
     home.packages = with pkgs; [ qFlipper ];
   };
 }

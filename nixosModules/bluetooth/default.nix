@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.bluetooth.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.bluetooth.enable {
     hardware.bluetooth.enable = true;
   };
 }

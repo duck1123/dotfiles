@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.vim.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.vim.enable {
     home.packages = with pkgs; [ neovim ];
 
     programs = {

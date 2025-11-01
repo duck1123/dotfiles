@@ -1,4 +1,4 @@
-{ host, lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: {
   config = let
     emacsPackages = pkgs.emacs.pkgs.withPackages (epkgs:
       with epkgs.melpaPackages; [
@@ -48,7 +48,7 @@
         windswap
         yaml-mode
       ]);
-  in lib.mkIf host.features.emacs.enable {
+  in lib.mkIf config.host.features.emacs.enable {
     programs.emacs = {
       enable = true;
       extraConfig = ''

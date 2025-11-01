@@ -1,9 +1,7 @@
-{ inputs, hosts, ... }:
+{ config, inputs, ... }:
 let
   core = [
     {
-      inherit hosts;
-
       boot.loader.grub = {
         enable = true;
         device = "/dev/vda";
@@ -22,7 +20,11 @@ let
   ];
   mkSpecialisation = module: {
     inheritParentConfig = false;
-    configuration.imports = core ++ [ module ];
+    configuration = {
+      imports = core ++ [ module ];
+      inherit (config) host hosts;
+      _module.args = { inherit inputs; };
+    };
   };
   specialisations = {
     budgie = mkSpecialisation ../../environments/budgie;

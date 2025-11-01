@@ -1,6 +1,6 @@
-{ host, lib, inputs, pkgs, ... }: {
+{ config, inputs, lib, pkgs, ... }: {
   config = let inherit (inputs.k3s-fleetops.lib) toYAML;
-  in lib.mkIf host.features.dbt.enable {
+  in lib.mkIf config.host.features.dbt.enable {
     home = {
       file.".dbt/profiles.yml".text = toYAML {
         inherit pkgs;

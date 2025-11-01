@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.font.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.font.enable {
     # Configure console font
     console = {
       font = "ter-v32n";

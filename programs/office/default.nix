@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.office.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.office.enable {
     home.packages = with pkgs;
       [
         # gnumeric

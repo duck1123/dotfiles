@@ -1,4 +1,5 @@
-{ host, lib, ... }: {
-  config =
-    lib.mkIf host.features.touch.enable { services.libinput.enable = true; };
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.touch.enable {
+    services.libinput.enable = true;
+  };
 }

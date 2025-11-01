@@ -1,5 +1,5 @@
-{ host, pkgs, ... }:
-let inherit (host.identity) username;
+{ config, pkgs, ... }:
+let inherit (config.host.identity) username;
 in {
   imports = [
     ../backups

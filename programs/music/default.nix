@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.music.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.music.enable {
     home.packages = with pkgs; [
       # Multi-track hard disk recording software
       ardour

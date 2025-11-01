@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.vscode.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.vscode.enable {
     programs.vscode = {
       enable = true;
       profiles.default.userSettings = {

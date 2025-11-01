@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.ncmpcpp.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.ncmpcpp.enable {
     programs.ncmpcpp = {
       enable = false;
       settings = {

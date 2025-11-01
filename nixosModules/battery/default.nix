@@ -1,4 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config =
-    lib.mkIf host.features.battery.enable { services.upower.enable = true; };
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.battery.enable {
+    services.upower.enable = true;
+  };
 }

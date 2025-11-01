@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.docker.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.docker.enable {
     virtualisation.docker.enable = true;
   };
 }

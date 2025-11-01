@@ -1,53 +1,44 @@
-{ hosts, inputs, pkgs, system, ... }:
-# Home configurations
-# Accessible via 'home-manager'
+{ hosts, inputs, pkgs, ... }:
 let
-  core =
-    [ inputs.stylix.homeModules.stylix inputs.zen-browser.homeModules.beta ];
+  core = [
+    inputs.stylix.homeModules.stylix
+    inputs.zen-browser.homeModules.beta
+    { inherit hosts; }
+    ../nixosModules/flakeModules
+  ];
   inherit (inputs.home-manager.lib) homeManagerConfiguration;
 in {
   drenfer = homeManagerConfiguration {
     inherit pkgs;
-    extraSpecialArgs = {
-      inherit hosts inputs system;
-      host = hosts.vallenpc;
-    };
-    modules = core ++ [ ../hosts/vavirl-pw0bwnq8/home.nix ];
+    extraSpecialArgs = { inherit inputs; };
+    modules = core
+      ++ [ { host = hosts.vallenpc; } ../hosts/vavirl-pw0bwnq8/home.nix ];
   };
 
   deck = homeManagerConfiguration {
     inherit pkgs;
-    extraSpecialArgs = {
-      inherit hosts inputs system;
-      host = hosts.steamdeck;
-    };
-    modules = core ++ [ ../hosts/steamdeck/home.nix ];
+    extraSpecialArgs = { inherit inputs; };
+    modules = core
+      ++ [ { host = hosts.steamdeck; } ../hosts/steamdeck/home.nix ];
   };
 
   "duck@inspernix" = homeManagerConfiguration {
     inherit pkgs;
-    extraSpecialArgs = {
-      inherit hosts inputs system;
-      host = hosts.inspernix;
-    };
-    modules = core ++ [ ../hosts/inspernix/home.nix ];
+    extraSpecialArgs = { inherit inputs; };
+    modules = core
+      ++ [ { host = hosts.inspernix; } ../hosts/inspernix/home.nix ];
   };
 
   "duck@nasnix" = homeManagerConfiguration {
     inherit pkgs;
-    extraSpecialArgs = {
-      inherit hosts inputs system;
-      host = hosts.nasnix;
-    };
-    modules = core ++ [ ../hosts/nasnix/home.nix ];
+    extraSpecialArgs = { inherit inputs; };
+    modules = core ++ [ { host = hosts.nasnix; } ../hosts/nasnix/home.nix ];
   };
 
   "duck@powerspecnix" = homeManagerConfiguration {
     inherit pkgs;
-    extraSpecialArgs = {
-      inherit hosts inputs system;
-      host = hosts.powerspecnix;
-    };
-    modules = core ++ [ ../hosts/powerspecnix/home.nix ];
+    extraSpecialArgs = { inherit inputs; };
+    modules = core
+      ++ [ { host = hosts.powerspecnix; } ../hosts/powerspecnix/home.nix ];
   };
 }

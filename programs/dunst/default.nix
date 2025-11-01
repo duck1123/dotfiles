@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.dunst.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.dunst.enable {
     home.packages = with pkgs; [ dunst ];
 
     services.dunst = {

@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.hyprland.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.hyprland.enable {
     home.packages = with pkgs; [
       cascadia-code
       font-awesome

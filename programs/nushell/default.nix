@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.nushell.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.nushell.enable {
     home.packages = with pkgs; [
       carapace
       fish

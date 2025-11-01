@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.ssh.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.ssh.enable {
     services.openssh = {
       enable = true;
 

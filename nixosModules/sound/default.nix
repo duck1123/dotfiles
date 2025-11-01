@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.sound.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.sound.enable {
     security.rtkit.enable = true;
 
     services = {

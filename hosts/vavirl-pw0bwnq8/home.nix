@@ -1,5 +1,5 @@
-{ host, pkgs, ... }:
-let inherit (host.identity) email gpgKey name username;
+{ config, pkgs, ... }:
+let inherit (config.host.identity) email gpgKey name username;
 in {
   programs.home-manager.enable = true;
 

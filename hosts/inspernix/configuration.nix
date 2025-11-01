@@ -1,8 +1,7 @@
-{ inputs, hosts, ... }:
+{ config, inputs, ... }:
 let
   core = [
     {
-      inherit hosts;
 
       boot.loader = {
         systemd-boot.enable = true;
@@ -21,7 +20,11 @@ let
   ];
   mkSpecialisation = module: {
     inheritParentConfig = false;
-    configuration.imports = core ++ [ module ];
+    configuration = {
+      imports = core ++ [ module ];
+      inherit (config) host hosts;
+      _module.args = { inherit inputs; };
+    };
   };
   specialisations = {
     budgie = mkSpecialisation ../../environments/budgie;

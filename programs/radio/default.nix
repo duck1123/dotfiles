@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.radio.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.radio.enable {
     home.packages = with pkgs; [
       cubicsdr
       gnuradio

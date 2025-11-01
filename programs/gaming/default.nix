@@ -1,5 +1,5 @@
-{ lib, host, pkgs, ... }: {
-  config = lib.mkIf host.features.gaming.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.gaming.enable {
     home.packages = with pkgs; [
       heroic
       itch

@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.emacs-prelude.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.emacs-prelude.enable {
     home = {
       file = {
         ".emacs.d/personal/01-personal.el".source = ./01-personal.el;

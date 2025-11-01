@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.dconf.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.dconf.enable {
     dconf.settings = {
       "org/gnome/desktop/interface".color-scheme = "prefer-dark";
 

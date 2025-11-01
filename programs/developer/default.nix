@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.developer.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.developer.enable {
     home.packages = with pkgs; [
       age
       argo-workflows

@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.nix.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.nix.enable {
     nix = {
       extraOptions = ''
         experimental-features = nix-command flakes

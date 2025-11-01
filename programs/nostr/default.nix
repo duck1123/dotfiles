@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.nostr.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.nostr.enable {
     home.packages = with pkgs; [
       # CLI application for nostr
       algia

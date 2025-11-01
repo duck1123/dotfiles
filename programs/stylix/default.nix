@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.stylix.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.stylix.enable {
     stylix = {
       enable = true;
       autoEnable = true;

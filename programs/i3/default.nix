@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.i3.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.i3.enable {
     programs.i3status-rust = { enable = true; };
 
     programs.rofi = {

@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.nfs.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.nfs.enable {
     services.nfs.server = {
       enable = false;
       statdPort = 4000;

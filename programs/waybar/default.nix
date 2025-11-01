@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.waybar.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.waybar.enable {
     programs.waybar = {
       enable = true;
 

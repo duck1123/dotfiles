@@ -1,5 +1,5 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.xserver.enable {
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.xserver.enable {
     services.xserver = {
       enable = true;
 

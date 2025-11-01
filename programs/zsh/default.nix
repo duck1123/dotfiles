@@ -1,6 +1,6 @@
-{ host, lib, pkgs, ... }: {
-  config = let inherit (host.identity) username;
-  in lib.mkIf host.features.zsh.enable {
+{ config, lib, pkgs, ... }: {
+  config = let inherit (config.host.identity) username;
+  in lib.mkIf config.host.features.zsh.enable {
     home.packages = with pkgs; [ hstr ];
 
     programs.zsh = {

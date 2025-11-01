@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.network.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.network.enable {
     environment.systemPackages = with pkgs; [ gvfs nfs-utils cifs-utils ];
 
     networking = {
@@ -19,7 +19,7 @@
         enable = false;
       };
 
-      hostName = host.hostname;
+      hostName = config.host.hostname;
       networkmanager.enable = true;
     };
 

@@ -1,5 +1,5 @@
-{ host, lib, pkgs, ... }: {
-  config = lib.mkIf host.features.kubernetes.server.enable {
+{ config, lib, pkgs, ... }: {
+  config = lib.mkIf config.host.features.kubernetes.server.enable {
     environment.systemPackages = with pkgs; [ k3s nfs-utils openiscsi ];
 
     networking.firewall = {
@@ -18,7 +18,7 @@
 
       openiscsi = {
         enable = true;
-        name = "${host.hostname}-initiatorhost";
+        name = "${config.host.hostname}-initiatorhost";
       };
     };
 

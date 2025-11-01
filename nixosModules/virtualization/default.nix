@@ -1,6 +1,6 @@
-{ host, lib, ... }: {
-  config = lib.mkIf host.features.virtualization.enable {
-    users.extraGroups.vboxusers.members = [ host.identity.username ];
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.virtualization.enable {
+    users.extraGroups.vboxusers.members = [ config.host.identity.username ];
 
     virtualisation.virtualbox.host = {
       addNetworkInterface = false;

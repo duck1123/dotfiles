@@ -1,8 +1,7 @@
-{ host, hosts, lib, ... }: {
-  config = lib.mkIf host.features.syncthing.enable {
-    inherit hosts;
+{ config, lib, ... }: {
+  config = lib.mkIf config.host.features.syncthing.enable {
 
-    services.syncthing = let inherit (host.identity) username;
+    services.syncthing = let inherit (config.host.identity) username;
     in {
       enable = true;
       user = username;
@@ -12,7 +11,7 @@
       overrideFolders = false;
       overrideDevices = true;
 
-      settings = with hosts; {
+      settings = with config.hosts; {
         devices = {
           ${powerspecnix.name} = {
             id = powerspecnix.id;
@@ -30,12 +29,12 @@
           };
 
           "VallenPC" = {
-            id = hosts.vallenpc.id;
+            id = config.hosts.vallenpc.id;
             autoAcceptFolders = true;
           };
 
           "inspernix" = {
-            id = hosts.inspernix.id;
+            id = config.hosts.inspernix.id;
             autoAcceptFolders = true;
           };
         };
