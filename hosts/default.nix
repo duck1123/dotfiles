@@ -1,4 +1,8 @@
-{ identities, system, ... }: {
+{ ... }:
+let
+  identities = import ../identities.nix { };
+  system = "x86_64-linux";
+in {
   inspernix = import ./inspernix { inherit system identities; };
   nasnix = import ./nasnix { inherit system identities; };
   pixel8 = import ./pixel8 { inherit system identities; };

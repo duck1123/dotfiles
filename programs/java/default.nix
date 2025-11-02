@@ -1,4 +1,5 @@
 { config, lib, pkgs, ... }: {
-  config =
-    lib.mkIf config.host.features.java.enable { home.packages = with pkgs; [ jdk ]; };
+  config = lib.mkIf config.host.features.java.enable {
+    home.packages = with pkgs; [ jdk ];
+  };
 }

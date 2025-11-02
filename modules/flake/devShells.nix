@@ -2,7 +2,8 @@
 let
   inherit (inputs.flake-utils.lib) eachSystemMap defaultSystems;
   eachDefaultSystemMap = eachSystemMap defaultSystems;
-  devShells = eachDefaultSystemMap (system:
+in {
+  flake.devShells = eachDefaultSystemMap (system:
     let pkgs = import inputs.nixpkgs { inherit system; };
     in {
       default = pkgs.mkShell {
@@ -35,4 +36,4 @@ let
         ];
       };
     });
-in { inherit devShells; }
+}

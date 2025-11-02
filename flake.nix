@@ -2,6 +2,7 @@
   description = "Duck's system configuration";
 
   nixConfig = {
+    allow-import-from-derivation = true;
     extra-experimental-features = "nix-command flakes";
     # extra-substituters =
     #   [ "https://duck1123.cachix.org" "https://nix-community.cachix.org" ];
@@ -200,25 +201,6 @@
   };
 
   outputs = inputs:
-    let
-      identities = import ./identities.nix { };
-      system = "x86_64-linux";
-      pkgs = import inputs.nixpkgs {
-        inherit system;
-        # May the FOSS gods take mercy upon me
-        config.allowUnfree = true;
-        overlays = [ ];
-      };
-      hosts = import ./hosts { inherit identities system; };
-      homeConfigurations =
-        import ./homeConfigurations { inherit hosts inputs pkgs system; };
-      nixosConfigurations =
-        import ./nixosConfigurations { inherit hosts inputs system; };
-      devShells = import ./devShells { inherit inputs; };
-    in devShells // {
-      inherit homeConfigurations nixosConfigurations;
-
-      # FIXME: Can't use `nix shell` without this.
-      packages.${system}.default = pkgs.cowsay;
-    };
+    inputs.flake-parts.lib.mkFlake { inherit inputs; }
+    (inputs.import-tree ./modules);
 }
