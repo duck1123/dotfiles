@@ -97,11 +97,7 @@
 
   ci
   {:doc     "Build all targets"
-   :depends [check build-home-inspernix build-home-nasnix build-home-powerspecnix
-             build-home-steamdeck build-home-vallen
-             build-os-inspernix
-             build-os-nasnix
-             build-os-powerspecnix]}
+   :depends [check build-all]}
 
   format
   {:doc  "Format all .nix files using nixpkgs-fmt"
