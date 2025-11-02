@@ -1,9 +1,24 @@
-{ ... }: {
-  flake.modules.nixos.nasnix = { config, inputs, ... }:
+{ ... }:
+let
+  hosts = import ../../../hosts/default.nix { };
+  host = hosts.nasnix;
+in {
+  flake.modules.home-manager.nasnix = { pkgs, ... }: {
+    imports = [ ../../../programs ];
+    inherit host hosts;
+
+    home = {
+      packages = with pkgs; [ nerdfetch ];
+      sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+    };
+  };
+
+  flake.modules.nixos.nasnix = { inputs, ... }:
     let
-      hosts = import ../../../hosts/default.nix { };
       core = [
         {
+          inherit host hosts;
+
           boot.loader.grub = {
             enable = true;
             device = "/dev/vda";
@@ -20,7 +35,6 @@
         inheritParentConfig = false;
         configuration = {
           imports = core ++ [ module ];
-          inherit (config) host hosts;
           _module.args = { inherit inputs; };
         };
       };
@@ -31,14 +45,13 @@
         plasma6 = mkSpecialisation ../../../environments/plasma6;
       };
       host-module = {
-        inherit hosts;
-        host = hosts.nasnix;
         imports = specialisations.budgie.configuration.imports;
-        # specialisation = {
-        #   inherit (specialisations)
-        #   # budgie
-        #     gnome hyprland plasma6;
-        # };
+        specialisation = {
+          # inherit (specialisations) budgie;
+          # inherit (specialisations) gnome;
+          # inherit (specialisations) hyprland;
+          # inherit (specialisations) plasma6;
+        };
       };
     in {
       _module.args = { inherit inputs; };

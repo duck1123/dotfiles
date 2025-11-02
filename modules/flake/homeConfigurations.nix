@@ -1,61 +1,41 @@
-{ config, inputs, ... }:
+{ inputs, ... }:
 let
   inherit (inputs.home-manager.lib) homeManagerConfiguration;
-  system = "x86_64-linux";
+  inherit (inputs.self.modules) home-manager;
   pkgs = import inputs.nixpkgs {
-    inherit system;
-    config = { allowUnfree = true; };
+    config.allowUnfree = true;
+    system = "x86_64-linux";
   };
 in {
   flake.homeConfigurations = {
     "drenfer@VAVIRL-PW0BWNQ8" = homeManagerConfiguration {
       inherit pkgs;
-      extraSpecialArgs = { inherit inputs; };
-      modules = [
-        ({ config, ... }: { host = config.hosts.vallenpc; })
-        config.flake.modules.home-manager.core
-        ../../hosts/vavirl-pw0bwnq8/home.nix
-      ];
+      extraSpecialArgs = { inherit inputs pkgs; };
+      modules = with home-manager; [ core vavirl-pw0bwnq8 ];
     };
 
     "deck@steamdeck" = homeManagerConfiguration {
       inherit pkgs;
-      extraSpecialArgs = { inherit inputs; };
-      modules = [
-        ({ config, ... }: { host = config.hosts.steamdeck; })
-        config.flake.modules.home-manager.core
-        ../../hosts/steamdeck/home.nix
-      ];
+      extraSpecialArgs = { inherit inputs pkgs; };
+      modules = with home-manager; [ core steamdeck ];
     };
 
     "duck@inspernix" = homeManagerConfiguration {
       inherit pkgs;
-      extraSpecialArgs = { inherit inputs; };
-      modules = [
-        ({ config, ... }: { host = config.hosts.inspernix; })
-        config.flake.modules.home-manager.core
-        ../../hosts/inspernix/home.nix
-      ];
+      extraSpecialArgs = { inherit inputs pkgs; };
+      modules = with home-manager; [ core inspernix ];
     };
 
     "duck@nasnix" = homeManagerConfiguration {
       inherit pkgs;
-      extraSpecialArgs = { inherit inputs; };
-      modules = [
-        ({ config, ... }: { host = config.hosts.nasnix; })
-        config.flake.modules.home-manager.core
-        ../../hosts/nasnix/home.nix
-      ];
+      extraSpecialArgs = { inherit inputs pkgs; };
+      modules = with home-manager; [ core nasnix ];
     };
 
     "duck@powerspecnix" = homeManagerConfiguration {
       inherit pkgs;
-      extraSpecialArgs = { inherit inputs; };
-      modules = [
-        ({ config, ... }: { host = config.hosts.powerspecnix; })
-        config.flake.modules.home-manager.core
-        ../../hosts/powerspecnix/home.nix
-      ];
+      extraSpecialArgs = { inherit inputs pkgs; };
+      modules = with home-manager; [ core powerspecnix ];
     };
   };
 }

@@ -1,8 +1,0 @@
-{ pkgs, ... }: {
-  imports = [ ../../programs/base ];
-
-  home = {
-    packages = with pkgs; [ cheese discord nerdfetch ];
-    sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
-  };
-}

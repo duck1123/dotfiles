@@ -1,9 +1,11 @@
-{ ... }: {
-  flake.modules.home-manager.powerspecnix = { config, pkgs, ... }: {
-    inherit (config) hosts;
-    host = config.hosts.powerspecnix;
-
-    imports = [ ../../programs ];
+{ ... }:
+let
+  hosts = import ../../../hosts/default.nix { };
+  host = hosts.powerspecnix;
+in {
+  flake.modules.home-manager.powerspecnix = { pkgs, ... }: {
+    imports = [ ../../../programs ];
+    inherit host hosts;
 
     home = {
       packages = with pkgs; [
@@ -49,11 +51,12 @@
     };
   };
 
-  flake.modules.nixos.powerspecnix = { config, inputs, ... }:
+  flake.modules.nixos.powerspecnix = { inputs, ... }:
     let
-      hosts = import ../../../hosts/default.nix { };
       core = [
         {
+          inherit host hosts;
+
           boot.loader = {
             systemd-boot.enable = true;
             efi.canTouchEfiVariables = true;
@@ -69,7 +72,6 @@
         inheritParentConfig = false;
         configuration = {
           imports = core ++ [ module ];
-          inherit (config) host hosts;
           _module.args = { inherit inputs; };
         };
       };
@@ -81,18 +83,16 @@
         plasma6 = mkSpecialisation ../../../environments/plasma6;
       };
       host-module = {
-        inherit hosts;
-        host = hosts.powerspecnix;
         imports = specialisations.hyprland.configuration.imports;
         specialisation = {
-          inherit (specialisations)
-            budgie
-            # gnome i3 hyprland plasma6
-          ;
+          inherit (specialisations) budgie;
+          # inherit (specialisations) gnome;
+          # inherit (specialisations) i3;
+          # inherit (specialisations) hyprland;
+          # inherit (specialisations) plasma6;
         };
       };
     in {
-      # Provide module arguments that modules need
       _module.args = { inherit inputs; };
       imports = [ host-module ../../../nixosModules ];
     };

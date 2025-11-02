@@ -29,7 +29,7 @@
           };
 
           "VallenPC" = {
-            id = config.hosts.vallenpc.id;
+            id = config.hosts.vavirl-pw0bwnq8.id;
             autoAcceptFolders = true;
           };
 

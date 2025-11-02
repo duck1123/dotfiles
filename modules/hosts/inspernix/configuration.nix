@@ -1,6 +1,11 @@
-{ ... }: {
+{ ... }:
+let
+  hosts = import ../../../hosts/default.nix { };
+  host = hosts.inspernix;
+in {
   flake.modules.home-manager.inspernix = { pkgs, ... }: {
-    imports = [ ../../../programs/base ];
+    imports = [ ../../../programs ];
+    inherit host hosts;
 
     home = {
       packages = with pkgs; [ cheese discord nerdfetch ];
@@ -8,11 +13,12 @@
     };
   };
 
-  flake.modules.nixos.inspernix = { config, inputs, ... }:
+  flake.modules.nixos.inspernix = { inputs, ... }:
     let
-      hosts = import ../../../hosts/default.nix { };
       core = [
         {
+          inherit host hosts;
+
           boot.loader = {
             systemd-boot.enable = true;
             efi.canTouchEfiVariables = true;
@@ -28,7 +34,6 @@
         inheritParentConfig = false;
         configuration = {
           imports = core ++ [ module ];
-          inherit (config) host hosts;
           _module.args = { inherit inputs; };
         };
       };
@@ -40,15 +45,13 @@
         plasma6 = mkSpecialisation ../../../environments/plasma6;
       };
       host-module = {
-        inherit hosts;
-        host = hosts.inspernix;
-
         imports = specialisations.hyprland.configuration.imports;
         specialisation = {
-          inherit (specialisations)
-            budgie
-            # gnome hyprland i3 plasma6
-          ;
+          inherit (specialisations) budgie;
+          # inherit (specialisations) gnome;
+          # inherit (specialisations) hyprland;
+          # inherit (specialisations) i3;
+          # inherit (specialisations) plasma6;
         };
       };
     in {
