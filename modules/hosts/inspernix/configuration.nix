@@ -1,4 +1,13 @@
 { ... }: {
+  flake.modules.home-manager.inspernix = { pkgs, ... }: {
+    imports = [ ../../../programs/base ];
+
+    home = {
+      packages = with pkgs; [ cheese discord nerdfetch ];
+      sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+    };
+  };
+
   flake.modules.nixos.inspernix = { config, inputs, lib, ... }:
     let
       hosts = import ../../../hosts/default.nix { };

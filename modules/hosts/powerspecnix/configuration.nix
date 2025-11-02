@@ -1,4 +1,54 @@
 { ... }: {
+  flake.modules.home-manager.powerspecnix = { config, pkgs, ... }: {
+    inherit (config) hosts;
+    host = config.hosts.powerspecnix;
+
+    imports = [ ../../programs ];
+
+    home = {
+      packages = with pkgs; [
+        alacritty
+        colmena
+        discord
+        distrobox
+        docker
+        # fastfetch
+        ffmpeg
+        # gitu
+        # kakoune
+        # kb
+        # keet
+        # khoj
+        kty
+        libnotify
+        # logseq
+        # mdcat
+        minio-client
+        # mullvad-browser
+        networkmanager
+        nix-tree
+        # obsidian
+        # onlyoffice-bin
+        playerctl
+        # postman
+        # sparrow
+        syncthing
+        telegram-desktop
+        # tilt
+        transmission_4-gtk
+        # tree
+        unzip
+        # virtualbox
+        vscode
+        wine
+        xsel
+        # yq
+      ];
+
+      sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+    };
+  };
+
   flake.modules.nixos.powerspecnix = { config, inputs, ... }:
     let
       hosts = import ../../../hosts/default.nix { };
