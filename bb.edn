@@ -59,7 +59,7 @@
   build-home-vallen
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.drenfer@vavirl-pw0bwnq8.activationPackage"
+         cmd    "nh home build .#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}

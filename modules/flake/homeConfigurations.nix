@@ -15,7 +15,7 @@ let
   ];
 in {
   flake.homeConfigurations = {
-    "drenfer@vavirl-pw0bwnq8" = homeManagerConfiguration {
+    "drenfer@VAVIRL-PW0BWNQ8" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs; };
       modules = core
