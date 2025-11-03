@@ -51,7 +51,7 @@
   build-home-steamdeck
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.deck.activationPackage"
+         cmd    "nh home build .#homeConfigurations.deck@steamdeck.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
@@ -59,7 +59,7 @@
   build-home-vallen
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.drenfer.activationPackage"
+         cmd    "nh home build .#homeConfigurations.drenfer@vavirl-pw0bwnq8.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}

@@ -15,14 +15,14 @@ let
   ];
 in {
   flake.homeConfigurations = {
-    drenfer = homeManagerConfiguration {
+    "drenfer@vavirl-pw0bwnq8" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs; };
       modules = core
         ++ [ { host = hosts.vallenpc; } ../../hosts/vavirl-pw0bwnq8/home.nix ];
     };
 
-    deck = homeManagerConfiguration {
+    "deck@steamdeck" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs; };
       modules = core
