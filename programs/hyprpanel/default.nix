@@ -24,7 +24,6 @@
               "volume"
               "notifications"
             ];
-
           };
 
           media.show_label = false;
@@ -46,14 +45,12 @@
             weather = {
               location = "Detroit";
               unit = "metric";
-
             };
           };
 
           dashboard = {
             directories.enabled = true;
-
-            powermenu = { avatar.name = "Duck"; };
+            powermenu.avatar.name = "Duck";
 
             shortcuts.left.shortcut1 = {
               command = "firefox";
@@ -65,7 +62,7 @@
         };
 
         theme = {
-          bar = { buttons = { style = "wave"; }; };
+          bar.buttons.style = "wave";
 
           font = {
             name = "CaskaydiaCove NF";
