@@ -98,10 +98,6 @@
     in {
       # Provide module arguments that modules need
       _module.args = { inherit inputs; };
-      imports = with inputs.self.modules.nixos; [
-        host-module
-        # duck
-        ../../../nixosModules
-      ];
+      imports = [ host-module ../../../nixosModules ];
     };
 }

@@ -8,7 +8,7 @@
     };
   };
 
-  flake.modules.nixos.inspernix = { config, inputs, lib, ... }:
+  flake.modules.nixos.inspernix = { config, inputs, ... }:
     let
       hosts = import ../../../hosts/default.nix { };
       core = [
@@ -58,10 +58,6 @@
       };
     in {
       _module.args = { inherit inputs; };
-      imports = with inputs.self.modules.nixos; [
-        host-module
-        # duck
-        ../../../nixosModules
-      ];
+      imports = [ host-module ../../../nixosModules ];
     };
 }

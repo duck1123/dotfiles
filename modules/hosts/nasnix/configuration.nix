@@ -1,4 +1,4 @@
-{ inputs, ... }: {
+{ ... }: {
   flake.modules.nixos.nasnix = { config, inputs, ... }:
     let
       hosts = import ../../../hosts/default.nix { };
@@ -46,10 +46,6 @@
       };
     in {
       _module.args = { inherit inputs; };
-      imports = with inputs.self.modules.nixos; [
-        host-module
-        # duck
-        ../../../nixosModules
-      ];
+      imports = [ host-module ../../../nixosModules ];
     };
 }
