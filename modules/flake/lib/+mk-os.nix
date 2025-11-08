@@ -4,7 +4,13 @@ let
     system: cls: name:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
-      specialArgs = { inherit inputs; };
+      specialArgs = {
+        inherit inputs;
+        # pkgs = import inputs.nixpkgs {
+        #   inherit system;
+        #   config.allowUnfree = true;
+        # };
+      };
       modules = [
         {
           networking.hostName = lib.mkDefault name;
