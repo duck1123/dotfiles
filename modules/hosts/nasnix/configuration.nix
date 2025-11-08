@@ -26,8 +26,6 @@ in {
 
           environment.systemPackages = with pkgs; [ samba ];
 
-          nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
-
           services.samba = {
             enable = true;
             settings.global = {
@@ -42,6 +40,7 @@ in {
           time.timeZone = "America/Detroit";
         }
         inputs.self.modules.nixos.base
+        inputs.self.modules.nixos.sddm
         ../../../hosts/nasnix/hardware-configuration.nix
       ];
       mkSpecialisation = module: {

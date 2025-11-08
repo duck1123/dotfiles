@@ -23,8 +23,6 @@ in {
             efi.canTouchEfiVariables = true;
           };
 
-          nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
-
           programs = {
             dconf.enable = true;
             firefox.enable = true;
@@ -48,6 +46,7 @@ in {
           time.timeZone = "America/Detroit";
         }
         inputs.self.modules.nixos.base
+        inputs.self.modules.nixos.sddm
         ../../../hosts/inspernix/hardware-configuration.nix
       ];
       mkSpecialisation = module: {

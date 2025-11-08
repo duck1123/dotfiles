@@ -100,10 +100,9 @@ in {
             docker.enable = true;
             libvirtd.enable = true;
           };
-
-          nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
         }
         inputs.self.modules.nixos.base
+        inputs.self.modules.nixos.sddm
         ../../../hosts/powerspecnix/hardware-configuration.nix
       ];
       mkSpecialisation = module: {
