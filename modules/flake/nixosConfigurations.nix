@@ -1,6 +1,6 @@
 { inputs, ... }:
 let
-  inherit (inputs.self.lib.mk-os) wsl linux;
+  inherit (inputs.self.lib.mk-os) linux;
 in
 {
   flake.nixosConfigurations = {
