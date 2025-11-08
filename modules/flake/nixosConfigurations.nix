@@ -1,6 +1,6 @@
 { inputs, ... }:
 let
-  inherit (inputs.self.lib.mk-os) wsl linux;
+  inherit (inputs.self.lib.mk-os) linux;
 in
 {
   flake.nixosConfigurations = {
@@ -10,6 +10,5 @@ in
     powerspecnix = linux "powerspecnix";
     nixmini = linux "nixmini";
     vidcentre = linux "vidcentre";
-    # vavirl-pw0bwnq8 = wsl "vavirl-pw0bwnq8";
   };
 }
