@@ -13,7 +13,6 @@
       hosts = import ../../../hosts/default.nix { };
       core = [
         {
-
           boot.loader = {
             systemd-boot.enable = true;
             efi.canTouchEfiVariables = true;

@@ -4,13 +4,19 @@
       options = {
         home-manager = lib.mkOption {
           type = lib.types.attrsOf lib.types.anything;
-          description = "NixOS modules for different hosts";
+          description = "NixOS modules for home manager";
           default = { };
         };
 
         nixos = lib.mkOption {
           type = lib.types.attrsOf lib.types.anything;
           description = "NixOS modules for different hosts";
+          default = { };
+        };
+
+        options = lib.mkOption {
+          type = lib.types.attrsOf lib.types.anything;
+          description = "modules for options";
           default = { };
         };
       };

@@ -5,7 +5,6 @@
     ./bluetooth
     ./boot
     ./docker
-    ./flakeModules
     ./font
     ./gaming
     ./i18n
