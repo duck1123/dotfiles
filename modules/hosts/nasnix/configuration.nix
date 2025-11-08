@@ -12,13 +12,9 @@
 
           nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
         }
-        inputs.home-manager.nixosModules.home-manager
-        inputs.sddm-sugar-candy-nix.nixosModules.default
-        inputs.sops-nix.nixosModules.sops
-        inputs.stylix.nixosModules.stylix
+        inputs.self.modules.nixos.base
         ../../../hosts/nasnix/base.nix
         ../../../hosts/nasnix/hardware-configuration.nix
-        ../../../nixosModules
       ];
       mkSpecialisation = module: {
         inheritParentConfig = false;
