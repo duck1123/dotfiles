@@ -3,7 +3,13 @@ let
   mkNixos = system: cls: name:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
-      specialArgs = { inherit inputs; };
+      specialArgs = {
+        inherit inputs;
+        # pkgs = import inputs.nixpkgs {
+        #   inherit system;
+        #   config.allowUnfree = true;
+        # };
+      };
       modules = [
         inputs.self.modules.nixos.${cls}
         inputs.self.modules.nixos.${name}
