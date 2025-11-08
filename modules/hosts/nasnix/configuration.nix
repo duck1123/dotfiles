@@ -34,19 +34,20 @@
         gnome = mkSpecialisation ../../../environments/gnome;
         plasma6 = mkSpecialisation ../../../environments/plasma6;
       };
+      host-module = {
+        inherit hosts;
+        host = hosts.nasnix;
+        imports = specialisations.budgie.configuration.imports;
+        # specialisation = {
+        #   inherit (specialisations)
+        #   # budgie
+        #     gnome hyprland plasma6;
+        # };
+      };
     in {
       _module.args = { inherit inputs; };
       imports = with inputs.self.modules.nixos; [
-        {
-          inherit hosts;
-          host = hosts.nasnix;
-          imports = specialisations.budgie.configuration.imports;
-          # specialisation = {
-          #   inherit (specialisations)
-          #   # budgie
-          #     gnome hyprland plasma6;
-          # };
-        }
+        host-module
         # duck
         ../../../nixosModules
       ];

@@ -84,21 +84,22 @@
         i3 = mkSpecialisation ../../../environments/i3;
         plasma6 = mkSpecialisation ../../../environments/plasma6;
       };
+      host-module = {
+        inherit hosts;
+        host = hosts.powerspecnix;
+        imports = specialisations.hyprland.configuration.imports;
+        specialisation = {
+          inherit (specialisations)
+            budgie
+            # gnome i3 hyprland plasma6
+          ;
+        };
+      };
     in {
       # Provide module arguments that modules need
       _module.args = { inherit inputs; };
       imports = with inputs.self.modules.nixos; [
-        {
-          inherit hosts;
-          host = hosts.powerspecnix;
-          imports = specialisations.hyprland.configuration.imports;
-          specialisation = {
-            inherit (specialisations)
-              budgie
-              # gnome i3 hyprland plasma6
-            ;
-          };
-        }
+        host-module
         # duck
         ../../../nixosModules
       ];
