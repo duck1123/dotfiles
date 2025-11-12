@@ -74,7 +74,7 @@
             mod = "$mainMod";
             key = "b";
             command = "exec";
-            arg = "zen";
+            arg = "zen-beta";
           }
           {
             mod = "$mainMod";
