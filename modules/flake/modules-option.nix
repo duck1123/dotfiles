@@ -8,7 +8,7 @@
           default = { };
         };
 
-        home-manager = lib.mkOption {
+        homeManager = lib.mkOption {
           type = lib.types.attrsOf lib.types.anything;
           description = "NixOS modules for home manager";
           default = { };

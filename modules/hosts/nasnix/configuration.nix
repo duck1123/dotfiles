@@ -3,7 +3,7 @@ let
   hosts = import ../../../hosts/default.nix { };
   host = hosts.nasnix;
 in {
-  flake.modules.home-manager.nasnix = { pkgs, ... }: {
+  flake.modules.homeManager.nasnix = { pkgs, ... }: {
     imports = [ ../../../programs ];
     inherit host hosts;
 

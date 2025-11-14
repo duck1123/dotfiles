@@ -3,7 +3,7 @@ let
   hosts = import ../../../hosts/default.nix { };
   host = hosts.steamdeck;
 in {
-  flake.modules.home-manager.steamdeck = { pkgs, ... }:
+  flake.modules.homeManager.steamdeck = { pkgs, ... }:
     let
       name = "Duck Nebuchadnezzar";
       username = "deck";

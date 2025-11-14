@@ -1,5 +1,5 @@
 { ... }: {
-  flake.modules.home-manager.core = { inputs, ... }:
+  flake.modules.homeManager.core = { inputs, ... }:
     let hosts = import ../../hosts/default.nix { };
     in {
       inherit hosts;

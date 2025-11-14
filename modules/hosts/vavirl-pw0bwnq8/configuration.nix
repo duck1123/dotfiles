@@ -3,7 +3,7 @@ let
   hosts = import ../../../hosts/default.nix { };
   host = hosts.vavirl-pw0bwnq8;
 in {
-  flake.modules.home-manager.vavirl-pw0bwnq8 = { config, pkgs, ... }:
+  flake.modules.homeManager.vavirl-pw0bwnq8 = { config, pkgs, ... }:
     let inherit (config.host.identity) email gpgKey name username;
     in {
       inherit host hosts;
