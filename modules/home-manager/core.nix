@@ -5,7 +5,7 @@
       inherit hosts;
 
       imports = [
-        inputs.self.modules.options.default
+        inputs.self.modules.generic.options
         inputs.stylix.homeModules.stylix
         inputs.zen-browser.homeModules.beta
       ];

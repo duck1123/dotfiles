@@ -2,6 +2,12 @@
   options.flake.modules = lib.mkOption {
     type = lib.types.submodule {
       options = {
+        generic = lib.mkOption {
+          type = lib.types.attrsOf lib.types.anything;
+          description = "Generic modules";
+          default = { };
+        };
+
         home-manager = lib.mkOption {
           type = lib.types.attrsOf lib.types.anything;
           description = "NixOS modules for home manager";

@@ -1,5 +1,5 @@
 { ... }: {
-  flake.modules.options.host = { inputs, lib, ... }:
+  flake.modules.generic.host-options = { inputs, lib, ... }:
     with lib;
     let
       typesLib = inputs.self.modules.options.types { inherit lib; };

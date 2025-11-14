@@ -1,5 +1,5 @@
 { ... }: {
-  flake.modules.options.default = { inputs, ... }: {
-    imports = with inputs.self.modules.options; [ host hosts identity ];
+  flake.modules.generic.options = { inputs, ... }: {
+    imports = with inputs.self.modules.generic; [ host-options hosts-options ];
   };
 }
