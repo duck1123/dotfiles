@@ -11,7 +11,7 @@ in {
           inherit hostname system;
           id =
             "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
-          identity = config.identities.duck;
+          # identity = config.identities.duck;
           name = hostname;
 
           features = {

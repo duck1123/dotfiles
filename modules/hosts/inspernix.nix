@@ -12,7 +12,7 @@ in {
           inherit hostname system;
           id =
             "OWMQLRL-CD5VB7H-A3T436E-6XT4H66-6XRF22Y-MQXMNAU-DFRNGOV-ADSKFAV";
-          identity = config.identities.duck;
+          # identity = config.identities.duck;
           name = hostname;
 
           features = {

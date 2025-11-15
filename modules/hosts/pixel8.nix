@@ -83,7 +83,7 @@ in {
         };
 
         id = "7Y3NTUQ-MRUHGO4-5L34ZC7-EDRXHKA-QVCG7AJ-HWHIINY-OV5B2T7-OFQS2QP";
-        identity = config.identities.duck;
+        # identity = config.identities.duck;
         name = "Pixel 8";
       };
     };

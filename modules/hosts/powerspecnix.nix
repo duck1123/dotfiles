@@ -7,11 +7,13 @@ in {
   flake.modules = {
     generic.${hostname} = { config, pkgs, ... }:
       let
-        identity = config.identities.duck;
+        # identity = config.identities.duck;
         system = pkgs.stdenv.hostPlatform.system;
       in {
         hosts.${hostname} = {
-          inherit hostname identity system;
+          inherit hostname
+            # identity
+            system;
 
           features = {
             backups.enable = true;
@@ -91,8 +93,8 @@ in {
             "UFCCQLJ-3EKBVCQ-O5CNVM5-ERJQAQG-JWKQRPU-7FOZHPG-VMEOMKJ-KZSUFQK";
           name = hostname;
           nixos.enable = true;
-          pubkey =
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHaYYrgkSRYftmy5p0TbtGBWTR+oJmP6hkB8eoWFB7va ${identity.username}@${hostname}";
+          # pubkey =
+          #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHaYYrgkSRYftmy5p0TbtGBWTR+oJmP6hkB8eoWFB7va ${identity.username}@${hostname}";
         };
       };
 

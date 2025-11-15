@@ -82,7 +82,7 @@ in {
 
           id =
             "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX";
-          identity = config.identities.deck;
+          # identity = config.identities.deck;
           name = hostname;
           home-manager.enable = true;
           nixos.enable = false;
