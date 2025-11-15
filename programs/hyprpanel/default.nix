@@ -15,15 +15,12 @@
           layouts."*" = {
             left = [ "dashboard" "workspaces" "windowtitle" ];
             middle = [ "clock" ];
-            right = [
-              "media"
-              "network"
-              "bluetooth"
-              "battery"
-              "systray"
-              "volume"
-              "notifications"
-            ];
+            right = let
+              batteryEnabled = (config.host.features.battery or { enable = false; }).enable;
+            in
+              [ "media" "network" "bluetooth" ]
+              ++ (lib.optionals batteryEnabled [ "battery" ])
+              ++ [ "systray" "volume" "notifications" ];
           };
 
           media.show_label = false;

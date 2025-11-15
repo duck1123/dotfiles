@@ -10,7 +10,8 @@
           modules-left = [ "hyprland/workspaces" ];
           modules-center = [ "clock" ];
           modules-right =
-            [ "battery" "tray" "cpu" "memory" "pulseaudio" "network" ];
+            (lib.optionals config.host.features.battery.enable [ "battery" ])
+            ++ [ "tray" "cpu" "memory" "pulseaudio" "network" ];
 
           cpu.format = "<span color='#b4befe'>🖥️ </span>{usage}%";
 
