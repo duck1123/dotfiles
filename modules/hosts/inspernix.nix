@@ -114,7 +114,11 @@ in {
           host = config.hosts.${hostname};
 
           boot.loader = {
-            systemd-boot.enable = true;
+            systemd-boot = {
+              enable = true;
+              configurationLimit = 10;
+              editor = false;
+            };
             efi.canTouchEfiVariables = true;
           };
 
