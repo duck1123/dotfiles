@@ -101,7 +101,7 @@ in {
         };
       };
 
-    homeManager.${hostname} = { pkgs, config, ... }:
+    homeManager.${hostname} = { config, pkgs, ... }:
       let
         hosts = loadHosts config;
         host = hosts.${hostname};
