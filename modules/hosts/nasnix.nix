@@ -21,33 +21,33 @@ in {
       let
         hosts = loadHosts config;
         host = hosts.${hostname};
+        core-module = {
+          inherit host hosts;
+
+          boot.loader.grub = {
+            enable = true;
+            device = "/dev/vda";
+            useOSProber = true;
+          };
+
+          environment.systemPackages = with pkgs; [ samba ];
+
+          services.samba = {
+            enable = true;
+            settings.global = {
+              security = "user";
+              "client min protocol" = "SMB2";
+              "client max protocol" = "SMB3";
+              workgroup = "WORKGROUP";
+            };
+          };
+
+          system.stateVersion = "25.05";
+          time.timeZone = "America/Detroit";
+        };
         core = [
-          {
-            inherit host hosts;
-
-            boot.loader.grub = {
-              enable = true;
-              device = "/dev/vda";
-              useOSProber = true;
-            };
-
-            environment.systemPackages = with pkgs; [ samba ];
-
-            services.samba = {
-              enable = true;
-              settings.global = {
-                security = "user";
-                "client min protocol" = "SMB2";
-                "client max protocol" = "SMB3";
-                workgroup = "WORKGROUP";
-              };
-            };
-
-            system.stateVersion = "25.05";
-            time.timeZone = "America/Detroit";
-          }
+          core-module
           inputs.self.modules.nixos.base
-          inputs.self.modules.nixos.sddm
           ../../hosts/nasnix/hardware-configuration.nix
         ];
         mkSpecialisation = module: {
@@ -63,18 +63,15 @@ in {
           gnome = mkSpecialisation environments-gnome;
           plasma6 = mkSpecialisation environments-plasma6;
         };
-        host-module = {
-          imports = specialisations.budgie.configuration.imports;
-          specialisation = {
-            # inherit (specialisations) budgie;
-            # inherit (specialisations) gnome;
-            # inherit (specialisations) hyprland;
-            # inherit (specialisations) plasma6;
-          };
-        };
       in {
         _module.args = { inherit inputs; };
-        imports = [ host-module ];
+        imports = specialisations.budgie.configuration.imports;
+        specialisation = {
+          # inherit (specialisations) budgie;
+          # inherit (specialisations) gnome;
+          # inherit (specialisations) hyprland;
+          # inherit (specialisations) plasma6;
+        };
       };
   };
 }

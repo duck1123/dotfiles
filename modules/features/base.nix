@@ -58,6 +58,7 @@
         network-feature
         nfs-feature
         nix-feature
+        sddm
         sddm-feature
         sound-feature
         ssh-feature

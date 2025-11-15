@@ -21,39 +21,39 @@ in {
       let
         hosts = loadHosts config;
         host = hosts.${hostname};
+        core-module = {
+          inherit host hosts;
+
+          boot.loader = {
+            systemd-boot.enable = true;
+            efi.canTouchEfiVariables = true;
+          };
+
+          programs = {
+            dconf.enable = true;
+            firefox.enable = true;
+
+            gnupg.agent = {
+              enable = true;
+              enableSSHSupport = true;
+            };
+
+            nix-ld = {
+              enable = true;
+              libraries = with pkgs; [ alsa-lib libGL ];
+            };
+          };
+
+          services = {
+            gnome.gnome-keyring.enable = true;
+            printing.enable = true;
+          };
+
+          time.timeZone = "America/Detroit";
+        };
         core = [
-          {
-            inherit host hosts;
-
-            boot.loader = {
-              systemd-boot.enable = true;
-              efi.canTouchEfiVariables = true;
-            };
-
-            programs = {
-              dconf.enable = true;
-              firefox.enable = true;
-
-              gnupg.agent = {
-                enable = true;
-                enableSSHSupport = true;
-              };
-
-              nix-ld = {
-                enable = true;
-                libraries = with pkgs; [ alsa-lib libGL ];
-              };
-            };
-
-            services = {
-              gnome.gnome-keyring.enable = true;
-              printing.enable = true;
-            };
-
-            time.timeZone = "America/Detroit";
-          }
+          core-module
           inputs.self.modules.nixos.base
-          inputs.self.modules.nixos.sddm
           ../../hosts/inspernix/hardware-configuration.nix
         ];
         mkSpecialisation = module: {
@@ -70,19 +70,16 @@ in {
           i3 = mkSpecialisation environments-i3;
           plasma6 = mkSpecialisation environments-plasma6;
         };
-        host-module = {
-          imports = specialisations.hyprland.configuration.imports;
-          specialisation = {
-            inherit (specialisations) budgie;
-            # inherit (specialisations) gnome;
-            # inherit (specialisations) hyprland;
-            # inherit (specialisations) i3;
-            # inherit (specialisations) plasma6;
-          };
-        };
       in {
         _module.args = { inherit inputs; };
-        imports = [ host-module ];
+        imports = specialisations.hyprland.configuration.imports;
+        specialisation = {
+          inherit (specialisations) budgie;
+          # inherit (specialisations) gnome;
+          # inherit (specialisations) hyprland;
+          # inherit (specialisations) i3;
+          # inherit (specialisations) plasma6;
+        };
       };
   };
 }
