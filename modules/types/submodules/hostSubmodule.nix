@@ -56,6 +56,12 @@
           description = "NixOS environment configuration";
         };
 
+        pubkey = mkOption {
+          type = types.str;
+          default = "";
+          description = "The pubkey for this system";
+        };
+
         system = mkOption {
           type = types.str;
           description = "The system architecture";

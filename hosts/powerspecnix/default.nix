@@ -80,4 +80,5 @@
   identity = config.identities.duck;
   name = "powerspecnix";
   nixos.enable = true;
+  pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHaYYrgkSRYftmy5p0TbtGBWTR+oJmP6hkB8eoWFB7va duck@powerspecnix";
 }
