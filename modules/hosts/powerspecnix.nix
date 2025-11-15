@@ -7,12 +7,12 @@ in {
   flake.modules = {
     generic.${hostname} = { config, pkgs, ... }:
       let
-        # identity = config.identities.duck;
+        identity = config.identities.duck;
         system = pkgs.stdenv.hostPlatform.system;
       in {
         hosts.${hostname} = {
           inherit hostname
-            # identity
+            identity
             system;
 
           features = {
