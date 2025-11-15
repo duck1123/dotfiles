@@ -4,7 +4,6 @@ let
   host = hosts.powerspecnix;
 in {
   flake.modules.homeManager.powerspecnix = { pkgs, ... }: {
-    imports = [ ../../../programs ];
     inherit host hosts;
 
     home = {
@@ -133,6 +132,6 @@ in {
       };
     in {
       _module.args = { inherit inputs; };
-      imports = [ host-module ../../../nixosModules ];
+      imports = [ host-module ];
     };
 }

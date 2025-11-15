@@ -10,16 +10,6 @@ in {
 
       programs.home-manager.enable = true;
 
-      imports = [
-        ../../../programs/clojure
-        ../../../programs/developer
-        # ../../programs/dunst
-        ../../../programs/emacs-prelude
-        ../../../programs/jujutsu
-        ../../../programs/nushell
-        ../../../programs/zsh
-      ];
-
       home = {
         stateVersion = "21.11";
 

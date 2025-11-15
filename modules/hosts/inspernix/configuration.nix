@@ -4,7 +4,6 @@ let
   host = hosts.inspernix;
 in {
   flake.modules.homeManager.inspernix = { pkgs, ... }: {
-    imports = [ ../../../programs ];
     inherit host hosts;
 
     home = {
@@ -77,6 +76,6 @@ in {
       };
     in {
       _module.args = { inherit inputs; };
-      imports = [ host-module ../../../nixosModules ];
+      imports = [ host-module ];
     };
 }

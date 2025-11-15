@@ -12,6 +12,7 @@
     bluetooth.enable = false;
     chm.enable = false;
     clojure.enable = true;
+    common.enable = true;
     dbt.enable = false;
     dconf.enable = false;
     developer.enable = true;

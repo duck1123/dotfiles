@@ -1,8 +1,14 @@
 { ... }: {
+  flake.modules.homeManager.media = { config, lib, pkgs, ... }: {
+    config = lib.mkIf config.host.features.media.enable {
+      home.packages = with pkgs; [ plex vlc ];
+      programs.kodi.enable = false;
+    };
+  };
+
   flake.modules.nixos.media-feature = { config, lib, ... }: {
     config = lib.mkIf config.host.features.media.server.enable {
       services.plex.enable = true;
     };
   };
 }
-

@@ -2,12 +2,13 @@
   inherit system;
 
   features = {
-    backups.enable = false;
+    backups.enable = true;
     battery.enable = false;
     bitcoin.enable = false;
     bluetooth.enable = true;
     chm.enable = false;
     clojure.enable = true;
+    common.enable = true;
     dbt.enable = false;
     dconf.enable = false;
     developer.enable = true;

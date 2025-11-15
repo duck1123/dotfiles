@@ -3,7 +3,8 @@
     let
       inherit (inputs.self.types) generic;
       identitySubmodule = generic.identitySubmodule { inherit inputs lib; };
-      home-manager-submodule = generic.home-manager-submodule { inherit inputs lib; };
+      home-manager-submodule =
+        generic.home-manager-submodule { inherit inputs lib; };
       featureSubmodule = generic.feature-submodule { inherit inputs lib; };
       nixos-submodule = generic.nixos-submodule { inherit inputs lib; };
       android-submodule = generic.android-submodule { inherit inputs lib; };

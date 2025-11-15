@@ -9,11 +9,13 @@
     in types.submodule {
       options = {
         backups = simpleFeature "backups feature";
+        base = simpleFeature "base feature";
         battery = simpleFeature "battery feature";
         bitcoin = simpleFeature "bitcoin feature";
         bluetooth = simpleFeature "bluetooth feature";
         chm = simpleFeature "chm feature";
         clojure = simpleFeature "clojure feature";
+        common = simpleFeature "common feature";
         dbt = simpleFeature "dbt feature";
         dconf = simpleFeature "dconf feature";
         developer = simpleFeature "developer feature";

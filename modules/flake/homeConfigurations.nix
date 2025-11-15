@@ -11,31 +11,31 @@ in {
     "drenfer@VAVIRL-PW0BWNQ8" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ core vavirl-pw0bwnq8 ];
+      modules = with homeManager; [ base vavirl-pw0bwnq8 ];
     };
 
     "deck@steamdeck" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ core steamdeck ];
+      modules = with homeManager; [ base steamdeck ];
     };
 
     "duck@inspernix" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ core inspernix ];
+      modules = with homeManager; [ base inspernix ];
     };
 
     "duck@nasnix" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ core nasnix ];
+      modules = with homeManager; [ base nasnix ];
     };
 
     "duck@powerspecnix" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ core powerspecnix ];
+      modules = with homeManager; [ base powerspecnix ];
     };
   };
 }

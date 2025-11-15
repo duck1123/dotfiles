@@ -4,7 +4,6 @@ let
   host = hosts.nasnix;
 in {
   flake.modules.homeManager.nasnix = { pkgs, ... }: {
-    imports = [ ../../../programs ];
     inherit host hosts;
 
     home = {
@@ -69,6 +68,6 @@ in {
       };
     in {
       _module.args = { inherit inputs; };
-      imports = [ host-module ../../../nixosModules ];
+      imports = [ host-module ];
     };
 }
