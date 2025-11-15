@@ -38,11 +38,11 @@ in {
           _module.args = { inherit inputs; };
         };
       };
-      specialisations = {
-        budgie = mkSpecialisation ../../../environments/budgie;
-        hyprland = mkSpecialisation ../../../environments/hyprland;
-        gnome = mkSpecialisation ../../../environments/gnome;
-        plasma6 = mkSpecialisation ../../../environments/plasma6;
+      specialisations = with inputs.self.modules.nixos; {
+        budgie = mkSpecialisation environments-budgie;
+        hyprland = mkSpecialisation environments-hyprland;
+        gnome = mkSpecialisation environments-gnome;
+        plasma6 = mkSpecialisation environments-plasma6;
       };
       host-module = {
         imports = specialisations.budgie.configuration.imports;
