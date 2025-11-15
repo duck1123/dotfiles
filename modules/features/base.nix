@@ -30,6 +30,7 @@
         office
         pictures
         radio
+        starship
         stylix
         vim
         vscode

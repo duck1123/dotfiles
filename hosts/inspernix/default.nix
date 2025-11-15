@@ -55,6 +55,7 @@
     sddm.enable = true;
     sound.enable = true;
     ssh.enable = true;
+    starship.enable = true;
     stylix.enable = true;
 
     syncthing = {

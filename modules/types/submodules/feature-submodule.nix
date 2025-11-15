@@ -65,6 +65,7 @@
         sddm = simpleFeature "sddm feature";
         sound = simpleFeature "sound feature";
         ssh = simpleFeature "ssh feature";
+        starship = simpleFeature "starship feature";
         stylix = simpleFeature "stylix feature";
 
         syncthing = mkOption {
