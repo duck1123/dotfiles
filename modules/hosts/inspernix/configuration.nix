@@ -13,7 +13,7 @@ in {
     };
   };
 
-  flake.modules.nixos.inspernix = { inputs, ... }:
+  flake.modules.nixos.inspernix = { inputs, pkgs, ... }:
     let
       core = [
         {
@@ -25,9 +25,30 @@ in {
           };
 
           nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
+
+          programs = {
+            dconf.enable = true;
+            firefox.enable = true;
+
+            gnupg.agent = {
+              enable = true;
+              enableSSHSupport = true;
+            };
+
+            nix-ld = {
+              enable = true;
+              libraries = with pkgs; [ alsa-lib libGL ];
+            };
+          };
+
+          services = {
+            gnome.gnome-keyring.enable = true;
+            printing.enable = true;
+          };
+
+          time.timeZone = "America/Detroit";
         }
         inputs.self.modules.nixos.base
-        ../../../hosts/inspernix/base.nix
         ../../../hosts/inspernix/hardware-configuration.nix
       ];
       mkSpecialisation = module: {

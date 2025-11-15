@@ -13,7 +13,7 @@ in {
     };
   };
 
-  flake.modules.nixos.nasnix = { inputs, ... }:
+  flake.modules.nixos.nasnix = { inputs, pkgs, ... }:
     let
       core = [
         {
@@ -25,10 +25,24 @@ in {
             useOSProber = true;
           };
 
+          environment.systemPackages = with pkgs; [ samba ];
+
           nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
+
+          services.samba = {
+            enable = true;
+            settings.global = {
+              security = "user";
+              "client min protocol" = "SMB2";
+              "client max protocol" = "SMB3";
+              workgroup = "WORKGROUP";
+            };
+          };
+
+          system.stateVersion = "25.05";
+          time.timeZone = "America/Detroit";
         }
         inputs.self.modules.nixos.base
-        ../../../hosts/nasnix/base.nix
         ../../../hosts/nasnix/hardware-configuration.nix
       ];
       mkSpecialisation = module: {

@@ -51,7 +51,7 @@ in {
     };
   };
 
-  flake.modules.nixos.powerspecnix = { inputs, ... }:
+  flake.modules.nixos.powerspecnix = { inputs, pkgs, ... }:
     let
       core = [
         {
@@ -62,10 +62,49 @@ in {
             efi.canTouchEfiVariables = true;
           };
 
+          environment.systemPackages = with pkgs; [ git ];
+
+          hardware = {
+            flipperzero.enable = true;
+            rtl-sdr.enable = true;
+          };
+
+          nixpkgs.config.chromium.enableWideVine = true;
+
+          programs = {
+            dconf.enable = true;
+
+            gnupg.agent = {
+              enable = true;
+              enableSSHSupport = true;
+            };
+
+            nix-ld = {
+              enable = true;
+              libraries = with pkgs; [ alsa-lib libGL ];
+            };
+          };
+
+          services = {
+            gnome.gnome-keyring.enable = true;
+            flatpak.enable = true;
+            plex.enable = true;
+            printing.enable = true;
+            udev.packages = with pkgs; [ gnome-settings-daemon ];
+          };
+
+          system.stateVersion = "25.05";
+
+          time.timeZone = "America/Detroit";
+
+          virtualisation = {
+            docker.enable = true;
+            libvirtd.enable = true;
+          };
+
           nixpkgs.overlays = [ inputs.sddm-sugar-candy-nix.overlays.default ];
         }
         inputs.self.modules.nixos.base
-        ../../../hosts/powerspecnix/base.nix
         ../../../hosts/powerspecnix/hardware-configuration.nix
       ];
       mkSpecialisation = module: {
