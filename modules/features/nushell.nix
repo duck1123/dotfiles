@@ -18,8 +18,7 @@
         # nushellPlugins.net
       ];
 
-      home.file."nushell/completions".source =
-        ../../nushell/completions;
+      home.file."nushell/completions".source = ../../nushell/completions;
       home.file."nushell/modules".source = ../../nushell/modules;
 
       home.file."nushell/me.nu".source = builtins.fetchurl {
