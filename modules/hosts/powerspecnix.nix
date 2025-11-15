@@ -1,68 +1,151 @@
 { ... }:
 let
   hostname = "powerspecnix";
-  loadHosts = config: import ../../hosts/default.nix { inherit config; };
   mount-nas = false;
   nas-ip = "192.168.0.124";
+  system = "x86_64-linux";
 in {
   flake.modules = {
-    homeManager.${hostname} = { pkgs, config, ... }:
-      let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
+    generic.${hostname} = { config, ... }:
+      let identity = config.identities.duck;
       in {
-        inherit host hosts;
+        hosts.${hostname} = {
+          inherit hostname identity system;
 
-        home = {
-          packages = with pkgs; [
-            alacritty
-            colmena
-            discord
-            distrobox
-            docker
-            # fastfetch
-            ffmpeg
-            # gitu
-            # kakoune
-            # kb
-            # keet
-            # khoj
-            kty
-            libnotify
-            # logseq
-            # mdcat
-            minio-client
-            # mullvad-browser
-            networkmanager
-            nix-tree
-            # obsidian
-            # onlyoffice-bin
-            playerctl
-            # postman
-            # sparrow
-            syncthing
-            telegram-desktop
-            # tilt
-            transmission_4-gtk
-            # tree
-            unzip
-            # virtualbox
-            vscode
-            wine
-            xsel
-            # yq
-          ];
+          features = {
+            backups.enable = true;
+            battery.enable = false;
+            bitcoin.enable = false;
+            bluetooth.enable = true;
+            chm.enable = false;
+            clojure.enable = true;
+            common.enable = true;
+            dbt.enable = false;
+            dconf.enable = false;
+            developer.enable = true;
+            docker.enable = true;
+            dunst.enable = false;
+            emacs.enable = true;
+            emacs-prelude.enable = false;
+            email.enable = true;
+            flipper.enable = false;
+            font.enable = true;
+            gaming.enable = true;
+            git.enable = true;
+            gnome.enable = true;
+            hyprland.enable = true;
+            hyprpanel.enable = true;
+            i3.enable = false;
+            java.enable = true;
+            jujutsu.enable = true;
 
-          sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+            kubernetes = {
+              client.enable = true;
+              server.enable = false;
+            };
+
+            media = {
+              enable = true;
+              server.enable = false;
+            };
+
+            music.enable = false;
+            ncmpcpp.enable = false;
+            network.enable = true;
+            nfs.enable = false;
+            nix.enable = true;
+            nostr.enable = true;
+            nushell.enable = true;
+            office.enable = true;
+            pictures.enable = false;
+            radio.enable = false;
+            sddm.enable = true;
+            sound.enable = true;
+            ssh.enable = true;
+            starship.enable = true;
+            stylix.enable = true;
+
+            syncthing = {
+              enable = true;
+
+              shares = {
+                camera.enable = true;
+                keepass.enable = true;
+                org-roam.enable = true;
+                renpy.enable = true;
+              };
+            };
+
+            tailscale.enable = true;
+            touch.enable = false;
+            vim.enable = false;
+            virtualization.enable = false;
+            vscode.enable = true;
+            waybar.enable = false;
+            xserver.enable = true;
+            zsh.enable = true;
+          };
+
+          id =
+            "UFCCQLJ-3EKBVCQ-O5CNVM5-ERJQAQG-JWKQRPU-7FOZHPG-VMEOMKJ-KZSUFQK";
+          name = hostname;
+          nixos.enable = true;
+          pubkey =
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHaYYrgkSRYftmy5p0TbtGBWTR+oJmP6hkB8eoWFB7va ${identity.username}@${hostname}";
         };
       };
 
+    homeManager.${hostname} = { config, pkgs, ... }: {
+      host = config.hosts.${hostname};
+
+      home = {
+        packages = with pkgs; [
+          alacritty
+          colmena
+          discord
+          distrobox
+          docker
+          # fastfetch
+          ffmpeg
+          # gitu
+          # kakoune
+          # kb
+          # keet
+          # khoj
+          kty
+          libnotify
+          # logseq
+          # mdcat
+          minio-client
+          # mullvad-browser
+          networkmanager
+          nix-tree
+          # obsidian
+          # onlyoffice-bin
+          playerctl
+          # postman
+          # sparrow
+          syncthing
+          telegram-desktop
+          # tilt
+          transmission_4-gtk
+          # tree
+          unzip
+          # virtualbox
+          vscode
+          wine
+          xsel
+          # yq
+        ];
+
+        sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+      };
+    };
+
     nixos.${hostname} = { config, inputs, lib, modulesPath, pkgs, ... }:
       let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
         core-module = {
-          inherit host hosts;
+          host = config.hosts.${hostname};
 
           boot.loader = {
             systemd-boot.enable = true;
@@ -192,10 +275,10 @@ in {
         };
         core =
           [ core-module hardware-configuration inputs.self.modules.nixos.base ];
-        mkSpecialisation = module: {
+        mkSpecialisation = env-module: {
           inheritParentConfig = false;
           configuration = {
-            imports = core ++ [ module ];
+            imports = core ++ [ env-module ];
             _module.args = { inherit inputs; };
           };
         };

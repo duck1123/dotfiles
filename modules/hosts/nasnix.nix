@@ -1,29 +1,115 @@
 { ... }:
 let
   hostname = "nasnix";
-  loadHosts = config: import ../../hosts/default.nix { inherit config; };
   nas-ip = "192.168.0.124";
+  system = "x86_64-linux";
 in {
   flake.modules = {
-    homeManager.${hostname} = { pkgs, config, ... }:
-      let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
-      in {
-        inherit host hosts;
+    generic.${hostname} = { config, ... }: {
+      hosts.${hostname} = {
+        inherit hostname system;
+        id = "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
+        identity = config.identities.duck;
+        name = hostname;
 
-        home = {
-          packages = with pkgs; [ nerdfetch ];
-          sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+        features = {
+          backups.enable = false;
+          battery.enable = false;
+          bitcoin.enable = true;
+          bluetooth.enable = false;
+          chm.enable = false;
+          clojure.enable = true;
+          common.enable = true;
+          dbt.enable = false;
+          dconf.enable = false;
+          developer.enable = true;
+          docker.enable = true;
+          dunst.enable = false;
+          emacs.enable = true;
+          emacs-prelude.enable = false;
+          email.enable = false;
+          flipper.enable = false;
+          font.enable = true;
+          gaming.enable = false;
+          git.enable = true;
+          gnome.enable = false;
+          hyprland.enable = true;
+          hyprpanel.enable = true;
+          i3.enable = false;
+          java.enable = false;
+          jujutsu.enable = true;
+
+          kubernetes = {
+            client.enable = true;
+            server.enable = true;
+          };
+
+          media = {
+            enable = true;
+            server.enable = true;
+          };
+
+          music.enable = false;
+          ncmpcpp.enable = false;
+          network.enable = true;
+          nfs.enable = false;
+          nix.enable = true;
+          nostr.enable = true;
+          nushell.enable = true;
+          office.enable = false;
+          pictures.enable = false;
+          radio.enable = false;
+          sddm.enable = true;
+          sound.enable = false;
+          ssh.enable = true;
+          starship.enable = true;
+          stylix.enable = true;
+
+          syncthing = {
+            enable = true;
+
+            shares = {
+              camera.enable = false;
+              keepass.enable = true;
+              org-roam.enable = false;
+              renpy.enable = false;
+            };
+          };
+
+          tailscale.enable = true;
+          touch.enable = false;
+          vim.enable = false;
+          virtualization.enable = false;
+          vscode.enable = true;
+          waybar.enable = false;
+          xserver.enable = true;
+          zsh.enable = true;
+        };
+
+        nixos = {
+          enable = true;
+          budgie.enable = false;
+          gnome.enable = false;
+          hyprland.enable = false;
+          i3.enable = false;
+          plasma6.enable = false;
         };
       };
+    };
+
+    homeManager.${hostname} = { config, pkgs, ... }: {
+      host = config.hosts.${hostname};
+
+      home = {
+        packages = with pkgs; [ nerdfetch ];
+        sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+      };
+    };
 
     nixos.${hostname} = { config, inputs, lib, modulesPath, pkgs, ... }:
       let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
         core-module = {
-          inherit host hosts;
+          host = config.hosts.${hostname};
 
           boot.loader.grub = {
             enable = true;

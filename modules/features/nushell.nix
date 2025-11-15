@@ -38,9 +38,6 @@
           configFile.source = ../../nushell/config.nu;
           envFile.source = ../../nushell/env.nu;
 
-          extraConfig = ''
-          '';
-
           extraEnv = ''
             $env.EDITOR = "emacsclient -c -a \'\'";
             $env.VISUAL = "emacsclient -c -a \'\'";
