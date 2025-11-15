@@ -1,11 +1,13 @@
 { ... }:
-let loadHosts = config: import ../../hosts/default.nix { inherit config; };
+let
+  hostname = "inspernix";
+  loadHosts = config: import ../../hosts/default.nix { inherit config; };
 in {
   flake.modules = {
-    homeManager.inspernix = { pkgs, config, ... }:
+    homeManager.${hostname} = { pkgs, config, ... }:
       let
         hosts = loadHosts config;
-        host = hosts.inspernix;
+        host = hosts.${hostname};
       in {
         inherit host hosts;
 
@@ -15,10 +17,10 @@ in {
         };
       };
 
-    nixos.inspernix = { inputs, pkgs, config, ... }:
+    nixos.${hostname} = { inputs, pkgs, config, ... }:
       let
         hosts = loadHosts config;
-        host = hosts.inspernix;
+        host = hosts.${hostname};
         core = [
           {
             inherit host hosts;

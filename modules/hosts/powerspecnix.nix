@@ -1,11 +1,13 @@
 { ... }:
-let loadHosts = config: import ../../hosts/default.nix { inherit config; };
+let
+  hostname = "powerspecnix";
+  loadHosts = config: import ../../hosts/default.nix { inherit config; };
 in {
   flake.modules = {
-    homeManager.powerspecnix = { pkgs, config, ... }:
+    homeManager.${hostname} = { pkgs, config, ... }:
       let
         hosts = loadHosts config;
-        host = hosts.powerspecnix;
+        host = hosts.${hostname};
       in {
         inherit host hosts;
 
@@ -53,10 +55,10 @@ in {
         };
       };
 
-    nixos.powerspecnix = { inputs, pkgs, config, ... }:
+    nixos.${hostname} = { inputs, pkgs, config, ... }:
       let
         hosts = loadHosts config;
-        host = hosts.powerspecnix;
+        host = hosts.${hostname};
         core = [
           {
             inherit host hosts;
@@ -138,7 +140,5 @@ in {
         _module.args = { inherit inputs; };
         imports = [ host-module ];
       };
-
   };
-
 }

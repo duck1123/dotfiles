@@ -1,11 +1,13 @@
 { ... }:
-let loadHosts = config: import ../../hosts/default.nix { inherit config; };
+let
+  hostname = "nasnix";
+  loadHosts = config: import ../../hosts/default.nix { inherit config; };
 in {
   flake.modules = {
-    homeManager.nasnix = { pkgs, config, ... }:
+    homeManager.${hostname} = { pkgs, config, ... }:
       let
         hosts = loadHosts config;
-        host = hosts.nasnix;
+        host = hosts.${hostname};
       in {
         inherit host hosts;
 
@@ -15,10 +17,10 @@ in {
         };
       };
 
-    nixos.nasnix = { inputs, pkgs, config, ... }:
+    nixos.${hostname} = { inputs, pkgs, config, ... }:
       let
         hosts = loadHosts config;
-        host = hosts.nasnix;
+        host = hosts.${hostname};
         core = [
           {
             inherit host hosts;
@@ -74,7 +76,5 @@ in {
         _module.args = { inherit inputs; };
         imports = [ host-module ];
       };
-
   };
-
 }
