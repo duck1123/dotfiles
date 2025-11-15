@@ -4,16 +4,101 @@ let
   loadHosts = config: import ../../hosts/default.nix { inherit config; };
 in {
   flake.modules = {
+    generic.${hostname} = { config, pkgs, ... }:
+      let system = pkgs.stdenv.hostPlatform.system;
+      in {
+        hosts.${hostname} = {
+          inherit hostname system;
+
+          features = {
+            backups.enable = false;
+            battery.enable = true;
+            bitcoin.enable = false;
+            bluetooth.enable = true;
+            chm.enable = false;
+            clojure.enable = false;
+            common.enable = true;
+            dbt.enable = false;
+            dconf.enable = false;
+            developer.enable = false;
+            docker.enable = false;
+            dunst.enable = false;
+            emacs.enable = false;
+            emacs-prelude.enable = false;
+            email.enable = false;
+            flipper.enable = false;
+            font.enable = true;
+            gaming.enable = false;
+            git.enable = true;
+            gnome.enable = true;
+            hyprland.enable = false;
+            hyprpanel.enable = true;
+            i3.enable = false;
+            java.enable = true;
+            jujutsu.enable = true;
+
+            kubernetes = {
+              client.enable = false;
+              server.enable = false;
+            };
+
+            media = {
+              enable = false;
+              server.enable = false;
+            };
+
+            music.enable = false;
+            ncmpcpp.enable = false;
+            nfs.enable = false;
+            nix.enable = true;
+            nostr.enable = false;
+            nushell.enable = false;
+            office.enable = false;
+            pictures.enable = false;
+            radio.enable = false;
+            sddm.enable = true;
+            sound.enable = true;
+            ssh.enable = false;
+            starship.enable = true;
+            stylix.enable = false;
+
+            syncthing = {
+              enable = true;
+              shares = {
+                camera.enable = false;
+                keepass.enable = true;
+                org-roam.enable = false;
+                renpy.enable = true;
+              };
+            };
+
+            tailscale.enable = true;
+            touch.enable = true;
+            vim.enable = false;
+            virtualization.enable = false;
+            vscode.enable = false;
+            waybar.enable = false;
+            xserver.enable = true;
+            zsh.enable = false;
+          };
+
+          id =
+            "ZPO3QWJ-LQHVWBH-TAI3LLD-ZS6WSBM-N5IQ7JX-P4HUVF3-XNOX6N4-NBIF3AX";
+          identity = config.identities.deck;
+          name = hostname;
+          home-manager.enable = true;
+          nixos.enable = false;
+        };
+      };
+
     homeManager.${hostname} = { pkgs, config, ... }:
       let
         hosts = loadHosts config;
         host = hosts.${hostname};
-        name = "Duck Nebuchadnezzar";
-        username = "deck";
-        email = "duck@kronkltd.net";
-        gpgKey = "9564904D297DBF3C";
+        inherit (host.identity) email gpgKey name username;
       in {
         inherit host hosts;
+
         home.stateVersion = "21.11";
 
         home = {
