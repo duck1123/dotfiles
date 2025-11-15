@@ -39,56 +39,6 @@
           envFile.source = ../../nushell/env.nu;
 
           extraConfig = ''
-            let carapace_completer = {|spans|
-              carapace $spans.0 nushell ...$spans
-                | from json
-                | if ($in | default [] | where value == $"($spans | last)ERR" | is-empty) { $in } else { null }
-            }
-
-            let fish_completer = {|spans|
-              fish --private -i --command $'complete --do-complete "($spans | str join " ")"'
-                | from tsv --flexible --noheaders --no-infer
-                | rename value description
-                | update cells --columns ["value"] { ansi strip }
-            }
-
-            # This completer will use carapace by default
-            let external_completer = {|spans|
-              let expanded_alias = scope aliases
-                | where name == $spans.0
-                | get --optional 0.expansion
-
-              let spans = if $expanded_alias != null {
-                  $spans
-                    | skip 1
-                    | prepend ($expanded_alias | split row ' ' | take 1)
-                } else {
-                  $spans
-                }
-
-              match $spans.0 {
-                ag => $fish_completer
-                alacritty => $fish_completer
-                asdf => $fish_completer
-                argocd => $fish_completer
-                az => $fish_completer
-                doctl => $fish_completer
-                git => $fish_completer
-                jj => $fish_completer
-                k3d => $fish_completer
-                keepassxc-cli => $fish_completer
-                # mc => $fish_completer
-                nix => $fish_completer
-                nu => $fish_completer
-                playerctl => $fish_completer
-                sops => $fish_completer
-                tailscale => $fish_completer
-                wofi => $fish_completer
-                _ => $carapace_completer
-              } | do $in $spans
-            }
-
-            $env.config.completions.external = { enable: true completer: $external_completer }
           '';
 
           extraEnv = ''
