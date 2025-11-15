@@ -1,63 +1,65 @@
 { ... }:
 let loadHosts = config: import ../../hosts/default.nix { inherit config; };
 in {
-  flake.modules.homeManager.vavirl-pw0bwnq8 = { config, pkgs, ... }:
-    let
-      hosts = loadHosts config;
-      host = hosts.vavirl-pw0bwnq8;
-      inherit (config.host.identity) email gpgKey name username;
-    in {
-      inherit host hosts;
+  flake.modules = {
+    homeManager.vavirl-pw0bwnq8 = { config, pkgs, ... }:
+      let
+        hosts = loadHosts config;
+        host = hosts.vavirl-pw0bwnq8;
+        inherit (config.host.identity) email gpgKey name username;
+      in {
+        inherit host hosts;
 
-      programs.home-manager.enable = true;
+        programs.home-manager.enable = true;
 
-      home = {
-        stateVersion = "21.11";
+        home = {
+          stateVersion = "21.11";
 
-        username = "${username}";
-        homeDirectory = "/home/${username}";
+          username = "${username}";
+          homeDirectory = "/home/${username}";
 
-        file.".bb/bb.edn".source = ../../bb.edn;
+          file.".bb/bb.edn".source = ../../bb.edn;
 
-        packages = with pkgs; [
-          bat
-          direnv
-          git
-          gitu
-          htop
-          neofetch
-          nixfmt-classic
-          nh
-          silver-searcher
-          sqlcmd
-        ];
-      };
-
-      programs = {
-        bash.enable = true;
-
-        direnv = {
-          enable = true;
-          nix-direnv.enable = true;
+          packages = with pkgs; [
+            bat
+            direnv
+            git
+            gitu
+            htop
+            neofetch
+            nixfmt-classic
+            nh
+            silver-searcher
+            sqlcmd
+          ];
         };
 
-        eza.enable = true;
+        programs = {
+          bash.enable = true;
 
-        git = {
-          enable = true;
-          lfs.enable = true;
-
-          settings.user = { inherit email name; };
-
-          signing = {
-            signByDefault = false;
-            key = gpgKey;
+          direnv = {
+            enable = true;
+            nix-direnv.enable = true;
           };
-        };
 
-        hstr.enable = true;
-        jq.enable = true;
-        tmux.enable = true;
+          eza.enable = true;
+
+          git = {
+            enable = true;
+            lfs.enable = true;
+
+            settings.user = { inherit email name; };
+
+            signing = {
+              signByDefault = false;
+              key = gpgKey;
+            };
+          };
+
+          hstr.enable = true;
+          jq.enable = true;
+          tmux.enable = true;
+        };
       };
-    };
+  };
 }

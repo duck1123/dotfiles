@@ -1,141 +1,143 @@
 { ... }:
 let loadHosts = config: import ../../hosts/default.nix { inherit config; };
 in {
-  flake.modules.homeManager.steamdeck = { pkgs, config, ... }:
-    let
-      hosts = loadHosts config;
-      host = hosts.steamdeck;
-      name = "Duck Nebuchadnezzar";
-      username = "deck";
-      email = "duck@kronkltd.net";
-      gpgKey = "9564904D297DBF3C";
-    in {
-      inherit host hosts;
-      home.stateVersion = "21.11";
+  flake.modules = {
+    homeManager.steamdeck = { pkgs, config, ... }:
+      let
+        hosts = loadHosts config;
+        host = hosts.steamdeck;
+        name = "Duck Nebuchadnezzar";
+        username = "deck";
+        email = "duck@kronkltd.net";
+        gpgKey = "9564904D297DBF3C";
+      in {
+        inherit host hosts;
+        home.stateVersion = "21.11";
 
-      home = {
-        # Home Manager needs a bit of information about you and the
-        # paths it should manage.
-        username = "${username}";
-        homeDirectory = "/home/${username}";
+        home = {
+          # Home Manager needs a bit of information about you and the
+          # paths it should manage.
+          username = "${username}";
+          homeDirectory = "/home/${username}";
 
-        file.".bb/bb.edn".source = ../../bb.edn;
+          file.".bb/bb.edn".source = ../../bb.edn;
 
-        packages = with pkgs; [
-          appimage-run
-          babashka
-          bat
-          devspace
-          digikam
-          emacs
-          firefox
-          git
-          gitu
-          gnumake
-          guake
-          hstr
-          htop
-          jet
-          keepassxc
-          neofetch
-          nixfmt-classic
-          syncthing
-          tailscale
-          vscode
-          wine
-        ];
-      };
-
-      programs = {
-        bash.enable = true;
-        direnv.enable = true;
-
-        git = {
-          enable = true;
-          lfs.enable = true;
-
-          settings.user = { inherit email name; };
-
-          signing = {
-            signByDefault = false;
-            key = gpgKey;
-          };
+          packages = with pkgs; [
+            appimage-run
+            babashka
+            bat
+            devspace
+            digikam
+            emacs
+            firefox
+            git
+            gitu
+            gnumake
+            guake
+            hstr
+            htop
+            jet
+            keepassxc
+            neofetch
+            nixfmt-classic
+            syncthing
+            tailscale
+            vscode
+            wine
+          ];
         };
 
-        gpg.enable = true;
-        jq.enable = true;
-        home-manager.enable = true;
-        tmux.enable = true;
+        programs = {
+          bash.enable = true;
+          direnv.enable = true;
 
-        zsh = {
-          autosuggestion.enable = true;
-
-          defaultKeymap = "emacs";
-          enable = true;
-
-          history = {
-            expireDuplicatesFirst = true;
-            extended = true;
-            ignoreAllDups = true;
-            ignoreDups = true;
-          };
-
-          oh-my-zsh = {
+          git = {
             enable = true;
-            theme = "jonathan";
-            plugins = [
-              "bgnotify"
-              "colorize"
-              # "command-not-found"
-              "compleat"
-              # "docker-compose"
-              "history"
-              "kubectl"
-              "nmap"
-              "node"
-              "npm"
-              "pj"
-              "sudo"
-              "systemd"
-            ];
+            lfs.enable = true;
+
+            settings.user = { inherit email name; };
+
+            signing = {
+              signByDefault = false;
+              key = gpgKey;
+            };
           };
 
-          initContent = ''
-            if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
-                . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
-            fi # added by Nix installer
+          gpg.enable = true;
+          jq.enable = true;
+          home-manager.enable = true;
+          tmux.enable = true;
 
-            # bind hstr to Ctrl-r (for Vi mode check doc)
-            bindkey -s "\C-r" "\C-a hstr -- \C-j"
+          zsh = {
+            autosuggestion.enable = true;
 
-            # source <(argocd completion zsh)
-            # source <(k3d completion zsh)
-            # source <(devspace completion zsh)
+            defaultKeymap = "emacs";
+            enable = true;
 
-            _bb_tasks() {
-              local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
-              compadd -a matches
-            }
-            compdef _bb_tasks bb
-          '';
+            history = {
+              expireDuplicatesFirst = true;
+              extended = true;
+              ignoreAllDups = true;
+              ignoreDups = true;
+            };
 
-          localVariables.PROJECT_PATHS = [ "/home/${username}/projects" ];
+            oh-my-zsh = {
+              enable = true;
+              theme = "jonathan";
+              plugins = [
+                "bgnotify"
+                "colorize"
+                # "command-not-found"
+                "compleat"
+                # "docker-compose"
+                "history"
+                "kubectl"
+                "nmap"
+                "node"
+                "npm"
+                "pj"
+                "sudo"
+                "systemd"
+              ];
+            };
 
-          sessionVariables = {
-            EDITOR = "emacsclient -ct";
-            HSTR_CONFIG = "hicolor";
-          };
+            initContent = ''
+              if [ -e /home/${username}/.nix-profile/etc/profile.d/nix.sh ]; then
+                  . /home/${username}/.nix-profile/etc/profile.d/nix.sh;
+              fi # added by Nix installer
 
-          shellAliases = {
-            d = "devspace";
-            dr = "devspace run";
-            cat = "bat";
-            hh = "hstr";
-            bbg = "bb --config ~/.bb/bb.edn";
-            psgrep = "ps -ef | grep -v grep | grep ";
-            "reload!" = "bbg switch-home && . ~/.zshrc";
+              # bind hstr to Ctrl-r (for Vi mode check doc)
+              bindkey -s "\C-r" "\C-a hstr -- \C-j"
+
+              # source <(argocd completion zsh)
+              # source <(k3d completion zsh)
+              # source <(devspace completion zsh)
+
+              _bb_tasks() {
+                local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
+                compadd -a matches
+              }
+              compdef _bb_tasks bb
+            '';
+
+            localVariables.PROJECT_PATHS = [ "/home/${username}/projects" ];
+
+            sessionVariables = {
+              EDITOR = "emacsclient -ct";
+              HSTR_CONFIG = "hicolor";
+            };
+
+            shellAliases = {
+              d = "devspace";
+              dr = "devspace run";
+              cat = "bat";
+              hh = "hstr";
+              bbg = "bb --config ~/.bb/bb.edn";
+              psgrep = "ps -ef | grep -v grep | grep ";
+              "reload!" = "bbg switch-home && . ~/.zshrc";
+            };
           };
         };
       };
-    };
+  };
 }
