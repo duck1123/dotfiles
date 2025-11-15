@@ -1,51 +1,57 @@
-{ config, ... }:
-let loadHosts = config: import ../../../hosts/default.nix { inherit config; };
+{ ... }:
+let loadHosts = config: import ../../hosts/default.nix { inherit config; };
 in {
-  flake.modules.homeManager.nasnix = { pkgs, config, ... }:
+  flake.modules.homeManager.inspernix = { pkgs, config, ... }:
     let
       hosts = loadHosts config;
-      host = hosts.nasnix;
+      host = hosts.inspernix;
     in {
       inherit host hosts;
 
       home = {
-        packages = with pkgs; [ nerdfetch ];
+        packages = with pkgs; [ cheese discord nerdfetch ];
         sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
       };
     };
 
-  flake.modules.nixos.nasnix = { inputs, pkgs, config, ... }:
+  flake.modules.nixos.inspernix = { inputs, pkgs, config, ... }:
     let
       hosts = loadHosts config;
-      host = hosts.nasnix;
+      host = hosts.inspernix;
       core = [
         {
           inherit host hosts;
 
-          boot.loader.grub = {
-            enable = true;
-            device = "/dev/vda";
-            useOSProber = true;
+          boot.loader = {
+            systemd-boot.enable = true;
+            efi.canTouchEfiVariables = true;
           };
 
-          environment.systemPackages = with pkgs; [ samba ];
+          programs = {
+            dconf.enable = true;
+            firefox.enable = true;
 
-          services.samba = {
-            enable = true;
-            settings.global = {
-              security = "user";
-              "client min protocol" = "SMB2";
-              "client max protocol" = "SMB3";
-              workgroup = "WORKGROUP";
+            gnupg.agent = {
+              enable = true;
+              enableSSHSupport = true;
+            };
+
+            nix-ld = {
+              enable = true;
+              libraries = with pkgs; [ alsa-lib libGL ];
             };
           };
 
-          system.stateVersion = "25.05";
+          services = {
+            gnome.gnome-keyring.enable = true;
+            printing.enable = true;
+          };
+
           time.timeZone = "America/Detroit";
         }
         inputs.self.modules.nixos.base
         inputs.self.modules.nixos.sddm
-        ../../../hosts/nasnix/hardware-configuration.nix
+        ../../hosts/inspernix/hardware-configuration.nix
       ];
       mkSpecialisation = module: {
         inheritParentConfig = false;
@@ -58,14 +64,16 @@ in {
         budgie = mkSpecialisation environments-budgie;
         hyprland = mkSpecialisation environments-hyprland;
         gnome = mkSpecialisation environments-gnome;
+        i3 = mkSpecialisation environments-i3;
         plasma6 = mkSpecialisation environments-plasma6;
       };
       host-module = {
-        imports = specialisations.budgie.configuration.imports;
+        imports = specialisations.hyprland.configuration.imports;
         specialisation = {
-          # inherit (specialisations) budgie;
+          inherit (specialisations) budgie;
           # inherit (specialisations) gnome;
           # inherit (specialisations) hyprland;
+          # inherit (specialisations) i3;
           # inherit (specialisations) plasma6;
         };
       };

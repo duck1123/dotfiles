@@ -1,5 +1,5 @@
 { ... }:
-let loadHosts = config: import ../../../hosts/default.nix { inherit config; };
+let loadHosts = config: import ../../hosts/default.nix { inherit config; };
 in {
   flake.modules.homeManager.powerspecnix = { pkgs, config, ... }:
     let
@@ -107,7 +107,7 @@ in {
         }
         inputs.self.modules.nixos.base
         inputs.self.modules.nixos.sddm
-        ../../../hosts/powerspecnix/hardware-configuration.nix
+        ../../hosts/powerspecnix/hardware-configuration.nix
       ];
       mkSpecialisation = module: {
         inheritParentConfig = false;

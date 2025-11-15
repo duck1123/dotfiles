@@ -1,5 +1,5 @@
 { ... }:
-let loadHosts = config: import ../../../hosts/default.nix { inherit config; };
+let loadHosts = config: import ../../hosts/default.nix { inherit config; };
 in {
   flake.modules.homeManager.steamdeck = { pkgs, config, ... }:
     let
@@ -19,7 +19,7 @@ in {
         username = "${username}";
         homeDirectory = "/home/${username}";
 
-        file.".bb/bb.edn".source = ../../../bb.edn;
+        file.".bb/bb.edn".source = ../../bb.edn;
 
         packages = with pkgs; [
           appimage-run
