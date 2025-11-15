@@ -1,7 +1,5 @@
 { ... }:
-let
-  hostname = "steamdeck";
-  loadHosts = config: import ../../hosts/default.nix { inherit config; };
+let hostname = "steamdeck";
 in {
   flake.modules = {
     generic.${hostname} = { config, pkgs, ... }:
@@ -91,13 +89,10 @@ in {
         };
       };
 
-    homeManager.${hostname} = { config, pkgs, ... }:
-      let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
-        inherit (host.identity) email gpgKey name username;
+    homeManager.${hostname} = { pkgs, config, ... }:
+      let inherit (config.host.identity) email gpgKey name username;
       in {
-        inherit host hosts;
+        host = config.hosts.${hostname};
 
         home.stateVersion = "21.11";
 
@@ -107,7 +102,7 @@ in {
           username = "${username}";
           homeDirectory = "/home/${username}";
 
-          file.".bb/bb.edn".source = ../../bb.edn;
+          file.".bb/bb.edn".source = ../../../bb.edn;
 
           packages = with pkgs; [
             appimage-run

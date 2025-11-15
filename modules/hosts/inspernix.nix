@@ -1,7 +1,6 @@
 { ... }:
 let
   hostname = "inspernix";
-  loadHosts = config: import ../../hosts/default.nix { inherit config; };
   mount-nas = false;
   nas-ip = "192.168.0.124";
 in {
@@ -101,25 +100,19 @@ in {
         };
       };
 
-    homeManager.${hostname} = { config, pkgs, ... }:
-      let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
-      in {
-        inherit host hosts;
+    homeManager.${hostname} = { config, pkgs, ... }: {
+      host = config.hosts.${hostname};
 
-        home = {
-          packages = with pkgs; [ cheese discord nerdfetch ];
-          sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
-        };
+      home = {
+        packages = with pkgs; [ cheese discord nerdfetch ];
+        sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
       };
+    };
 
     nixos.${hostname} = { config, inputs, lib, modulesPath, pkgs, ... }:
       let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
         core-module = {
-          inherit host hosts;
+          host = config.hosts.${hostname};
 
           boot.loader = {
             systemd-boot.enable = true;

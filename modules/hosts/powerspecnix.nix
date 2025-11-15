@@ -1,7 +1,6 @@
 { ... }:
 let
   hostname = "powerspecnix";
-  loadHosts = config: import ../../hosts/default.nix { inherit config; };
   mount-nas = false;
   nas-ip = "192.168.0.124";
 in {
@@ -97,63 +96,57 @@ in {
         };
       };
 
-    homeManager.${hostname} = { config, pkgs, ... }:
-      let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
-      in {
-        inherit host hosts;
+    homeManager.${hostname} = { config, pkgs, ... }: {
+      host = config.hosts.${hostname};
 
-        home = {
-          packages = with pkgs; [
-            alacritty
-            colmena
-            discord
-            distrobox
-            docker
-            # fastfetch
-            ffmpeg
-            # gitu
-            # kakoune
-            # kb
-            # keet
-            # khoj
-            kty
-            libnotify
-            # logseq
-            # mdcat
-            minio-client
-            # mullvad-browser
-            networkmanager
-            nix-tree
-            # obsidian
-            # onlyoffice-bin
-            playerctl
-            # postman
-            # sparrow
-            syncthing
-            telegram-desktop
-            # tilt
-            transmission_4-gtk
-            # tree
-            unzip
-            # virtualbox
-            vscode
-            wine
-            xsel
-            # yq
-          ];
+      home = {
+        packages = with pkgs; [
+          alacritty
+          colmena
+          discord
+          distrobox
+          docker
+          # fastfetch
+          ffmpeg
+          # gitu
+          # kakoune
+          # kb
+          # keet
+          # khoj
+          kty
+          libnotify
+          # logseq
+          # mdcat
+          minio-client
+          # mullvad-browser
+          networkmanager
+          nix-tree
+          # obsidian
+          # onlyoffice-bin
+          playerctl
+          # postman
+          # sparrow
+          syncthing
+          telegram-desktop
+          # tilt
+          transmission_4-gtk
+          # tree
+          unzip
+          # virtualbox
+          vscode
+          wine
+          xsel
+          # yq
+        ];
 
-          sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
-        };
+        sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
       };
+    };
 
     nixos.${hostname} = { config, inputs, lib, modulesPath, pkgs, ... }:
       let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
         core-module = {
-          inherit host hosts;
+          host = config.hosts.${hostname};
 
           boot.loader = {
             systemd-boot.enable = true;
@@ -283,10 +276,10 @@ in {
         };
         core =
           [ core-module hardware-configuration inputs.self.modules.nixos.base ];
-        mkSpecialisation = module: {
+        mkSpecialisation = env-module: {
           inheritParentConfig = false;
           configuration = {
-            imports = core ++ [ module ];
+            imports = core ++ [ env-module ];
             _module.args = { inherit inputs; };
           };
         };

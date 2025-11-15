@@ -1,7 +1,5 @@
 { ... }:
-let
-  hostname = "vavirl-pw0bwnq8";
-  loadHosts = config: import ../../hosts/default.nix { inherit config; };
+let hostname = "vavirl-pw0bwnq8";
 in {
   flake.modules = {
     generic.${hostname} = { config, pkgs, ... }:
@@ -82,12 +80,9 @@ in {
       };
 
     homeManager.vavirl-pw0bwnq8 = { config, pkgs, ... }:
-      let
-        hosts = loadHosts config;
-        host = hosts.${hostname};
-        inherit (config.host.identity) email gpgKey name username;
+      let inherit (config.host.identity) email gpgKey name username;
       in {
-        inherit host hosts;
+        host = config.hosts.${hostname};
 
         programs.home-manager.enable = true;
 

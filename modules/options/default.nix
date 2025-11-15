@@ -7,6 +7,7 @@
       identity-duck
       identity-deck
       identity-drenfer
+      hosts
     ];
   };
 }
