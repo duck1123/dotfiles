@@ -155,10 +155,6 @@ in
             "/boot" = {
               device = "/dev/disk/by-uuid/1D60-65FB";
               fsType = "vfat";
-              options = [
-                "fmask=0077"
-                "dmask=0077"
-              ];
             };
           }
           // lib.optionalAttrs mount-nas {
