@@ -25,6 +25,7 @@ in {
           kubectl
           nh
           nix
+          nix-output-monitor
           nixpkgs-fmt
           nmap
           runme

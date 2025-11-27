@@ -8,8 +8,8 @@
    :depends [build-home build-os]}
 
   build-all
-  {:doc     "build all configurations"
-   :depends [build-all-home build-all-os]}
+  {:doc  "build all configurations"
+   :task (shell "nom build .#ci")}
 
   build-all-home
   {:doc     "Build all home configurations"
@@ -196,11 +196,11 @@
    :task        (shell "k3d cluster delete k3s-default")}
 
   k3d-start
-  {:doc "Start the k3s cluster"
+  {:doc  "Start the k3s cluster"
    :task (shell "k3d cluster start")}
 
   k3d-stop
-  {:doc "Stop the k3s cluster"
+  {:doc  "Stop the k3s cluster"
    :task (shell "k3d cluster stop")}
 
   install-argocd
