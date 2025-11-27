@@ -95,6 +95,8 @@ in {
           i3.enable = false;
           plasma6.enable = false;
         };
+
+        pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPOVof4NXp3oq5lRnBawW5n8FEeMZY7H55NtCOeO+hoL duck@inspernix";
       };
     };
 
