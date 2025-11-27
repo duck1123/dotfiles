@@ -37,5 +37,11 @@ in {
       extraSpecialArgs = { inherit inputs pkgs; };
       modules = with homeManager; [ base powerspecnix ];
     };
+
+    "duck@vidcentre" = homeManagerConfiguration {
+      inherit pkgs;
+      extraSpecialArgs = { inherit inputs pkgs; };
+      modules = with homeManager; [ base vidcentre ];
+    };
   };
 }

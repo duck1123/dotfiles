@@ -64,6 +64,14 @@
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
 
+  build-home-vidcentre
+  {:task
+   (let [trace? false
+         cmd    "nh home build .#homeConfigurations.duck@vidcentre.activationPackage"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
+
   build-os
   {:task (shell "nh os build .")}
 
@@ -87,6 +95,14 @@
   {:task
    (let [trace? false
          cmd    "nh os build .#nixosConfigurations.powerspecnix"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
+
+  build-os-vidcentre
+  {:task
+   (let [trace? false
+         cmd    "nh os build .#nixosConfigurations.vidcentre"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
