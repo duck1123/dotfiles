@@ -4,5 +4,10 @@
       home.packages = with pkgs; [ qFlipper ];
     };
   };
-}
 
+  flake.modules.nixos.flipper = { config, lib, pkgs, ... }: {
+    config = lib.mkIf config.host.features.flipper.enable {
+      hardware.flipperzero.enable = true;
+    };
+  };
+}

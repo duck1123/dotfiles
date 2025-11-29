@@ -50,6 +50,7 @@
         bluetooth-feature
         boot
         docker-feature
+        flipper
         font-feature
         gaming-feature
         i18n

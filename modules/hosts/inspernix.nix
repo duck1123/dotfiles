@@ -33,7 +33,6 @@ in {
           gaming.enable = true;
           git.enable = true;
           gnome.enable = true;
-          flipper.enable = false;
           hyprland.enable = true;
           hyprpanel.enable = true;
           i3.enable = false;

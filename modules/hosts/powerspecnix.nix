@@ -28,7 +28,7 @@ in {
             emacs.enable = true;
             emacs-prelude.enable = false;
             email.enable = true;
-            flipper.enable = false;
+            flipper.enable = true;
             font.enable = true;
             gaming.enable = true;
             git.enable = true;
@@ -153,12 +153,7 @@ in {
           };
 
           environment.systemPackages = with pkgs; [ git ];
-
-          hardware = {
-            flipperzero.enable = true;
-            rtl-sdr.enable = true;
-          };
-
+          hardware.rtl-sdr.enable = true;
           nixpkgs.config.chromium.enableWideVine = true;
 
           programs = {

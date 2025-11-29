@@ -24,7 +24,6 @@ in {
         emacs.enable = false;
         emacs-prelude.enable = false;
         email.enable = false;
-        flipper.enable = false;
         font.enable = false;
         gaming.enable = false;
         git.enable = false;
