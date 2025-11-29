@@ -2,7 +2,7 @@
   flake.modules.homeManager.gaming = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.gaming.enable {
       home.packages = with pkgs; [
-        heroic
+        # heroic
         itch
         lutris
         # nexusmods-app
