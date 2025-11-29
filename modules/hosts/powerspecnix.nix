@@ -173,7 +173,6 @@ in {
           services = {
             gnome.gnome-keyring.enable = true;
             flatpak.enable = true;
-            plex.enable = true;
             printing.enable = true;
             udev.packages = with pkgs; [ gnome-settings-daemon ];
           };

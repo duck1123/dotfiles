@@ -15,7 +15,6 @@
           allowedTCPPorts = [
             139 # NetBIOS
             445 # SMB
-            32400 # Plex Media Server
           ];
 
           allowedUDPPorts = [
@@ -43,4 +42,3 @@
     };
   };
 }
-
