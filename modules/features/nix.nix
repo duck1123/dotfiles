@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.nix = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "nix feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "nix feature";
 
   flake.modules.nixos.nix-feature = { config, lib, ... }: {
     config = lib.mkIf config.host.features.nix.enable {

@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.hyprland = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "hyprland feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "hyprland feature";
 
   flake.modules.homeManager.hyprland = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.hyprland.enable {

@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.dunst = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "dunst feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "dunst feature";
 
   flake.modules.homeManager.dunst = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.dunst.enable {

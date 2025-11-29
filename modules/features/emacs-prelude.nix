@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.emacs-prelude = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "emacs-prelude feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "emacs-prelude feature";
 
   flake.modules.homeManager.emacs-prelude = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.emacs-prelude.enable {

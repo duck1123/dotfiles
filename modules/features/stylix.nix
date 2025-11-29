@@ -2,11 +2,8 @@
 let image = ../../resources/wallpaper/nix-wallpaper-mosaic-blue.png;
 in {
   flake.types.generic.feature-options.stylix = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "stylix feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "stylix feature";
 
   flake.modules.nixos.stylix-feature = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.stylix.enable {

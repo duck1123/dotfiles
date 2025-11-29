@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.nushell = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "nushell feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "nushell feature";
 
   flake.modules.homeManager.nushell = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.nushell.enable {

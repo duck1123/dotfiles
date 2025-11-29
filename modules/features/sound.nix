@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.sound = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "sound feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "sound feature";
 
   flake.modules.nixos.sound-feature = { config, lib, ... }: {
     config = lib.mkIf config.host.features.sound.enable {

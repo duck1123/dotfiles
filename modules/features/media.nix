@@ -1,11 +1,9 @@
 { ... }: {
   flake.types.generic.feature-options.media = { inputs, lib }:
     with lib;
-    let
-      inherit (inputs.self.types) generic;
-      media-submodule = generic.media-submodule { inherit inputs lib; };
+    let inherit (inputs.self.types.generic) media-submodule;
     in mkOption {
-      type = media-submodule;
+      type = media-submodule { inherit inputs lib; };
       default = { };
       description = "Media configuration";
     };

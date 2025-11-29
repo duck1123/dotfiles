@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.nfs = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "nfs feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "nfs feature";
 
   flake.modules.nixos.nfs-feature = { config, lib, ... }: {
     config = lib.mkIf config.host.features.nfs.enable {

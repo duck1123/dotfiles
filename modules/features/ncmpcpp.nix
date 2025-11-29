@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.ncmpcpp = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "ncmpcpp feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "ncmpcpp feature";
 
   flake.modules.homeManager.ncmpcpp = { config, lib, ... }: {
     config = lib.mkIf config.host.features.ncmpcpp.enable {

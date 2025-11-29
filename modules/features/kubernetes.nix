@@ -1,14 +1,12 @@
 { ... }: {
   flake.types.generic.feature-options.kubernetes = { inputs, lib }:
     with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    let inherit (inputs.self.types.generic) simpleFeature;
     in mkOption {
       type = types.submodule {
         options = {
-          client = simpleFeature "kubernetes client";
-          server = simpleFeature "kubernetes server";
+          client = simpleFeature { inherit inputs lib; } "kubernetes client";
+          server = simpleFeature { inherit inputs lib; } "kubernetes server";
         };
       };
       default = { };

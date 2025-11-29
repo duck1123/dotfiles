@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.starship = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "starship feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "starship feature";
 
   flake.modules.homeManager.starship = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.starship.enable {

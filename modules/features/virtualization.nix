@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.virtualization = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "virtualization feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "virtualization feature";
 
   flake.modules.nixos.virtualization-feature = { config, lib, ... }: {
     config = lib.mkIf config.host.features.virtualization.enable {

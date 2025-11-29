@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.jujutsu = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "jujutsu feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "jujutsu feature";
 
   flake.modules.homeManager.jujutsu = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.jujutsu.enable {

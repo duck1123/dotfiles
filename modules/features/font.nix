@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.font = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "font feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "font feature";
 
   flake.modules.nixos.font-feature = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.font.enable {

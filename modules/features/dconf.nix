@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.dconf = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "dconf feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "dconf feature";
 
   flake.modules.homeManager.dconf = { config, lib, ... }: {
     config = lib.mkIf config.host.features.dconf.enable {

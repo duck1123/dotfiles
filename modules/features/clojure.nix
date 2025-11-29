@@ -1,10 +1,7 @@
 { ... }: {
   flake.types.generic.feature-options.clojure = { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types) generic;
-      simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in simpleFeature "clojure feature";
+    let inherit (inputs.self.types.generic) simpleFeature;
+    in simpleFeature { inherit inputs lib; } "clojure feature";
 
   flake.modules.homeManager.clojure = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.clojure.enable {
