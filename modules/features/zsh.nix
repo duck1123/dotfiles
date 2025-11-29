@@ -1,4 +1,11 @@
 { ... }: {
+  flake.types.generic.feature-options.zsh = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    in simpleFeature "zsh feature";
+
   flake.modules.homeManager.zsh = { config, lib, pkgs, ... }: {
     config = let inherit (config.host.identity) username;
     in lib.mkIf config.host.features.zsh.enable {

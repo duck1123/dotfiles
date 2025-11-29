@@ -1,6 +1,13 @@
 { ... }:
 let enable-polybar = false;
 in {
+  flake.types.generic.feature-options.i3 = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    in simpleFeature "i3 feature";
+
   flake.modules.homeManager.i3 = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.i3.enable {
       programs.i3status-rust = { enable = true; };

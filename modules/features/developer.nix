@@ -1,4 +1,11 @@
 { ... }: {
+  flake.types.generic.feature-options.developer = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    in simpleFeature "developer feature";
+
   flake.modules.homeManager.developer = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.developer.enable {
       home.packages = with pkgs; [

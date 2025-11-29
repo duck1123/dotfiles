@@ -1,4 +1,11 @@
 { ... }: {
+  flake.types.generic.feature-options.music = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    in simpleFeature "music feature";
+
   flake.modules.homeManager.music = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.music.enable {
       home.packages = with pkgs; [

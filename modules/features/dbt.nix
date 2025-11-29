@@ -1,4 +1,11 @@
 { ... }: {
+  flake.types.generic.feature-options.dbt = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    in simpleFeature "dbt feature";
+
   flake.modules.homeManager.dbt = { config, inputs, lib, pkgs, ... }: {
     config = let inherit (inputs.k3s-fleetops.lib) toYAML;
     in lib.mkIf config.host.features.dbt.enable {

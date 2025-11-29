@@ -1,4 +1,11 @@
 { ... }: {
+  flake.types.generic.feature-options.hyprpanel = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    in simpleFeature "hyprpanel feature";
+
   flake.modules.homeManager.hyprpanel = { config, lib, ... }: {
     config = lib.mkIf config.host.features.hyprpanel.enable {
       # https://github.com/Jas-SinghFSU/HyprPanel/blob/master/nix/module.nix

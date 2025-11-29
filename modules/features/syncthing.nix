@@ -1,4 +1,15 @@
 { ... }: {
+  flake.types.generic.feature-options.syncthing = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      syncthing-submodule = generic.syncthing-submodule { inherit inputs lib; };
+    in mkOption {
+      type = syncthing-submodule;
+      default = { };
+      description = "Syncthing configuration";
+    };
+
   flake.modules.nixos.syncthing-feature = { config, lib, ... }: {
     config = lib.mkIf config.host.features.syncthing.enable {
 

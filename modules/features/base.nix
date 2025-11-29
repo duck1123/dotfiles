@@ -1,4 +1,11 @@
 { ... }: {
+  flake.types.generic.feature-options.base = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    in simpleFeature "base feature";
+
   flake.modules = {
     homeManager.base = { inputs, ... }: {
       imports = (with inputs.self.modules.homeManager; [

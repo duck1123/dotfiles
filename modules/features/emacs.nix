@@ -1,4 +1,11 @@
 { ... }: {
+  flake.types.generic.feature-options.emacs = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    in simpleFeature "emacs feature";
+
   flake.modules.homeManager.emacs = { config, lib, pkgs, ... }: {
     config = let
       emacsPackages = pkgs.emacs.pkgs.withPackages (epkgs:

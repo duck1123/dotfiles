@@ -1,4 +1,11 @@
 { ... }: {
+  flake.types.generic.feature-options.common = { inputs, lib }:
+    with lib;
+    let
+      inherit (inputs.self.types) generic;
+      simpleFeature = generic.simpleFeature { inherit inputs lib; };
+    in simpleFeature "common feature";
+
   flake.modules.homeManager.common = { config, lib, pkgs, ... }:
     let inherit (config.host.identity) username;
     in {
