@@ -59,6 +59,7 @@ in {
           office.enable = false;
           pictures.enable = false;
           radio.enable = false;
+          samba.enable = true;
           sddm.enable = true;
           sound.enable = false;
           ssh.enable = true;
@@ -106,29 +107,16 @@ in {
       };
     };
 
-    nixos.${hostname} = { config, inputs, lib, modulesPath, pkgs, ... }:
+    nixos.${hostname} = { config, inputs, lib, modulesPath, ... }:
       let
         core-module = {
-          host = config.hosts.${hostname};
-
           boot.loader.grub = {
             enable = true;
             device = "/dev/sda";
             useOSProber = true;
           };
 
-          environment.systemPackages = with pkgs; [ samba ];
-
-          services.samba = {
-            enable = true;
-            settings.global = {
-              security = "user";
-              "client min protocol" = "SMB2";
-              "client max protocol" = "SMB3";
-              workgroup = "WORKGROUP";
-            };
-          };
-
+          host = config.hosts.${hostname};
           system.stateVersion = "25.05";
           time.timeZone = "America/Detroit";
         };

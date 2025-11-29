@@ -5,11 +5,8 @@
 
       networking = {
         firewall = {
-          allowedTCPPorts = [
-            139 # NetBIOS
-            445 # SMB
-            32400 # Plex Media Server
-          ];
+          # NetBIOS
+          allowedTCPPorts = [ 139 ];
 
           allowedUDPPorts = [
             5353 # mDNS
@@ -36,4 +33,3 @@
     };
   };
 }
-

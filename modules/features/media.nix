@@ -8,6 +8,8 @@
 
   flake.modules.nixos.media-feature = { config, lib, ... }: {
     config = lib.mkIf config.host.features.media.server.enable {
+      networking.firewall.allowedTCPPorts = [ 32400 ];
+
       services.plex.enable = true;
     };
   };
