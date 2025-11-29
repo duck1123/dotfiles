@@ -66,6 +66,7 @@
         network-feature
         nfs-feature
         nix-feature
+        samba
         sddm
         sddm-feature
         sound-feature

@@ -12,10 +12,8 @@
 
       networking = {
         firewall = {
-          allowedTCPPorts = [
-            139 # NetBIOS
-            445 # SMB
-          ];
+          # NetBIOS
+          allowedTCPPorts = [ 139 ];
 
           allowedUDPPorts = [
             5353 # mDNS

@@ -108,26 +108,13 @@ in {
     nixos.${hostname} = { config, inputs, lib, modulesPath, pkgs, ... }:
       let
         core-module = {
-          host = config.hosts.${hostname};
-
           boot.loader.grub = {
             enable = true;
             device = "/dev/vda";
             useOSProber = true;
           };
 
-          environment.systemPackages = with pkgs; [ samba ];
-
-          services.samba = {
-            enable = true;
-            settings.global = {
-              security = "user";
-              "client min protocol" = "SMB2";
-              "client max protocol" = "SMB3";
-              workgroup = "WORKGROUP";
-            };
-          };
-
+          host = config.hosts.${hostname};
           system.stateVersion = "25.05";
           time.timeZone = "America/Detroit";
         };
