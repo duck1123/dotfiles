@@ -73,6 +73,7 @@ in {
                 keepass.enable = true;
                 org-roam.enable = true;
                 renpy.enable = true;
+                sims4.enable = true;
               };
             };
 

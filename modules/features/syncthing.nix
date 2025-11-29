@@ -1,86 +1,130 @@
 { ... }: {
-  flake.types.generic.feature-options.syncthing = { inputs, lib }:
+  flake.types.generic.feature-options.syncthing = { lib, ... }:
     with lib;
-    let inherit (inputs.self.types.generic) syncthing-submodule;
+    let
+      shareWithPath = mkOption {
+        type = types.submodule {
+          options = {
+            enable = mkOption {
+              type = types.bool;
+              default = false;
+              description = "Enable this share";
+            };
+            path = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description =
+                "Path for this share (uses default from shares config if not set)";
+            };
+          };
+        };
+        default = { };
+        description = "Share configuration";
+      };
     in mkOption {
-      type = syncthing-submodule { inherit inputs lib; };
+      type = types.submodule {
+        options = {
+          enable = mkOption {
+            type = types.bool;
+            default = false;
+            description = "Enable syncthing";
+          };
+
+          shares = mkOption {
+            type = types.submodule {
+              options = {
+                camera = shareWithPath;
+                keepass = shareWithPath;
+                org-roam = shareWithPath;
+                renpy = shareWithPath;
+                sims4 = shareWithPath;
+              };
+            };
+            default = { };
+            description = "Syncthing shares configuration";
+          };
+        };
+      };
       default = { };
       description = "Syncthing configuration";
     };
 
-  flake.modules.nixos.syncthing-feature = { config, lib, ... }: {
-    config = lib.mkIf config.host.features.syncthing.enable {
-
-      services.syncthing = let inherit (config.host.identity) username;
-      in {
-        enable = true;
-        user = username;
-        dataDir = "/home/${username}/Documents";
-        configDir = "/home/${username}/Documents/.config/syncthing";
-        openDefaultPorts = true;
-        overrideFolders = false;
-        overrideDevices = true;
-
-        settings = with config.hosts; {
-          devices = {
-            ${powerspecnix.name} = {
-              id = powerspecnix.id;
-              autoAcceptFolders = true;
+  flake.modules.nixos.syncthing-feature = { config, lib, ... }:
+    with lib; {
+      config = mkIf config.host.features.syncthing.enable {
+        services.syncthing = let
+          inherit (config.host.identity) username;
+          homeDir = "/home/${username}";
+          getDevicesForShare = shareName:
+            lists.map (host: host.name) (lists.filter (host:
+              (host.features.syncthing.enable or false)
+              && (host.features.syncthing.shares.${shareName}.enable or false))
+              (attrsets.mapAttrsToList (_: value: value) config.hosts));
+          shares = {
+            camera = {
+              path = "${homeDir}/Camera";
+              label = "camera";
             };
-
-            ${pixel8.name} = {
-              id = pixel8.id;
-              autoAcceptFolders = true;
-            };
-
-            "steamdeck" = {
-              id = steamdeck.id;
-              autoAcceptFolders = true;
-            };
-
-            "VallenPC" = {
-              id = config.hosts.vavirl-pw0bwnq8.id;
-              autoAcceptFolders = true;
-            };
-
-            "inspernix" = {
-              id = config.hosts.inspernix.id;
-              autoAcceptFolders = true;
-            };
-          };
-
-          folders = {
-            "Camera" = {
-              label = "Camera";
-              path = "/home/${username}/Camera";
-              devices = [ "Pixel 8" "powerspecnix" "inspernix" ];
-            };
-
-            "keepass" = {
+            keepass = {
+              path = "${homeDir}/keepass";
               label = "keepass";
-              path = "/home/${username}/keepass";
-              devices = [ "Pixel 8" "VallenPC" "inspernix" "powerspecnix" ];
             };
-
-            "org-roam" = {
-              path = "/home/${username}/org-roam";
-              devices = [ "Pixel 8" "inspernix" "powerspecnix" ];
+            org-roam = {
+              path = "${homeDir}/org-roam";
               versioning = {
                 type = "simple";
                 params.keep = "10";
               };
             };
-
-            "steamdeck-renpy" = {
-              path = "/home/${username}/.renpy";
-              devices = [ "steamdeck" "powerspecnix" ];
+            renpy = {
+              path = "${homeDir}/.renpy";
+              folderName = "steamdeck-renpy";
+            };
+            sims4 = {
+              path =
+                "${homeDir}/.steam/steam/steamapps/compatdata/1222670/pfx/drive_c/users/steamuser/Documents/Electronic Arts/The Sims 4";
             };
           };
+        in {
+          enable = true;
+          user = username;
+          dataDir = "${homeDir}/Documents";
+          configDir = "${homeDir}/Documents/.config/syncthing";
+          openDefaultPorts = true;
+          overrideFolders = false;
+          overrideDevices = true;
 
-          options.urAccepted = -1;
+          settings = {
+            devices = attrsets.mapAttrs' (name: value: {
+              name = value.name;
+              value = {
+                id = value.id;
+                autoAcceptFolders = true;
+              };
+            }) config.hosts;
+
+            folders = attrsets.mapAttrs' (shareName: shareConfig:
+              let
+                share = config.host.features.syncthing.shares.${shareName};
+                folderName = shareConfig.folderName or shareName;
+                # Use host config path if set (not null), otherwise use default from shares config
+                path = if share.path != null then share.path else shareConfig.path;
+                folderConfig = {
+                  inherit path;
+                  devices = getDevicesForShare shareName;
+                } // optionalAttrs (shareConfig ? label) {
+                  label = shareConfig.label;
+                } // optionalAttrs (shareConfig ? versioning) {
+                  inherit (shareConfig) versioning;
+                };
+              in attrsets.nameValuePair folderName folderConfig)
+              (attrsets.filterAttrs (shareName: _:
+                config.host.features.syncthing.shares.${shareName}.enable or false)
+                shares);
+
+            options.urAccepted = -1;
+          };
         };
       };
     };
-  };
 }
-
