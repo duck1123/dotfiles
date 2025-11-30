@@ -16,4 +16,10 @@
       ];
     };
   };
+
+  flake.modules.nixos.radio = { config, lib, ... }: {
+    config = lib.mkIf config.host.features.radio.enable {
+      hardware.rtl-sdr.enable = true;
+    };
+  };
 }

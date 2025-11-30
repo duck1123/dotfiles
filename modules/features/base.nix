@@ -63,6 +63,7 @@
         network-feature
         nfs-feature
         nix-feature
+        radio
         samba
         sddm
         sddm-feature

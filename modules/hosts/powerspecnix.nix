@@ -154,7 +154,6 @@ in {
           };
 
           environment.systemPackages = with pkgs; [ git ];
-          hardware.rtl-sdr.enable = true;
           nixpkgs.config.chromium.enableWideVine = true;
 
           programs = {
