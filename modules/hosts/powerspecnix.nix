@@ -1,7 +1,7 @@
 { ... }:
 let
   hostname = "powerspecnix";
-  mount-nas = false;
+  mount-nas = true;
   nas-ip = "192.168.0.124";
   system = "x86_64-linux";
 in {
@@ -186,6 +186,7 @@ in {
             libvirtd.enable = true;
           };
         };
+
         hardware-configuration = {
           imports = [ (modulesPath + "/installer/scan/not-detected.nix") ];
 
@@ -234,6 +235,13 @@ in {
 
             "/mnt/music" = {
               device = "${nas-ip}:/volume1/Music";
+              fsType = "nfs";
+              options =
+                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+            };
+
+            "/mnt/photos" = {
+              device = "${nas-ip}:/volume1/Photos";
               fsType = "nfs";
               options =
                 [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
