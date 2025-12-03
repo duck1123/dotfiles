@@ -54,6 +54,30 @@
           yaml-mode
         ]);
     in lib.mkIf config.host.features.emacs.enable {
+      xdg.desktopEntries.emacsclient = {
+        name = "Emacs Client";
+        genericName = "Text Editor";
+        exec = "emacsclient -c %F";
+        icon = "emacs";
+        mimeType = [
+          "text/plain"
+          "text/markdown"
+          "text/x-markdown"
+          "text/org"
+          "text/x-org"
+        ];
+        terminal = false;
+        categories = [ "Utility" "TextEditor" ];
+      };
+
+      xdg.mimeApps.defaultApplications = {
+        "text/plain" = [ "emacsclient.desktop" ];
+        "text/markdown" = [ "emacsclient.desktop" ];
+        "text/x-markdown" = [ "emacsclient.desktop" ];
+        "text/org" = [ "emacsclient.desktop" ];
+        "text/x-org" = [ "emacsclient.desktop" ];
+      };
+
       programs.emacs = {
         enable = true;
         extraConfig = ''
