@@ -133,6 +133,22 @@ in
 
           host = config.hosts.${hostname};
           time.timeZone = "America/Detroit";
+
+          users.users.steam = {
+            isNormalUser = true;
+            extraGroups = [
+              # "dialout"
+              # "docker"
+              "jackaudio"
+              # "libvirtd"
+              "networkmanager"
+              "plugdev"
+              "realtime"
+              # "vboxusers"
+              "wheel"
+            ];
+            hashedPassword = null;
+          };
         };
 
         hardware-configuration = {
