@@ -6,7 +6,24 @@
   flake.modules.homeManager.emacs = { config, lib, pkgs, ... }: {
     config = let
       emacsPackages = pkgs.emacs.pkgs.withPackages (epkgs:
-        with epkgs.melpaPackages; [
+        let
+          melpa = epkgs.melpaPackages;
+          quickroam = epkgs.trivialBuild {
+            pname = "quickroam";
+            version = "git-2025-01-01";
+            src = pkgs.fetchFromGitHub {
+              owner = "meedstrom";
+              repo = "quickroam";
+              rev = "master";
+              sha256 = "sha256-JzhpTZmYHtJ5MBicbP7JCp7b66ahX4piivAIf+8u8u0=";
+            };
+            packageRequires = [
+              melpa.org-roam
+              melpa.pcre2el
+            ];
+          };
+        in
+        with melpa; [
           ag
           # ac-cider
           auto-complete
@@ -38,6 +55,7 @@
           org-ql
           org-roam
           org-roam-ui
+          quickroam
           paredit
           prettier
           projectile
@@ -54,6 +72,8 @@
           yaml-mode
         ]);
     in lib.mkIf config.host.features.emacs.enable {
+      programs.ripgrep.enable = true;
+
       xdg.desktopEntries.emacsclient = {
         name = "Emacs Client";
         genericName = "Text Editor";
@@ -209,8 +229,6 @@
             (("C-x n c"   . org-roam-dailies-capture-today)
              ("C-x n C-d" . org-roam-dailies-goto-date)
              ("C-x n l"   . org-roam-buffer-toggle)
-             ("C-x n f"   . org-roam-node-find)
-             ("C-x n i"   . org-roam-node-insert)
              ("C-x n C-t" . org-roam-dailies-goto-today))
 
             :config
@@ -224,9 +242,15 @@
                      :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>
           "))))
             (setq org-roam-file-exclude-regexp
-                  (concat "^" (expand-file-name org-roam-directory) "logseq/.*"))
-            (global-set-key (kbd "C-x n c")     'org-roam-dailies-capture-today)
-            (global-set-key (kbd "C-x n f")     'org-roam-node-find))
+               (concat "^" (expand-file-name org-roam-directory) "logseq/.*")))
+
+          (use-package quickroam
+            :after org
+            :config
+            (quickroam-mode))
+
+          (global-set-key (kbd "C-x n f")     'quickroam-find)
+          (global-set-key (kbd "C-x n i")     'quickroam-insert)
 
           (use-package org-roam-ui
             :ensure t
@@ -323,4 +347,3 @@
     };
   };
 }
-
