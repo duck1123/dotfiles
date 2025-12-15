@@ -85,6 +85,7 @@
           (setq gc-cons-threshold (* 100 1024 1024))
           (setq read-process-output-max (* 1024 1024))
           (setq create-lockfiles nil)
+          (setq make-backup-files nil)
 
           ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
           (setq user-emacs-directory (expand-file-name "~/.cache/emacs/"))
