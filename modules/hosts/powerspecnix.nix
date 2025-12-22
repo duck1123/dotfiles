@@ -103,9 +103,13 @@ in {
         packages = with pkgs; [
           alacritty
           colmena
+          cozy
+          diffr
+          digikam
           discord
           distrobox
           docker
+          dolphin-emu
           # fastfetch
           ffmpeg
           # gitu
@@ -118,6 +122,7 @@ in {
           # logseq
           # mdcat
           minio-client
+          mpv
           # mullvad-browser
           networkmanager
           nix-tree
@@ -132,8 +137,11 @@ in {
           transmission_4-gtk
           # tree
           unzip
+          viewnior
           # virtualbox
           vscode
+          yt-dlp
+          youtube-tui
           wine
           xsel
           # yq
