@@ -101,8 +101,8 @@ in {
 
       home = {
         packages = with pkgs; [
-          alacritty
-          colmena
+          # alacritty
+          # colmena
           cozy
           diffr
           digikam
