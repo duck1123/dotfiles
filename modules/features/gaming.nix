@@ -6,12 +6,14 @@
   flake.modules.homeManager.gaming = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.gaming.enable {
       home.packages = with pkgs; [
+        dolphin-emu
         # heroic
         itch
         lutris
         # nexusmods-app
         protontricks
         satisfactorymodmanager
+        wine
       ];
     };
   };

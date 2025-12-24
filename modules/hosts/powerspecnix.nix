@@ -20,6 +20,7 @@ in {
             chm.enable = false;
             clojure.enable = true;
             common.enable = true;
+            chat.enable = true;
             dbt.enable = false;
             dconf.enable = false;
             developer.enable = true;
@@ -57,7 +58,7 @@ in {
             nostr.enable = true;
             nushell.enable = true;
             office.enable = true;
-            pictures.enable = false;
+            pictures.enable = true;
             radio.enable = false;
             sddm.enable = true;
             sound.enable = true;
@@ -96,60 +97,8 @@ in {
         };
       };
 
-    homeManager.${hostname} = { config, pkgs, ... }: {
+    homeManager.${hostname} = { config, ... }: {
       host = config.hosts.${hostname};
-
-      home = {
-        packages = with pkgs; [
-          # alacritty
-          # colmena
-          cozy
-          diffr
-          digikam
-          discord
-          distrobox
-          docker
-          dolphin-emu
-          # fastfetch
-          ffmpeg
-          # gitu
-          # kakoune
-          # kb
-          # keet
-          # khoj
-          kty
-          libnotify
-          # logseq
-          # mdcat
-          minio-client
-          mpv
-          # mullvad-browser
-          networkmanager
-          nix-tree
-          # obsidian
-          # onlyoffice-bin
-          playerctl
-          plexamp
-          # postman
-          # sparrow
-          syncthing
-          telegram-desktop
-          # tilt
-          transmission_4-gtk
-          # tree
-          unzip
-          viewnior
-          # virtualbox
-          vscode
-          yt-dlp
-          youtube-tui
-          wine
-          xsel
-          # yq
-        ];
-
-        sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
-      };
     };
 
     nixos.${hostname} = { config, inputs, lib, modulesPath, pkgs, ... }:

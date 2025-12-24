@@ -10,16 +10,20 @@
         argo-workflows
         argocd
         # arkade
+        # colmena
         # dbx
         dbeaver-bin
         # devpod
         # devpod-desktop
         devspace
         devenv
+        diffr
         dig
+        distrobox
         # dnschef
         # dnslookup
         # dnsmap
+        docker
         # docker-compose
         doctl
         earthly
@@ -38,6 +42,7 @@
         k3d
         k9s
         # krew
+        kty
         kubernetes-helm
         kubectl
         kubernix
@@ -45,6 +50,7 @@
         kustomize
         # lens
         # md-tangle
+        minio-client
         # mr
         nixd
         nmap
@@ -54,6 +60,7 @@
         # podman
         # podman-desktop
         # podman-tui
+        # postman
         # python3
         runme
         sqlite
@@ -61,10 +68,10 @@
         # sqsh
         ssh-to-age
         ssh-to-pgp
+        # tilt
         # vcluster
         # virtualbox
       ];
     };
   };
 }
-

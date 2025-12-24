@@ -1,5 +1,7 @@
-{ ... }: {
-  flake.types.generic.feature-options.syncthing = { lib, ... }:
+{ ... }:
+let feature-name = "syncthing";
+in {
+  flake.types.generic.feature-options.${feature-name} = { lib, ... }:
     with lib;
     let
       shareWithPath = mkOption {
@@ -49,9 +51,15 @@
       description = "Syncthing configuration";
     };
 
-  flake.modules.nixos.syncthing-feature = { config, lib, ... }:
+  flake.modules.homeManager.${feature-name} = { config, lib, pkgs, ... }: {
+    config = lib.mkIf config.host.features.${feature-name}.enable {
+      home.packages = with pkgs; [ syncthing ];
+    };
+  };
+
+  flake.modules.nixos.${feature-name} = { config, lib, ... }:
     with lib; {
-      config = mkIf config.host.features.syncthing.enable {
+      config = mkIf config.host.features.${feature-name}.enable {
         services.syncthing = let
           inherit (config.host.identity) username;
           homeDir = "/home/${username}";
@@ -108,7 +116,8 @@
                 share = config.host.features.syncthing.shares.${shareName};
                 folderName = shareConfig.folderName or shareName;
                 # Use host config path if set (not null), otherwise use default from shares config
-                path = if share.path != null then share.path else shareConfig.path;
+                path =
+                  if share.path != null then share.path else shareConfig.path;
                 folderConfig = {
                   inherit path;
                   devices = getDevicesForShare shareName;

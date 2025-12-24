@@ -37,17 +37,21 @@
             htop
             keepassxc
             lens
+            libnotify
             mosh
             neofetch
             nerdfetch
             nh
+            nix-tree
             nixd
             nixfmt-classic
             # radicle-node
             silver-searcher
             slack
             # simplex-chat-desktop
+            unzip
             youtube-music
+            xsel
           ];
 
           stateVersion = "21.11";
