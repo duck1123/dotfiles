@@ -228,6 +228,13 @@ in {
               options = [ "nofail" ];
             };
           } // lib.optionalAttrs mount-nas {
+            "/mnt/audiobooks" = {
+              device = "${nas-ip}:/volume1/Audiobooks";
+              fsType = "nfs";
+              options =
+                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+            };
+
             "/mnt/books" = {
               device = "${nas-ip}:/volume1/Books";
               fsType = "nfs";
@@ -251,6 +258,13 @@ in {
 
             "/mnt/photos" = {
               device = "${nas-ip}:/volume1/Photos";
+              fsType = "nfs";
+              options =
+                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+            };
+
+            "/mnt/roms" = {
+              device = "${nas-ip}:/volume1/Roms";
               fsType = "nfs";
               options =
                 [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
