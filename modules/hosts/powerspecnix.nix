@@ -129,6 +129,7 @@ in {
           # obsidian
           # onlyoffice-bin
           playerctl
+          plexamp
           # postman
           # sparrow
           syncthing
