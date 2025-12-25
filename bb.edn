@@ -156,8 +156,12 @@
    :task       (shell "nh home switch . -b backup")}
 
   switch-os
-  {:decription "Update nixos from flake"
+  {:decription "Update nixos from flake (builds and activates immediately)"
    :task       (shell "nh os switch .")}
+
+  boot-os
+  {:decription "Build nixos config and set as boot default (activates on reboot, avoids activation timeouts)"
+   :task       (shell "nh os boot .")}
 
   k3d-create-registry
   {:task
