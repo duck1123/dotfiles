@@ -72,6 +72,7 @@ in {
         tailscale-feature
         touch-feature
         users
+        vpn
         virtualization-feature
         xserver-feature
         zsh-feature

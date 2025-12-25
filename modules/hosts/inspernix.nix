@@ -80,6 +80,7 @@ in {
           touch.enable = true;
           vim.enable = false;
           virtualization.enable = false;
+          vpn.enable = true;
           vscode.enable = true;
           waybar.enable = false;
           xserver.enable = true;
