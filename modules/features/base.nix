@@ -1,5 +1,5 @@
 { ... }:
-let unified-modules = [ "bitcoin" "chat" "network" "syncthing" ];
+let unified-modules = [ "bitcoin" "chat" "media" "network" "syncthing" ];
 in {
   flake.types.generic.feature-options.base = { inputs, lib }:
     let inherit (inputs.self.types.generic) simpleFeature;
@@ -28,7 +28,6 @@ in {
         i3
         java
         jujutsu
-        media
         music
         ncmpcpp
         nostr
@@ -42,11 +41,13 @@ in {
         vscode
         waybar
         zsh
-      ]) ++ (map (name: inputs.self.modules.homeManager.${name}) unified-modules) ++ [
-        inputs.self.modules.generic.options
-        inputs.stylix.homeModules.stylix
-        inputs.zen-browser.homeModules.beta
-      ];
+      ])
+        ++ (map (name: inputs.self.modules.homeManager.${name}) unified-modules)
+        ++ [
+          inputs.self.modules.generic.options
+          inputs.stylix.homeModules.stylix
+          inputs.zen-browser.homeModules.beta
+        ];
     };
 
     nixos.base = { inputs, ... }: {
