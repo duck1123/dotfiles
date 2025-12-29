@@ -199,6 +199,13 @@ in {
                 [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
             };
 
+            "/mnt/movies" = {
+              device = "${nas-ip}:/volume1/Movies";
+              fsType = "nfs";
+              options =
+                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+            };
+
             "/mnt/music" = {
               device = "${nas-ip}:/volume1/Music";
               fsType = "nfs";
@@ -215,6 +222,13 @@ in {
 
             "/mnt/roms" = {
               device = "${nas-ip}:/volume1/Roms";
+              fsType = "nfs";
+              options =
+                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+            };
+
+            "/mnt/tv" = {
+              device = "${nas-ip}:/volume1/TV";
               fsType = "nfs";
               options =
                 [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
