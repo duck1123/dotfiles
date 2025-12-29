@@ -15,7 +15,7 @@ in {
         features = {
           backups.enable = false;
           battery.enable = false;
-          bitcoin.enable = true;
+          bitcoin.enable = false;
           bluetooth.enable = false;
           chm.enable = false;
           clojure.enable = true;
