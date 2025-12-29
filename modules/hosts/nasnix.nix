@@ -13,29 +13,15 @@ in {
         name = hostname;
 
         features = {
-          backups.enable = false;
-          battery.enable = false;
-          bitcoin.enable = false;
-          bluetooth.enable = false;
-          chm.enable = false;
           clojure.enable = true;
           common.enable = true;
-          dbt.enable = false;
-          dconf.enable = false;
           developer.enable = true;
           docker.enable = true;
-          dunst.enable = false;
           emacs.enable = true;
-          emacs-prelude.enable = false;
-          email.enable = false;
           font.enable = true;
-          gaming.enable = false;
           git.enable = true;
-          gnome.enable = false;
           hyprland.enable = true;
           hyprpanel.enable = true;
-          i3.enable = false;
-          java.enable = false;
           jujutsu.enable = true;
 
           kubernetes = {
@@ -48,18 +34,11 @@ in {
             server.enable = true;
           };
 
-          music.enable = false;
-          ncmpcpp.enable = false;
           network.enable = true;
-          nfs.enable = false;
           nix.enable = true;
           nostr.enable = true;
           nushell.enable = true;
-          office.enable = false;
-          pictures.enable = false;
-          radio.enable = false;
           sddm.enable = true;
-          sound.enable = false;
           ssh.enable = true;
           starship.enable = true;
           stylix.enable = true;
@@ -71,28 +50,17 @@ in {
               camera.enable = false;
               keepass.enable = true;
               org-roam.enable = false;
-              renpy.enable = false;
+              renpy.enable = true;
             };
           };
 
           tailscale.enable = true;
-          touch.enable = false;
-          vim.enable = false;
-          virtualization.enable = false;
           vscode.enable = true;
-          waybar.enable = false;
           xserver.enable = true;
           zsh.enable = true;
         };
 
-        nixos = {
-          enable = true;
-          budgie.enable = false;
-          gnome.enable = false;
-          hyprland.enable = false;
-          i3.enable = false;
-          plasma6.enable = false;
-        };
+        nixos.enable = true;
       };
     };
 
@@ -105,7 +73,7 @@ in {
       };
     };
 
-    nixos.${hostname} = { config, inputs, lib, modulesPath, pkgs, ... }:
+    nixos.${hostname} = { config, inputs, lib, modulesPath, ... }:
       let
         core-module = {
           boot.loader.grub = {
