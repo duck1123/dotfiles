@@ -45,12 +45,12 @@
             nix-tree
             nixd
             nixfmt-classic
+            pear-desktop
             # radicle-node
             silver-searcher
             slack
             # simplex-chat-desktop
             unzip
-            youtube-music
             xsel
           ];
 

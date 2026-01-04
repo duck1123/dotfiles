@@ -73,7 +73,7 @@
               mod = "$mainMod";
               key = "a";
               command = "exec";
-              arg = "youtube-music";
+              arg = "pear-desktop";
             }
             {
               mod = "$mainMod";
@@ -397,4 +397,3 @@
     };
   };
 }
-
