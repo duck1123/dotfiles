@@ -12,6 +12,7 @@
         autosuggestion.enable = true;
 
         defaultKeymap = "emacs";
+        dotDir = "${config.xdg.configHome}/zsh";
         enable = true;
 
         history = {
