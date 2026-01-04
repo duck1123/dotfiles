@@ -42,7 +42,7 @@
         k3d
         k9s
         # krew
-        kty
+        # kty
         kubernetes-helm
         kubectl
         kubernix
