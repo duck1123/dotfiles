@@ -59,6 +59,7 @@ in {
 
         targets.emacs.enable = false;
         targets.firefox.profileNames = [ "default" ];
+        targets.hyprland.enable = true;  # Re-enabled so stylix processes the wallpaper - hyprland module will override the config
         targets.vscode.profileNames = [ "default" ];
         targets.zen-browser.profileNames = [ "default" ];
 
@@ -77,6 +78,9 @@ in {
           };
         };
       };
+
+      # Force overwrite hyprpaper.conf since hyprland module's script will regenerate it
+      xdg.configFile."hypr/hyprpaper.conf".force = true;
     };
   };
 }
