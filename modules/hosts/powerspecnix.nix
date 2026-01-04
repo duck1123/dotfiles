@@ -42,9 +42,10 @@ in {
 
             kubernetes = {
               client.enable = true;
+              gpu = "amd";
               server.enable = true;
-              tokenFile = ./../../secrets/k3s-token.yaml;
               serverAddr = "https://nasnix:6443";
+              tokenFile = ./../../secrets/k3s-token.yaml;
             };
 
             media = {

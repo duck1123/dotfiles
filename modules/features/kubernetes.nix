@@ -23,6 +23,11 @@
             default = null;
             description = "Server address (hostname or IP) for joining an existing k3s cluster";
           };
+          gpu = mkOption {
+            type = types.nullOr (types.enum [ "amd" "nvidia" ]);
+            default = null;
+            description = "Enable GPU support for Kubernetes pods (amd or nvidia)";
+          };
         };
       };
       default = { };
@@ -31,7 +36,11 @@
 
   flake.modules.nixos.kubernetes-feature = { config, lib, pkgs, ... }: {
     config = lib.mkIf config.host.features.kubernetes.server.enable {
-      environment.systemPackages = with pkgs; [ k3s nfs-utils openiscsi ];
+      environment.systemPackages = with pkgs;
+        [ k3s nfs-utils openiscsi ]
+        ++ lib.optional (config.host.features.kubernetes.gpu == "nvidia") [
+          nvidia-podman
+        ];
 
       networking.firewall = {
         enable = false;
@@ -88,6 +97,15 @@
         '';
       };
 
+      # Configure GPU support if enabled
+      hardware.graphics = lib.mkIf (config.host.features.kubernetes.gpu == "amd") {
+        enable = true;
+        extraPackages = with pkgs; [
+          rocmPackages.clr.icd
+          rocmPackages.rocm-device-libs
+        ];
+      };
+
       services = {
         k3s = let
           kubernetes = config.host.features.kubernetes;
@@ -97,6 +115,10 @@
           else
             null;
           isAgent = (kubernetes.token != null || tokenPath != null) && kubernetes.serverAddr != null;
+          baseFlags = if isAgent then
+            [ ]
+          else
+            [ "--cluster-cidr=10.42.0.0/16" "--disable=traefik" ];
         in {
           enable = true;
           role = if isAgent then "agent" else "server";
@@ -107,11 +129,7 @@
         } // lib.optionalAttrs (kubernetes.serverAddr != null) {
           serverAddr = kubernetes.serverAddr;
         } // {
-          extraFlags =
-            if isAgent then
-              toString [ ]
-            else
-              toString [ "--cluster-cidr=10.42.0.0/16" "--disable=traefik" ];
+          extraFlags = toString baseFlags;
         };
 
         openiscsi = {
