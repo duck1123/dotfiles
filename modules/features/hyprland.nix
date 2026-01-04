@@ -386,11 +386,11 @@
             [ "HDMI-A-1, 1920x1080, 0x0, 1" "DP-3, 1920x1080, 1920x0, 1" ];
 
           windowrule = [
-            "float,class:pavucontrol"
-            "float,class:blueman-manager"
-            "size 934 525,class:mpv"
-            "float,class:mpv"
-            "center,class:mpv"
+            "match:class pavucontrol float"
+            "match:class blueman-manager float"
+            "match:class mpv size 934 525"
+            "match:class mpv float"
+            "match:class mpv center"
           ];
         };
       };
