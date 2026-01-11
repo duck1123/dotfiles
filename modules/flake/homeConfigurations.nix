@@ -20,6 +20,12 @@ in {
       modules = with homeManager; [ base steamdeck ];
     };
 
+    "duck@edgenix" = homeManagerConfiguration {
+      inherit pkgs;
+      extraSpecialArgs = { inherit inputs pkgs; };
+      modules = with homeManager; [ base edgenix ];
+    };
+
     "duck@inspernix" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };

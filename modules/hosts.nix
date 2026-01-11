@@ -1,6 +1,7 @@
 { ... }: {
   flake.modules.generic.hosts = { inputs, ... }: {
     imports = with inputs.self.modules.generic; [
+      edgenix
       inspernix
       nasnix
       pixel8

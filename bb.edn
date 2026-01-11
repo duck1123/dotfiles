@@ -24,6 +24,14 @@
   {:doc  "Build the current home configuration"
    :task (shell "nh home build .")}
 
+  build-home-edgenix
+  {:task
+   (let [trace? false
+         cmd    "nh home build .#homeConfigurations.duck@edgenix.activationPackage"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
+
   build-home-inspernix
   {:task
    (let [trace? false
@@ -74,6 +82,14 @@
 
   build-os
   {:task (shell "nh os build .")}
+
+  build-os-edgenix
+  {:task
+   (let [trace? false
+         cmd    "nh os build .#nixosConfigurations.edgenix"
+         cmd    (str cmd (when trace? " -- --show-trace"))]
+     (binding [*out* *err*] (println cmd))
+     (shell cmd))}
 
   build-os-inspernix
   {:task
