@@ -25,7 +25,7 @@ in {
           email.enable = false;
           flipper.enable = false;
           font.enable = true;
-          gaming.enable = true;
+          gaming.enable = false;
           git.enable = true;
           gnome.enable = false;
           hyprland.enable = true;
@@ -35,12 +35,12 @@ in {
           jujutsu.enable = false;
 
           kubernetes = {
-            client.enable = true;
+            client.enable = false;
             server.enable = false;
           };
 
           media = {
-            enable = true;
+            enable = false;
             server.enable = false;
           };
 
@@ -105,10 +105,9 @@ in {
     nixos.${hostname} = { config, inputs, lib, modulesPath, ... }:
       let
         core-module = {
-          boot.loader.grub = {
-            enable = true;
-            device = "/dev/sda";
-            useOSProber = true;
+          boot.loader = {
+            systemd-boot.enable = true;
+            efi.canTouchEfiVariables = true;
           };
 
           host = config.hosts.${hostname};
