@@ -98,6 +98,7 @@ in {
           nixos.enable = true;
           pubkey =
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHaYYrgkSRYftmy5p0TbtGBWTR+oJmP6hkB8eoWFB7va ${identity.username}@${hostname}";
+          # pubkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC1MRZsSlV1woP3bD5T1W7BjN+buwU70mo1BmtZNFHZtOogDT5FH0jy9itMV+JwHyZCbG325RvD9eRrG1GPJsUHM7bsUNuKwYpTOR868CanKthDr5fp5pGVBxzUKZnl1YA/rWbaEO9M3iSVwxmOmlc0MMgzUujCfr3Cc2pZHEXvBXW6xasMEh7DA6zbPqrSMEk2/d2oVCDD3DBfJKzLX6oLfknLAMWPFcik6UBbAhm+xhc0jbjU1etOZc6Xau5aXWODo9xE2v/PhlSgmFLS1BeFQvfFNJkF7ADdtGBiI1eR76uxV3RHOJ45/vNw1Dvtf3vNSg4qK7xz7osSfKUvvnQjWipFllPxwzkpcK93Bz4JrrYwH9gwYi2roE6cEMl3HI7NIjTMDuUhjMeKNedn4FG0jQOvJRfHkBDnHq4vbMdJErRf1x07AMTicT7HoCJ2mKfrEmVUgekT1xyWN+THwQfFnaOj1sqSWYzydXmKo0VJhzvuS605JFO9lU8Fi3qmUVs= duck@powerspecnix";
         };
       };
 
