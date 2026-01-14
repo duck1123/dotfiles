@@ -44,7 +44,7 @@
             nh
             nix-tree
             nixd
-            nixfmt-classic
+            nixfmt
             pear-desktop
             # radicle-node
             silver-searcher
