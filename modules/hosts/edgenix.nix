@@ -62,7 +62,7 @@ in {
           stylix.enable = true;
 
           syncthing = {
-            enable = false;
+            enable = true;
 
             shares = {
               camera.enable = false;
