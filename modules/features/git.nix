@@ -19,6 +19,8 @@
             git = {
               enable = true;
 
+              extraConfig.fetch.prune = true;
+
               lfs.enable = true;
 
               settings = {
