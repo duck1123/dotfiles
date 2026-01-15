@@ -79,7 +79,6 @@
         nixhelm.follows = "nixhelm";
         nixpkgs.follows = "nixpkgs";
         nixpkgs-lib.follows = "nixpkgs-lib";
-        poetry2nix.follows = "poetry2nix";
         sops-nix.follows = "sops-nix";
         systems.follows = "systems";
       };
@@ -91,7 +90,6 @@
         flake-compat.follows = "flake-compat";
         nixpkgs.follows = "nixpkgs";
         systems.follows = "systems";
-        treefmt.follows = "treefmt-nix";
       };
       url = "github:hall/kubenix";
     };
@@ -117,7 +115,6 @@
         haumea.follows = "haumea";
         nix-kube-generators.follows = "nix-kube-generators";
         nixpkgs.follows = "nixpkgs";
-        poetry2nix.follows = "poetry2nix";
       };
       url = "github:farcaller/nixhelm";
     };
@@ -145,16 +142,6 @@
       url = "github:nix-community/NUR";
     };
 
-    poetry2nix = {
-      inputs = {
-        flake-utils.follows = "flake-utils";
-        nixpkgs.follows = "nixpkgs";
-        systems.follows = "systems";
-        treefmt-nix.follows = "treefmt-nix";
-      };
-      url = "github:nix-community/poetry2nix";
-    };
-
     pre-commit-hooks = {
       inputs = {
         flake-compat.follows = "flake-compat";
@@ -165,7 +152,10 @@
     };
 
     sddm-sugar-candy-nix = {
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        flake-parts.follows = "flake-parts";
+        nixpkgs.follows = "nixpkgs";
+      };
       url = "gitlab:Zhaith-Izaliel/sddm-sugar-candy-nix";
     };
 
@@ -185,11 +175,6 @@
     };
 
     systems.url = "github:nix-systems/default";
-
-    treefmt-nix = {
-      inputs.nixpkgs.follows = "nixpkgs";
-      url = "github:numtide/treefmt-nix";
-    };
 
     zen-browser = {
       inputs = {
