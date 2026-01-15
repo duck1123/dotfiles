@@ -97,7 +97,7 @@ in {
       host = config.hosts.${hostname};
 
       home = {
-        packages = with pkgs; [ nerdfetch ];
+        packages = with pkgs; [ guake nerdfetch ];
         sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
       };
     };
