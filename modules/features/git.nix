@@ -12,7 +12,10 @@
 
           lfs.enable = true;
 
-          settings.user = { inherit email name; };
+          settings = {
+            fetch.prune = true;
+            user = { inherit email name; };
+          };
 
           signing = {
             signByDefault = false;
@@ -27,4 +30,3 @@
     };
   };
 }
-
