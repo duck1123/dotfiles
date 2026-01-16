@@ -90,6 +90,8 @@ in {
           i3.enable = false;
           plasma6.enable = true;
         };
+
+        pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIqJGVkP5pUAJrJyW7Gdqv5XO3ImDNjtYuNS2rEUj7bt duck@edgenix";
       };
     };
 
