@@ -81,6 +81,9 @@ in {
 
       # Force overwrite hyprpaper.conf since hyprland module's script will regenerate it
       xdg.configFile."hypr/hyprpaper.conf".force = true;
+      
+      # Force overwrite .gtkrc-2.0 since stylix manages it
+      home.file.".gtkrc-2.0".force = true;
     };
   };
 }
