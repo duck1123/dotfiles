@@ -105,6 +105,79 @@ Update OS configuration
 nh os switch ${HOME?}/dotfiles -- --impure --show-trace
 ```
 
+### Remote Deployment
+
+Deploy to remote servers (edgenix and nasnix). All builds happen locally with `nom` for better progress display, then packages are copied to remote hosts.
+
+#### Build Only (No Activation)
+
+Build configurations locally to see what will be deployed:
+
+```sh {"name":"build-remote"}
+# Build NixOS configs (no activation)
+bb build-remote-os-edgenix
+bb build-remote-os-nasnix
+
+# Build home-manager configs (no activation)
+bb build-remote-home-edgenix
+bb build-remote-home-nasnix
+```
+
+#### Show Package Changes (Diff)
+
+See what packages will change between current and new system (similar to `nh` local diffs):
+
+```sh {"name":"diff-remote"}
+# Show package changes for edgenix
+bb diff-remote-os-edgenix
+
+# Show package changes for nasnix
+bb diff-remote-os-nasnix
+```
+
+#### Dry Run (See What Would Change)
+
+Preview changes without applying them:
+
+```sh {"name":"dry-run-remote"}
+# See what would change on edgenix
+bb dry-run-remote-os-edgenix
+
+# See what would change on nasnix
+bb dry-run-remote-os-nasnix
+```
+
+#### Switch (Build and Activate)
+
+Build locally and activate on remote:
+
+```sh {"name":"switch-remote"}
+# Switch both NixOS and home-manager on both hosts
+bb switch-remote
+
+# Switch both NixOS and home-manager on specific host
+bb switch-remote-edgenix
+bb switch-remote-nasnix
+
+# Switch only NixOS (builds with nom locally, then copies and activates remotely)
+bb switch-remote-os-edgenix
+bb switch-remote-os-nasnix
+
+# Switch only home-manager (builds with nom locally, copies, then activates remotely)
+bb switch-remote-home-edgenix
+bb switch-remote-home-nasnix
+```
+
+**How it works:**
+- **NixOS**: Builds with `nom build` locally, then uses `nixos-rebuild switch --target-host` to copy and activate
+- **Home-manager**: Builds activation package with `nom build` locally, copies with `nix copy`, then activates remotely
+
+**Prerequisites:**
+- SSH key-based authentication set up for `edgenix` and `nasnix`
+- Remote hosts accessible via their hostnames (configure `~/.ssh/config` if needed)
+- Remote hosts must have Nix installed and configured to accept SSH-based store access
+- Remote user needs sudo access (tasks will prompt for sudo password when switching NixOS configurations)
+
 ### Reboot
 
 Restart the computer

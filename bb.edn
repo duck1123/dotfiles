@@ -179,6 +179,141 @@
   {:decription "Build nixos config and set as boot default (activates on reboot, avoids activation timeouts)"
    :task       (shell "nh os boot .")}
 
+  ;; Remote deployment tasks (build locally, push to remote)
+  switch-remote
+  {:doc     "Switch both NixOS and home-manager on edgenix and nasnix"
+   :depends [switch-remote-edgenix switch-remote-nasnix]}
+
+  switch-remote-edgenix
+  {:doc  "Switch both NixOS and home-manager on edgenix (builds locally, pushes to remote)"
+   :depends [switch-remote-os-edgenix switch-remote-home-edgenix]}
+
+  switch-remote-nasnix
+  {:doc  "Switch both NixOS and home-manager on nasnix (builds locally, pushes to remote)"
+   :depends [switch-remote-os-nasnix switch-remote-home-nasnix]}
+
+  ;; Build-only tasks (use nom for better progress display)
+  build-remote-os-edgenix
+  {:doc  "Build NixOS config for edgenix locally using nom (no activation)"
+   :task (shell "nom build .#nixosConfigurations.edgenix.config.system.build.toplevel")}
+
+  build-remote-os-nasnix
+  {:doc  "Build NixOS config for nasnix locally using nom (no activation)"
+   :task (shell "nom build .#nixosConfigurations.nasnix.config.system.build.toplevel")}
+
+  ;; Show package changes (diff current vs new system)
+  diff-remote-os-edgenix
+  {:doc  "Show package changes between current edgenix system and new build"
+   :task (do
+           (println "Building new NixOS configuration for edgenix...")
+           (shell "sh -c 'nom build .#nixosConfigurations.edgenix.config.system.build.toplevel --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/edgenix-new-system.txt'")
+           (shell {:extra-env {"NIX_SSHOPTS" "-t"}} "sh -c \"ssh edgenix 'readlink -f /nix/var/nix/profiles/system' > /tmp/edgenix-current-system.txt 2>&1\"")
+           (let [new-system (str/trim (slurp "/tmp/edgenix-new-system.txt"))
+                 current-system (str/trim (slurp "/tmp/edgenix-current-system.txt"))]
+             (if (and new-system current-system (not= new-system "") (not= current-system "") (str/starts-with? new-system "/nix/store") (str/starts-with? current-system "/nix/store"))
+               (do
+                 (println "\n=== Package Changes ===")
+                 (println (str "Current: " current-system))
+                 (println (str "New:     " new-system "\n"))
+                 (shell (str "nix store diff-closures " current-system " " new-system)))
+               (do
+                 (println "ERROR: Could not determine system paths")
+                 (println (str "New system path: " (if new-system new-system "empty")))
+                 (println (str "Current system path: " (if current-system current-system "empty")))))))}
+
+  diff-remote-os-nasnix
+  {:doc  "Show package changes between current nasnix system and new build"
+   :task (do
+           (println "Building new NixOS configuration for nasnix...")
+           (shell "sh -c 'nom build .#nixosConfigurations.nasnix.config.system.build.toplevel --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/nasnix-new-system.txt'")
+           (shell {:extra-env {"NIX_SSHOPTS" "-t"}} "sh -c \"ssh nasnix 'readlink -f /nix/var/nix/profiles/system' > /tmp/nasnix-current-system.txt 2>&1\"")
+           (let [new-system (str/trim (slurp "/tmp/nasnix-new-system.txt"))
+                 current-system (str/trim (slurp "/tmp/nasnix-current-system.txt"))]
+             (if (and new-system current-system (not= new-system "") (not= current-system "") (str/starts-with? new-system "/nix/store") (str/starts-with? current-system "/nix/store"))
+               (do
+                 (println "\n=== Package Changes ===")
+                 (println (str "Current: " current-system))
+                 (println (str "New:     " new-system "\n"))
+                 (shell (str "nix store diff-closures " current-system " " new-system)))
+               (do
+                 (println "ERROR: Could not determine system paths")
+                 (println (str "New system path: " (if new-system new-system "empty")))
+                 (println (str "Current system path: " (if current-system current-system "empty")))))))}
+
+  build-remote-home-edgenix
+  {:doc  "Build home-manager activation package for edgenix locally using nom (no activation)"
+   :task (shell "nom build .#homeConfigurations.duck@edgenix.activationPackage")}
+
+  build-remote-home-nasnix
+  {:doc  "Build home-manager activation package for nasnix locally using nom (no activation)"
+   :task (shell "nom build .#homeConfigurations.duck@nasnix.activationPackage")}
+
+  ;; Dry-run tasks (show what would change without applying)
+  dry-run-remote-os-edgenix
+  {:doc  "Show what would change on edgenix without applying (dry-run, prompts for sudo password)"
+   :task (shell {:extra-env {"NIX_SSHOPTS" "-t"}} "nixos-rebuild dry-activate --flake .#edgenix --target-host edgenix --build-host localhost --sudo --ask-sudo-password")}
+
+  dry-run-remote-os-nasnix
+  {:doc  "Show what would change on nasnix without applying (dry-run, prompts for sudo password)"
+   :task (shell {:extra-env {"NIX_SSHOPTS" "-t"}} "nixos-rebuild dry-activate --flake .#nasnix --target-host nasnix --build-host localhost --sudo --ask-sudo-password")}
+
+  ;; Switch tasks (build with nom first, then copy and activate)
+  switch-remote-os-edgenix
+  {:doc  "Build NixOS config locally with nom, then copy and switch on edgenix (prompts for sudo password)"
+   :task (do
+           (println "Building NixOS configuration for edgenix with nom...")
+           (shell "sh -c 'nom build .#nixosConfigurations.edgenix.config.system.build.toplevel --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/edgenix-system-path.txt'")
+           (let [system-path (str/trim (slurp "/tmp/edgenix-system-path.txt"))]
+             (if (and system-path (str/starts-with? system-path "/nix/store"))
+               (do
+                 (println (str "Copying system to edgenix: " system-path))
+                 (shell (str "nix copy --to ssh://edgenix " system-path))
+                 (println "Activating on edgenix (will prompt for sudo password)...")
+                 (shell (str "ssh -t edgenix 'sudo nix-env -p /nix/var/nix/profiles/system --set " system-path " && sudo " system-path "/bin/switch-to-configuration switch'")))
+               (println "ERROR: Failed to build or get system path"))))}
+
+  switch-remote-os-nasnix
+  {:doc  "Build NixOS config locally with nom, then copy and switch on nasnix (prompts for sudo password)"
+   :task (do
+           (println "Building NixOS configuration for nasnix with nom...")
+           (shell "sh -c 'nom build .#nixosConfigurations.nasnix.config.system.build.toplevel --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/nasnix-system-path.txt'")
+           (let [system-path (str/trim (slurp "/tmp/nasnix-system-path.txt"))]
+             (if (and system-path (str/starts-with? system-path "/nix/store"))
+               (do
+                 (println (str "Copying system to nasnix: " system-path))
+                 (shell (str "nix copy --to ssh://nasnix " system-path))
+                 (println "Activating on nasnix (will prompt for sudo password)...")
+                 (shell (str "ssh -t nasnix 'sudo nix-env -p /nix/var/nix/profiles/system --set " system-path " && sudo " system-path "/bin/switch-to-configuration switch'")))
+               (println "ERROR: Failed to build or get system path"))))}
+
+  switch-remote-home-edgenix
+  {:doc  "Build home-manager activation package locally, copy to edgenix, and activate"
+   :task (do
+           (println "Building home-manager activation package for edgenix...")
+           (shell (str "sh -c 'nom build .#homeConfigurations.duck@edgenix.activationPackage --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/edgenix-home-path.txt'"))
+           (let [activation-path (str/trim (slurp "/tmp/edgenix-home-path.txt"))]
+             (if (and activation-path (str/starts-with? activation-path "/nix/store"))
+               (do
+                 (println (str "Copying to edgenix: " activation-path))
+                 (shell (str "nix copy --to ssh://edgenix " activation-path))
+                 (println "Activating on edgenix...")
+                 (shell (str "ssh edgenix " activation-path "/activate")))
+               (println "ERROR: Failed to build activation package or invalid path"))))}
+
+  switch-remote-home-nasnix
+  {:doc  "Build home-manager activation package locally, copy to nasnix, and activate"
+   :task (do
+           (println "Building home-manager activation package for nasnix...")
+           (shell (str "sh -c 'nom build .#homeConfigurations.duck@nasnix.activationPackage --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/nasnix-home-path.txt'"))
+           (let [activation-path (str/trim (slurp "/tmp/nasnix-home-path.txt"))]
+             (if (and activation-path (str/starts-with? activation-path "/nix/store"))
+               (do
+                 (println (str "Copying to nasnix: " activation-path))
+                 (shell (str "nix copy --to ssh://nasnix " activation-path))
+                 (println "Activating on nasnix...")
+                 (shell (str "ssh nasnix " activation-path "/activate")))
+               (println "ERROR: Failed to build activation package or invalid path"))))}
+
   k3d-create-registry
   {:task
    (shell "k3d registry create myregistry.localtest.me --port 12345")}

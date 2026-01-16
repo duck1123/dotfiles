@@ -17,7 +17,6 @@ in {
           babashka
           cachix
           clojure
-          pkgs.colmena
           emacs
           git
           pkgs.home-manager
