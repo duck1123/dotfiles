@@ -8,7 +8,7 @@ in {
     generic.${hostname} = { config, ... }: {
       hosts.${hostname} = {
         inherit hostname system;
-        id = "C5K6RA6-WXFIGSZ-5PKIJY2-BCOGWYM-XTGSO4T-F4NQT6I-EOIUMT7-ZTHWHAF";
+        id = "PVIXR2M-YL4TSHJ-7PHLJOO-3EYFEJR-TVT5VS6-EFRNFGP-7QGVFJW-25AAVAF";
         identity = config.identities.duck;
         name = hostname;
 
