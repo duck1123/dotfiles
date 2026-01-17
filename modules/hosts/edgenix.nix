@@ -35,8 +35,10 @@ in {
           jujutsu.enable = false;
 
           kubernetes = {
-            client.enable = false;
-            server.enable = false;
+            client.enable = true;
+            server.enable = true;
+            serverAddr = "https://nasnix:6443";
+            tokenFile = ./../../secrets/k3s-token.yaml;
           };
 
           media = {
