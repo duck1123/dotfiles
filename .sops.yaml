@@ -6,10 +6,18 @@ keys:
   # - &admin_duck 07FB96789934E76A3A442D4236D7F9B5EDBF141B
   # - &admin_duck C2A83A6A267A4F71B2C8FA4D30A24C7B3159CAEE
   - &server_powerspecnix age1vks9s5g7p0uhpe4eeregfga6zfcrpuxdjx8x2hwsdwe5hf77l5msxfujpe
+      - age1pruk356e077spzmhvrv5frwehm65gx803663x474ppfm8adz4djqy9xmhk
+      - age1jzj26nv7682hc86huyz89vhxyggz4lxyhquqzcrd2rp230n083dqvz7hma
+      - age1rp6t6g2kmqcrrxk9h4m2zrrg5q84ztursacf2sq45kt6c944nqwszdu6t3
   - &ssh_host_key age1d32pykvc4a7ed6dcgey8xuj0s63tt9cjne878cf5mp0drez6uels9006ln
+  - &server_inspernix age1jzj26nv7682hc86huyz89vhxyggz4lxyhquqzcrd2rp230n083dqvz7hma
+  - &server_nasnix age1rp6t6g2kmqcrrxk9h4m2zrrg5q84ztursacf2sq45kt6c944nqwszdu6t3
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
     - age:
-      - *ssh_host_key
-      - *server_powerspecnix
+      - age1d32pykvc4a7ed6dcgey8xuj0s63tt9cjne878cf5mp0drez6uels9006ln
+      - age1vks9s5g7p0uhpe4eeregfga6zfcrpuxdjx8x2hwsdwe5hf77l5msxfujpe
+      - age1pruk356e077spzmhvrv5frwehm65gx803663x474ppfm8adz4djqy9xmhk
+      - age1jzj26nv7682hc86huyz89vhxyggz4lxyhquqzcrd2rp230n083dqvz7hma
+      - age1rp6t6g2kmqcrrxk9h4m2zrrg5q84ztursacf2sq45kt6c944nqwszdu6t3
