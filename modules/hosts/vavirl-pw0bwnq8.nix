@@ -99,7 +99,6 @@ in {
             gitu
             htop
             neofetch
-            nixfmt-classic
             nh
             silver-searcher
             sqlcmd
