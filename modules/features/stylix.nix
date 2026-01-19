@@ -78,9 +78,6 @@ in {
           };
         };
       };
-
-      # Force overwrite hyprpaper.conf since hyprland module's script will regenerate it
-      xdg.configFile."hypr/hyprpaper.conf".force = true;
     };
   };
 }
