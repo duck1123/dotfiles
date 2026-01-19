@@ -96,8 +96,6 @@ in
         programs.home-manager.enable = true;
 
         home = {
-          stateVersion = "21.11";
-
           username = "${username}";
           homeDirectory = "/home/${username}";
 

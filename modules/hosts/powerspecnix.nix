@@ -155,8 +155,6 @@ in
             udev.packages = with pkgs; [ gnome-settings-daemon ];
           };
 
-          system.stateVersion = "25.05";
-
           time.timeZone = "America/Detroit";
 
           virtualisation = {

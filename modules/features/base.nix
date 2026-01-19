@@ -20,6 +20,7 @@ in
     homeManager.base =
       { inputs, ... }:
       {
+        home.stateVersion = "21.11";
         imports =
           (with inputs.self.modules.homeManager; [
             backups

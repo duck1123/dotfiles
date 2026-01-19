@@ -133,7 +133,6 @@ in
           };
 
           host = config.hosts.${hostname};
-          system.stateVersion = "25.05";
           time.timeZone = "America/Detroit";
         };
 

@@ -6,13 +6,13 @@ let
       inherit system;
       specialArgs = { inherit inputs; };
       modules = [
-        inputs.self.modules.nixos.${cls}
-        inputs.self.modules.nixos.${name}
         {
           networking.hostName = lib.mkDefault name;
           nixpkgs.hostPlatform = lib.mkDefault system;
-          system.stateVersion = "25.05";
+          system.stateVersion = "26.05";
         }
+        inputs.self.modules.nixos.${cls}
+        inputs.self.modules.nixos.${name}
       ];
     };
 
