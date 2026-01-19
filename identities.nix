@@ -1,4 +1,5 @@
-{ ... }: rec {
+{ ... }:
+rec {
   deck = {
     inherit (duck) name email gpgKey;
     username = "deck";

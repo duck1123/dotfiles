@@ -1,9 +1,12 @@
-{ ... }: {
-  flake.types.generic.nixos-submodule = { inputs, lib, ... }:
+{ ... }:
+{
+  flake.types.generic.nixos-submodule =
+    { inputs, lib, ... }:
     let
       inherit (inputs.self.types) generic;
       simpleFeature = generic.simpleFeature { inherit inputs lib; };
-    in with lib;
+    in
+    with lib;
     types.submodule {
       options = {
         enable = mkOption {

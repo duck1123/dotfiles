@@ -27,12 +27,19 @@ let
 
   ci = pkgs.symlinkJoin {
     name = "ci";
-    paths = [ ci-home ci-os ];
+    paths = [
+      ci-home
+      ci-os
+    ];
   };
-in {
-  perSystem = { system, ... }:
-    if system == "x86_64-linux" then {
-      packages = { inherit ci ci-home ci-os; };
-    } else
+in
+{
+  perSystem =
+    { system, ... }:
+    if system == "x86_64-linux" then
+      {
+        packages = { inherit ci ci-home ci-os; };
+      }
+    else
       { };
 }

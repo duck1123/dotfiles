@@ -1,28 +1,33 @@
-{ ... }: {
-  flake.types.generic.feature-options.sound = { inputs, lib }:
-    let inherit (inputs.self.types.generic) simpleFeature;
-    in simpleFeature { inherit inputs lib; } "sound feature";
+{ ... }:
+{
+  flake.types.generic.feature-options.sound =
+    { inputs, lib }:
+    let
+      inherit (inputs.self.types.generic) simpleFeature;
+    in
+    simpleFeature { inherit inputs lib; } "sound feature";
 
-  flake.modules.nixos.sound-feature = { config, lib, ... }: {
-    config = lib.mkIf config.host.features.sound.enable {
-      security.rtkit.enable = true;
+  flake.modules.nixos.sound-feature =
+    { config, lib, ... }:
+    {
+      config = lib.mkIf config.host.features.sound.enable {
+        security.rtkit.enable = true;
 
-      services = {
-        pipewire = {
-          enable = true;
-
-          alsa = {
+        services = {
+          pipewire = {
             enable = true;
-            support32Bit = true;
+
+            alsa = {
+              enable = true;
+              support32Bit = true;
+            };
+
+            jack.enable = true;
+            pulse.enable = true;
           };
 
-          jack.enable = true;
-          pulse.enable = true;
+          pulseaudio.enable = false;
         };
-
-        pulseaudio.enable = false;
       };
     };
-  };
 }
-

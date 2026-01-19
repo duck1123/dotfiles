@@ -1,45 +1,55 @@
-{ ... }: {
-  flake.types.generic.feature-options.music = { inputs, lib }:
-    let inherit (inputs.self.types.generic) simpleFeature;
-    in simpleFeature { inherit inputs lib; } "music feature";
+{ ... }:
+{
+  flake.types.generic.feature-options.music =
+    { inputs, lib }:
+    let
+      inherit (inputs.self.types.generic) simpleFeature;
+    in
+    simpleFeature { inherit inputs lib; } "music feature";
 
-  flake.modules.homeManager.music = { config, lib, pkgs, ... }: {
-    config = lib.mkIf config.host.features.music.enable {
-      home.packages = with pkgs; [
-        # Multi-track hard disk recording software
-        ardour
+  flake.modules.homeManager.music =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      config = lib.mkIf config.host.features.music.enable {
+        home.packages = with pkgs; [
+          # Multi-track hard disk recording software
+          ardour
 
-        # obs-studio
+          # obs-studio
 
-        # Audio plugin host
-        carla
+          # Audio plugin host
+          carla
 
-        guitarix
+          guitarix
 
-        # Advanced drum machine
-        hydrogen
+          # Advanced drum machine
+          hydrogen
 
-        # DAW similar to FL Studio (music production software)
-        # lmms
+          # DAW similar to FL Studio (music production software)
+          # lmms
 
-        musescore
+          musescore
 
-        qjackctl
+          qjackctl
 
-        # Modern tracker-based DAW
-        # renoise
+          # Modern tracker-based DAW
+          # renoise
 
-        supercollider
+          supercollider
 
-        # Old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx
-        synthv1
+          # Old-school 4-oscillator subtractive polyphonic synthesizer with stereo fx
+          synthv1
 
-        # vcv-rack
+          # vcv-rack
 
-        # Virtual MIDI Piano Keyboard
-        vmpk
-      ];
+          # Virtual MIDI Piano Keyboard
+          vmpk
+        ];
+      };
     };
-  };
 }
-

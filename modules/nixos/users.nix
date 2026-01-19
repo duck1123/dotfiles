@@ -1,7 +1,11 @@
-{ ... }: {
-  flake.modules.nixos.users = { config, pkgs, ... }:
-    let inherit (config.host.identity) name username;
-    in {
+{ ... }:
+{
+  flake.modules.nixos.users =
+    { config, pkgs, ... }:
+    let
+      inherit (config.host.identity) name username;
+    in
+    {
       # Define a user account. Don't forget to set a password with 'passwd'.
       users.users."${username}" = {
         isNormalUser = true;
@@ -17,7 +21,11 @@
           "vboxusers"
           "wheel"
         ];
-        packages = with pkgs; [ appimage-run emacs firefox ];
+        packages = with pkgs; [
+          appimage-run
+          emacs
+          firefox
+        ];
         shell = pkgs.zsh;
       };
     };

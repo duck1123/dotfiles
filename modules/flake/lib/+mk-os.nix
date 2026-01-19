@@ -1,6 +1,7 @@
 { inputs, lib, ... }:
 let
-  mkNixos = system: cls: name:
+  mkNixos =
+    system: cls: name:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = { inherit inputs; };
@@ -15,7 +16,8 @@ let
       ];
     };
 
-  mkDarwin = system: name:
+  mkDarwin =
+    system: name:
     inputs.nix-darwin.lib.darwinSystem {
       inherit system;
       modules = [
@@ -28,7 +30,8 @@ let
         }
       ];
     };
-in {
+in
+{
   flake.lib.mk-os = {
     inherit mkDarwin mkNixos;
     darwin = mkDarwin "aarch64-darwin";

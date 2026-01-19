@@ -1,6 +1,8 @@
 { inputs, ... }:
-let inherit (inputs.self.lib.mk-os) wsl linux;
-in {
+let
+  inherit (inputs.self.lib.mk-os) wsl linux;
+in
+{
   flake.nixosConfigurations = {
     edgenix = linux "edgenix";
     inspernix = linux "inspernix";

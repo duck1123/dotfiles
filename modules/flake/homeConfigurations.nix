@@ -6,48 +6,70 @@ let
     config.allowUnfree = true;
     system = "x86_64-linux";
   };
-in {
+in
+{
   flake.homeConfigurations = {
     "drenfer@VAVIRL-PW0BWNQ8" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ base vavirl-pw0bwnq8 ];
+      modules = with homeManager; [
+        base
+        vavirl-pw0bwnq8
+      ];
     };
 
     "deck@steamdeck" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ base steamdeck ];
+      modules = with homeManager; [
+        base
+        steamdeck
+      ];
     };
 
     "duck@edgenix" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ base edgenix ];
+      modules = with homeManager; [
+        base
+        edgenix
+      ];
     };
 
     "duck@inspernix" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ base inspernix ];
+      modules = with homeManager; [
+        base
+        inspernix
+      ];
     };
 
     "duck@nasnix" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ base nasnix ];
+      modules = with homeManager; [
+        base
+        nasnix
+      ];
     };
 
     "duck@powerspecnix" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ base powerspecnix ];
+      modules = with homeManager; [
+        base
+        powerspecnix
+      ];
     };
 
     "duck@vidcentre" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [ base vidcentre ];
+      modules = with homeManager; [
+        base
+        vidcentre
+      ];
     };
   };
 }

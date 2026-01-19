@@ -1,11 +1,23 @@
-{ ... }: {
-  flake.types.generic.feature-options.common = { inputs, lib }:
-    let inherit (inputs.self.types.generic) simpleFeature;
-    in simpleFeature { inherit inputs lib; } "common feature";
+{ ... }:
+{
+  flake.types.generic.feature-options.common =
+    { inputs, lib }:
+    let
+      inherit (inputs.self.types.generic) simpleFeature;
+    in
+    simpleFeature { inherit inputs lib; } "common feature";
 
-  flake.modules.homeManager.common = { config, lib, pkgs, ... }:
-    let inherit (config.host.identity) username;
-    in {
+  flake.modules.homeManager.common =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      inherit (config.host.identity) username;
+    in
+    {
       config = lib.mkIf config.host.features.common.enable {
         home = {
           file.".bb/bb.edn".source = ../../bb.edn;

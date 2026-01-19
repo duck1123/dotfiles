@@ -1,14 +1,16 @@
-{ ... }: {
-  flake.types.generic.hostSubmodule = { inputs, lib, ... }:
+{ ... }:
+{
+  flake.types.generic.hostSubmodule =
+    { inputs, lib, ... }:
     let
       inherit (inputs.self.types) generic;
       android-submodule = generic.android-submodule { inherit inputs lib; };
       featureSubmodule = generic.feature-submodule { inherit inputs lib; };
-      home-manager-submodule =
-        generic.home-manager-submodule { inherit inputs lib; };
+      home-manager-submodule = generic.home-manager-submodule { inherit inputs lib; };
       identitySubmodule = generic.identitySubmodule { inherit inputs lib; };
       nixos-submodule = generic.nixos-submodule { inherit inputs lib; };
-    in with lib;
+    in
+    with lib;
     types.submodule {
       options = {
         android = mkOption {
@@ -41,8 +43,7 @@
 
         identity = mkOption {
           type = identitySubmodule;
-          description =
-            "The identity configuration (name, username, email, gpgKey)";
+          description = "The identity configuration (name, username, email, gpgKey)";
         };
 
         name = mkOption {

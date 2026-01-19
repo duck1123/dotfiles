@@ -1,5 +1,7 @@
-{ ... }: {
-  flake.types.generic.simpleFeature = { lib, ... }:
+{ ... }:
+{
+  flake.types.generic.simpleFeature =
+    { lib, ... }:
     description:
     with lib;
     mkOption {

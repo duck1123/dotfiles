@@ -3,77 +3,92 @@ let
   hostname = "nasnix";
   nas-ip = "192.168.0.124";
   system = "x86_64-linux";
-in {
+in
+{
   flake.modules = {
-    generic.${hostname} = { config, ... }: {
-      hosts.${hostname} = {
-        inherit hostname system;
-        id = "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
-        identity = config.identities.duck;
-        name = hostname;
+    generic.${hostname} =
+      { config, ... }:
+      {
+        hosts.${hostname} = {
+          inherit hostname system;
+          id = "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
+          identity = config.identities.duck;
+          name = hostname;
 
-        features = {
-          clojure.enable = true;
-          common.enable = true;
-          developer.enable = true;
-          docker.enable = true;
-          emacs.enable = true;
-          font.enable = true;
-          git.enable = true;
-          hyprland.enable = true;
-          hyprpanel.enable = true;
-          jujutsu.enable = true;
+          features = {
+            clojure.enable = true;
+            common.enable = true;
+            developer.enable = true;
+            docker.enable = true;
+            emacs.enable = true;
+            font.enable = true;
+            git.enable = true;
+            hyprland.enable = true;
+            hyprpanel.enable = true;
+            jujutsu.enable = true;
 
-          kubernetes = {
-            client.enable = true;
-            server.enable = true;
-          };
-
-          media = {
-            enable = true;
-            server.enable = true;
-          };
-
-          network.enable = true;
-          nix.enable = true;
-          nostr.enable = true;
-          nushell.enable = true;
-          sddm.enable = true;
-          ssh.enable = true;
-          starship.enable = true;
-          stylix.enable = true;
-
-          syncthing = {
-            enable = true;
-
-            shares = {
-              camera.enable = false;
-              keepass.enable = true;
-              org-roam.enable = false;
-              renpy.enable = true;
+            kubernetes = {
+              client.enable = true;
+              server.enable = true;
             };
+
+            media = {
+              enable = true;
+              server.enable = true;
+            };
+
+            network.enable = true;
+            nix.enable = true;
+            nostr.enable = true;
+            nushell.enable = true;
+            sddm.enable = true;
+            ssh.enable = true;
+            starship.enable = true;
+            stylix.enable = true;
+
+            syncthing = {
+              enable = true;
+
+              shares = {
+                camera.enable = false;
+                keepass.enable = true;
+                org-roam.enable = false;
+                renpy.enable = true;
+              };
+            };
+
+            tailscale.enable = true;
+            vscode.enable = true;
+            xserver.enable = true;
+            zsh.enable = true;
           };
 
-          tailscale.enable = true;
-          vscode.enable = true;
-          xserver.enable = true;
-          zsh.enable = true;
+          nixos.enable = true;
         };
-
-        nixos.enable = true;
       };
-    };
 
-    homeManager.${hostname} = { config, pkgs, ... }: {
-      host = config.hosts.${hostname};
+    homeManager.${hostname} =
+      { config, pkgs, ... }:
+      {
+        host = config.hosts.${hostname};
 
-      home = {
-        packages = with pkgs; [ nerdfetch ];
-        sessionPath = [ "$HOME/.cargo/bin:$PATH" "$HOME/.local/bin:$PATH" ];
+        home = {
+          packages = with pkgs; [ nerdfetch ];
+          sessionPath = [
+            "$HOME/.cargo/bin:$PATH"
+            "$HOME/.local/bin:$PATH"
+          ];
+        };
       };
-    };
 
-    nixos.${hostname} = { config, inputs, lib, modulesPath, ... }:
+    nixos.${hostname} =
+      {
+        config,
+        inputs,
+        lib,
+        modulesPath,
+        ...
+      }:
       let
         core-module = {
           boot.loader.grub = {
@@ -93,8 +108,13 @@ in {
             extraModulePackages = [ ];
 
             initrd = {
-              availableKernelModules =
-                [ "ata_piix" "uhci_hcd" "virtio_pci" "sr_mod" "virtio_blk" ];
+              availableKernelModules = [
+                "ata_piix"
+                "uhci_hcd"
+                "virtio_pci"
+                "sr_mod"
+                "virtio_blk"
+              ];
               kernelModules = [ ];
             };
 
@@ -110,64 +130,118 @@ in {
             "/mnt/audiobooks" = {
               device = "${nas-ip}:/volume1/Audiobooks";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/books" = {
               device = "${nas-ip}:/volume1/Books";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/downloads" = {
               device = "${nas-ip}:/volume1/Downloads";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/movies" = {
               device = "${nas-ip}:/volume1/Movies";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/music" = {
               device = "${nas-ip}:/volume1/Music";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/photos" = {
               device = "${nas-ip}:/volume1/Photos";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/roms" = {
               device = "${nas-ip}:/volume1/Roms";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/tv" = {
               device = "${nas-ip}:/volume1/TV";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/videos" = {
               device = "${nas-ip}:/volume1/Videos";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
           };
 
@@ -175,8 +249,11 @@ in {
           networking.useDHCP = lib.mkDefault true;
           nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
         };
-        core =
-          [ core-module hardware-configuration inputs.self.modules.nixos.base ];
+        core = [
+          core-module
+          hardware-configuration
+          inputs.self.modules.nixos.base
+        ];
         mkSpecialisation = module: {
           inheritParentConfig = false;
           configuration = {
@@ -190,7 +267,8 @@ in {
           gnome = mkSpecialisation environments-gnome;
           plasma6 = mkSpecialisation environments-plasma6;
         };
-      in {
+      in
+      {
         _module.args = { inherit inputs; };
         imports = specialisations.budgie.configuration.imports;
         specialisation = {

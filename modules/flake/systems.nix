@@ -1,1 +1,4 @@
-{ inputs, ... }: { systems = import inputs.systems; }
+{ inputs, ... }:
+{
+  systems = import inputs.systems;
+}

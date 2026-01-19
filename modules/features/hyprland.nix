@@ -1,477 +1,497 @@
-{ ... }: {
-  flake.types.generic.feature-options.hyprland = { inputs, lib }:
-    let inherit (inputs.self.types.generic) simpleFeature;
-    in simpleFeature { inherit inputs lib; } "hyprland feature";
+{ ... }:
+{
+  flake.types.generic.feature-options.hyprland =
+    { inputs, lib }:
+    let
+      inherit (inputs.self.types.generic) simpleFeature;
+    in
+    simpleFeature { inherit inputs lib; } "hyprland feature";
 
-  flake.modules.homeManager.hyprland = { config, lib, pkgs, ... }:
+  flake.modules.homeManager.hyprland =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       # Get wallpaper path from stylix - stylix processes the image and stores it in config.stylix.image
       # This will be the Nix store path to the processed wallpaper
       stylixImage = if config.stylix.enable or false then config.stylix.image else null;
-    in {
-    config = lib.mkIf config.host.features.hyprland.enable {
-      home.packages = with pkgs; [
-        cascadia-code
-        font-awesome
-        grim
-        hyprpanel
-        hyprpaper
-        hyprshot
-        jq
-        nautilus
-        ncpamixer
-        nwg-dock-hyprland
-        nwg-drawer
-        nwg-launchers
-        pamixer
-        pavucontrol
-        socat
-        wev
-        wofi
-      ];
+    in
+    {
+      config = lib.mkIf config.host.features.hyprland.enable {
+        home.packages = with pkgs; [
+          cascadia-code
+          font-awesome
+          grim
+          hyprpanel
+          hyprpaper
+          hyprshot
+          jq
+          nautilus
+          ncpamixer
+          nwg-dock-hyprland
+          nwg-drawer
+          nwg-launchers
+          pamixer
+          pavucontrol
+          socat
+          wev
+          wofi
+        ];
 
-      # Fix hyprpaper config for 0.8.0 compatibility
-      # Stylix generates wallpaper=, format which doesn't work in 0.8.0
-      # Create a wrapper script that generates correct config and starts hyprpaper
-      home.file.".config/hypr/start-hyprpaper.sh" =
-        let
-          # Get wallpaper path from stylix if available
-          defaultWallpaper = if stylixImage != null then toString stylixImage else "";
-        in {
-        text = ''
-          #!/usr/bin/env bash
-          # Generate correct hyprpaper config for 0.8.0 and start hyprpaper
-          CONFIG_FILE="$HOME/.config/hypr/hyprpaper.conf"
+        # Fix hyprpaper config for 0.8.0 compatibility
+        # Stylix generates wallpaper=, format which doesn't work in 0.8.0
+        # Create a wrapper script that generates correct config and starts hyprpaper
+        home.file.".config/hypr/start-hyprpaper.sh" =
+          let
+            # Get wallpaper path from stylix if available
+            defaultWallpaper = if stylixImage != null then toString stylixImage else "";
+          in
+          {
+            text = ''
+              #!/usr/bin/env bash
+              # Generate correct hyprpaper config for 0.8.0 and start hyprpaper
+              CONFIG_FILE="$HOME/.config/hypr/hyprpaper.conf"
 
-          # Get wallpaper path from stylix (embedded in script or from existing config)
-          WALLPAPER="${defaultWallpaper}"
+              # Get wallpaper path from stylix (embedded in script or from existing config)
+              WALLPAPER="${defaultWallpaper}"
 
-          # Fallback: try to find stylix wallpaper from stylix-generated config
-          # Stylix generates a symlink at ~/.config/hypr/hyprpaper.conf pointing to the Nix store
-          if [ -z "$WALLPAPER" ] || [ ! -f "$WALLPAPER" ]; then
-            # Check if hyprpaper.conf is a symlink to stylix's generated file
-            if [ -L "$HOME/.config/hypr/hyprpaper.conf" ]; then
-              REAL_CONFIG=$(readlink -f "$HOME/.config/hypr/hyprpaper.conf" 2>/dev/null)
-              if [ -f "$REAL_CONFIG" ]; then
-                WALLPAPER=$(grep '^preload=' "$REAL_CONFIG" 2>/dev/null | cut -d'=' -f2 | tr -d ' ' | head -1)
+              # Fallback: try to find stylix wallpaper from stylix-generated config
+              # Stylix generates a symlink at ~/.config/hypr/hyprpaper.conf pointing to the Nix store
+              if [ -z "$WALLPAPER" ] || [ ! -f "$WALLPAPER" ]; then
+                # Check if hyprpaper.conf is a symlink to stylix's generated file
+                if [ -L "$HOME/.config/hypr/hyprpaper.conf" ]; then
+                  REAL_CONFIG=$(readlink -f "$HOME/.config/hypr/hyprpaper.conf" 2>/dev/null)
+                  if [ -f "$REAL_CONFIG" ]; then
+                    WALLPAPER=$(grep '^preload=' "$REAL_CONFIG" 2>/dev/null | cut -d'=' -f2 | tr -d ' ' | head -1)
+                  fi
+                elif [ -f "$HOME/.config/hypr/hyprpaper.conf" ]; then
+                  WALLPAPER=$(grep '^preload=' "$HOME/.config/hypr/hyprpaper.conf" 2>/dev/null | cut -d'=' -f2 | tr -d ' ' | head -1)
+                fi
               fi
-            elif [ -f "$HOME/.config/hypr/hyprpaper.conf" ]; then
-              WALLPAPER=$(grep '^preload=' "$HOME/.config/hypr/hyprpaper.conf" 2>/dev/null | cut -d'=' -f2 | tr -d ' ' | head -1)
-            fi
-          fi
 
-          # Fallback: check local config
-          if [ -z "$WALLPAPER" ] || [ ! -f "$WALLPAPER" ]; then
-            if [ -f "$HOME/.config/hypr/hyprpaper.conf.local" ]; then
-              WALLPAPER=$(grep '^preload=' "$HOME/.config/hypr/hyprpaper.conf.local" 2>/dev/null | cut -d'=' -f2 | tr -d ' ' | head -1)
-            fi
-          fi
+              # Fallback: check local config
+              if [ -z "$WALLPAPER" ] || [ ! -f "$WALLPAPER" ]; then
+                if [ -f "$HOME/.config/hypr/hyprpaper.conf.local" ]; then
+                  WALLPAPER=$(grep '^preload=' "$HOME/.config/hypr/hyprpaper.conf.local" 2>/dev/null | cut -d'=' -f2 | tr -d ' ' | head -1)
+                fi
+              fi
 
-          # Debug output
-          if [ -n "$WALLPAPER" ] && [ -f "$WALLPAPER" ]; then
-            echo "Using wallpaper: $WALLPAPER" >&2
-          else
-            echo "Warning: Could not find wallpaper! WALLPAPER='$WALLPAPER'" >&2
-          fi
+              # Debug output
+              if [ -n "$WALLPAPER" ] && [ -f "$WALLPAPER" ]; then
+                echo "Using wallpaper: $WALLPAPER" >&2
+              else
+                echo "Warning: Could not find wallpaper! WALLPAPER='$WALLPAPER'" >&2
+              fi
 
-          if [ -n "$WALLPAPER" ] && [ -f "$WALLPAPER" ]; then
-            # Wait for monitors to be detected (hyprland needs time to initialize)
-            sleep 3
+              if [ -n "$WALLPAPER" ] && [ -f "$WALLPAPER" ]; then
+                # Wait for monitors to be detected (hyprland needs time to initialize)
+                sleep 3
 
-            # Generate config with monitor-specific entries
-            # Use a temp file first to ensure atomic write
-            TEMP_CONFIG=$(mktemp)
-            {
-              echo "preload = $WALLPAPER"
-              echo ""
-              # Get monitor names and create wallpaper entries
-              hyprctl monitors -j 2>/dev/null | jq -r '.[].name' | while read monitor; do
-                [ -n "$monitor" ] && echo "wallpaper = $monitor,$WALLPAPER"
-              done
-            } > "$TEMP_CONFIG"
+                # Generate config with monitor-specific entries
+                # Use a temp file first to ensure atomic write
+                TEMP_CONFIG=$(mktemp)
+                {
+                  echo "preload = $WALLPAPER"
+                  echo ""
+                  # Get monitor names and create wallpaper entries
+                  hyprctl monitors -j 2>/dev/null | jq -r '.[].name' | while read monitor; do
+                    [ -n "$monitor" ] && echo "wallpaper = $monitor,$WALLPAPER"
+                  done
+                } > "$TEMP_CONFIG"
 
-            # Move temp file to final location
-            mv "$TEMP_CONFIG" "$CONFIG_FILE"
-          fi
+                # Move temp file to final location
+                mv "$TEMP_CONFIG" "$CONFIG_FILE"
+              fi
 
-          # Start hyprpaper (it will read from the standard config location)
-          exec hyprpaper
-        '';
-        executable = true;
-      };
+              # Start hyprpaper (it will read from the standard config location)
+              exec hyprpaper
+            '';
+            executable = true;
+          };
 
-      programs.kitty.enable = true;
+        programs.kitty.enable = true;
 
-      wayland.windowManager.hyprland = {
-        enable = true;
-        settings = {
-          "$fileManager" = "nautiulus";
-          "$menu" = "wofi --show drun";
-          "$mainMod" = "SUPER";
-          "$terminal" = "kitty";
+        wayland.windowManager.hyprland = {
+          enable = true;
+          settings = {
+            "$fileManager" = "nautiulus";
+            "$menu" = "wofi --show drun";
+            "$mainMod" = "SUPER";
+            "$terminal" = "kitty";
 
-          animations = {
-            enabled = "yes";
-            bezier = "ease, 0.4, 0.02, 0.21, 1";
-            animation = [
-              "windows, 1, 3.5, ease, slide"
-              "windowsOut, 1, 3.5, ease, slide"
-              "border, 1, 6, default"
-              "fade, 1, 3, ease"
-              "workspaces, 1, 3.5, ease"
+            animations = {
+              enabled = "yes";
+              bezier = "ease, 0.4, 0.02, 0.21, 1";
+              animation = [
+                "windows, 1, 3.5, ease, slide"
+                "windowsOut, 1, 3.5, ease, slide"
+                "border, 1, 6, default"
+                "fade, 1, 3, ease"
+                "workspaces, 1, 3.5, ease"
+              ];
+            };
+
+            env = [
+              "XCURSOR_SIZE,24"
+              "HYPRCURSOR_SIZE,24"
+            ];
+            exec = [
+              "~/.config/hypr/start-hyprpaper.sh"
+
+              # "hyprpanel"
+              # "waybar"
+            ];
+            decoration.rounding = 10;
+
+            dwindle = {
+              pseudotile = "yes";
+              "preserve_split" = "yes";
+            };
+
+            general = {
+              "gaps_in" = 5;
+              "gaps_out" = 5;
+              "border_size" = 2;
+              layout = "dwindle";
+            };
+
+            # gestures."workspace_swipe" = false;
+
+            bind =
+              (map (x: "${x.mod},${x.key},${x.command},${x.arg}") [
+                # Letter key bindings (sorted by key)
+                {
+                  mod = "$mainMod";
+                  key = "a";
+                  command = "exec";
+                  arg = "pear-desktop";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "b";
+                  command = "exec";
+                  arg = "zen-beta";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "c";
+                  command = "killactive";
+                  arg = "";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "d";
+                  command = "exec";
+                  arg = ''nautilus "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
+                }
+                {
+                  mod = "$mainMod";
+                  key = "e";
+                  command = "exec";
+                  arg = ''emacsclient -c -a "" --eval "(magit-status \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\")"'';
+                }
+                {
+                  mod = "$mainMod";
+                  key = "f";
+                  command = "fullscreen";
+                  arg = "";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "g";
+                  command = "exec";
+                  arg = "gossip";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "h";
+                  command = "exec";
+                  arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" htop'';
+                }
+                {
+                  mod = "$mainMod";
+                  key = "j";
+                  command = "togglesplit";
+                  arg = "";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "k";
+                  command = "exec";
+                  arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" k9s'';
+                }
+                {
+                  mod = "$mainMod";
+                  key = "l";
+                  command = "exec";
+                  arg = "lens";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "m";
+                  command = "exit";
+                  arg = "";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "n";
+                  command = "exec";
+                  arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" nu'';
+                }
+                {
+                  mod = "$mainMod";
+                  key = "p";
+                  command = "pseudo";
+                  arg = "";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "r";
+                  command = "exec";
+                  arg = "rofiWindow";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "t";
+                  command = "exec";
+                  arg = "teams-for-linux";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "u";
+                  command = "exec";
+                  arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" jjui'';
+                }
+                {
+                  mod = "$mainMod";
+                  key = "v";
+                  command = "togglefloating";
+                  arg = "";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "w";
+                  command = "exec";
+                  arg = "nwg-drawer";
+                }
+                # Direction key bindings
+                {
+                  mod = "$mainMod";
+                  key = "down";
+                  command = "movefocus";
+                  arg = "d";
+                }
+                {
+                  mod = "SUPER_SHIFT";
+                  key = "down";
+                  command = "movewindow";
+                  arg = "d";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "left";
+                  command = "movefocus";
+                  arg = "l";
+                }
+                {
+                  mod = "SUPER_SHIFT";
+                  key = "left";
+                  command = "movewindow";
+                  arg = "l";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "right";
+                  command = "movefocus";
+                  arg = "r";
+                }
+                {
+                  mod = "SUPER_SHIFT";
+                  key = "right";
+                  command = "movewindow";
+                  arg = "r";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "up";
+                  command = "movefocus";
+                  arg = "u";
+                }
+                {
+                  mod = "SUPER_SHIFT";
+                  key = "up";
+                  command = "movewindow";
+                  arg = "u";
+                }
+                # Special key bindings
+                {
+                  mod = "$mainMod";
+                  key = "mouse_down";
+                  command = "workspace";
+                  arg = "e+1";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "mouse_up";
+                  command = "workspace";
+                  arg = "e-1";
+                }
+                {
+                  mod = "";
+                  key = "Print";
+                  command = "exec";
+                  arg = "hyprshot -m region";
+                }
+                {
+                  mod = "SHIFT";
+                  key = "Print";
+                  command = "exec";
+                  arg = ''grim -g "$(slurp)"'';
+                }
+                {
+                  mod = "$mainMod";
+                  key = "RETURN";
+                  command = "exec";
+                  arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
+                }
+                {
+                  mod = "$mainMod";
+                  key = "SPACE";
+                  command = "exec";
+                  arg = "nwg-drawer";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "Tab";
+                  command = "cyclenext";
+                  arg = "";
+                }
+                {
+                  mod = "$mainMod";
+                  key = "Tab";
+                  command = "bringactivetotop";
+                  arg = "";
+                }
+                # Media keys
+                {
+                  mod = "";
+                  key = "XF86AudioLowerVolume";
+                  command = "exec";
+                  arg = "pamixer -d 5";
+                }
+                {
+                  mod = "";
+                  key = "XF86AudioMicMute";
+                  command = "exec";
+                  arg = "pamixer --default-source -t";
+                }
+                {
+                  mod = "";
+                  key = "XF86AudioMute";
+                  command = "exec";
+                  arg = "pamixer -t";
+                }
+                {
+                  mod = "";
+                  key = "XF86AudioPause";
+                  command = "exec";
+                  arg = "playerctl play-pause";
+                }
+                {
+                  mod = "";
+                  key = "XF86AudioPlay";
+                  command = "exec";
+                  arg = "playerctl play-pause";
+                }
+                {
+                  mod = "";
+                  key = "XF86AudioRaiseVolume";
+                  command = "exec";
+                  arg = "pamixer -i 5";
+                }
+                {
+                  mod = "";
+                  key = "XF86MonBrightnessDown";
+                  command = "exec";
+                  arg = "light -U 20";
+                }
+                {
+                  mod = "";
+                  key = "XF86MonBrightnessUp";
+                  command = "exec";
+                  arg = "light -A 20";
+                }
+              ])
+              ++ (
+                # workspaces
+                # binds $mainMod + [shift +] {1..9} to [move to] workspace {1..9}
+                builtins.concatLists (
+                  builtins.genList (
+                    i:
+                    let
+                      ws = i + 1;
+                    in
+                    [
+                      "$mainMod, code:1${toString i}, workspace, ${toString ws}"
+                      "$mainMod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
+                    ]
+                  ) 9
+                )
+              );
+
+            bindm =
+              let
+                left-click = "mouse:272";
+                right-click = "mouse:273";
+                back-thumb = "mouse:275";
+                front-thumb = "mouse:276";
+              in
+              (map (x: "${x.mod},${x.key},${x.command}") [
+                {
+                  mod = "$mainMod";
+                  key = left-click;
+                  command = "movewindow";
+                }
+                {
+                  mod = "ALT";
+                  key = left-click;
+                  command = "resizewindow";
+                }
+                {
+                  mod = "$mainMod";
+                  key = right-click;
+                  command = "resizewindow";
+                }
+                {
+                  mod = "";
+                  key = back-thumb;
+                  command = "movewindow";
+                }
+                {
+                  mod = "";
+                  key = front-thumb;
+                  command = "resizewindow";
+                }
+              ]);
+
+            # FIXME: This is environment specific
+            monitor = [
+              "HDMI-A-1, 1920x1080, 0x0, 1"
+              "DP-3, 1920x1080, 1920x0, 1"
+            ];
+
+            windowrule = [
+              "match:class pavucontrol float"
+              "match:class blueman-manager float"
+              "match:class mpv size 934 525"
+              "match:class mpv float"
+              "match:class mpv center"
             ];
           };
-
-          env = [ "XCURSOR_SIZE,24" "HYPRCURSOR_SIZE,24" ];
-          exec = [
-            "~/.config/hypr/start-hyprpaper.sh"
-
-            # "hyprpanel"
-            # "waybar"
-          ];
-          decoration.rounding = 10;
-
-          dwindle = {
-            pseudotile = "yes";
-            "preserve_split" = "yes";
-          };
-
-          general = {
-            "gaps_in" = 5;
-            "gaps_out" = 5;
-            "border_size" = 2;
-            layout = "dwindle";
-          };
-
-          # gestures."workspace_swipe" = false;
-
-          bind = (map (x: "${x.mod},${x.key},${x.command},${x.arg}") [
-            # Letter key bindings (sorted by key)
-            {
-              mod = "$mainMod";
-              key = "a";
-              command = "exec";
-              arg = "pear-desktop";
-            }
-            {
-              mod = "$mainMod";
-              key = "b";
-              command = "exec";
-              arg = "zen-beta";
-            }
-            {
-              mod = "$mainMod";
-              key = "c";
-              command = "killactive";
-              arg = "";
-            }
-            {
-              mod = "$mainMod";
-              key = "d";
-              command = "exec";
-              arg = ''nautilus "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
-            }
-            {
-              mod = "$mainMod";
-              key = "e";
-              command = "exec";
-              arg = ''
-                emacsclient -c -a "" --eval "(magit-status \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\")"'';
-            }
-            {
-              mod = "$mainMod";
-              key = "f";
-              command = "fullscreen";
-              arg = "";
-            }
-            {
-              mod = "$mainMod";
-              key = "g";
-              command = "exec";
-              arg = "gossip";
-            }
-            {
-              mod = "$mainMod";
-              key = "h";
-              command = "exec";
-              arg = ''
-                kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" htop'';
-            }
-            {
-              mod = "$mainMod";
-              key = "j";
-              command = "togglesplit";
-              arg = "";
-            }
-            {
-              mod = "$mainMod";
-              key = "k";
-              command = "exec";
-              arg = ''
-                kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" k9s'';
-            }
-            {
-              mod = "$mainMod";
-              key = "l";
-              command = "exec";
-              arg = "lens";
-            }
-            {
-              mod = "$mainMod";
-              key = "m";
-              command = "exit";
-              arg = "";
-            }
-            {
-              mod = "$mainMod";
-              key = "n";
-              command = "exec";
-              arg = ''
-                kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" nu'';
-            }
-            {
-              mod = "$mainMod";
-              key = "p";
-              command = "pseudo";
-              arg = "";
-            }
-            {
-              mod = "$mainMod";
-              key = "r";
-              command = "exec";
-              arg = "rofiWindow";
-            }
-            {
-              mod = "$mainMod";
-              key = "t";
-              command = "exec";
-              arg = "teams-for-linux";
-            }
-            {
-              mod = "$mainMod";
-              key = "u";
-              command = "exec";
-              arg = ''
-                kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" jjui'';
-            }
-            {
-              mod = "$mainMod";
-              key = "v";
-              command = "togglefloating";
-              arg = "";
-            }
-            {
-              mod = "$mainMod";
-              key = "w";
-              command = "exec";
-              arg = "nwg-drawer";
-            }
-            # Direction key bindings
-            {
-              mod = "$mainMod";
-              key = "down";
-              command = "movefocus";
-              arg = "d";
-            }
-            {
-              mod = "SUPER_SHIFT";
-              key = "down";
-              command = "movewindow";
-              arg = "d";
-            }
-            {
-              mod = "$mainMod";
-              key = "left";
-              command = "movefocus";
-              arg = "l";
-            }
-            {
-              mod = "SUPER_SHIFT";
-              key = "left";
-              command = "movewindow";
-              arg = "l";
-            }
-            {
-              mod = "$mainMod";
-              key = "right";
-              command = "movefocus";
-              arg = "r";
-            }
-            {
-              mod = "SUPER_SHIFT";
-              key = "right";
-              command = "movewindow";
-              arg = "r";
-            }
-            {
-              mod = "$mainMod";
-              key = "up";
-              command = "movefocus";
-              arg = "u";
-            }
-            {
-              mod = "SUPER_SHIFT";
-              key = "up";
-              command = "movewindow";
-              arg = "u";
-            }
-            # Special key bindings
-            {
-              mod = "$mainMod";
-              key = "mouse_down";
-              command = "workspace";
-              arg = "e+1";
-            }
-            {
-              mod = "$mainMod";
-              key = "mouse_up";
-              command = "workspace";
-              arg = "e-1";
-            }
-            {
-              mod = "";
-              key = "Print";
-              command = "exec";
-              arg = "hyprshot -m region";
-            }
-            {
-              mod = "SHIFT";
-              key = "Print";
-              command = "exec";
-              arg = ''grim -g "$(slurp)"'';
-            }
-            {
-              mod = "$mainMod";
-              key = "RETURN";
-              command = "exec";
-              arg = ''
-                kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
-            }
-            {
-              mod = "$mainMod";
-              key = "SPACE";
-              command = "exec";
-              arg = "nwg-drawer";
-            }
-            {
-              mod = "$mainMod";
-              key = "Tab";
-              command = "cyclenext";
-              arg = "";
-            }
-            {
-              mod = "$mainMod";
-              key = "Tab";
-              command = "bringactivetotop";
-              arg = "";
-            }
-            # Media keys
-            {
-              mod = "";
-              key = "XF86AudioLowerVolume";
-              command = "exec";
-              arg = "pamixer -d 5";
-            }
-            {
-              mod = "";
-              key = "XF86AudioMicMute";
-              command = "exec";
-              arg = "pamixer --default-source -t";
-            }
-            {
-              mod = "";
-              key = "XF86AudioMute";
-              command = "exec";
-              arg = "pamixer -t";
-            }
-            {
-              mod = "";
-              key = "XF86AudioPause";
-              command = "exec";
-              arg = "playerctl play-pause";
-            }
-            {
-              mod = "";
-              key = "XF86AudioPlay";
-              command = "exec";
-              arg = "playerctl play-pause";
-            }
-            {
-              mod = "";
-              key = "XF86AudioRaiseVolume";
-              command = "exec";
-              arg = "pamixer -i 5";
-            }
-            {
-              mod = "";
-              key = "XF86MonBrightnessDown";
-              command = "exec";
-              arg = "light -U 20";
-            }
-            {
-              mod = "";
-              key = "XF86MonBrightnessUp";
-              command = "exec";
-              arg = "light -A 20";
-            }
-          ]) ++ (
-            # workspaces
-            # binds $mainMod + [shift +] {1..9} to [move to] workspace {1..9}
-            builtins.concatLists (builtins.genList (i:
-              let ws = i + 1;
-              in [
-                "$mainMod, code:1${toString i}, workspace, ${toString ws}"
-                "$mainMod SHIFT, code:1${toString i}, movetoworkspace, ${
-                  toString ws
-                }"
-              ]) 9));
-
-          bindm = let
-            left-click = "mouse:272";
-            right-click = "mouse:273";
-            back-thumb = "mouse:275";
-            front-thumb = "mouse:276";
-          in (map (x: "${x.mod},${x.key},${x.command}") [
-            {
-              mod = "$mainMod";
-              key = left-click;
-              command = "movewindow";
-            }
-            {
-              mod = "ALT";
-              key = left-click;
-              command = "resizewindow";
-            }
-            {
-              mod = "$mainMod";
-              key = right-click;
-              command = "resizewindow";
-            }
-            {
-              mod = "";
-              key = back-thumb;
-              command = "movewindow";
-            }
-            {
-              mod = "";
-              key = front-thumb;
-              command = "resizewindow";
-            }
-          ]);
-
-          # FIXME: This is environment specific
-          monitor =
-            [ "HDMI-A-1, 1920x1080, 0x0, 1" "DP-3, 1920x1080, 1920x0, 1" ];
-
-          windowrule = [
-            "match:class pavucontrol float"
-            "match:class blueman-manager float"
-            "match:class mpv size 934 525"
-            "match:class mpv float"
-            "match:class mpv center"
-          ];
         };
       };
     };
-  };
 }

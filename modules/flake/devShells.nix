@@ -2,10 +2,14 @@
 let
   inherit (inputs.flake-utils.lib) eachSystemMap defaultSystems;
   eachDefaultSystemMap = eachSystemMap defaultSystems;
-in {
-  flake.devShells = eachDefaultSystemMap (system:
-    let pkgs = import inputs.nixpkgs { inherit system; };
-    in {
+in
+{
+  flake.devShells = eachDefaultSystemMap (
+    system:
+    let
+      pkgs = import inputs.nixpkgs { inherit system; };
+    in
+    {
       default = pkgs.mkShell {
         name = "installation-shell";
 
@@ -35,5 +39,6 @@ in {
           wget
         ];
       };
-    });
+    }
+  );
 }

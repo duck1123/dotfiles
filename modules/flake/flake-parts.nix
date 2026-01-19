@@ -1,4 +1,5 @@
 # Import flake-parts modules module
-{ inputs, ... }: {
+{ inputs, ... }:
+{
   imports = [ inputs.flake-parts.flakeModules.modules ];
 }

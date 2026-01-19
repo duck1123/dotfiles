@@ -4,11 +4,15 @@ let
   mount-nas = true;
   nas-ip = "192.168.0.124";
   system = "x86_64-linux";
-in {
+in
+{
   flake.modules = {
-    generic.${hostname} = { config, ... }:
-      let identity = config.identities.duck;
-      in {
+    generic.${hostname} =
+      { config, ... }:
+      let
+        identity = config.identities.duck;
+      in
+      {
         hosts.${hostname} = {
           inherit hostname identity system;
 
@@ -92,21 +96,29 @@ in {
             zsh.enable = true;
           };
 
-          id =
-            "UFCCQLJ-3EKBVCQ-O5CNVM5-ERJQAQG-JWKQRPU-7FOZHPG-VMEOMKJ-KZSUFQK";
+          id = "UFCCQLJ-3EKBVCQ-O5CNVM5-ERJQAQG-JWKQRPU-7FOZHPG-VMEOMKJ-KZSUFQK";
           name = hostname;
           nixos.enable = true;
-          pubkey =
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHaYYrgkSRYftmy5p0TbtGBWTR+oJmP6hkB8eoWFB7va ${identity.username}@${hostname}";
+          pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHaYYrgkSRYftmy5p0TbtGBWTR+oJmP6hkB8eoWFB7va ${identity.username}@${hostname}";
           # pubkey = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC1MRZsSlV1woP3bD5T1W7BjN+buwU70mo1BmtZNFHZtOogDT5FH0jy9itMV+JwHyZCbG325RvD9eRrG1GPJsUHM7bsUNuKwYpTOR868CanKthDr5fp5pGVBxzUKZnl1YA/rWbaEO9M3iSVwxmOmlc0MMgzUujCfr3Cc2pZHEXvBXW6xasMEh7DA6zbPqrSMEk2/d2oVCDD3DBfJKzLX6oLfknLAMWPFcik6UBbAhm+xhc0jbjU1etOZc6Xau5aXWODo9xE2v/PhlSgmFLS1BeFQvfFNJkF7ADdtGBiI1eR76uxV3RHOJ45/vNw1Dvtf3vNSg4qK7xz7osSfKUvvnQjWipFllPxwzkpcK93Bz4JrrYwH9gwYi2roE6cEMl3HI7NIjTMDuUhjMeKNedn4FG0jQOvJRfHkBDnHq4vbMdJErRf1x07AMTicT7HoCJ2mKfrEmVUgekT1xyWN+THwQfFnaOj1sqSWYzydXmKo0VJhzvuS605JFO9lU8Fi3qmUVs= duck@powerspecnix";
         };
       };
 
-    homeManager.${hostname} = { config, ... }: {
-      host = config.hosts.${hostname};
-    };
+    homeManager.${hostname} =
+      { config, ... }:
+      {
+        host = config.hosts.${hostname};
+      };
 
-    nixos.${hostname} = { config, inputs, lib, modulesPath, pkgs, ... }:
+    nixos.${hostname} =
+      {
+        config,
+        inputs,
+        lib,
+        modulesPath,
+        pkgs,
+        ...
+      }:
       let
         core-module = {
           host = config.hosts.${hostname};
@@ -129,7 +141,10 @@ in {
 
             nix-ld = {
               enable = true;
-              libraries = with pkgs; [ alsa-lib libGL ];
+              libraries = with pkgs; [
+                alsa-lib
+                libGL
+              ];
             };
           };
 
@@ -157,8 +172,13 @@ in {
             extraModulePackages = [ ];
 
             initrd = {
-              availableKernelModules =
-                [ "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" ];
+              availableKernelModules = [
+                "xhci_pci"
+                "ahci"
+                "usbhid"
+                "usb_storage"
+                "sd_mod"
+              ];
               kernelModules = [ ];
             };
 
@@ -181,73 +201,127 @@ in {
               fsType = "ext4";
               options = [ "nofail" ];
             };
-          } // lib.optionalAttrs mount-nas {
+          }
+          // lib.optionalAttrs mount-nas {
             "/mnt/audiobooks" = {
               device = "${nas-ip}:/volume1/Audiobooks";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/books" = {
               device = "${nas-ip}:/volume1/Books";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/downloads" = {
               device = "${nas-ip}:/volume1/Downloads";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/movies" = {
               device = "${nas-ip}:/volume1/Movies";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/music" = {
               device = "${nas-ip}:/volume1/Music";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/photos" = {
               device = "${nas-ip}:/volume1/Photos";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/roms" = {
               device = "${nas-ip}:/volume1/Roms";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/tv" = {
               device = "${nas-ip}:/volume1/TV";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
 
             "/mnt/videos" = {
               device = "${nas-ip}:/volume1/Videos";
               fsType = "nfs";
-              options =
-                [ "nfsvers=3" "rw" "hard" "timeo=600" "retrans=2" "_netdev" ];
+              options = [
+                "nfsvers=3"
+                "rw"
+                "hard"
+                "timeo=600"
+                "retrans=2"
+                "_netdev"
+              ];
             };
           };
 
-          hardware.cpu.amd.updateMicrocode =
-            lib.mkDefault config.hardware.enableRedistributableFirmware;
+          hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
           networking = {
             interfaces = {
@@ -266,8 +340,11 @@ in {
 
           swapDevices = [ ];
         };
-        core =
-          [ core-module hardware-configuration inputs.self.modules.nixos.base ];
+        core = [
+          core-module
+          hardware-configuration
+          inputs.self.modules.nixos.base
+        ];
         mkSpecialisation = env-module: {
           inheritParentConfig = false;
           configuration = {
@@ -282,7 +359,8 @@ in {
           i3 = mkSpecialisation environments-i3;
           plasma6 = mkSpecialisation environments-plasma6;
         };
-      in {
+      in
+      {
         _module.args = { inherit inputs; };
         imports = specialisations.hyprland.configuration.imports;
         specialisation = {

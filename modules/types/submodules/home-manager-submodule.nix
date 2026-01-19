@@ -1,5 +1,7 @@
-{ ... }: {
-  flake.types.generic.home-manager-submodule = { lib, ... }:
+{ ... }:
+{
+  flake.types.generic.home-manager-submodule =
+    { lib, ... }:
     with lib;
     types.submodule {
       options = {

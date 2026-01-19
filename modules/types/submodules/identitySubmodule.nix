@@ -1,5 +1,7 @@
-{ ... }: {
-  flake.types.generic.identitySubmodule = { lib, ... }:
+{ ... }:
+{
+  flake.types.generic.identitySubmodule =
+    { lib, ... }:
     with lib;
     types.submodule {
       options = {
