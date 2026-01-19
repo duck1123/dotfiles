@@ -105,9 +105,11 @@ in
       };
 
     homeManager.${hostname} =
-      { config, ... }:
+      { config, pkgs, ... }:
       {
         host = config.hosts.${hostname};
+
+        home.packages = with pkgs; [ plex-desktop ];
       };
 
     nixos.${hostname} =
