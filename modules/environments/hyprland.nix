@@ -1,10 +1,7 @@
 { ... }:
 {
   flake.modules.nixos.environments-hyprland =
-    { inputs, pkgs, ... }:
-    let
-      system = pkgs.stdenv.hostPlatform.system;
-    in
+    { pkgs, ... }:
     {
       environment = {
         sessionVariables = {
@@ -20,19 +17,10 @@
           hypridle
           starship
           tuigreet
-          zathura
         ];
       };
 
-      # Enable Hyprland
-      programs.hyprland = {
-        enable = true;
-        # set the flake package
-        package = inputs.hyprland.packages.${system}.hyprland;
-        # make sure to also set the portal package, so that they are in sync
-        portalPackage = inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
-      };
-
+      programs.hyprland.enable = true;
       services.displayManager.defaultSession = "hyprland";
     };
 }
