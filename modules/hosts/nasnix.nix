@@ -120,129 +120,38 @@ in
             kernelModules = [ "kvm-intel" ];
           };
 
-          fileSystems = {
-            "/" = {
-              device = "/dev/disk/by-uuid/1f61c6bf-be89-48fe-8081-7a74ec707a38";
-              fsType = "ext4";
-            };
+          fileSystems =
+            let
+              nasMount = location: {
+                device = "${nas-ip}:/volume1/${location}";
+                fsType = "nfs";
+                options = [
+                  "nfsvers=3"
+                  "rw"
+                  "hard"
+                  "timeo=600"
+                  "retrans=2"
+                  "_netdev"
+                ];
 
-            "/mnt/audiobooks" = {
-              device = "${nas-ip}:/volume1/Audiobooks";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
+              };
+            in
+            {
+              "/" = {
+                device = "/dev/disk/by-uuid/1f61c6bf-be89-48fe-8081-7a74ec707a38";
+                fsType = "ext4";
+              };
 
-            "/mnt/books" = {
-              device = "${nas-ip}:/volume1/Books";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
+              "/mnt/audiobooks" = nasMount "Audiobooks";
+              "/mnt/books" = nasMount "Books";
+              "/mnt/downloads" = nasMount "Downloads";
+              "/mnt/movies" = nasMount "Movies";
+              "/mnt/music" = nasMount "Music";
+              "/mnt/photos" = nasMount "Photos";
+              "/mnt/roms" = nasMount "Roms";
+              "/mnt/tv" = nasMount "TV";
+              "/mnt/videos" = nasMount "Videos";
             };
-
-            "/mnt/downloads" = {
-              device = "${nas-ip}:/volume1/Downloads";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/movies" = {
-              device = "${nas-ip}:/volume1/Movies";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/music" = {
-              device = "${nas-ip}:/volume1/Music";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/photos" = {
-              device = "${nas-ip}:/volume1/Photos";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/roms" = {
-              device = "${nas-ip}:/volume1/Roms";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/tv" = {
-              device = "${nas-ip}:/volume1/TV";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/videos" = {
-              device = "${nas-ip}:/volume1/Videos";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-          };
 
           swapDevices = [ ];
           networking.useDHCP = lib.mkDefault true;
