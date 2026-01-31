@@ -45,8 +45,8 @@ in
             };
 
             media = {
-              enable = false;
-              server.enable = false;
+              enable = true;
+              server.enable = true;
             };
 
             music.enable = false;
