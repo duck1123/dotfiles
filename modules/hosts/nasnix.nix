@@ -32,11 +32,6 @@ in
               server.enable = true;
             };
 
-            media = {
-              enable = true;
-              server.enable = true;
-            };
-
             network.enable = true;
             nix.enable = true;
             nostr.enable = true;
