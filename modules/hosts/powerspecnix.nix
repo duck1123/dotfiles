@@ -362,7 +362,7 @@ in
       in
       {
         _module.args = { inherit inputs; };
-        imports = specialisations.hyprland.configuration.imports;
+        imports = specialisations.hyprland.configuration.imports ++ [ inputs.self.modules.nixos.nixos ];
         specialisation = {
           inherit (specialisations) budgie;
           # inherit (specialisations) gnome;
