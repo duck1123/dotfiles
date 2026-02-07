@@ -192,7 +192,7 @@ in
       in
       {
         _module.args = { inherit inputs; };
-        imports = specialisations.plasma6.configuration.imports;
+        imports = specialisations.plasma6.configuration.imports  ++ [ inputs.self.modules.nixos.nixos ];
         specialisation = {
           inherit (specialisations) budgie;
           # inherit (specialisations) gnome;

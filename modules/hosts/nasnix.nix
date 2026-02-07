@@ -173,7 +173,7 @@ in
       in
       {
         _module.args = { inherit inputs; };
-        imports = specialisations.budgie.configuration.imports;
+        imports = specialisations.budgie.configuration.imports  ++ [ inputs.self.modules.nixos.nixos ];
         specialisation = {
           # inherit (specialisations) budgie;
           # inherit (specialisations) gnome;
