@@ -55,6 +55,12 @@ in
           openFirewall = true;
           user = username;
         };
+
+        system.activationScripts.plexStatePermissions.text = ''
+          if [ -d /var/lib/plex ]; then
+            chown -R ${username}:${primaryGroup} /var/lib/plex
+          fi
+        '';
       };
     };
 }
