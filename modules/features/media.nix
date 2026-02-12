@@ -44,7 +44,13 @@ in
     {
       config = lib.mkIf config.host.features.${feature-name}.server.enable {
         networking.firewall.allowedTCPPorts = [ 32400 ];
-        services.plex.enable = true;
+
+        services.plex = {
+          enable = true;
+          group = "1000";
+          openFirewall = true;
+          user = "1000";
+        };
       };
     };
 }
