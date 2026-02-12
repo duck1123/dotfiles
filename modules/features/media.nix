@@ -41,15 +41,18 @@ in
 
   flake.modules.nixos.${feature-name} =
     { config, lib, ... }:
+    let
+      inherit (config.host.identity) username;
+    in
     {
       config = lib.mkIf config.host.features.${feature-name}.server.enable {
         networking.firewall.allowedTCPPorts = [ 32400 ];
 
         services.plex = {
           enable = true;
-          group = "1000";
+          group = username;
           openFirewall = true;
-          user = "1000";
+          user = username;
         };
       };
     };
