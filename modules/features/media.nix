@@ -43,6 +43,7 @@ in
     { config, lib, ... }:
     let
       inherit (config.host.identity) username;
+      primaryGroup = config.users.users.${username}.group;
     in
     {
       config = lib.mkIf config.host.features.${feature-name}.server.enable {
@@ -50,7 +51,7 @@ in
 
         services.plex = {
           enable = true;
-          group = username;
+          group = primaryGroup;
           openFirewall = true;
           user = username;
         };
