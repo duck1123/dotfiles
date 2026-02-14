@@ -18,8 +18,8 @@
       config = lib.mkIf config.host.features.developer.enable {
         home.packages = with pkgs; [
           age
-          argo-workflows
-          argocd
+          # argo-workflows
+          # argocd
           # arkade
           # colmena
           # dbx

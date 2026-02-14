@@ -70,11 +70,11 @@
               # bind hstr to Ctrl-r (for Vi mode check doc)
               bindkey -s "\C-r" "\C-a hstr -- \C-j"
 
-              source <(argo completion zsh)
-              source <(argocd completion zsh)
-              source <(k3d completion zsh)
-              source <(devspace completion zsh)
-              source <(runme completion zsh)
+              # source <(argo completion zsh)
+              # source <(argocd completion zsh)
+              # source <(k3d completion zsh)
+              # source <(devspace completion zsh)
+              # source <(runme completion zsh)
 
               _bb_tasks() {
                 local matches=(`bb tasks |tail -n +3 |cut -f1 -d ' '`)
