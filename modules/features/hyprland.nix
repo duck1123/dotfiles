@@ -8,17 +8,7 @@
     simpleFeature { inherit inputs lib; } "hyprland feature";
 
   flake.modules.homeManager.hyprland =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    let
-      # Get wallpaper path from stylix - stylix processes the image and stores it in config.stylix.image
-      # This will be the Nix store path to the processed wallpaper
-      stylixImage = if config.stylix.enable or false then config.stylix.image else null;
-    in
+    { config, lib, pkgs, ... }:
     {
       config = lib.mkIf config.host.features.hyprland.enable {
         home.packages = with pkgs; [
@@ -40,77 +30,6 @@
           wev
           wofi
         ];
-
-        # Fix hyprpaper config for 0.8.0 compatibility
-        # Stylix generates wallpaper=, format which doesn't work in 0.8.0
-        # Create a wrapper script that generates correct config and starts hyprpaper
-        home.file.".config/hypr/start-hyprpaper.sh" =
-          let
-            # Get wallpaper path from stylix if available
-            defaultWallpaper = if stylixImage != null then toString stylixImage else "";
-          in
-          {
-            text = ''
-              #!/usr/bin/env bash
-              # Generate correct hyprpaper config for 0.8.0 and start hyprpaper
-              CONFIG_FILE="$HOME/.config/hypr/hyprpaper.conf"
-
-              # Get wallpaper path from stylix (embedded in script or from existing config)
-              WALLPAPER="${defaultWallpaper}"
-
-              # Fallback: try to find stylix wallpaper from stylix-generated config
-              # Stylix generates a symlink at ~/.config/hypr/hyprpaper.conf pointing to the Nix store
-              if [ -z "$WALLPAPER" ] || [ ! -f "$WALLPAPER" ]; then
-                # Check if hyprpaper.conf is a symlink to stylix's generated file
-                if [ -L "$HOME/.config/hypr/hyprpaper.conf" ]; then
-                  REAL_CONFIG=$(readlink -f "$HOME/.config/hypr/hyprpaper.conf" 2>/dev/null)
-                  if [ -f "$REAL_CONFIG" ]; then
-                    WALLPAPER=$(grep '^preload=' "$REAL_CONFIG" 2>/dev/null | cut -d'=' -f2 | tr -d ' ' | head -1)
-                  fi
-                elif [ -f "$HOME/.config/hypr/hyprpaper.conf" ]; then
-                  WALLPAPER=$(grep '^preload=' "$HOME/.config/hypr/hyprpaper.conf" 2>/dev/null | cut -d'=' -f2 | tr -d ' ' | head -1)
-                fi
-              fi
-
-              # Fallback: check local config
-              if [ -z "$WALLPAPER" ] || [ ! -f "$WALLPAPER" ]; then
-                if [ -f "$HOME/.config/hypr/hyprpaper.conf.local" ]; then
-                  WALLPAPER=$(grep '^preload=' "$HOME/.config/hypr/hyprpaper.conf.local" 2>/dev/null | cut -d'=' -f2 | tr -d ' ' | head -1)
-                fi
-              fi
-
-              # Debug output
-              if [ -n "$WALLPAPER" ] && [ -f "$WALLPAPER" ]; then
-                echo "Using wallpaper: $WALLPAPER" >&2
-              else
-                echo "Warning: Could not find wallpaper! WALLPAPER='$WALLPAPER'" >&2
-              fi
-
-              if [ -n "$WALLPAPER" ] && [ -f "$WALLPAPER" ]; then
-                # Wait for monitors to be detected (hyprland needs time to initialize)
-                sleep 3
-
-                # Generate config with monitor-specific entries
-                # Use a temp file first to ensure atomic write
-                TEMP_CONFIG=$(mktemp)
-                {
-                  echo "preload = $WALLPAPER"
-                  echo ""
-                  # Get monitor names and create wallpaper entries
-                  hyprctl monitors -j 2>/dev/null | jq -r '.[].name' | while read monitor; do
-                    [ -n "$monitor" ] && echo "wallpaper = $monitor,$WALLPAPER"
-                  done
-                } > "$TEMP_CONFIG"
-
-                # Move temp file to final location
-                mv "$TEMP_CONFIG" "$CONFIG_FILE"
-              fi
-
-              # Start hyprpaper (it will read from the standard config location)
-              exec hyprpaper
-            '';
-            executable = true;
-          };
 
         programs.kitty.enable = true;
 
@@ -139,8 +58,6 @@
               "HYPRCURSOR_SIZE,24"
             ];
             exec = [
-              "~/.config/hypr/start-hyprpaper.sh"
-
               # "hyprpanel"
               # "waybar"
             ];

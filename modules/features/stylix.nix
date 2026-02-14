@@ -78,7 +78,7 @@ in
 
           targets.emacs.enable = false;
           targets.firefox.profileNames = [ "default" ];
-          targets.hyprland.enable = true; # Re-enabled so stylix processes the wallpaper - hyprland module will override the config
+          targets.hyprland.enable = false;
           targets.vscode.profileNames = [ "default" ];
           targets.zen-browser.profileNames = [ "default" ];
 
