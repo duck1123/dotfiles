@@ -19,23 +19,12 @@ in
             bluetooth.enable = true;
             clojure.enable = true;
             common.enable = true;
-            dconf.enable = false;
-            developer.enable = false;
             docker.enable = true;
-            dunst.enable = false;
             emacs.enable = true;
-            emacs-prelude.enable = false;
-            email.enable = false;
-            flipper.enable = false;
             font.enable = true;
-            gaming.enable = false;
             git.enable = true;
-            gnome.enable = false;
             hyprland.enable = true;
             hyprpanel.enable = true;
-            i3.enable = false;
-            java.enable = false;
-            jujutsu.enable = false;
 
             kubernetes = {
               client.enable = true;
@@ -49,17 +38,9 @@ in
               server.enable = true;
             };
 
-            music.enable = false;
-            ncmpcpp.enable = false;
             network.enable = true;
-            nfs.enable = false;
             nix.enable = true;
-            nostr.enable = false;
             nushell.enable = true;
-            office.enable = false;
-            pictures.enable = false;
-            radio.enable = false;
-            samba.enable = false;
             sddm.enable = true;
             sound.enable = true;
             ssh.enable = true;
@@ -78,11 +59,7 @@ in
             };
 
             tailscale.enable = true;
-            touch.enable = false;
-            vim.enable = false;
-            virtualization.enable = false;
-            vscode.enable = true;
-            waybar.enable = false;
+            vscode.enable = false;
             xserver.enable = true;
             zsh.enable = true;
           };
