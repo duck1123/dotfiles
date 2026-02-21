@@ -125,6 +125,7 @@
           enable = true;
           enable32Bit = true;
           extraPackages = with pkgs; [
+            mesa.drivers
             rocmPackages.clr.icd
             rocmPackages.rocm-device-libs
           ];
