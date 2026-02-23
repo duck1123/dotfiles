@@ -174,6 +174,7 @@ in
               "/mnt/music" = nasMount "Music";
               "/mnt/photos" = nasMount "Photos";
               "/mnt/roms" = nasMount "Roms";
+              "/mnt/slskd_downloads" = nasMount "slskd_downloads";
               "/mnt/tv" = nasMount "TV";
               "/mnt/videos" = nasMount "Videos";
             };
