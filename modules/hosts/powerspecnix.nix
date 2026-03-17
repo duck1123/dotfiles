@@ -64,7 +64,6 @@ in
             nix.enable = true;
             nostr.enable = true;
             nushell.enable = true;
-            office.enable = true;
             pictures.enable = true;
             radio.enable = false;
             sddm.enable = true;
