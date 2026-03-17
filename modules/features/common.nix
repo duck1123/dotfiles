@@ -45,13 +45,13 @@
             # google-chrome
             # graphviz
             # gum
+            fastfetch
             hstr
             htop
             keepassxc
             lens
             libnotify
             mosh
-            neofetch
             nerdfetch
             nh
             nix-tree

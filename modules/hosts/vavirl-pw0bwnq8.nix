@@ -107,7 +107,6 @@ in
             git
             gitu
             htop
-            neofetch
             nh
             silver-searcher
             sqlcmd
