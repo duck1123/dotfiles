@@ -75,8 +75,6 @@ in
         home = {
           packages = with pkgs; [
             cheese
-            discord
-            nerdfetch
           ];
           sessionPath = [
             "$HOME/.cargo/bin:$PATH"

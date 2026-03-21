@@ -86,7 +86,6 @@ in
         home = {
           packages = with pkgs; [
             guake
-            nerdfetch
           ];
           sessionPath = [
             "$HOME/.cargo/bin:$PATH"

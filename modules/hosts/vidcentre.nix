@@ -102,17 +102,14 @@ in
       };
 
     homeManager.${hostname} =
-      { config, pkgs, ... }:
+      { config, ... }:
       {
         host = config.hosts.${hostname};
 
-        home = {
-          packages = with pkgs; [ nerdfetch ];
-          sessionPath = [
-            "$HOME/.cargo/bin:$PATH"
-            "$HOME/.local/bin:$PATH"
-          ];
-        };
+        home.sessionPath = [
+          "$HOME/.cargo/bin:$PATH"
+          "$HOME/.local/bin:$PATH"
+        ];
       };
 
     nixos.${hostname} =
