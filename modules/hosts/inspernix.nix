@@ -312,7 +312,7 @@ in
           inherit (specialisations) gnome;
           # inherit (specialisations) hyprland;
           # inherit (specialisations) i3;
-          # inherit (specialisations) plasma6;
+          inherit (specialisations) plasma6;
         };
       };
   };
