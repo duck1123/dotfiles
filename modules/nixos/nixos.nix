@@ -3,7 +3,6 @@
   flake.modules.nixos.nixos =
     { ... }:
     {
-      # Base nixos module - empty by default
-      system.stateVersion = "26.05";
+      # Keep this module available for compatibility; stateVersion is provided via nixos.base
     };
 }

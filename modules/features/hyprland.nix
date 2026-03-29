@@ -8,7 +8,12 @@
     simpleFeature { inherit inputs lib; } "hyprland feature";
 
   flake.modules.homeManager.hyprland =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       config = lib.mkIf config.host.features.hyprland.enable {
         home.packages = with pkgs; [

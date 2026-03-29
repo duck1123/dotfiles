@@ -9,7 +9,6 @@ let
         {
           networking.hostName = lib.mkDefault name;
           nixpkgs.hostPlatform = lib.mkDefault system;
-          system.stateVersion = "26.05";
         }
         inputs.self.modules.nixos.${cls}
         inputs.self.modules.nixos.${name}
