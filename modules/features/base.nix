@@ -35,6 +35,7 @@ in
           emacs
           emacs-prelude
           email
+          environments-gnome
           flipper
           gaming
           git
