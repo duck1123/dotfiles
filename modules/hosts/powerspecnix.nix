@@ -333,6 +333,10 @@ in
             # still possible to use this option, but it's recommended to use it in conjunction
             # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
             useDHCP = lib.mkDefault true;
+
+            # Use Pi-hole for DNS regardless of what DHCP hands out.
+            # Pi-hole provides split-horizon resolution for *.local and *.dev.kronkltd.net.
+            nameservers = [ "192.168.0.242" "8.8.8.8" "1.1.1.1" ];
           };
 
           nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
