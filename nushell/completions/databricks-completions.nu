@@ -261,3 +261,10 @@ export extern "databricks workspace update-permissions" []
 
 export extern "databricks workspace-bindings" []
 export extern "databricks workspace-conf" []
+
+
+export extern "dbsqlcli" [
+
+] {
+
+}
