@@ -181,7 +181,7 @@ in
               kernelModules = [ ];
             };
 
-            kernelModules = [ "kvm-amd" ];
+            kernelModules = [ "kvm-amd" "ntsync" ];
           };
 
           fileSystems = {
