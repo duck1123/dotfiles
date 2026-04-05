@@ -72,7 +72,6 @@
           # podman-desktop
           # podman-tui
           # postman
-          # python3
           runme
           sqlite
           sops

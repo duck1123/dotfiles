@@ -51,6 +51,7 @@ in
           nushell
           office
           pictures
+          python
           radio
           starship
           stylix
