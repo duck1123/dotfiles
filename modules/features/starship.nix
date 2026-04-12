@@ -25,7 +25,7 @@
               add_newline = true;
 
               format = ''
-                $shlvl$username$hostname$kubernetes$git_branch$git_commit$git_state$git_status$directory$nix_shell$jobs
+                $shlvl$username$hostname$kubernetes$git_branch$git_commit$git_state$git_status$directory$python$nix_shell$jobs
                 $cmd_duration$shell$character'';
 
               character = {
