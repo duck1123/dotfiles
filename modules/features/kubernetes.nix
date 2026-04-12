@@ -38,6 +38,15 @@
             description = "Enable GPU support for Kubernetes pods (amd or nvidia)";
           };
           dualStack = simpleFeature { inherit inputs lib; } "IPv6 dual-stack networking";
+          extraK3sFlags = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = ''
+              Extra k3s CLI flags appended after the defaults. For dual-stack, you often need a
+              host IPv6 address on some interface; if k3s fails with "no IPv6 address was found on node",
+              enable IPv6 on the NIC or set e.g. "--node-ip=192.168.0.1,2001:db8:…" here (see k3s dual-stack docs).
+            '';
+          };
         };
       };
       default = { };
@@ -141,25 +150,25 @@
               isAgent = (kubernetes.token != null || tokenPath != null) && kubernetes.serverAddr != null;
               isDualStack = kubernetes.dualStack.enable;
               baseFlags =
-                if isAgent then
-                  [ ]
-                else
-                  [
-                    (
-                      if isDualStack then
-                        "--cluster-cidr=10.42.0.0/16,fd42:42:42::/56"
-                      else
-                        "--cluster-cidr=10.42.0.0/16"
-                    )
-                    (
-                      if isDualStack then
-                        "--service-cidr=10.43.0.0/16,fd43:43:43::/112"
-                      else
-                        "--service-cidr=10.43.0.0/16"
-                    )
-                    "--disable=traefik"
-                  ]
-                  ++ lib.optional isDualStack "--flannel-ipv6-masq";
+                (
+                  if isAgent then
+                    [ ]
+                  else
+                    [
+                      (
+                        if isDualStack then "--cluster-cidr=10.42.0.0/16,fd42:42:42::/56" else "--cluster-cidr=10.42.0.0/16"
+                      )
+                      (
+                        if isDualStack then
+                          "--service-cidr=10.43.0.0/16,fd43:43:43::/112"
+                        else
+                          "--service-cidr=10.43.0.0/16"
+                      )
+                      "--disable=traefik"
+                    ]
+                    ++ lib.optional isDualStack "--flannel-ipv6-masq"
+                )
+                ++ kubernetes.extraK3sFlags;
             in
             {
               enable = true;
