@@ -53,7 +53,7 @@ in
             stylix.enable = true;
 
             syncthing = {
-              enable = true;
+              enable = false;
               shares = {
                 camera.enable = false;
                 keepass.enable = true;
@@ -62,7 +62,7 @@ in
               };
             };
 
-            tailscale.enable = true;
+            tailscale.enable = false;
             touch.enable = true;
             vim.enable = false;
             virtualization.enable = false;
@@ -105,7 +105,6 @@ in
             bat
             direnv
             git
-            gitu
             htop
             nh
             silver-searcher
