@@ -57,7 +57,7 @@ in
               server.enable = false;
             };
 
-            music.enable = false;
+            music.enable = true;
             ncmpcpp.enable = false;
             network.enable = true;
             nfs.enable = false;
