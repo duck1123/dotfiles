@@ -184,7 +184,7 @@
               serverAddr = kubernetes.serverAddr;
             }
             // {
-              extraFlags = toString baseFlags;
+              extraFlags = baseFlags;
             };
 
           openiscsi = {
