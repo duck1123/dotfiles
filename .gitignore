@@ -14,3 +14,8 @@ programs/emacs/transient
 programs/emacs/workspace
 /result
 .aider*
+
+# kubernetes/manifests/ is a separate git checkout of the private manifests repo
+kubernetes/manifests/
+# plaintext decrypted secrets (never commit)
+secrets/k8s.yaml

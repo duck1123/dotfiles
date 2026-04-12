@@ -73,6 +73,7 @@
         flake-parts.follows = "flake-parts";
         flake-utils.follows = "flake-utils";
         make-shell.follows = "make-shell";
+        nix-csi.follows = "nix-csi";
         nix-fetcher-data.follows = "nix-fetcher-data";
         nix-kube-generators.follows = "nix-kube-generators";
         nixidy.follows = "nixidy";
@@ -107,6 +108,11 @@
       url = "github:jlesquembre/nix-fetcher-data";
     };
 
+    nix-csi = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:Lillecarl/nix-csi";
+    };
+
     nix-kube-generators.url = "github:farcaller/nix-kube-generators";
 
     nixhelm = {
@@ -125,7 +131,7 @@
         nix-kube-generators.follows = "nix-kube-generators";
         nixpkgs.follows = "nixpkgs";
       };
-      url = "github:duck1123/nixidy?ref=feature/chmod";
+      url = "github:arnarg/nixidy";
     };
 
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";

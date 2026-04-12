@@ -744,7 +744,9 @@
         "make-shell": [
           "make-shell"
         ],
-        "nix-csi": "nix-csi",
+        "nix-csi": [
+          "nix-csi"
+        ],
         "nix-fetcher-data": [
           "nix-fetcher-data"
         ],
@@ -837,7 +839,6 @@
         "easykubenix": "easykubenix",
         "flake-compatish": "flake-compatish",
         "nixpkgs": [
-          "k3s-fleetops",
           "nixpkgs"
         ],
         "treefmt-nix": "treefmt-nix"
@@ -939,16 +940,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1751730551,
-        "narHash": "sha256-KwgMlGqIyuALFJ1YFPa+h9hC+pNVOr7GI+GAJT1m0X4=",
-        "owner": "duck1123",
+        "lastModified": 1774341194,
+        "narHash": "sha256-Vwj9Dq3LjbBlt3aIcCoAUI/kiCZcgVzFfY+Yb4k0jSI=",
+        "owner": "arnarg",
         "repo": "nixidy",
-        "rev": "f43e82949e93bd0212198195e402ec7fb835805a",
+        "rev": "d7e5a3c338c8cdb4f85248ba7637dc38c9d1615a",
         "type": "github"
       },
       "original": {
-        "owner": "duck1123",
-        "ref": "feature/chmod",
+        "owner": "arnarg",
         "repo": "nixidy",
         "type": "github"
       }
@@ -1114,6 +1114,7 @@
         "k3s-fleetops": "k3s-fleetops",
         "kubenix": "kubenix",
         "make-shell": "make-shell",
+        "nix-csi": "nix-csi",
         "nix-fetcher-data": "nix-fetcher-data",
         "nix-kube-generators": "nix-kube-generators",
         "nixhelm": "nixhelm",
@@ -1315,7 +1316,6 @@
     "treefmt-nix": {
       "inputs": {
         "nixpkgs": [
-          "k3s-fleetops",
           "nix-csi",
           "nixpkgs"
         ]

@@ -433,4 +433,44 @@
   {:doc  "Wipe k3s directories"
    :task (do
            (shell "sudo rm -rf /etc/rancher/k3s")
-           (shell "sudo rm -rf /var/lib/rancher/k3s"))}}}
+           (shell "sudo rm -rf /var/lib/rancher/k3s"))}
+
+  ;; -----------------------------------------------------------------------
+  ;; Kubernetes manifest management (nixidy + private manifests repo)
+  ;; Prerequisites: kubernetes/manifests/ must be a checkout of your private
+  ;;                manifests repo. Clone it once with:
+  ;;                  git clone <url> kubernetes/manifests
+  ;; -----------------------------------------------------------------------
+
+  k8s-switch-charts
+  {:doc "Build nixidy manifests and write to kubernetes/manifests/"
+   :task (shell "sh scripts/k8s-switch-charts.sh")}
+
+  k8s-push
+  {:doc "Commit and push generated manifests to the private manifests repo"
+   :task (shell "sh scripts/k8s-push-manifests.sh")}
+
+  k8s-deploy
+  {:doc "Build manifests and push to private repo (switch-charts + push)"
+   :depends [k8s-switch-charts k8s-push]}
+
+  k8s-decrypt
+  {:doc "Decrypt kubernetes secrets to secrets/k8s.yaml (plaintext — do not commit)"
+   :task (shell "sops --decrypt secrets/k8s.enc.yaml > secrets/k8s.yaml")}
+
+  k8s-encrypt
+  {:doc "Encrypt secrets/k8s.yaml back to secrets/k8s.enc.yaml"
+   :task (shell "sops --encrypt secrets/k8s.yaml > secrets/k8s.enc.yaml")}
+
+  k8s-edit-secrets
+  {:doc "Edit kubernetes secrets in-place (no plaintext file written)"
+   :task (shell "sops secrets/k8s.enc.yaml")}
+
+  ;; ArgoCD bootstrap — run once after installing ArgoCD, before the first sync
+  k8s-generate-deploy-key
+  {:doc "Generate SSH deploy key pair for argo-manifests (add public key to GitHub, private key to secrets)"
+   :task (shell "sh scripts/k8s-generate-deploy-key.sh")}
+
+  k8s-bootstrap-argocd-repo
+  {:doc "Apply ArgoCD repository credential for argo-manifests (one-time bootstrap, needs kubectl)"
+   :task (shell "sh scripts/k8s-bootstrap-argocd-repo.sh")}}}

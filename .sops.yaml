@@ -12,7 +12,14 @@ keys:
   - &ssh_host_key age1d32pykvc4a7ed6dcgey8xuj0s63tt9cjne878cf5mp0drez6uels9006ln
   - &server_inspernix age1jzj26nv7682hc86huyz89vhxyggz4lxyhquqzcrd2rp230n083dqvz7hma
   - &server_nasnix age1rp6t6g2kmqcrrxk9h4m2zrrg5q84ztursacf2sq45kt6c944nqwszdu6t3
+  # Primary age key used by k3s-fleetops / kubernetes secrets
+  - &k8s_primary age1n372e8dgautnjhecllf7uvvldw9g6vyx3kggj0kyduz5jr2upvysue242c
 creation_rules:
+  # kubernetes secrets — encrypted with the k8s primary key only (matches k3s-fleetops convention)
+  - path_regex: secrets/k8s\.enc\.(yaml|json)$
+    key_groups:
+    - age:
+      - *k8s_primary
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
     - age:
