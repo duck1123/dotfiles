@@ -37,6 +37,7 @@
             default = null;
             description = "Enable GPU support for Kubernetes pods (amd or nvidia)";
           };
+          dualStack = simpleFeature { inherit inputs lib; } "IPv6 dual-stack networking";
         };
       };
       default = { };
@@ -138,14 +139,27 @@
               # Use sops secret path if tokenFile is set, otherwise use plain token
               tokenPath = if kubernetes.tokenFile != null then config.sops.secrets.k3s-token.path else null;
               isAgent = (kubernetes.token != null || tokenPath != null) && kubernetes.serverAddr != null;
+              isDualStack = kubernetes.dualStack.enable;
               baseFlags =
                 if isAgent then
                   [ ]
                 else
                   [
-                    "--cluster-cidr=10.42.0.0/16"
+                    (
+                      if isDualStack then
+                        "--cluster-cidr=10.42.0.0/16,fd42:42:42::/56"
+                      else
+                        "--cluster-cidr=10.42.0.0/16"
+                    )
+                    (
+                      if isDualStack then
+                        "--service-cidr=10.43.0.0/16,fd43:43:43::/112"
+                      else
+                        "--service-cidr=10.43.0.0/16"
+                    )
                     "--disable=traefik"
-                  ];
+                  ]
+                  ++ lib.optional isDualStack "--flannel-ipv6-masq";
             in
             {
               enable = true;

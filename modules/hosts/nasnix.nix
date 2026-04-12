@@ -30,6 +30,7 @@ in
             kubernetes = {
               client.enable = true;
               server.enable = true;
+              dualStack.enable = true;
             };
 
             network.enable = true;
