@@ -39,7 +39,6 @@
             with melpa;
             [
               ag
-              # ac-cider
               auto-complete
               cider
               clojure-mode
@@ -53,10 +52,8 @@
               general
               go-mode
               gradle-mode
-              # helm-descbinds
               helm-make
               helm-projectile
-              kubernetes
               lsp-mode
               lsp-ui
               magit
@@ -65,7 +62,6 @@
               nushell-ts-mode
               nvm
               nyan-mode
-              # org
               org-ql
               org-roam
               org-roam-ui
@@ -79,9 +75,7 @@
               smartparens
               terraform-mode
               tree-sitter
-              # use-package
               which-key
-              # windmove
               windswap
               yaml-mode
             ]
@@ -285,12 +279,6 @@
                 :init
                 (rainbow-delimiters-mode-enable))
 
-              ;; (use-package reformatter
-              ;;   :ensure t
-              ;;   :config
-              ;;   (reformatter-define nix-format :program "nixpkgs-fmt")
-              ;;   (add-hook 'nix-mode-hook #'nix-format-on-save-mode))
-
               (use-package lsp-mode
                 :ensure t
                 :commands (lsp lsp-deferred)
@@ -353,7 +341,6 @@
                 #'(lambda ()
                   (substitute-key-definition 'eshell-list-history 'helm-eshell-history eshell-mode-map)))
               (substitute-key-definition 'find-tag 'helm-etags-select global-map)
-              ;; (helm-descbinds-mode)
 
               (projectile-mode +1)
 
