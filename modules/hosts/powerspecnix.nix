@@ -336,7 +336,7 @@ in
 
             # Use Pi-hole for DNS regardless of what DHCP hands out.
             # Pi-hole provides split-horizon resolution for *.local and *.dev.kronkltd.net.
-            nameservers = [ "192.168.0.242" "8.8.8.8" "1.1.1.1" ];
+            # nameservers = [ "192.168.0.242" "8.8.8.8" "1.1.1.1" ];
           };
 
           nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
