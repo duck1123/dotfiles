@@ -79,18 +79,29 @@
           allowedUDPPorts = [ 8472 ];
         };
 
-        # Set up sops secret for k3s token if tokenFile is specified
-        sops.secrets = lib.mkIf (config.host.features.kubernetes.tokenFile != null) {
-          k3s-token = {
-            sopsFile = config.host.features.kubernetes.tokenFile;
-            key = "k3s_token";
-            path = "/run/secrets/k3s-token";
-            mode = "0400";
-            owner = "root";
-            group = "root";
-            restartUnits = [ "k3s.service" ];
-          };
-        };
+        sops.secrets = lib.mkMerge [
+          # ArgoCD SSH deploy key — used by the bootstrap service to register argo-manifests
+          {
+            argocd-deploy-key = {
+              sopsFile = ./../../secrets/k8s.enc.yaml;
+              key = "argocd/sshDeployKey";
+              path = "/run/secrets/argocd-deploy-key";
+              mode = "0400";
+            };
+          }
+          # k3s join token — only needed when joining an existing cluster
+          (lib.mkIf (config.host.features.kubernetes.tokenFile != null) {
+            k3s-token = {
+              sopsFile = config.host.features.kubernetes.tokenFile;
+              key = "k3s_token";
+              path = "/run/secrets/k3s-token";
+              mode = "0400";
+              owner = "root";
+              group = "root";
+              restartUnits = [ "k3s.service" ];
+            };
+          })
+        ];
 
         # Trim the token file using a systemd service that runs before k3s
         systemd.services."k3s-token-trim" = lib.mkIf (config.host.features.kubernetes.tokenFile != null) {
@@ -191,6 +202,114 @@
             enable = true;
             name = "${config.host.hostname}-initiatorhost";
           };
+        };
+
+        # Bootstrap services — idempotent, run on every boot, safe to re-run via kubectl apply.
+        # Ordering: k3s → install ArgoCD → register repo credential → apply root Application.
+        systemd.services.k8s-install-argocd = {
+          description = "Bootstrap: install ArgoCD into the k3s cluster";
+          after = [
+            "k3s.service"
+            "network-online.target"
+          ];
+          wants = [ "network-online.target" ];
+          wantedBy = [ "multi-user.target" ];
+          environment.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          script = ''
+            until ${pkgs.k3s}/bin/k3s kubectl get nodes >/dev/null 2>&1; do
+              echo "Waiting for k3s API..."
+              sleep 5
+            done
+            # Skip the heavy network fetch if ArgoCD is already installed
+            if ${pkgs.k3s}/bin/k3s kubectl get deployment argocd-server -n argocd >/dev/null 2>&1; then
+              echo "ArgoCD already installed, skipping"
+              exit 0
+            fi
+            ${pkgs.k3s}/bin/k3s kubectl create namespace argocd --dry-run=client -o yaml \
+              | ${pkgs.k3s}/bin/k3s kubectl apply -f -
+            ${pkgs.k3s}/bin/k3s kubectl apply -n argocd \
+              -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+          '';
+        };
+
+        systemd.services.k8s-bootstrap-argocd-repo = {
+          description = "Bootstrap: register argo-manifests SSH credential with ArgoCD";
+          after = [ "k8s-install-argocd.service" ];
+          requires = [ "k8s-install-argocd.service" ];
+          wantedBy = [ "multi-user.target" ];
+          environment.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          script = ''
+            # kubectl apply is idempotent — safe to re-apply the credential on every boot
+            ${pkgs.k3s}/bin/k3s kubectl apply -f - <<EOF
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: argo-manifests-repo-creds
+              namespace: argocd
+              labels:
+                argocd.argoproj.io/secret-type: repository
+            stringData:
+              type: git
+              url: git@github.com:duck1123/argo-manifests.git
+              sshPrivateKey: |
+            $(sed 's/^/    /' /run/secrets/argocd-deploy-key)
+            EOF
+          '';
+        };
+
+        systemd.services.k8s-apply-master-application = {
+          description = "Bootstrap: apply ArgoCD 00-master root Application pointing at argo-manifests";
+          after = [ "k8s-bootstrap-argocd-repo.service" ];
+          requires = [ "k8s-bootstrap-argocd-repo.service" ];
+          wantedBy = [ "multi-user.target" ];
+          environment.KUBECONFIG = "/etc/rancher/k3s/k3s.yaml";
+          serviceConfig = {
+            Type = "oneshot";
+            RemainAfterExit = true;
+          };
+          script =
+            let
+              masterApp = pkgs.writeText "00-master.yaml" ''
+                apiVersion: argoproj.io/v1alpha1
+                kind: Application
+                metadata:
+                  name: 00-master
+                  namespace: argocd
+                spec:
+                  destination:
+                    namespace: argocd
+                    server: https://kubernetes.default.svc
+                  project: default
+                  source:
+                    directory:
+                      jsonnet: {}
+                      recurse: true
+                    path: dev/apps
+                    repoURL: git@github.com:duck1123/argo-manifests.git
+                    targetRevision: master
+                  syncPolicy:
+                    automated:
+                      prune: true
+                      selfHeal: true
+                    syncOptions:
+                      - CreateNamespace=true
+              '';
+            in
+            ''
+              until ${pkgs.k3s}/bin/k3s kubectl get crd applications.argoproj.io >/dev/null 2>&1; do
+                echo "Waiting for ArgoCD CRDs..."
+                sleep 5
+              done
+              ${pkgs.k3s}/bin/k3s kubectl apply -f ${masterApp}
+            '';
         };
 
         system.activationScripts.makeUsrBinSymlinks = ''
