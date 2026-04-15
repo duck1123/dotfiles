@@ -16,6 +16,7 @@
           profiles.default.userSettings = {
             "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
             "calva.paredit.defaultKeyMap" = "original";
+            "claudeCode.preferredLocation" =  "panel";
             "diffEditor.hideUnchangedRegions.enabled" = true;
             "direnv.restart.automatic" = true;
             "editor.renderWhitespace" = "trailing";
