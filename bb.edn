@@ -562,4 +562,8 @@
 
   k8s-bootstrap-argocd-repo
   {:doc "Apply ArgoCD repository credential for argo-manifests (one-time bootstrap, needs kubectl)"
-   :task (shell "sh scripts/k8s-bootstrap-argocd-repo.sh")}}}
+   :task (shell "sh scripts/k8s-bootstrap-argocd-repo.sh")}
+
+  apply-master-application
+  {:doc "Apply the 00-master ArgoCD root Application (points ArgoCD at argo-manifests/dev/apps)"
+   :task (shell "kubectl apply -f kubernetes/bootstrap/00-master.yaml")}}}
