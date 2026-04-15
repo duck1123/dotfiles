@@ -38,6 +38,7 @@
             description = "Enable GPU support for Kubernetes pods (amd or nvidia)";
           };
           dualStack = simpleFeature { inherit inputs lib; } "IPv6 dual-stack networking";
+          argocdBootstrap = simpleFeature { inherit inputs lib; } "bootstrap ArgoCD and apply 00-master root Application on first boot";
           extraK3sFlags = mkOption {
             type = types.listOf types.str;
             default = [ ];
@@ -80,15 +81,15 @@
         };
 
         sops.secrets = lib.mkMerge [
-          # ArgoCD SSH deploy key — used by the bootstrap service to register argo-manifests
-          {
+          # ArgoCD SSH deploy key — decrypted only when bootstrap is enabled
+          (lib.mkIf config.host.features.kubernetes.argocdBootstrap.enable {
             argocd-deploy-key = {
               sopsFile = ./../../secrets/k8s.enc.yaml;
               key = "argocd/sshDeployKey";
               path = "/run/secrets/argocd-deploy-key";
               mode = "0400";
             };
-          }
+          })
           # k3s join token — only needed when joining an existing cluster
           (lib.mkIf (config.host.features.kubernetes.tokenFile != null) {
             k3s-token = {
@@ -204,9 +205,10 @@
           };
         };
 
-        # Bootstrap services — idempotent, run on every boot, safe to re-run via kubectl apply.
+        # Bootstrap services — enabled via kubernetes.argocdBootstrap.enable.
+        # Idempotent: safe to re-run on every boot via kubectl apply.
         # Ordering: k3s → install ArgoCD → register repo credential → apply root Application.
-        systemd.services.k8s-install-argocd = {
+        systemd.services.k8s-install-argocd = lib.mkIf config.host.features.kubernetes.argocdBootstrap.enable {
           description = "Bootstrap: install ArgoCD into the k3s cluster";
           after = [
             "k3s.service"
@@ -236,7 +238,7 @@
           '';
         };
 
-        systemd.services.k8s-bootstrap-argocd-repo = {
+        systemd.services.k8s-bootstrap-argocd-repo = lib.mkIf config.host.features.kubernetes.argocdBootstrap.enable {
           description = "Bootstrap: register argo-manifests SSH credential with ArgoCD";
           after = [ "k8s-install-argocd.service" ];
           requires = [ "k8s-install-argocd.service" ];
@@ -265,7 +267,7 @@
           '';
         };
 
-        systemd.services.k8s-apply-master-application = {
+        systemd.services.k8s-apply-master-application = lib.mkIf config.host.features.kubernetes.argocdBootstrap.enable {
           description = "Bootstrap: apply ArgoCD 00-master root Application pointing at argo-manifests";
           after = [ "k8s-bootstrap-argocd-repo.service" ];
           requires = [ "k8s-bootstrap-argocd-repo.service" ];
