@@ -88,6 +88,29 @@ export extern "databricks ip-access-lists" []
 
 export extern "databricks jobs" []
 
+# Cancel all runs of a job.
+export extern "databricks jobs cancel-all-runs" []
+
+export extern "databricks jobs cancel-run" []
+export extern "databricks jobs create" []
+export extern "databricks jobs delete" []
+export extern "databricks jobs delete-run" []
+export extern "databricks jobs export-run" []
+export extern "databricks jobs get" [
+  job_id # The canonical identifier of the job to retrieve information about.
+]
+export extern "databricks jobs get-run" []
+export extern "databricks jobs get-run-output" []
+export extern "databricks jobs list" []
+export extern "databricks jobs list-runs" []
+export extern "databricks jobs repair-run" []
+export extern "databricks jobs reset" []
+export extern "databricks jobs run-now" []
+export extern "databricks jobs submit" []
+export extern "databricks jobs update" []
+
+
+
 export extern "databricks labs" []
 export extern "databricks lakeview" []
 export extern "databricks lakeview create" []
