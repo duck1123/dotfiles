@@ -98,6 +98,7 @@ in
         home = {
           username = "${username}";
           homeDirectory = "/home/${username}";
+          sessionPath = [ "$HOME/.local/bin" ];
 
           file.".bb/bb.edn".source = ../../bb.edn;
 
