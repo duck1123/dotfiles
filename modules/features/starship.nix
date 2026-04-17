@@ -39,7 +39,7 @@
               };
 
               directory = {
-                format = "[$path]($style)[$read_only]($read_only_style)";
+                format = "[$path]($style)[$read_only]($read_only_style) ";
                 read_only = "";
                 truncation_length = 0;
               };
@@ -61,6 +61,7 @@
                 style = "bright-purple bold";
               };
               git_status = {
+                format = "[$all_status$ahead_behind]($style) ";
                 style = "bright-yellow bold";
               };
 
@@ -97,7 +98,7 @@
 
               shlvl = {
                 disabled = false;
-                format = "[$symbol$shlvl]($style)";
+                format = "[$symbol$shlvl]($style) ";
                 symbol = "ﰬ";
                 style = "bright-red bold";
               };
