@@ -27,6 +27,15 @@ in
       ];
     };
 
+    "duck@nixmini" = homeManagerConfiguration {
+      inherit pkgs;
+      extraSpecialArgs = { inherit inputs pkgs; };
+      modules = with homeManager; [
+        base
+        nixmini
+      ];
+    };
+
     "duck@edgenix" = homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = { inherit inputs pkgs; };
