@@ -11,10 +11,10 @@
     { config, lib, ... }:
     {
       config = lib.mkIf config.host.features.sleep.enable {
-        services.logind = {
-          lidSwitch = "ignore";
-          lidSwitchDocked = "ignore";
-          settings.Login.HandleSuspendKey = "ignore";
+        services.logind.settings.Login = {
+          HandleLidSwitch = "ignore";
+          HandleLidSwitchDocked = "ignore";
+          HandleSuspendKey = "ignore";
         };
 
         systemd.sleep.settings.Sleep = {
