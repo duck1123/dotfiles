@@ -185,30 +185,15 @@
 
   switch-home
   {:description "Update home-manager from flake"
-   :task
-   (let [result (shell {:continue true} "nh home switch . -b backup -- --show-trace")]
-     (when (not= 0 (:exit result))
-       (binding [*out* *err*]
-         (println (str "switch-home failed (exit " (:exit result) ")")))
-       (System/exit (:exit result))))}
+   :task        (shell (str "home-manager switch --flake . -b backup." (System/currentTimeMillis) " --show-trace"))}
 
   switch-os
   {:description "Update nixos from flake (builds and activates immediately)"
-   :task
-   (let [result (shell {:continue true} "nh os switch . -- --show-trace")]
-     (when (not= 0 (:exit result))
-       (binding [*out* *err*]
-         (println (str "switch-os failed (exit " (:exit result) ")")))
-       (System/exit (:exit result))))}
+   :task        (shell "sudo nixos-rebuild switch --flake . --show-trace")}
 
   boot-os
   {:description "Build nixos config and set as boot default (activates on reboot, avoids activation timeouts)"
-   :task
-   (let [result (shell {:continue true} "nh os boot . -- --show-trace")]
-     (when (not= 0 (:exit result))
-       (binding [*out* *err*]
-         (println (str "boot-os failed (exit " (:exit result) ")")))
-       (System/exit (:exit result))))}
+   :task        (shell "sudo nixos-rebuild boot --flake . --show-trace")}
 
   bootstrap-os
   {:doc  "Apply NixOS config on a fresh install where nix-command is not yet enabled"
