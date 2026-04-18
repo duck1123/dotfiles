@@ -358,7 +358,7 @@
                  (println (str "Copying to edgenix: " activation-path))
                  (shell (str "nix copy --to ssh://edgenix " activation-path))
                  (println "Activating on edgenix...")
-                 (shell (str "ssh edgenix " activation-path "/activate")))
+                 (shell (str "ssh edgenix 'HOME_MANAGER_BACKUP_EXT=backup.$(date +%s) " activation-path "/activate'")))
                (println "ERROR: Failed to build activation package or invalid path"))))}
 
   switch-remote-home-nasnix
@@ -372,7 +372,7 @@
                  (println (str "Copying to nasnix: " activation-path))
                  (shell (str "nix copy --to ssh://nasnix " activation-path))
                  (println "Activating on nasnix...")
-                 (shell (str "ssh nasnix " activation-path "/activate")))
+                 (shell (str "ssh nasnix 'HOME_MANAGER_BACKUP_EXT=backup.$(date +%s) " activation-path "/activate'")))
                (println "ERROR: Failed to build activation package or invalid path"))))}
 
   switch-remote-os-nixmini
@@ -400,7 +400,7 @@
                  (println (str "Copying to nixmini: " activation-path))
                  (shell (str "nix copy --to ssh://nixmini " activation-path))
                  (println "Activating on nixmini...")
-                 (shell (str "ssh nixmini " activation-path "/activate")))
+                 (shell (str "ssh nixmini 'HOME_MANAGER_BACKUP_EXT=backup.$(date +%s) " activation-path "/activate'")))
                (println "ERROR: Failed to build activation package or invalid path"))))}
 
   k3d-create-registry

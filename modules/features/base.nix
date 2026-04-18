@@ -108,6 +108,7 @@ in
           inputs.self.modules.generic.options
           inputs.sops-nix.nixosModules.sops
           inputs.stylix.nixosModules.stylix
+          { home-manager.backupFileExtension = "backup"; }
         ];
       };
   };
