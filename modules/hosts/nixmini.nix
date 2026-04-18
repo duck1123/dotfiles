@@ -43,6 +43,7 @@ in
             nushell.enable = true;
             sddm.enable = true;
             sound.enable = true;
+            sleep.enable = true;
             ssh.enable = true;
             starship.enable = true;
             stylix.enable = true;
