@@ -184,16 +184,31 @@
   {:depends [switch-home switch-os]}
 
   switch-home
-  {:decription "Update home-manager from flake"
-   :task       (shell "nh home switch . -b backup")}
+  {:description "Update home-manager from flake"
+   :task
+   (let [result (shell {:continue true} "nh home switch . -b backup -- --show-trace")]
+     (when (not= 0 (:exit result))
+       (binding [*out* *err*]
+         (println (str "switch-home failed (exit " (:exit result) ")")))
+       (System/exit (:exit result))))}
 
   switch-os
-  {:decription "Update nixos from flake (builds and activates immediately)"
-   :task       (shell "nh os switch .")}
+  {:description "Update nixos from flake (builds and activates immediately)"
+   :task
+   (let [result (shell {:continue true} "nh os switch . -- --show-trace")]
+     (when (not= 0 (:exit result))
+       (binding [*out* *err*]
+         (println (str "switch-os failed (exit " (:exit result) ")")))
+       (System/exit (:exit result))))}
 
   boot-os
-  {:decription "Build nixos config and set as boot default (activates on reboot, avoids activation timeouts)"
-   :task       (shell "nh os boot .")}
+  {:description "Build nixos config and set as boot default (activates on reboot, avoids activation timeouts)"
+   :task
+   (let [result (shell {:continue true} "nh os boot . -- --show-trace")]
+     (when (not= 0 (:exit result))
+       (binding [*out* *err*]
+         (println (str "boot-os failed (exit " (:exit result) ")")))
+       (System/exit (:exit result))))}
 
   bootstrap-os
   {:doc  "Apply NixOS config on a fresh install where nix-command is not yet enabled"
