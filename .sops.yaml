@@ -8,6 +8,7 @@
 #   (powerspecnix user): age1pruk356e077spzmhvrv5frwehm65gx803663x474ppfm8adz4djqy9xmhk
 #   server_inspernix:   age1jzj26nv7682hc86huyz89vhxyggz4lxyhquqzcrd2rp230n083dqvz7hma
 #   server_nasnix:      age1rp6t6g2kmqcrrxk9h4m2zrrg5q84ztursacf2sq45kt6c944nqwszdu6t3
+#   server_nixmini:     age1at4ccl5tw3482vhugf3qr48e8qhspsx8qddh4xk3jt9qhff33uqqj2fh78
 #   k8s_primary:        age1n372e8dgautnjhecllf7uvvldw9g6vyx3kggj0kyduz5jr2upvysue242c
 creation_rules:
   # kubernetes secrets — encrypted for the k8s primary key and all server host keys
@@ -28,3 +29,4 @@ creation_rules:
       - age1pruk356e077spzmhvrv5frwehm65gx803663x474ppfm8adz4djqy9xmhk
       - age1jzj26nv7682hc86huyz89vhxyggz4lxyhquqzcrd2rp230n083dqvz7hma
       - age1rp6t6g2kmqcrrxk9h4m2zrrg5q84ztursacf2sq45kt6c944nqwszdu6t3
+      - age1at4ccl5tw3482vhugf3qr48e8qhspsx8qddh4xk3jt9qhff33uqqj2fh78
