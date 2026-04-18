@@ -189,7 +189,12 @@
 
   switch-os
   {:description "Update nixos from flake (builds and activates immediately)"
-   :task        (shell "sudo nixos-rebuild switch --flake . --show-trace")}
+   :task
+   (let [result (shell {:continue true} "sudo nixos-rebuild switch --flake . --show-trace")]
+     (when (not= 0 (:exit result))
+       (println "\n=== systemd journal (last 50 lines) ===")
+       (shell {:continue true} "journalctl -xe --no-pager -n 50")
+       (System/exit (:exit result))))}
 
   boot-os
   {:description "Build nixos config and set as boot default (activates on reboot, avoids activation timeouts)"
