@@ -195,6 +195,11 @@
   {:decription "Build nixos config and set as boot default (activates on reboot, avoids activation timeouts)"
    :task       (shell "nh os boot .")}
 
+  bootstrap-os
+  {:doc  "Apply NixOS config on a fresh install where nix-command is not yet enabled"
+   :task (shell {:extra-env {"NIX_CONFIG" "experimental-features = nix-command flakes"}}
+                "nh os boot .")}
+
   ;; Remote deployment tasks (build locally, push to remote)
   switch-remote
   {:doc     "Switch both NixOS and home-manager on edgenix and nasnix"
