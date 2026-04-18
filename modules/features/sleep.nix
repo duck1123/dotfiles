@@ -14,15 +14,15 @@
         services.logind = {
           lidSwitch = "ignore";
           lidSwitchDocked = "ignore";
-          extraConfig = "HandleSuspendKey=ignore";
+          settings.Login.HandleSuspendKey = "ignore";
         };
 
-        systemd.sleep.extraConfig = ''
-          AllowSuspend=no
-          AllowHibernation=no
-          AllowHybridSleep=no
-          AllowSuspendThenHibernate=no
-        '';
+        systemd.sleep.settings.Sleep = {
+          AllowSuspend = false;
+          AllowHibernation = false;
+          AllowHybridSleep = false;
+          AllowSuspendThenHibernate = false;
+        };
       };
     };
 }
