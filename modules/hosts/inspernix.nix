@@ -123,6 +123,10 @@ in
             gnome.gnome-keyring.enable = true;
             printing.enable = true;
           };
+          
+          networking.hosts = {
+            "192.168.0.25" = [ "nixmini" ];
+          };
 
           time.timeZone = "America/Detroit";
         };
