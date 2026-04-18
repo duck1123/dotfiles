@@ -323,8 +323,8 @@
   {:doc  "Build NixOS config locally with nom, then copy and switch on edgenix (prompts for sudo password)"
    :task (do
            (println "Building NixOS configuration for edgenix with nom...")
-           (shell "sh -c 'nom build .#nixosConfigurations.edgenix.config.system.build.toplevel --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/edgenix-system-path.txt'")
-           (let [system-path (str/trim (slurp "/tmp/edgenix-system-path.txt"))]
+           (shell "nom build .#nixosConfigurations.edgenix.config.system.build.toplevel --out-link /tmp/edgenix-system-result")
+           (let [system-path (str/trim (slurp "/tmp/edgenix-system-result"))]
              (if (and system-path (str/starts-with? system-path "/nix/store"))
                (do
                  (println (str "Copying system to edgenix: " system-path))
@@ -337,8 +337,8 @@
   {:doc  "Build NixOS config locally with nom, then copy and switch on nasnix (prompts for sudo password)"
    :task (do
            (println "Building NixOS configuration for nasnix with nom...")
-           (shell "sh -c 'nom build .#nixosConfigurations.nasnix.config.system.build.toplevel --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/nasnix-system-path.txt'")
-           (let [system-path (str/trim (slurp "/tmp/nasnix-system-path.txt"))]
+           (shell "nom build .#nixosConfigurations.nasnix.config.system.build.toplevel --out-link /tmp/nasnix-system-result")
+           (let [system-path (str/trim (slurp "/tmp/nasnix-system-result"))]
              (if (and system-path (str/starts-with? system-path "/nix/store"))
                (do
                  (println (str "Copying system to nasnix: " system-path))
@@ -351,8 +351,8 @@
   {:doc  "Build home-manager activation package locally, copy to edgenix, and activate"
    :task (do
            (println "Building home-manager activation package for edgenix...")
-           (shell (str "sh -c 'nom build .#homeConfigurations.duck@edgenix.activationPackage --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/edgenix-home-path.txt'"))
-           (let [activation-path (str/trim (slurp "/tmp/edgenix-home-path.txt"))]
+           (shell "nom build .#homeConfigurations.duck@edgenix.activationPackage --out-link /tmp/edgenix-home-result")
+           (let [activation-path (str/trim (slurp "/tmp/edgenix-home-result"))]
              (if (and activation-path (str/starts-with? activation-path "/nix/store"))
                (do
                  (println (str "Copying to edgenix: " activation-path))
@@ -365,8 +365,8 @@
   {:doc  "Build home-manager activation package locally, copy to nasnix, and activate"
    :task (do
            (println "Building home-manager activation package for nasnix...")
-           (shell (str "sh -c 'nom build .#homeConfigurations.duck@nasnix.activationPackage --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/nasnix-home-path.txt'"))
-           (let [activation-path (str/trim (slurp "/tmp/nasnix-home-path.txt"))]
+           (shell "nom build .#homeConfigurations.duck@nasnix.activationPackage --out-link /tmp/nasnix-home-result")
+           (let [activation-path (str/trim (slurp "/tmp/nasnix-home-result"))]
              (if (and activation-path (str/starts-with? activation-path "/nix/store"))
                (do
                  (println (str "Copying to nasnix: " activation-path))
@@ -379,8 +379,8 @@
   {:doc  "Build NixOS config locally with nom, then copy and switch on nixmini (prompts for sudo password)"
    :task (do
            (println "Building NixOS configuration for nixmini with nom...")
-           (shell "sh -c 'nom build .#nixosConfigurations.nixmini.config.system.build.toplevel --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/nixmini-system-path.txt'")
-           (let [system-path (str/trim (slurp "/tmp/nixmini-system-path.txt"))]
+           (shell "nom build .#nixosConfigurations.nixmini.config.system.build.toplevel --out-link /tmp/nixmini-system-result")
+           (let [system-path (str/trim (slurp "/tmp/nixmini-system-result"))]
              (if (and system-path (str/starts-with? system-path "/nix/store"))
                (do
                  (println (str "Copying system to nixmini: " system-path))
@@ -393,8 +393,8 @@
   {:doc  "Build home-manager activation package locally, copy to nixmini, and activate"
    :task (do
            (println "Building home-manager activation package for nixmini...")
-           (shell (str "sh -c 'nom build .#homeConfigurations.duck@nixmini.activationPackage --no-link --print-out-paths 2>&1 | grep -E \"^/nix/store\" | tail -1 > /tmp/nixmini-home-path.txt'"))
-           (let [activation-path (str/trim (slurp "/tmp/nixmini-home-path.txt"))]
+           (shell "nom build .#homeConfigurations.duck@nixmini.activationPackage --out-link /tmp/nixmini-home-result")
+           (let [activation-path (str/trim (slurp "/tmp/nixmini-home-result"))]
              (if (and activation-path (str/starts-with? activation-path "/nix/store"))
                (do
                  (println (str "Copying to nixmini: " activation-path))
