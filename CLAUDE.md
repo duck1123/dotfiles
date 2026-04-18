@@ -75,10 +75,32 @@ Features are toggled with `enable = true/false` under `hosts.<hostname>.features
 | edgenix | NixOS x86_64 | Primary desktop, Plasma6 + specialisations |
 | inspernix | NixOS x86_64 | |
 | nasnix | NixOS x86_64 | NAS + k3s server |
+| nixmini | NixOS x86_64 | |
 | powerspecnix | NixOS x86_64 | |
 | vidcentre | NixOS x86_64 | |
 | steamdeck | home-manager only | user: deck |
 | vavirl-pw0bwnq8 | home-manager only | WSL, user: drenfer |
+
+### Adding a New Host
+
+Four files must be updated when adding a NixOS host. Missing any one causes evaluation errors (e.g. `attribute '<hostname>' missing`).
+
+1. **`modules/hosts/<hostname>.nix`** — create the host file with three modules:
+   - `generic.<hostname>` — feature flags, identity, syncthing shares, pubkey, Syncthing device ID
+   - `homeManager.<hostname>` — extra packages, sessionPath
+   - `nixos.<hostname>` — hardware config (UUIDs, kernel modules, CPU type), boot loader, timezone, specialisations
+
+2. **`modules/hosts.nix`** — add `<hostname>` to the `imports` list inside `generic.hosts`. This is what makes `config.hosts.<hostname>` available everywhere (home-manager, NixOS, etc.). **Forgetting this causes the `attribute '<hostname>' missing` error.**
+
+3. **`modules/flake/nixosConfigurations.nix`** — add `<hostname> = linux "<hostname>";` (or `wsl`/`linux-arm` as appropriate).
+
+4. **`modules/flake/homeConfigurations.nix`** — add a `"<user>@<hostname>"` entry importing `[base <hostname>]` from `homeManager`.
+
+5. **`bb.edn`** — add the corresponding bb tasks:
+   - `build-home-<hostname>`, `build-os-<hostname>`
+   - `build-remote-os-<hostname>`, `build-remote-home-<hostname>`
+   - `diff-remote-os-<hostname>`, `dry-run-remote-os-<hostname>`
+   - `switch-remote-<hostname>`, `switch-remote-os-<hostname>`, `switch-remote-home-<hostname>`
 
 ### Secrets
 

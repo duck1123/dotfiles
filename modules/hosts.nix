@@ -7,6 +7,7 @@
         edgenix
         inspernix
         nasnix
+        nixmini
         pixel8
         powerspecnix
         steamdeck
