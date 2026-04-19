@@ -387,18 +387,6 @@
                 }
               ]);
 
-            bindmn = (map (x: "${x.mod},${x.key},${x.command}") [
-                {
-                  mod = "";
-                  key = "mouse:275";
-                  command = "movewindow";
-                }
-                {
-                  mod = "";
-                  key = "mouse:276";
-                  command = "resizewindow";
-                }
-              ]);
 
             # FIXME: This is environment specific
             monitor = [

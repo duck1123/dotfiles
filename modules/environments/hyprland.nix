@@ -18,6 +18,7 @@
           hyprcursor
           hyprlock
           hypridle
+          keyd
           starship
           tuigreet
           zathura
@@ -34,5 +35,15 @@
       };
 
       services.displayManager.defaultSession = "hyprland";
+
+      services.keyd = {
+        enable = true;
+        keyboards.mouse = {
+          ids = [ "*" ];
+          settings.main = {
+            "mouse2" = "M-leftmouse";
+          };
+        };
+      };
     };
 }
