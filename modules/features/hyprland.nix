@@ -368,8 +368,6 @@
               let
                 left-click = "mouse:272";
                 right-click = "mouse:273";
-                back-thumb = "mouse:275";
-                front-thumb = "mouse:276";
               in
               (map (x: "${x.mod},${x.key},${x.command}") [
                 {
@@ -387,14 +385,17 @@
                   key = right-click;
                   command = "resizewindow";
                 }
+              ]);
+
+            bindmn = (map (x: "${x.mod},${x.key},${x.command}") [
                 {
                   mod = "";
-                  key = back-thumb;
+                  key = "mouse:275";
                   command = "movewindow";
                 }
                 {
                   mod = "";
-                  key = front-thumb;
+                  key = "mouse:276";
                   command = "resizewindow";
                 }
               ]);
