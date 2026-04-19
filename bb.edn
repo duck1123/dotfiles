@@ -27,7 +27,7 @@
   build-home-edgenix
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.duck@edgenix.activationPackage"
+         cmd    "nom build .#homeConfigurations.duck@edgenix.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
@@ -35,7 +35,7 @@
   build-home-nixmini
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.duck@nixmini.activationPackage"
+         cmd    "nom build .#homeConfigurations.duck@nixmini.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
@@ -43,7 +43,7 @@
   build-home-inspernix
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.duck@inspernix.activationPackage"
+         cmd    "nom build .#homeConfigurations.duck@inspernix.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
@@ -51,7 +51,7 @@
   build-home-nasnix
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.duck@nasnix.activationPackage"
+         cmd    "nom build .#homeConfigurations.duck@nasnix.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
@@ -59,7 +59,7 @@
   build-home-powerspecnix
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.duck@powerspecnix.activationPackage"
+         cmd    "nom build .#homeConfigurations.duck@powerspecnix.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
@@ -67,7 +67,7 @@
   build-home-steamdeck
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.deck@steamdeck.activationPackage"
+         cmd    "nom build .#homeConfigurations.deck@steamdeck.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
@@ -75,7 +75,7 @@
   build-home-vallen
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage"
+         cmd    "nom build .#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
@@ -83,7 +83,7 @@
   build-home-vidcentre
   {:task
    (let [trace? false
-         cmd    "nh home build .#homeConfigurations.duck@vidcentre.activationPackage"
+         cmd    "nom build .#homeConfigurations.duck@vidcentre.activationPackage"
          cmd    (str cmd (when trace? " -- --show-trace"))]
      (binding [*out* *err*] (println cmd))
      (shell cmd))}
