@@ -156,6 +156,7 @@ in
           };
 
           networking.hosts = {
+            "192.168.0.16" = [ "nasnix" ];
             "192.168.0.25" = [ "nixmini" ];
           };
 
