@@ -15,6 +15,7 @@
           enable = true;
           profiles.default.userSettings = {
             "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
+            "[nushell]"."outline.showVariables" = false;
             "calva.paredit.defaultKeyMap" = "original";
             "claudeCode.preferredLocation" = "panel";
             "diffEditor.hideUnchangedRegions.enabled" = true;
