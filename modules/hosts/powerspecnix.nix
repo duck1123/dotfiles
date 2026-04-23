@@ -1,7 +1,7 @@
 { ... }:
 let
   hostname = "powerspecnix";
-  mount-nas = true;
+  mount-nas = false;
   nas-ip = "192.168.0.124";
   system = "x86_64-linux";
 in
