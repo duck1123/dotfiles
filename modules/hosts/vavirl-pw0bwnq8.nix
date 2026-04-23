@@ -113,6 +113,8 @@ in
           ];
         };
 
+        dconf.enable = false;
+
         programs = {
           bash.enable = true;
 
