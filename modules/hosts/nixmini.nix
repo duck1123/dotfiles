@@ -21,6 +21,7 @@ in
             docker.enable = true;
             emacs.enable = true;
             font.enable = true;
+            gaming.enable = true;
             git.enable = true;
             hyprland.enable = true;
             hyprpanel.enable = false;
