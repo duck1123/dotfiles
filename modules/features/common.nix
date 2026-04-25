@@ -81,7 +81,12 @@
           };
 
           eza.enable = true;
-          firefox.enable = true;
+
+          firefox = {
+            configPath = "${config.xdg.configHome}/mozilla/firefox";
+            enable = true;
+          };
+
           fish.enable = true;
           # gnome-terminal.enable = true;
           gpg.enable = true;
