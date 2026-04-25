@@ -22,6 +22,7 @@
             "editor.renderWhitespace" = "trailing";
             "editor.tabSize" = 2;
             "files.autoSave" = "onFocusChange";
+            "git.confirmSync" = false;
             "nix.enableLanguageServer" = true;
             "nix.serverPath" = "nixd";
             "screencastMode.fontSize" = 64.0;
