@@ -91,6 +91,7 @@ in
             vpn.enable = true;
             vscode.enable = false;
             waybar.enable = false;
+            windmill.enable = true;
             xserver.enable = true;
             zsh.enable = true;
           };
