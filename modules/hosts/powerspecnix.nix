@@ -89,7 +89,7 @@ in
             vim.enable = false;
             virtualization.enable = false;
             vpn.enable = true;
-            vscode.enable = true;
+            vscode.enable = false;
             waybar.enable = false;
             xserver.enable = true;
             zsh.enable = true;
@@ -107,7 +107,7 @@ in
       {
         host = config.hosts.${hostname};
 
-        home.packages = with pkgs; [ plex-desktop ];
+        home.packages = with pkgs; [ plex-desktop vscode ];
       };
 
     nixos.${hostname} =
