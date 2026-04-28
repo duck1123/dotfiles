@@ -1,0 +1,473 @@
+
+# say hello
+def "nur hello" [] {
+    "hello-world"
+}
+
+# Build the current configurations
+def "nur build" [] {
+    nur build-home
+    nur build-os
+}
+
+# Build all configurations
+def "nur build-all" [] {
+    ^nom build ".#ci"
+}
+
+# Build all home configurations
+def "nur build-all-home" [] {
+    nur build-home-inspernix
+    nur build-home-nasnix
+    nur build-home-powerspecnix
+    nur build-home-steamdeck
+    nur build-home-vallen
+}
+
+# Build all NixOS configurations
+def "nur build-all-os" [] {
+    nur build-os-inspernix
+    nur build-os-nasnix
+    nur build-os-powerspecnix
+}
+
+# Build the current home configuration
+def "nur build-home" [] {
+    ^nh home build .
+}
+
+# Build home config for edgenix
+def "nur build-home-edgenix" [] {
+    ^nom build ".#homeConfigurations.duck@edgenix.activationPackage"
+}
+
+# Build home config for nixmini
+def "nur build-home-nixmini" [] {
+    ^nom build ".#homeConfigurations.duck@nixmini.activationPackage"
+}
+
+# Build home config for inspernix
+def "nur build-home-inspernix" [] {
+    ^nom build ".#homeConfigurations.duck@inspernix.activationPackage"
+}
+
+# Build home config for nasnix
+def "nur build-home-nasnix" [] {
+    ^nom build ".#homeConfigurations.duck@nasnix.activationPackage"
+}
+
+# Build home config for powerspecnix
+def "nur build-home-powerspecnix" [] {
+    ^nom build ".#homeConfigurations.duck@powerspecnix.activationPackage"
+}
+
+# Build home config for steamdeck
+def "nur build-home-steamdeck" [] {
+    ^nom build ".#homeConfigurations.deck@steamdeck.activationPackage"
+}
+
+# Build home config for vallen (VAVIRL-PW0BWNQ8)
+def "nur build-home-vallen" [] {
+    ^nom build ".#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage"
+}
+
+# Build home config for vidcentre
+def "nur build-home-vidcentre" [] {
+    ^nom build ".#homeConfigurations.duck@vidcentre.activationPackage"
+}
+
+# Build the current NixOS configuration
+def "nur build-os" [] {
+    ^nh os build .
+}
+
+# Build NixOS config for edgenix
+def "nur build-os-edgenix" [] {
+    ^nh os build ".#nixosConfigurations.edgenix"
+}
+
+# Build NixOS config for nixmini
+def "nur build-os-nixmini" [] {
+    ^nh os build ".#nixosConfigurations.nixmini"
+}
+
+# Build NixOS config for inspernix
+def "nur build-os-inspernix" [] {
+    ^nh os build ".#nixosConfigurations.inspernix"
+}
+
+# Build NixOS config for nasnix
+def "nur build-os-nasnix" [] {
+    ^nh os build ".#nixosConfigurations.nasnix"
+}
+
+# Build NixOS config for powerspecnix
+def "nur build-os-powerspecnix" [] {
+    ^nh os build ".#nixosConfigurations.powerspecnix"
+}
+
+# Build NixOS config for vidcentre
+def "nur build-os-vidcentre" [] {
+    ^nh os build ".#nixosConfigurations.vidcentre"
+}
+
+# Run validation on the project
+def "nur check" [] {
+    ^nix flake check
+}
+
+# Build all targets (check + build-all)
+def "nur ci" [] {
+    nur check
+    nur build-all
+}
+
+# Format all .nix files using nixfmt
+def "nur format" [] {
+    ^find . -name '*.nix' -exec nixfmt {} +
+}
+
+# Install cert-manager into the current cluster
+def "nur install-cert-manager" [] {
+    let version = "1.14.4"
+    let url = $"https://github.com/cert-manager/cert-manager/releases/download/v($version)/cert-manager.yaml"
+    ^kubectl apply -f $url
+}
+
+# List GPG secret keys
+def "nur list-secret-keys" [] {
+    ^gpg --list-secret-keys --keyid-format=long
+}
+
+# Read windows key from firmware
+def "nur read-windows-key" [] {
+    ^sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM
+}
+
+# Switch both home-manager and NixOS
+def "nur switch" [] {
+    nur switch-home
+    nur switch-os
+}
+
+# Update home-manager from flake
+def "nur switch-home" [] {
+    let ts = (date now | format date '%s')
+    ^home-manager switch --flake . -b $"backup.($ts)" --show-trace
+}
+
+# Update NixOS from flake (builds and activates immediately)
+def "nur switch-os" [] {
+    try {
+        ^sudo nixos-rebuild switch --flake . --show-trace
+    } catch {|_e|
+        print "\n=== systemd journal (last 50 lines) ==="
+        ^journalctl -xe --no-pager -n 50
+        exit $env.LAST_EXIT_CODE
+    }
+}
+
+# Build NixOS config and set as boot default (activates on reboot)
+def "nur boot-os" [] {
+    ^sudo nixos-rebuild boot --flake . --show-trace
+}
+
+# Apply NixOS config on a fresh install where nix-command is not yet enabled
+def "nur bootstrap-os" [] {
+    with-env { NIX_CONFIG: "experimental-features = nix-command flakes" } {
+        ^nh os boot .
+    }
+}
+
+# Switch both NixOS and home-manager on edgenix and nasnix
+def "nur switch-remote" [] {
+    nur switch-remote-edgenix
+    nur switch-remote-nasnix
+}
+
+# Switch both NixOS and home-manager on edgenix
+def "nur switch-remote-edgenix" [] {
+    nur switch-remote-os-edgenix
+    nur switch-remote-home-edgenix
+}
+
+# Switch both NixOS and home-manager on nasnix
+def "nur switch-remote-nasnix" [] {
+    nur switch-remote-os-nasnix
+    nur switch-remote-home-nasnix
+}
+
+# Switch both NixOS and home-manager on nixmini
+def "nur switch-remote-nixmini" [] {
+    nur switch-remote-os-nixmini
+    nur switch-remote-home-nixmini
+}
+
+# Build NixOS config for edgenix locally using nom (no activation)
+def "nur build-remote-os-edgenix" [] {
+    ^nom build ".#nixosConfigurations.edgenix.config.system.build.toplevel"
+}
+
+# Build NixOS config for nasnix locally using nom (no activation)
+def "nur build-remote-os-nasnix" [] {
+    ^nom build ".#nixosConfigurations.nasnix.config.system.build.toplevel"
+}
+
+# Build NixOS config for nixmini locally using nom (no activation)
+def "nur build-remote-os-nixmini" [] {
+    ^nom build ".#nixosConfigurations.nixmini.config.system.build.toplevel"
+}
+
+# Build home-manager activation package for edgenix locally (no activation)
+def "nur build-remote-home-edgenix" [] {
+    ^nom build ".#homeConfigurations.duck@edgenix.activationPackage"
+}
+
+# Build home-manager activation package for nasnix locally (no activation)
+def "nur build-remote-home-nasnix" [] {
+    ^nom build ".#homeConfigurations.duck@nasnix.activationPackage"
+}
+
+# Build home-manager activation package for nixmini locally (no activation)
+def "nur build-remote-home-nixmini" [] {
+    ^nom build ".#homeConfigurations.duck@nixmini.activationPackage"
+}
+
+# Helper: diff OS closures between local build and remote host
+def diff-remote-os [host: string] {
+    print $"Building new NixOS configuration for ($host)..."
+    let new_system = (
+        ^nom build $".#nixosConfigurations.($host).config.system.build.toplevel" --no-link --print-out-paths
+        o+e>| lines
+        | where { |l| $l | str starts-with "/nix/store" }
+        | last
+    )
+    let current_system = (^ssh $host "readlink -f /nix/var/nix/profiles/system" | str trim)
+    if ($new_system | is-empty) or ($current_system | is-empty) {
+        print "ERROR: Could not determine system paths"
+        print $"New system path: ($new_system)"
+        print $"Current system path: ($current_system)"
+    } else {
+        print "\n=== Package Changes ==="
+        print $"Current: ($current_system)"
+        print $"New:     ($new_system)\n"
+        ^nix store diff-closures $current_system $new_system
+    }
+}
+
+# Show package changes between current edgenix system and new build
+def "nur diff-remote-os-edgenix" [] {
+    diff-remote-os edgenix
+}
+
+# Show package changes between current nasnix system and new build
+def "nur diff-remote-os-nasnix" [] {
+    diff-remote-os nasnix
+}
+
+# Show package changes between current nixmini system and new build
+def "nur diff-remote-os-nixmini" [] {
+    diff-remote-os nixmini
+}
+
+# Show what would change on edgenix without applying (dry-run)
+def "nur dry-run-remote-os-edgenix" [] {
+    with-env { NIX_SSHOPTS: "-t" } {
+        ^nixos-rebuild dry-activate --flake ".#edgenix" --target-host edgenix --build-host localhost --sudo --ask-sudo-password
+    }
+}
+
+# Show what would change on nasnix without applying (dry-run)
+def "nur dry-run-remote-os-nasnix" [] {
+    with-env { NIX_SSHOPTS: "-t" } {
+        ^nixos-rebuild dry-activate --flake ".#nasnix" --target-host nasnix --build-host localhost --sudo --ask-sudo-password
+    }
+}
+
+# Show what would change on nixmini without applying (dry-run)
+def "nur dry-run-remote-os-nixmini" [] {
+    with-env { NIX_SSHOPTS: "-t" } {
+        ^nixos-rebuild dry-activate --flake ".#nixmini" --target-host nixmini --build-host localhost --sudo --ask-sudo-password
+    }
+}
+
+# Helper: build NixOS config locally with nom, copy and switch on remote host
+def switch-remote-os [host: string] {
+    print $"Building NixOS configuration for ($host) with nom..."
+    let out_link = $"/tmp/($host)-system-result"
+    ^nom build $".#nixosConfigurations.($host).config.system.build.toplevel" --out-link $out_link
+    let system_path = (^realpath $out_link | str trim)
+    if ($system_path | str starts-with "/nix/store") {
+        print $"Copying system to ($host): ($system_path)"
+        ^nix copy --to $"ssh://($host)" $system_path
+        print $"Activating on ($host) (will prompt for sudo password)..."
+        ^ssh -t $host $"sudo nix-env -p /nix/var/nix/profiles/system --set ($system_path) && sudo ($system_path)/bin/switch-to-configuration switch"
+    } else {
+        print "ERROR: Failed to build or get system path"
+    }
+}
+
+# Helper: build home-manager package locally, copy and activate on remote host
+def switch-remote-home [host: string, user: string] {
+    print $"Building home-manager activation package for ($host)..."
+    let out_link = $"/tmp/($host)-home-result"
+    ^nom build $".#homeConfigurations.($user)@($host).activationPackage" --out-link $out_link
+    let activation_path = (^realpath $out_link | str trim)
+    if ($activation_path | str starts-with "/nix/store") {
+        print $"Copying to ($host): ($activation_path)"
+        ^nix copy --to $"ssh://($host)" $activation_path
+        print $"Activating on ($host)..."
+        let ts = (date now | format date '%s')
+        ^ssh $host $"HOME_MANAGER_BACKUP_EXT=backup.($ts) ($activation_path)/activate"
+    } else {
+        print "ERROR: Failed to build activation package or invalid path"
+    }
+}
+
+# Build NixOS config locally with nom, then copy and switch on edgenix
+def "nur switch-remote-os-edgenix" [] {
+    switch-remote-os edgenix
+}
+
+# Build NixOS config locally with nom, then copy and switch on nasnix
+def "nur switch-remote-os-nasnix" [] {
+    switch-remote-os nasnix
+}
+
+# Build NixOS config locally with nom, then copy and switch on nixmini
+def "nur switch-remote-os-nixmini" [] {
+    switch-remote-os nixmini
+}
+
+# Build home-manager activation package locally, copy to edgenix, and activate
+def "nur switch-remote-home-edgenix" [] {
+    switch-remote-home edgenix duck
+}
+
+# Build home-manager activation package locally, copy to nasnix, and activate
+def "nur switch-remote-home-nasnix" [] {
+    switch-remote-home nasnix duck
+}
+
+# Build home-manager activation package locally, copy to nixmini, and activate
+def "nur switch-remote-home-nixmini" [] {
+    switch-remote-home nixmini duck
+}
+
+# Create k3d local registry
+def "nur k3d-create-registry" [] {
+    ^k3d registry create myregistry.localtest.me --port 12345
+}
+
+# Create a k3d cluster
+def "nur k3d-create" [] {
+    ^k3d cluster create --api-port 6550 -p "80:80@loadbalancer" -p "443:443@loadbalancer" --k3s-arg "--disable=traefik@server:0" --servers 1 --registry-use k3d-myregistry.localtest.me:12345 --kubeconfig-update-default
+}
+
+# Delete k3d cluster
+def "nur k3d-delete" [] {
+    ^k3d cluster delete k3s-default
+}
+
+# Start the k3s cluster
+def "nur k3d-start" [] {
+    ^k3d cluster start
+}
+
+# Stop the k3s cluster
+def "nur k3d-stop" [] {
+    ^k3d cluster stop
+}
+
+# Install ArgoCD into the current cluster
+def "nur install-argocd" [] {
+    print "Installing argocd"
+    ^kubectl create namespace argocd
+    ^kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+}
+
+# Install consul into the current cluster
+def "nur install-consul" [] {
+    ^consul-k8s install --set server.replicas=1 --set ui.ingress.enabled=true --set "ui.ingress.hosts[0].host=consul.localhost" --set "ui.ingress.hosts[0].paths[0]=/" --set connectInject.enabled=true --set connectInject.default=true --set controller.enabled=true
+}
+
+# Install rancher via helm
+def "nur install-rancher" [] {
+    let namespace = "cattle-system"
+    let hostname = "rancher.dev.kronkltd.net"
+    let email = "duck@kronkltd.net"
+    let replicas = 1
+    ^helm install rancher rancher-latest/rancher --namespace $namespace $"--set=hostname=($hostname)" $"--set=replicas=($replicas)" --set=ingress.tls.source=letsEncrypt $"--set=letsEncrypt.email=($email)"
+}
+
+# Install traefik helm chart
+def "nur install-traefik" [] {
+    ^helm install traefik traefik/traefik
+}
+
+# Show listening ports
+def "nur show-ports" [] {
+    ^netstat -ltnp
+}
+
+# Update nix channels
+def "nur update-nix" [] {
+    ^nix-channel --update
+}
+
+# Watch kubernetes namespaces
+def "nur watch-namespaces" [] {
+    ^watch kubectl get namespaces
+}
+
+# Watch kubernetes pods across all namespaces
+def "nur watch-pods" [] {
+    ^watch kubectl get pods --all-namespaces
+}
+
+# Wipe k3s directories
+def "nur wipe-k3s" [] {
+    ^sudo rm -rf /etc/rancher/k3s
+    ^sudo rm -rf /var/lib/rancher/k3s
+}
+
+# Build nixidy manifests and write to kubernetes/manifests/
+def "nur k8s-switch-charts" [] {
+    ^sh scripts/k8s-switch-charts.sh
+}
+
+# Commit and push generated manifests to the private manifests repo
+def "nur k8s-push" [] {
+    ^sh scripts/k8s-push-manifests.sh
+}
+
+# Build manifests and push to private repo (switch-charts + push)
+def "nur k8s-deploy" [] {
+    nur k8s-switch-charts
+    nur k8s-push
+}
+
+# Decrypt kubernetes secrets to secrets/k8s.yaml (plaintext — do not commit)
+def "nur k8s-decrypt" [] {
+    ^sops --decrypt secrets/k8s.enc.yaml | save -f secrets/k8s.yaml
+}
+
+# Encrypt secrets/k8s.yaml back to secrets/k8s.enc.yaml
+def "nur k8s-encrypt" [] {
+    ^sops --encrypt secrets/k8s.yaml | save -f secrets/k8s.enc.yaml
+}
+
+# Edit kubernetes secrets in-place (no plaintext file written)
+def "nur k8s-edit-secrets" [] {
+    ^sops secrets/k8s.enc.yaml
+}
+
+# Generate SSH deploy key pair for argo-manifests
+def "nur k8s-generate-deploy-key" [] {
+    ^sh scripts/k8s-generate-deploy-key.sh
+}
+
+# Apply ArgoCD repository credential for argo-manifests (one-time bootstrap)
+def "nur k8s-bootstrap-argocd-repo" [] {
+    ^sh scripts/k8s-bootstrap-argocd-repo.sh
+}
