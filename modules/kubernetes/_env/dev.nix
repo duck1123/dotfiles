@@ -276,6 +276,8 @@ in
         name = "immich";
       };
 
+      hostAffinity = "nixmini";
+
       ingress = {
         domain = "immich.${tail-domain}";
         ingressClassName = "tailscale";
@@ -935,8 +937,10 @@ in
       enable = true;
       healthcheckcpuWorkers = 0;
       healthcheckgpuWorkers = 1;
-      # hostAffinity = "edgenix";
-      hostAffinity = "powerspecnix";
+      transcodeCpuWorkers = 0;
+      transcodeGpuWorkers = 0;
+      hostAffinity = "edgenix";
+      # hostAffinity = "powerspecnix";
 
       ingress = {
         domain = "tdarr.${tail-domain}";
@@ -947,7 +951,7 @@ in
       nfs = {
         enable = true;
         server = nas-host;
-        path = "${nas-base}";
+        path = nas-base;
       };
 
       puid = 1000;
