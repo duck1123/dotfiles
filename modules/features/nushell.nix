@@ -10,6 +10,7 @@
   flake.modules.homeManager.nushell =
     {
       config,
+      inputs,
       lib,
       pkgs,
       ...
@@ -31,6 +32,7 @@
           # nushellPlugins.dbus
           nushellPlugins.skim
           # nushellPlugins.net
+          inputs.self.packages.${pkgs.system}.nur-taskrunner
         ];
 
         home.file."nushell/completions".source = ../../nushell/completions;

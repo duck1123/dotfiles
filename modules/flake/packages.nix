@@ -29,6 +29,19 @@ let
       meta.mainProgram = "wmill";
     };
 
+  nur-taskrunner = pkgs.rustPlatform.buildRustPackage {
+    pname = "nur";
+    version = "0.24.1+0.112.2";
+    src = pkgs.fetchFromGitHub {
+      owner = "nur-taskrunner";
+      repo = "nur";
+      rev = "v0.24.1+0.112.2";
+      hash = "sha256-PNZQQhiV2j0THSlfTYM6yfAoZkjuIb6YtwY2Q9r7wfw=";
+    };
+    cargoHash = "sha256-AD9/0Byf18aPraSMpsiXzgADs+tbhjlQqBTOn87buJY=";
+    meta.mainProgram = "nur";
+  };
+
   ci-home = pkgs.symlinkJoin {
     name = "ci-home";
     paths = [
@@ -67,6 +80,7 @@ in
             ci
             ci-home
             ci-os
+            nur-taskrunner
             windmill-cli
             ;
         };
