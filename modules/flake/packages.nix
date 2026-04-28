@@ -62,7 +62,14 @@ in
     { system, ... }:
     if system == "x86_64-linux" then
       {
-        packages = { inherit ci ci-home ci-os windmill-cli; };
+        packages = {
+          inherit
+            ci
+            ci-home
+            ci-os
+            windmill-cli
+            ;
+        };
       }
     else
       { };

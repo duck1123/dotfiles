@@ -108,7 +108,10 @@ in
       {
         host = config.hosts.${hostname};
 
-        home.packages = with pkgs; [ plex-desktop vscode ];
+        home.packages = with pkgs; [
+          plex-desktop
+          vscode
+        ];
       };
 
     nixos.${hostname} =
@@ -186,7 +189,10 @@ in
               kernelModules = [ ];
             };
 
-            kernelModules = [ "kvm-amd" "ntsync" ];
+            kernelModules = [
+              "kvm-amd"
+              "ntsync"
+            ];
           };
 
           fileSystems = {

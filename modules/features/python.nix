@@ -8,7 +8,7 @@ in
     let
       inherit (inputs.self.types.generic) simpleFeature;
     in
-      simpleFeature { inherit inputs lib; } "${name} feature";
+    simpleFeature { inherit inputs lib; } "${name} feature";
 
   flake.modules.homeManager.${name} =
     {

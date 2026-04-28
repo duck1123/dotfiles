@@ -11,20 +11,19 @@ in
     else
       let
         # CRD generators from k3s-fleetops, using dotfiles' (shared) inputs for nixidy/nixhelm deps.
-        crdImports = (import "${inputs.k3s-fleetops}/generators" { inherit inputs system pkgs; }).crdImports;
+        crdImports =
+          (import "${inputs.k3s-fleetops}/generators" { inherit inputs system pkgs; }).crdImports;
 
         devEnv = inputs.nixidy.lib.mkEnvs {
           inherit pkgs;
           charts = inputs.nixhelm.chartsDerivations.${system};
           envs.dev.modules = [ ./_env/dev.nix ];
           extraSpecialArgs = { inherit self crdImports; };
-          modules =
-            (builtins.attrValues self.nixidyApps)
-            ++ [
-              self.modules.generic.ageRecipients
-              "${inputs.k3s-fleetops}/modules/secretManifest.nix"
-              "${inputs.k3s-fleetops}/modules/secretSpecs.nix"
-            ];
+          modules = (builtins.attrValues self.nixidyApps) ++ [
+            self.modules.generic.ageRecipients
+            "${inputs.k3s-fleetops}/modules/secretManifest.nix"
+            "${inputs.k3s-fleetops}/modules/secretSpecs.nix"
+          ];
         };
 
         devSecretManifest = devEnv.dev.config.nixidy.secretManifest or [ ];
