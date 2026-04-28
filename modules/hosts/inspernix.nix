@@ -58,6 +58,7 @@ in
             touch.enable = true;
             vpn.enable = true;
             vscode.enable = true;
+            windmill.enable = true;
             xserver.enable = true;
             zsh.enable = true;
           };
@@ -123,7 +124,7 @@ in
             gnome.gnome-keyring.enable = true;
             printing.enable = true;
           };
-          
+
           networking.hosts = {
             "192.168.0.25" = [ "nixmini" ];
           };
