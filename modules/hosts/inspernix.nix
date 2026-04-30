@@ -23,6 +23,7 @@ in
             common.enable = true;
             docker.enable = true;
             emacs.enable = true;
+            firefox.enable = true;
             font.enable = true;
             gaming.enable = true;
             git.enable = true;
@@ -104,7 +105,6 @@ in
 
           programs = {
             dconf.enable = true;
-            firefox.enable = true;
 
             gnupg.agent = {
               enable = true;

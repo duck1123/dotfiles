@@ -27,6 +27,7 @@ in
           emacs.enable = false;
           emacs-prelude.enable = false;
           email.enable = false;
+          firefox.enable = true;
           font.enable = false;
           gaming.enable = false;
           git.enable = false;
