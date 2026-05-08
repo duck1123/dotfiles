@@ -16,7 +16,7 @@ def "nur build" [
 def "nur build-all" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#ci"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#ci"
 }
 
 # Build all home configurations
@@ -43,112 +43,112 @@ def "nur build-all-os" [
 def "nur build-home" [
   --fallback = false
 ] {
-    ^nh home build (if $fallback { "--fallback" } else { null }) .
+    ^nh home build ...(if $fallback { ["--fallback"] } else { [] }) .
 }
 
 # Build home config for edgenix
 def "nur build-home-edgenix" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.duck@edgenix.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@edgenix.activationPackage"
 }
 
 # Build home config for nixmini
 def "nur build-home-nixmini" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.duck@nixmini.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@nixmini.activationPackage"
 }
 
 # Build home config for inspernix
 def "nur build-home-inspernix" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.duck@inspernix.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@inspernix.activationPackage"
 }
 
 # Build home config for nasnix
 def "nur build-home-nasnix" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.duck@nasnix.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@nasnix.activationPackage"
 }
 
 # Build home config for powerspecnix
 def "nur build-home-powerspecnix" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.duck@powerspecnix.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@powerspecnix.activationPackage"
 }
 
 # Build home config for steamdeck
 def "nur build-home-steamdeck" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.deck@steamdeck.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.deck@steamdeck.activationPackage"
 }
 
 # Build home config for vallen (VAVIRL-PW0BWNQ8)
 def "nur build-home-vallen" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage"
 }
 
 # Build home config for vidcentre
 def "nur build-home-vidcentre" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.duck@vidcentre.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@vidcentre.activationPackage"
 }
 
 # Build the current NixOS configuration
 def "nur build-os" [
   --fallback = false
 ] {
-    ^nh os build (if $fallback { "--fallback" } else { null }) .
+    ^nh os build ...(if $fallback { ["--fallback"] } else { [] }) .
 }
 
 # Build NixOS config for edgenix
 def "nur build-os-edgenix" [
   --fallback = false
 ] {
-    ^nh os build (if $fallback { "--fallback" } else { null }) ".#nixosConfigurations.edgenix"
+    ^nh os build ...(if $fallback { ["--fallback"] } else { [] }) ".#nixosConfigurations.edgenix"
 }
 
 # Build NixOS config for nixmini
 def "nur build-os-nixmini" [
   --fallback = false
 ] {
-    ^nh os build (if $fallback { "--fallback" } else { null }) ".#nixosConfigurations.nixmini"
+    ^nh os build ...(if $fallback { ["--fallback"] } else { [] }) ".#nixosConfigurations.nixmini"
 }
 
 # Build NixOS config for inspernix
 def "nur build-os-inspernix" [
   --fallback = false
 ] {
-    ^nh os build (if $fallback { "--fallback" } else { null }) ".#nixosConfigurations.inspernix"
+    ^nh os build ...(if $fallback { ["--fallback"] } else { [] }) ".#nixosConfigurations.inspernix"
 }
 
 # Build NixOS config for nasnix
 def "nur build-os-nasnix" [
   --fallback = false
 ] {
-    ^nh os build (if $fallback { "--fallback" } else { null }) ".#nixosConfigurations.nasnix"
+    ^nh os build ...(if $fallback { ["--fallback"] } else { [] }) ".#nixosConfigurations.nasnix"
 }
 
 # Build NixOS config for powerspecnix
 def "nur build-os-powerspecnix" [
   --fallback = false
 ] {
-    ^nh os build (if $fallback { "--fallback" } else { null }) ".#nixosConfigurations.powerspecnix"
+    ^nh os build ...(if $fallback { ["--fallback"] } else { [] }) ".#nixosConfigurations.powerspecnix"
 }
 
 # Build NixOS config for vidcentre
 def "nur build-os-vidcentre" [
   --fallback = false
 ] {
-    ^nh os build (if $fallback { "--fallback" } else { null }) ".#nixosConfigurations.vidcentre"
+    ^nh os build ...(if $fallback { ["--fallback"] } else { [] }) ".#nixosConfigurations.vidcentre"
 }
 
 # Run validation on the project
@@ -247,42 +247,42 @@ def "nur switch-remote-nixmini" [] {
 def "nur build-remote-os-edgenix" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#nixosConfigurations.edgenix.config.system.build.toplevel"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#nixosConfigurations.edgenix.config.system.build.toplevel"
 }
 
 # Build NixOS config for nasnix locally using nom (no activation)
 def "nur build-remote-os-nasnix" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#nixosConfigurations.nasnix.config.system.build.toplevel"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#nixosConfigurations.nasnix.config.system.build.toplevel"
 }
 
 # Build NixOS config for nixmini locally using nom (no activation)
 def "nur build-remote-os-nixmini" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#nixosConfigurations.nixmini.config.system.build.toplevel"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#nixosConfigurations.nixmini.config.system.build.toplevel"
 }
 
 # Build home-manager activation package for edgenix locally (no activation)
 def "nur build-remote-home-edgenix" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.duck@edgenix.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@edgenix.activationPackage"
 }
 
 # Build home-manager activation package for nasnix locally (no activation)
 def "nur build-remote-home-nasnix" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.duck@nasnix.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@nasnix.activationPackage"
 }
 
 # Build home-manager activation package for nixmini locally (no activation)
 def "nur build-remote-home-nixmini" [
   --fallback = false
 ] {
-    ^nom build (if $fallback { "--fallback" } else { null }) ".#homeConfigurations.duck@nixmini.activationPackage"
+    ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@nixmini.activationPackage"
 }
 
 # Helper: diff OS closures between local build and remote host
