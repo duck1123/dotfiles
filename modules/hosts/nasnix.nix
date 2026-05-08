@@ -21,6 +21,7 @@ in
             developer.enable = true;
             docker.enable = true;
             emacs.enable = true;
+            firefox.enable = true;
             font.enable = true;
             git.enable = true;
             hyprland.enable = true;

@@ -34,6 +34,7 @@ in
             emacs-prelude.enable = false;
             email.enable = true;
             flipper.enable = true;
+            firefox.enable = true;
             font.enable = true;
             gaming.enable = true;
             git.enable = true;
