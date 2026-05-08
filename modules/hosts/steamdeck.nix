@@ -16,6 +16,7 @@ in
             bluetooth.enable = true;
             common.enable = true;
             emacs.enable = true;
+            firefox.enable = true;
             font.enable = true;
             gaming.enable = false;
             git.enable = true;

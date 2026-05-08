@@ -36,6 +36,7 @@ in
           emacs-prelude
           email
           environments-gnome
+          firefox
           flipper
           gaming
           git
@@ -80,6 +81,7 @@ in
           bluetooth-feature
           boot
           docker-feature
+          firefox-feature
           flipper
           font-feature
           gaming-feature

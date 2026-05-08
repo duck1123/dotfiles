@@ -24,7 +24,6 @@
         packages = with pkgs; [
           appimage-run
           emacs
-          firefox
         ];
         shell = pkgs.zsh;
       };
