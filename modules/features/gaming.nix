@@ -20,7 +20,7 @@
           dolphin-emu
           # heroic
           itch
-          lutris
+          # lutris
           # nexusmods-app
           protontricks
           satisfactorymodmanager
