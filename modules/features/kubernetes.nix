@@ -10,7 +10,33 @@
       type = types.submodule {
         options = {
           client = simpleFeature { inherit inputs lib; } "kubernetes client";
+          clusterInit = mkOption {
+            type = types.bool;
+            default = false;
+            description = "Initialize a new HA embedded-etcd cluster (passes --cluster-init to k3s). Enable on exactly one server per cluster. Incompatible with serverAddr — this node becomes the bootstrap server that others join.";
+          };
+          controlPlane = mkOption {
+            type = types.bool;
+            default = false;
+            description = "Join an existing cluster as a control plane (server) node rather than a worker agent. Requires serverAddr and token/tokenFile. The first server in the cluster must have clusterInit = true.";
+          };
+          dualStack = simpleFeature { inherit inputs lib; } "IPv6 dual-stack networking";
+          gpu = mkOption {
+            type = types.nullOr (
+              types.enum [
+                "amd"
+                "nvidia"
+              ]
+            );
+            default = null;
+            description = "Enable GPU support for Kubernetes pods (amd or nvidia)";
+          };
           server = simpleFeature { inherit inputs lib; } "kubernetes server";
+          serverAddr = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Server address (hostname or IP) for joining an existing k3s cluster";
+          };
           token = mkOption {
             type = types.nullOr types.str;
             default = null;
@@ -22,22 +48,6 @@
             description = "Path to sops-encrypted secrets file containing k3s_token key";
             example = ./../../secrets/k3s-token.yaml;
           };
-          serverAddr = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            description = "Server address (hostname or IP) for joining an existing k3s cluster";
-          };
-          gpu = mkOption {
-            type = types.nullOr (
-              types.enum [
-                "amd"
-                "nvidia"
-              ]
-            );
-            default = null;
-            description = "Enable GPU support for Kubernetes pods (amd or nvidia)";
-          };
-          dualStack = simpleFeature { inherit inputs lib; } "IPv6 dual-stack networking";
           extraK3sFlags = mkOption {
             type = types.listOf types.str;
             default = [ ];
@@ -147,11 +157,12 @@
               kubernetes = config.host.features.kubernetes;
               # Use sops secret path if tokenFile is set, otherwise use plain token
               tokenPath = if kubernetes.tokenFile != null then config.sops.secrets.k3s-token.path else null;
-              isAgent = (kubernetes.token != null || tokenPath != null) && kubernetes.serverAddr != null;
+              isJoiningCluster = (kubernetes.token != null || tokenPath != null) && kubernetes.serverAddr != null;
+              isAgent = isJoiningCluster && !kubernetes.controlPlane;
               isDualStack = kubernetes.dualStack.enable;
               baseFlags =
                 (
-                  if isAgent then
+                  if isJoiningCluster then
                     [ ]
                   else
                     [
@@ -167,6 +178,7 @@
                       "--disable=traefik"
                     ]
                     ++ lib.optional isDualStack "--flannel-ipv6-masq"
+                    ++ lib.optional kubernetes.clusterInit "--cluster-init"
                 )
                 ++ kubernetes.extraK3sFlags;
             in
