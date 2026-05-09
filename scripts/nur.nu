@@ -25,17 +25,33 @@ def host-user [host: string]: nothing -> string {
     }
 }
 
+def all-installables []: nothing -> list<string> {
+    [
+        ".#homeConfigurations.duck@inspernix.activationPackage"
+        ".#homeConfigurations.duck@nasnix.activationPackage"
+        ".#homeConfigurations.duck@powerspecnix.activationPackage"
+        ".#homeConfigurations.deck@steamdeck.activationPackage"
+        ".#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage"
+        ".#nixosConfigurations.inspernix.config.system.build.toplevel"
+        ".#nixosConfigurations.nasnix.config.system.build.toplevel"
+        ".#nixosConfigurations.powerspecnix.config.system.build.toplevel"
+    ]
+}
+
 # Build configurations (local, --host <name>, or --all)
 export def "nur build" [
     --host: string@nixos-hosts = ""
     --all = false
     --fallback = false
-] {
-    if $all and not ($host | is-empty) {
-        error make { msg: "--all and --host are mutually exclusive" }
+]: nothing -> nothing {
+    if $all and ($host | is-not-empty) {
+        error make {
+            msg: "--all and --host are mutually exclusive"
+            label: {text: "--host provided here", span: (metadata $host).span}
+        }
     }
     if $all {
-        ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#ci"
+        ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ...(all-installables)
     } else {
         nur build-home --host $host --fallback $fallback
         nur build-os --host $host --fallback $fallback
@@ -93,10 +109,10 @@ export def "nur check" [] {
     ^nix flake check
 }
 
-# Build all targets (check + build-all)
+# Build all targets (check + build --all)
 export def "nur ci" [] {
     nur check
-    nur build-all
+    nur build --all true
 }
 
 # Format all .nix files using nixfmt
@@ -211,51 +227,51 @@ def do-diff-remote-os [host: string] {
 
 # Helper: build NixOS config locally with nom, copy and switch on remote host
 def do-switch-remote-os [host: string] {
-    print $"Building NixOS configuration for ($host) with nom..."
+    print --stderr $"Building NixOS configuration for ($host) with nom..."
     let out_link = $"/tmp/($host)-system-result"
     ^nom build $".#nixosConfigurations.($host).config.system.build.toplevel" --out-link $out_link
     let system_path = (^realpath $out_link | str trim)
     if ($system_path | str starts-with "/nix/store") {
-        print $"Copying system to ($host): ($system_path)"
+        print --stderr $"Copying system to ($host): ($system_path)"
         ^nix copy --to $"ssh://($host)" $system_path
-        print $"Activating on ($host) \(will prompt for sudo password\)..."
+        print --stderr $"Activating on ($host) \(will prompt for sudo password\)..."
         ^ssh -t $host $"sudo nix-env -p /nix/var/nix/profiles/system --set ($system_path) && sudo ($system_path)/bin/switch-to-configuration switch"
     } else {
-        print "ERROR: Failed to build or get system path"
+        print --stderr "ERROR: Failed to build or get system path"
     }
 }
 
 # Helper: build NixOS config locally with nom, copy and set as boot default on remote host
 def do-boot-remote-os [host: string] {
-    print $"Building NixOS configuration for ($host) with nom..."
+    print --stderr $"Building NixOS configuration for ($host) with nom..."
     let out_link = $"/tmp/($host)-system-result"
     ^nom build $".#nixosConfigurations.($host).config.system.build.toplevel" --out-link $out_link
     let system_path = (^realpath $out_link | str trim)
     if ($system_path | str starts-with "/nix/store") {
-        print $"Copying system to ($host): ($system_path)"
+        print --stderr $"Copying system to ($host): ($system_path)"
         ^nix copy --to $"ssh://($host)" $system_path
-        print $"Setting boot default on ($host) \(will prompt for sudo password\)..."
+        print --stderr $"Setting boot default on ($host) \(will prompt for sudo password\)..."
         ^ssh -t $host $"sudo nix-env -p /nix/var/nix/profiles/system --set ($system_path) && sudo ($system_path)/bin/switch-to-configuration boot"
     } else {
-        print "ERROR: Failed to build or get system path"
+        print --stderr "ERROR: Failed to build or get system path"
     }
 }
 
 # Helper: build home-manager package locally, copy and activate on remote host
 def do-switch-remote-home [host: string, user: string] {
-    print $"Building home-manager activation package for ($host)..."
+    print --stderr $"Building home-manager activation package for ($host)..."
     let out_link = $"/tmp/($host)-home-result"
     let flake_host = (host-flake-name $host)
     ^nom build $".#homeConfigurations.($user)@($flake_host).activationPackage" --out-link $out_link
     let activation_path = (^realpath $out_link | str trim)
     if ($activation_path | str starts-with "/nix/store") {
-        print $"Copying to ($host): ($activation_path)"
+        print --stderr $"Copying to ($host): ($activation_path)"
         ^nix copy --to $"ssh://($host)" $activation_path
-        print $"Activating on ($host)..."
+        print --stderr $"Activating on ($host)..."
         let ts = (date now | format date '%s')
         ^ssh $host $"HOME_MANAGER_BACKUP_EXT=backup.($ts) ($activation_path)/activate"
     } else {
-        print "ERROR: Failed to build activation package or invalid path"
+        print --stderr "ERROR: Failed to build activation package or invalid path"
     }
 }
 

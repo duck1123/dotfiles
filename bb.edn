@@ -9,7 +9,15 @@
 
   build-all
   {:doc  "build all configurations"
-   :task (shell "nom build .#ci")}
+   :task (shell (str "nom build"
+                     " '.#homeConfigurations.duck@inspernix.activationPackage'"
+                     " '.#homeConfigurations.duck@nasnix.activationPackage'"
+                     " '.#homeConfigurations.duck@powerspecnix.activationPackage'"
+                     " '.#homeConfigurations.deck@steamdeck.activationPackage'"
+                     " '.#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage'"
+                     " '.#nixosConfigurations.inspernix.config.system.build.toplevel'"
+                     " '.#nixosConfigurations.nasnix.config.system.build.toplevel'"
+                     " '.#nixosConfigurations.powerspecnix.config.system.build.toplevel'"))}
 
   build-all-home
   {:doc     "Build all home configurations"
