@@ -352,7 +352,7 @@ def switch-remote-os [host: string] {
     if ($system_path | str starts-with "/nix/store") {
         print $"Copying system to ($host): ($system_path)"
         ^nix copy --to $"ssh://($host)" $system_path
-        print $"Activating on ($host) (will prompt for sudo password)..."
+        print $"Activating on ($host) \(will prompt for sudo password\)..."
         ^ssh -t $host $"sudo nix-env -p /nix/var/nix/profiles/system --set ($system_path) && sudo ($system_path)/bin/switch-to-configuration switch"
     } else {
         print "ERROR: Failed to build or get system path"
