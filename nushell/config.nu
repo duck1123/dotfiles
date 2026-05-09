@@ -63,17 +63,6 @@ def save_last_dir [] {
 $env.config.hooks.pre_prompt = [{ save_last_dir }]
 $env.config.show_banner = false
 
-# Enter a sub-shell with scripts/nur.nu overlay loaded from the current project
-def pnu [] {
-    let script = ($env.PWD | path join scripts nur.nu)
-    if not ($script | path exists) {
-        error make {msg: $"No scripts/nur.nu in ($env.PWD)"}
-    }
-    let tmp = (mktemp --suffix .nu)
-    $"source ($nu.config-path)\noverlay use ($script)\n" | save --force $tmp
-    nu --config $tmp
-    try { rm --force $tmp }
-}
 
 def "_parse keepassxc data" []: string -> record {
   lines

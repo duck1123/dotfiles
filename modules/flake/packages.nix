@@ -55,6 +55,28 @@ let
     meta.mainProgram = "soap";
   };
 
+  pnu = pkgs.writeShellApplication {
+    name = "pnu";
+    runtimeInputs = [ pkgs.nushell ];
+    text = ''
+      CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/nushell"
+      CONFIG="$CONFIG_DIR/config.nu"
+      ENV_CONFIG="$CONFIG_DIR/env.nu"
+      SCRIPT="$PWD/scripts/nur.nu"
+
+      TMP=$(mktemp --suffix=.nu)
+      trap 'rm -f "$TMP"' EXIT
+
+      if [ -f "$SCRIPT" ]; then
+        printf 'source "%s"\noverlay use "%s"\n' "$CONFIG" "$SCRIPT" > "$TMP"
+      else
+        printf 'source "%s"\n' "$CONFIG" > "$TMP"
+      fi
+
+      exec nu --env-config "$ENV_CONFIG" --config "$TMP" "$@"
+    '';
+  };
+
   nur-taskrunner = pkgs.rustPlatform.buildRustPackage {
     pname = "nur";
     version = "0.24.1+0.112.2";
@@ -107,6 +129,7 @@ in
             ci-home
             ci-os
             nur-taskrunner
+            pnu
             soap-cli
             windmill-cli
             ;

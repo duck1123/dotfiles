@@ -161,7 +161,7 @@
                   mod = "$mainMod";
                   key = "n";
                   command = "exec";
-                  arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" nu'';
+                  arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" pnu'';
                 }
                 {
                   mod = "$mainMod";

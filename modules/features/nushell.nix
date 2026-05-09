@@ -33,6 +33,7 @@
           nushellPlugins.skim
           # nushellPlugins.net
           inputs.self.packages.${pkgs.system}.nur-taskrunner
+          inputs.self.packages.${pkgs.system}.pnu
         ];
 
         home.file."nushell/completions".source = ../../nushell/completions;
