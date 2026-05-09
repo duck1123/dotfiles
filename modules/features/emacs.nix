@@ -40,19 +40,19 @@
             [
               ag
               auto-complete
-              cider
-              clojure-mode
+              # cider
+              # clojure-mode
               color-theme
               company
-              earthfile-mode
+              # earthfile-mode
               flycheck
-              flycheck-clj-kondo
-              flycheck-clojure
-              flycheck-gradle
+              # flycheck-clj-kondo
+              # flycheck-clojure
+              # flycheck-gradle
               general
-              go-mode
-              gradle-mode
-              helm-make
+              # go-mode
+              # gradle-mode
+              # helm-make
               helm-projectile
               lsp-mode
               lsp-ui
@@ -60,7 +60,7 @@
               nix-mode
               nushell-mode
               nushell-ts-mode
-              nvm
+              # nvm
               nyan-mode
               org-ql
               org-roam
@@ -71,9 +71,9 @@
               projectile
               rainbow-delimiters
               reformatter
-              scss-mode
+              # scss-mode
               smartparens
-              terraform-mode
+              # terraform-mode
               tree-sitter
               which-key
               windswap
