@@ -9,7 +9,7 @@ def home-hosts [] {
 }
 
 # Map a host's friendly name to its flake attribute name
-def host-flake-name [host: string]: string -> string {
+def host-flake-name [host: string]: nothing -> string {
     match $host {
         "vallen" => "VAVIRL-PW0BWNQ8",
         _ => $host
@@ -17,7 +17,7 @@ def host-flake-name [host: string]: string -> string {
 }
 
 # Map a host to its primary user
-def host-user [host: string]: string -> string {
+def host-user [host: string]: nothing -> string {
     match $host {
         "steamdeck" => "deck",
         "vallen" | "VAVIRL-PW0BWNQ8" => "drenfer",
