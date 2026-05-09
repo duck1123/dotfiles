@@ -285,6 +285,10 @@ def "nur build-remote-home-nixmini" [
     ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ".#homeConfigurations.duck@nixmini.activationPackage"
 }
 
+def nixos-hosts [] {
+    ["edgenix", "inspernix", "nasnix", "nixmini", "powerspecnix", "vidcentre"]
+}
+
 # Helper: diff OS closures between local build and remote host
 def diff-remote-os [host: string] {
     print $"Building new NixOS configuration for ($host)..."
@@ -359,6 +363,22 @@ def switch-remote-os [host: string] {
     }
 }
 
+# Helper: build NixOS config locally with nom, copy and set as boot default on remote host
+def boot-remote-os [host: string] {
+    print $"Building NixOS configuration for ($host) with nom..."
+    let out_link = $"/tmp/($host)-system-result"
+    ^nom build $".#nixosConfigurations.($host).config.system.build.toplevel" --out-link $out_link
+    let system_path = (^realpath $out_link | str trim)
+    if ($system_path | str starts-with "/nix/store") {
+        print $"Copying system to ($host): ($system_path)"
+        ^nix copy --to $"ssh://($host)" $system_path
+        print $"Setting boot default on ($host) \(will prompt for sudo password\)..."
+        ^ssh -t $host $"sudo nix-env -p /nix/var/nix/profiles/system --set ($system_path) && sudo ($system_path)/bin/switch-to-configuration boot"
+    } else {
+        print "ERROR: Failed to build or get system path"
+    }
+}
+
 # Helper: build home-manager package locally, copy and activate on remote host
 def switch-remote-home [host: string, user: string] {
     print $"Building home-manager activation package for ($host)..."
@@ -389,6 +409,11 @@ def "nur switch-remote-os-nasnix" [] {
 # Build NixOS config locally with nom, then copy and switch on nixmini
 def "nur switch-remote-os-nixmini" [] {
     switch-remote-os nixmini
+}
+
+# Build NixOS config locally with nom, copy and set as boot default on a remote host
+def "nur boot-remote-os" [host: string@nixos-hosts] {
+    boot-remote-os $host
 }
 
 # Build home-manager activation package locally, copy to edgenix, and activate
