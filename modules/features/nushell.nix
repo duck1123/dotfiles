@@ -20,7 +20,9 @@
         home.packages = with pkgs; [
           carapace
           fish
+          jc
           nushell
+          nu-lint
           nu_scripts
           nufmt
           # nushellPlugins.highlight

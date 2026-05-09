@@ -33,7 +33,7 @@ in
             emacs.enable = true;
             emacs-prelude.enable = false;
             email.enable = true;
-            flipper.enable = true;
+            flipper.enable = false;
             firefox.enable = true;
             font.enable = true;
             gaming.enable = true;
@@ -58,7 +58,7 @@ in
               server.enable = false;
             };
 
-            music.enable = true;
+            music.enable = false;
             ncmpcpp.enable = false;
             network.enable = true;
             nfs.enable = false;
@@ -66,6 +66,7 @@ in
             nostr.enable = true;
             nushell.enable = true;
             pictures.enable = true;
+            python.enable = true;
             radio.enable = false;
             sddm.enable = true;
             sound.enable = true;
@@ -110,7 +111,10 @@ in
         host = config.hosts.${hostname};
 
         home.packages = with pkgs; [
+          affine
+          claude-code
           plex-desktop
+          qbittorrent
           vscode
         ];
       };
