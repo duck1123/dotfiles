@@ -105,36 +105,42 @@ export def "nur build-os" [
 }
 
 # Run validation on the project
-export def "nur check" [] {
+export def "nur check" []: nothing -> nothing {
     ^nix flake check
 }
 
 # Build all targets (check + build --all)
-export def "nur ci" [] {
+export def "nur ci" []: nothing -> nothing {
     nur check
     nur build --all true
 }
 
 # Format all .nix files using nixfmt
-export def "nur format" [] {
+export def "nur format" []: nothing -> nothing {
     ^find . -name '*.nix' -exec nixfmt {} +
 }
 
 # Install cert-manager into the current cluster
-export def "nur install-cert-manager" [] {
+export def "nur install cert-manager" []: nothing -> nothing {
     let version = "1.14.4"
     let url = $"https://github.com/cert-manager/cert-manager/releases/download/v($version)/cert-manager.yaml"
-    ^kubectl apply -f $url
+    let result = (kubectl apply -f $url | complete)
+    if $result.exit_code != 0 {
+        error make {
+            msg: $result.stderr
+            label: {text: "kubectl apply failed", span: (metadata $url).span}
+        }
+    }
 }
 
 # List GPG secret keys
-export def "nur list-secret-keys" [] {
-    ^gpg --list-secret-keys --keyid-format=long
+export def "nur secrets list-keys" []: nothing -> string {
+    gpg --list-secret-keys --keyid-format=long
 }
 
 # Read windows key from firmware
-export def "nur read-windows-key" [] {
-    ^sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM
+export def "nur secrets windows-key" []: nothing -> string {
+    sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM
 }
 
 # Switch both home-manager and NixOS (local if no --host, otherwise remote)
@@ -144,7 +150,9 @@ export def "nur switch" [--host: string@nixos-hosts = ""] {
 }
 
 # Switch the home-manager configuration (local if no --host, otherwise remote)
-export def "nur switch-home" [--host: string@home-hosts = ""] {
+export def "nur switch-home" [
+  --host: string@home-hosts = ""
+] {
     if ($host | is-empty) {
         let ts = (date now | format date '%s')
         ^home-manager switch --flake . -b $"backup.($ts)" --show-trace
@@ -275,55 +283,10 @@ def do-switch-remote-home [host: string, user: string] {
     }
 }
 
-# Create k3d local registry
-export def "nur k3d create-registry" [] {
-    ^k3d registry create myregistry.localtest.me --port 12345
-}
-
-# Create a k3d cluster
-export def "nur k3d create" [] {
-    ^k3d cluster create --api-port 6550 -p "80:80@loadbalancer" -p "443:443@loadbalancer" --k3s-arg "--disable=traefik@server:0" --servers 1 --registry-use k3d-myregistry.localtest.me:12345 --kubeconfig-update-default
-}
-
-# Delete k3d cluster
-export def "nur k3d delete" [] {
-    ^k3d cluster delete k3s-default
-}
-
-# Start the k3s cluster
-export def "nur k3d start" [] {
-    ^k3d cluster start
-}
-
-# Stop the k3s cluster
-export def "nur k3d stop" [] {
-    ^k3d cluster stop
-}
-
 # Install ArgoCD into the current cluster
 export def "nur install argocd" [] {
-    print "Installing argocd"
     ^kubectl create namespace argocd
     ^kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-}
-
-# Install consul into the current cluster
-export def "nur install consul" [] {
-    ^consul-k8s install --set server.replicas=1 --set ui.ingress.enabled=true --set "ui.ingress.hosts[0].host=consul.localhost" --set "ui.ingress.hosts[0].paths[0]=/" --set connectInject.enabled=true --set connectInject.default=true --set controller.enabled=true
-}
-
-# Install rancher via helm
-export def "nur install rancher" [] {
-    let namespace = "cattle-system"
-    let hostname = "rancher.dev.kronkltd.net"
-    let email = "duck@kronkltd.net"
-    let replicas = 1
-    ^helm install rancher rancher-latest/rancher --namespace $namespace $"--set=hostname=($hostname)" $"--set=replicas=($replicas)" --set=ingress.tls.source=letsEncrypt $"--set=letsEncrypt.email=($email)"
-}
-
-# Install traefik helm chart
-export def "nur install traefik" [] {
-    ^helm install traefik traefik/traefik
 }
 
 # Show listening ports
@@ -369,7 +332,7 @@ export def "nur k8s decrypt" [] {
 }
 
 # Encrypt secrets/k8s.yaml back to secrets/k8s.enc.yaml
-export def "nur k8s-encrypt" [] {
+export def "nur k8s encrypt" [] {
     ^sops --encrypt secrets/k8s.yaml | save -f secrets/k8s.enc.yaml
 }
 

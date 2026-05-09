@@ -6,30 +6,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Nix flake-based dotfiles/system configuration repo managing multiple NixOS hosts and home-manager configurations. It uses [flake-parts](https://github.com/hercules-ci/flake-parts) + [import-tree](https://github.com/vic/import-tree) to auto-import all modules from `./modules/`.
 
-The primary task runner is [Babashka](https://github.com/babashka/babashka) (`bb`), with tasks defined in `bb.edn`.
+The primary task runner is [nur](https://github.com/nickel-lang/nur) using Nushell, with tasks defined in `scripts/nur.nu`.
 
 ## Key Commands
 
 ```sh
 # Build and apply local configuration
-bb build           # build current home + OS configs
-bb switch          # switch both home-manager and NixOS
-bb switch-home     # apply home-manager config only
-bb switch-os       # apply NixOS config only
-bb boot-os         # build NixOS and set as boot default (safe for slow activations)
+nur build           # build current home + OS configs
+nur switch          # switch both home-manager and NixOS
+nur switch-home     # apply home-manager config only
+nur switch-os       # apply NixOS config only
+nur boot-os         # build NixOS and set as boot default (safe for slow activations)
 
 # Validation and formatting
-bb check           # run nix flake check
-bb format          # format all .nix files with nixfmt
+nur check           # run nix flake check
+nur format          # format all .nix files with nixfmt
 
 # Remote deployment (builds locally, copies + activates remotely)
-bb switch-remote-edgenix   # deploy to edgenix
-bb switch-remote-nasnix    # deploy to nasnix
-bb diff-remote-os-edgenix  # show package changes before deploying
+nur switch --host edgenix    # deploy to edgenix
+nur switch --host nasnix     # deploy to nasnix
+nur diff-os --host edgenix   # show package changes before deploying
 
 # Flake maintenance
-nix flake update   # update flake.lock
-bb build-all       # build all configurations (nom build .#ci)
+nix flake update    # update flake.lock
+nur build --all     # build all configurations
 ```
 
 ## Architecture
@@ -96,15 +96,9 @@ Four files must be updated when adding a NixOS host. Missing any one causes eval
 
 4. **`modules/flake/homeConfigurations.nix`** — add a `"<user>@<hostname>"` entry importing `[base <hostname>]` from `homeManager`.
 
-5. **`bb.edn`** — add the corresponding bb tasks:
-   - `build-home-<hostname>`, `build-os-<hostname>`
-   - `build-remote-os-<hostname>`, `build-remote-home-<hostname>`
-   - `diff-remote-os-<hostname>`, `dry-run-remote-os-<hostname>`
-   - `switch-remote-<hostname>`, `switch-remote-os-<hostname>`, `switch-remote-home-<hostname>`
-
 ### Secrets
 
-Managed via [sops-nix](https://github.com/Mic92/sops-nix). Secret files live in `secrets/`. GPG keys are used for encryption (`bb list-secret-keys`).
+Managed via [sops-nix](https://github.com/Mic92/sops-nix). Secret files live in `secrets/`. GPG keys are used for encryption (`nur secrets list-keys`).
 
 ### Nushell
 
@@ -112,6 +106,6 @@ Managed via [sops-nix](https://github.com/Mic92/sops-nix). Secret files live in 
 
 ### Task Runner (`nur`)
 
-[nur](https://github.com/nickel-lang/nur) is a secondary task runner (alongside `bb`) using Nushell. Tasks are defined in `scripts/nur.nu` as a Nushell module with `export def "nur <task>"` commands. **`scripts/nur.nu` is not deployed to systems** — it's local to this repo only.
+[nur](https://github.com/nickel-lang/nur) is the task runner using Nushell. Tasks are defined in `scripts/nur.nu` as a Nushell module with `export def "nur <task>"` commands. **`scripts/nur.nu` is not deployed to systems** — it's local to this repo only.
 
 `nurfile` (at repo root) simply does `overlay use scripts/nur.nu` to load the module. Tasks run with CWD as the repo root.

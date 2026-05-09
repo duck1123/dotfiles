@@ -101,8 +101,6 @@ in
           homeDirectory = "/home/${username}";
           sessionPath = [ "$HOME/.local/bin" ];
 
-          file.".bb/bb.edn".source = ../../bb.edn;
-
           packages = with pkgs; [
             bat
             direnv

@@ -67,7 +67,6 @@
               dr = "devspace run";
               cat = "bat";
               hh = "hstr";
-              bbg = "bb --config ~/.bb/bb.edn";
               # psgrep = "ps -ef | grep -v grep | grep ";
               rmr = "runme run";
             };

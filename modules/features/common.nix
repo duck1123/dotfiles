@@ -20,7 +20,6 @@
     {
       config = lib.mkIf config.host.features.common.enable {
         home = {
-          file.".bb/bb.edn".source = ../../bb.edn;
           homeDirectory = "/home/${username}";
 
           packages = with pkgs; [
