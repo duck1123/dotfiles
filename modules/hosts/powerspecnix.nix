@@ -113,7 +113,6 @@ in
         home.packages = with pkgs; [
           affine
           claude-code
-          plex-desktop
           qbittorrent
           vscode
         ];
