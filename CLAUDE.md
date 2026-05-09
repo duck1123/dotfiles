@@ -109,3 +109,9 @@ Managed via [sops-nix](https://github.com/Mic92/sops-nix). Secret files live in 
 ### Nushell
 
 `nushell/` contains Nushell shell configuration (`config.nu`, `env.nu`) and custom modules/completions.
+
+### Task Runner (`nur`)
+
+[nur](https://github.com/nickel-lang/nur) is a secondary task runner (alongside `bb`) using Nushell. Tasks are defined in `scripts/nur.nu` as a Nushell module with `export def "nur <task>"` commands. **`scripts/nur.nu` is not deployed to systems** — it's local to this repo only.
+
+`nurfile` (at repo root) simply does `overlay use scripts/nur.nu` to load the module. Tasks run with CWD as the repo root.
