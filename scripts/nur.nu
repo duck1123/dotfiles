@@ -25,82 +25,68 @@ def host-user [host: string]: nothing -> string {
     }
 }
 
-def all-installables []: nothing -> list<string> {
+def all-home-installables []: nothing -> list<string> {
     [
         ".#homeConfigurations.duck@inspernix.activationPackage"
         ".#homeConfigurations.duck@nasnix.activationPackage"
         ".#homeConfigurations.duck@powerspecnix.activationPackage"
         ".#homeConfigurations.deck@steamdeck.activationPackage"
         ".#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage"
+    ]
+}
+
+def all-os-installables []: nothing -> list<string> {
+    [
         ".#nixosConfigurations.inspernix.config.system.build.toplevel"
         ".#nixosConfigurations.nasnix.config.system.build.toplevel"
         ".#nixosConfigurations.powerspecnix.config.system.build.toplevel"
     ]
 }
 
-# Build configurations (local, --host <name>, or --all)
+def all-installables []: nothing -> list<string> {
+    [...(all-home-installables) ...(all-os-installables)]
+}
+
+# Build configurations (local, --host <name>, or --all). Use --os-only or --home-only to restrict.
 export def "nur build" [
-    --host: string@nixos-hosts = ""
+    --host: string@home-hosts = ""
     --all = false
     --fallback = false
+    --os-only = false
+    --home-only = false
 ]: nothing -> nothing {
+    if $os_only and $home_only {
+        error make {
+            msg: "--os-only and --home-only are mutually exclusive"
+            label: {text: "conflicting flags", span: (metadata $os_only).span}
+        }
+    }
     if $all and ($host | is-not-empty) {
         error make {
             msg: "--all and --host are mutually exclusive"
             label: {text: "--host provided here", span: (metadata $host).span}
         }
     }
-    if $all {
-        ^nom build ...(if $fallback { ["--fallback"] } else { [] }) ...(all-installables)
-    } else {
-        nur build-home --host $host --fallback $fallback
-        nur build-os --host $host --fallback $fallback
-    }
-}
-
-# Build home configurations (local, --host <name>, or --all)
-export def "nur build-home" [
-    --host: string@home-hosts = ""
-    --all = false
-    --fallback = false
-] {
-    if $all and not ($host | is-empty) {
-        error make { msg: "--all and --host are mutually exclusive" }
-    }
     let args = (if $fallback { ["--fallback"] } else { [] })
     if $all {
-        nur build-home --host inspernix --fallback $fallback
-        nur build-home --host nasnix --fallback $fallback
-        nur build-home --host powerspecnix --fallback $fallback
-        nur build-home --host steamdeck --fallback $fallback
-        nur build-home --host vallen --fallback $fallback
+        let installables = (
+            if $os_only { all-os-installables }
+            else if $home_only { all-home-installables }
+            else { all-installables }
+        )
+        ^nom build ...$args ...$installables
     } else if ($host | is-empty) {
-        ^nh home build ...$args .
+        if not $os_only { ^nh home build ...$args . }
+        if not $home_only { ^nh os build ...$args . }
     } else {
-        let user = (host-user $host)
-        let flake_host = (host-flake-name $host)
-        ^nom build ...$args $".#homeConfigurations.($user)@($flake_host).activationPackage"
-    }
-}
-
-# Build NixOS configurations (local, --host <name>, or --all)
-export def "nur build-os" [
-    --host: string@nixos-hosts = ""
-    --all = false
-    --fallback = false
-] {
-    if $all and not ($host | is-empty) {
-        error make { msg: "--all and --host are mutually exclusive" }
-    }
-    let args = (if $fallback { ["--fallback"] } else { [] })
-    if $all {
-        nur build-os --host inspernix --fallback $fallback
-        nur build-os --host nasnix --fallback $fallback
-        nur build-os --host powerspecnix --fallback $fallback
-    } else if ($host | is-empty) {
-        ^nh os build ...$args .
-    } else {
-        ^nom build ...$args $".#nixosConfigurations.($host).config.system.build.toplevel"
+        if not $os_only {
+            let user = (host-user $host)
+            let flake_host = (host-flake-name $host)
+            ^nom build ...$args $".#homeConfigurations.($user)@($flake_host).activationPackage"
+        }
+        if not $home_only {
+            ^nom build ...$args $".#nixosConfigurations.($host).config.system.build.toplevel"
+        }
     }
 }
 
@@ -143,36 +129,39 @@ export def "nur secrets windows-key" []: nothing -> string {
     sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM
 }
 
-# Switch both home-manager and NixOS (local if no --host, otherwise remote)
-export def "nur switch" [--host: string@nixos-hosts = ""] {
-    nur switch-home --host $host
-    nur switch-os --host $host
-}
-
-# Switch the home-manager configuration (local if no --host, otherwise remote)
-export def "nur switch-home" [
-  --host: string@home-hosts = ""
+# Switch home-manager and/or NixOS configurations (local if no --host, otherwise remote).
+# Use --os-only or --home-only to restrict which configs are switched.
+export def "nur switch" [
+    --host: string@home-hosts = ""
+    --os-only = false
+    --home-only = false
 ] {
-    if ($host | is-empty) {
-        let ts = (date now | format date '%s')
-        ^home-manager switch --flake . -b $"backup.($ts)" --show-trace
-    } else {
-        do-switch-remote-home $host (host-user $host)
+    if $os_only and $home_only {
+        error make { msg: "--os-only and --home-only are mutually exclusive" }
     }
-}
-
-# Switch the NixOS configuration (local if no --host, otherwise remote)
-export def "nur switch-os" [--host: string@nixos-hosts = ""] {
-    if ($host | is-empty) {
-        try {
-            ^sudo nixos-rebuild switch --flake . --show-trace
-        } catch {|_e|
-            print "\n=== systemd journal (last 50 lines) ==="
-            ^journalctl -xe --no-pager -n 50
-            exit $env.LAST_EXIT_CODE
+    if not $os_only {
+        if ($host | is-empty) {
+            let ts = (date now | format date '%s')
+            ^home-manager switch --flake . -b $"backup.($ts)" --show-trace
+        } else {
+            do-switch-remote-home $host (host-user $host)
         }
-    } else {
-        do-switch-remote-os $host
+    }
+    if not $home_only {
+        if ($host | is-empty) {
+            try {
+                ^sudo nixos-rebuild switch --flake . --show-trace
+            } catch {|e|
+                print "\n=== systemd journal (last 50 lines) ==="
+                ^journalctl -xe --no-pager -n 50
+                error make {
+                    msg: $e.msg
+                    label: {text: "nixos-rebuild switch failed", span: (metadata $host).span}
+                }
+            }
+        } else {
+            do-switch-remote-os $host
+        }
     }
 }
 
