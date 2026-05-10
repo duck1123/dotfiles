@@ -25,6 +25,7 @@
           packages = with pkgs; [
             # aider-chat-full
             appimage-run
+            argocd
             baobab
             bat
             brotab
