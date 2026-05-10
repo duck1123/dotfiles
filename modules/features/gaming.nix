@@ -14,13 +14,22 @@
       pkgs,
       ...
     }:
+    let
+      patched = pkgs.extend (final: prev: {
+        openldap = prev.openldap.overrideAttrs { doCheck = false; };
+        pkgsi686Linux = prev.pkgsi686Linux.extend (_: prev686: {
+          openldap = prev686.openldap.overrideAttrs { doCheck = false; };
+        });
+      });
+    in
     {
       config = lib.mkIf config.host.features.gaming.enable {
         home.packages = with pkgs; [
           dolphin-emu
           # heroic
           itch
-          # lutris
+          patched.lutris
+
           # nexusmods-app
           protontricks
           satisfactorymodmanager
