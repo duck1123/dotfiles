@@ -119,6 +119,7 @@
               (setq read-process-output-max (* 1024 1024))
               (setq create-lockfiles nil)
               (setq make-backup-files nil)
+              (setq ring-bell-function 'ignore)
 
               ;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
               (setq user-emacs-directory (expand-file-name "~/.cache/emacs/"))
