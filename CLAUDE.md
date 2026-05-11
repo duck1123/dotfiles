@@ -12,11 +12,11 @@ The primary task runner is [nur](https://github.com/nickel-lang/nur) using Nushe
 
 ```sh
 # Build and apply local configuration
-nur build           # build current home + OS configs
-nur switch          # switch both home-manager and NixOS
-nur switch-home     # apply home-manager config only
-nur switch-os       # apply NixOS config only
-nur boot-os         # build NixOS and set as boot default (safe for slow activations)
+nur build                        # build current home + OS configs
+nur switch                       # switch both home-manager and NixOS
+nur switch --home-only true      # apply home-manager config only
+nur switch --os-only true        # apply NixOS config only
+nur boot-os                      # build NixOS and set as boot default (safe for slow activations)
 
 # Validation and formatting
 nur check           # run nix flake check
