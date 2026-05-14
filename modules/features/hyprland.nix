@@ -40,6 +40,7 @@
 
         wayland.windowManager.hyprland = {
           enable = true;
+          configType = "lua";
           settings = {
             "$fileManager" = "nautiulus";
             "$menu" = "wofi --show drun";
@@ -47,7 +48,7 @@
             "$terminal" = "kitty";
 
             animations = {
-              enabled = "yes";
+              enabled = true;
               bezier = "ease, 0.4, 0.02, 0.21, 1";
               animation = [
                 "windows, 1, 3.5, ease, slide"
@@ -69,8 +70,8 @@
             decoration.rounding = 10;
 
             dwindle = {
-              pseudotile = "yes";
-              "preserve_split" = "yes";
+              pseudotile = true;
+              "preserve_split" = true;
             };
 
             general = {
