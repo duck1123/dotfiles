@@ -46,6 +46,7 @@ in
 
             tailscale.enable = true;
             touch.enable = true;
+            zen-browser.enable = true;
             zsh.enable = false;
           };
 

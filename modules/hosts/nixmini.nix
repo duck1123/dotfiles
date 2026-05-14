@@ -64,6 +64,7 @@ in
             tailscale.enable = true;
             vscode.enable = false;
             xserver.enable = true;
+            zen-browser.enable = true;
             zsh.enable = true;
           };
 

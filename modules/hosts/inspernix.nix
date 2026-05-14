@@ -61,6 +61,7 @@ in
             vscode.enable = true;
             windmill.enable = true;
             xserver.enable = true;
+            zen-browser.enable = true;
             zsh.enable = true;
           };
 

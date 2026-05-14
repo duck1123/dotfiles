@@ -70,6 +70,7 @@ in
             vscode.enable = false;
             waybar.enable = false;
             xserver.enable = false;
+            zen-browser.enable = false;
             zsh.enable = true;
           };
 

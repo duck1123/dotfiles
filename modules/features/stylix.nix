@@ -80,8 +80,6 @@ in
           targets.firefox.profileNames = [ "default" ];
           targets.hyprland.enable = false;
           targets.vscode.profileNames = [ "default" ];
-          targets.zen-browser.profileNames = [ "default" ];
-
           fonts = {
             # monospace = {
             #   package = pkgs.nerdfonts.override {fonts = ["JetBrainsMono"];};

@@ -91,15 +91,6 @@
           jq.enable = true;
 
           tmux.enable = true;
-
-          zen-browser = {
-            enable = true;
-            # find more options here: https://mozilla.github.io/policy-templates/
-            policies = {
-              DisableAppUpdate = true;
-              DisableTelemetry = true;
-            };
-          };
         };
 
         targets.genericLinux.enable = true;

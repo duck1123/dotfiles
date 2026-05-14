@@ -60,6 +60,7 @@ in
           vscode
           waybar
           windmill
+          zen-browser
           zsh
         ])
         ++ (map (name: inputs.self.modules.homeManager.${name}) unified-modules)

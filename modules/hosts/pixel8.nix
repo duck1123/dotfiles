@@ -82,6 +82,7 @@ in
           vscode.enable = true;
           waybar.enable = false;
           xserver.enable = false;
+          zen-browser.enable = true;
           zsh.enable = true;
         };
 
