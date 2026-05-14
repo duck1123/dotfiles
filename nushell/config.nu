@@ -31,6 +31,7 @@ let external_completer = {|spans|
       asdf => $fish_completer
       argocd => $fish_completer
       az => $fish_completer
+      databricks => $fish_completer
       doctl => $fish_completer
       git => $fish_completer
       jj => $fish_completer
@@ -126,11 +127,8 @@ use ~/.nix-profile/share/nu_scripts/custom-completions/nix/nix-completions.nu *
 
 use ~/nushell/completions/algia-completions.nu *
 use ~/nushell/completions/bb-completions.nu *
-use ~/nushell/completions/databricks-completions.nu *
 use ~/nushell/completions/devspace-completions.nu *
-use ~/nushell/completions/earthly-completions.nu *
 use ~/nushell/completions/nak-completions.nu *
-use ~/nushell/completions/nh-completions.nu *
 
 use ~/nushell/modules/hypr_module.nu *
 use ~/nushell/modules/nostr_module.nu *
