@@ -104,11 +104,10 @@ export def "nur build" [
     if not $os_only {
       let user = (host-user $host)
       let flake_host = (host-flake-name $host)
-      ^nom build ...$args $".#homeConfigurations.($user)@($flake_host).activationPackage"
+      ^nom build --no-link ...$args $".#homeConfigurations.($user)@($flake_host).activationPackage"
     }
-
     if not $home_only {
-      ^nom build ...$args $".#nixosConfigurations.($host).config.system.build.toplevel"
+      ^nom build --no-link ...$args $".#nixosConfigurations.($host).config.system.build.toplevel"
     }
   }
 }
