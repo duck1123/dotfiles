@@ -40,7 +40,8 @@
 
         wayland.windowManager.hyprland = {
           enable = true;
-          configType = "lua";
+          # configType = "lua";
+          configType = "hyprlang";
           settings = {
             "$fileManager" = "nautiulus";
             "$menu" = "wofi --show drun";
