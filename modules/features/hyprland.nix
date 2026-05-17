@@ -71,7 +71,7 @@
             decoration.rounding = 10;
 
             dwindle = {
-              pseudotile = true;
+              # pseudotile = true;
               "preserve_split" = true;
             };
 
@@ -135,12 +135,12 @@
                   command = "exec";
                   arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" htop'';
                 }
-                {
-                  mod = "$mainMod";
-                  key = "j";
-                  command = "togglesplit";
-                  arg = "";
-                }
+                # {
+                #   mod = "$mainMod";
+                #   key = "j";
+                #   command = "togglesplit";
+                #   arg = "";
+                # }
                 {
                   mod = "$mainMod";
                   key = "k";
