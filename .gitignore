@@ -1,6 +1,7 @@
 *~
 .clj-kondo
 .direnv
+.envrc
 .lsp
 .portal
 /ncmpcpp.symlink/error.log
