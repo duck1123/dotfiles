@@ -54,7 +54,10 @@ in
               };
             };
 
-            tailscale.enable = true;
+            tailscale = {
+              enable = true;
+              advertiseRoutes = [ "192.168.0.0/24" ];
+            };
             vscode.enable = true;
             xserver.enable = true;
             zen-browser.enable = true;
