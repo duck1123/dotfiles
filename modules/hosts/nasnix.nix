@@ -16,7 +16,7 @@ in
           name = hostname;
 
           features = {
-            clojure.enable = true;
+            clojure.enable = false;
             common.enable = true;
             developer.enable = true;
             docker.enable = true;
@@ -26,7 +26,7 @@ in
             git.enable = true;
             hyprland.enable = true;
             hyprpanel.enable = true;
-            jujutsu.enable = true;
+            jujutsu.enable = false;
 
             kubernetes = {
               client.enable = true;
@@ -36,7 +36,7 @@ in
 
             network.enable = true;
             nix.enable = true;
-            nostr.enable = true;
+            nostr.enable = false;
             nushell.enable = true;
             sddm.enable = true;
             ssh.enable = true;
@@ -58,9 +58,10 @@ in
               enable = true;
               advertiseRoutes = [ "192.168.0.0/24" ];
             };
-            vscode.enable = true;
+
+            vscode.enable = false;
             xserver.enable = true;
-            zen-browser.enable = true;
+            zen-browser.enable = false;
             zsh.enable = true;
           };
 

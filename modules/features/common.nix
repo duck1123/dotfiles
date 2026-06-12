@@ -34,7 +34,7 @@
             # cheese
             # cloudflare-cli
             # cloudflared
-            code-cursor
+            # code-cursor
             curl
             gnupg
             # gpa
@@ -45,22 +45,22 @@
             # google-chrome
             # graphviz
             # gum
-            fastfetch
+            # fastfetch
             hstr
             htop
             keepassxc
             lens
             libnotify
-            mosh
+            # mosh
             nerdfetch
             nh
             nix-tree
             nixd
             nixfmt
-            pear-desktop
+            # pear-desktop
             # radicle-node
             silver-searcher
-            slack
+            # slack
             # simplex-chat-desktop
             unzip
             xsel
@@ -70,7 +70,7 @@
         };
 
         programs = {
-          alacritty.enable = true;
+          alacritty.enable = false;
           bash.enable = true;
           bat.enable = true;
           btop.enable = true;
@@ -80,7 +80,7 @@
             nix-direnv.enable = true;
           };
 
-          eza.enable = true;
+          eza.enable = false;
 
           fish.enable = true;
           # gnome-terminal.enable = true;
@@ -88,7 +88,7 @@
           home-manager.enable = true;
           hstr.enable = true;
           k9s.enable = true;
-          mr.enable = true;
+          mr.enable = false;
           jq.enable = true;
 
           tmux.enable = true;
