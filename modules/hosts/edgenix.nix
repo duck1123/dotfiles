@@ -146,6 +146,7 @@ in
                   "nfsvers=3"
                   "rw"
                   "hard"
+                  "noexec"
                   "timeo=600"
                   "retrans=2"
                   "_netdev"
