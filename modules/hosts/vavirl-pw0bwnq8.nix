@@ -123,8 +123,6 @@ in
             nix-direnv.enable = true;
           };
 
-          eza.enable = true;
-
           git = {
             enable = true;
             lfs.enable = true;
