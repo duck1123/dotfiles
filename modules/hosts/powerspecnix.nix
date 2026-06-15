@@ -392,8 +392,8 @@ in
         _module.args = { inherit inputs; };
         imports = specialisations.hyprland.configuration.imports;
         specialisation = {
-          inherit (specialisations) budgie;
-          inherit (specialisations) gnome;
+          # inherit (specialisations) budgie;
+          # inherit (specialisations) gnome;
           # inherit (specialisations) i3;
           # inherit (specialisations) hyprland;
           inherit (specialisations) plasma6;
