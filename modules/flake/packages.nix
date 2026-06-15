@@ -79,14 +79,15 @@ let
 
   nur-taskrunner = pkgs.rustPlatform.buildRustPackage {
     pname = "nur";
-    version = "0.24.1+0.112.2";
+    version = "0.28.1+0.113.1";
+    # https://github.com/nur-taskrunner/nur
     src = pkgs.fetchFromGitHub {
       owner = "nur-taskrunner";
       repo = "nur";
-      rev = "v0.24.1+0.112.2";
-      hash = "sha256-PNZQQhiV2j0THSlfTYM6yfAoZkjuIb6YtwY2Q9r7wfw=";
+      rev = "v0.28.1+0.113.1";
+      hash = "sha256-ON6E4tbaWabHejkzakGZQiKOmd3teZZMPKCM8LwVNoY=";
     };
-    cargoHash = "sha256-AD9/0Byf18aPraSMpsiXzgADs+tbhjlQqBTOn87buJY=";
+    cargoHash = "sha256-Kcs9+53y/+Qrd4+18N9QTYiGdQjjjDaUJxdl+xBZPuo=";
     meta.mainProgram = "nur";
   };
 
