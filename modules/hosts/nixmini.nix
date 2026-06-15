@@ -10,7 +10,7 @@ in
       {
         hosts.${hostname} = {
           inherit hostname system;
-          id = "";
+          id = "745DPT4-HGNIGCP-O4FV22H-SZ3ALWS-YV2EJNX-HMMIUPP-YWOVJHZ-FT3DXAM";
           identity = config.identities.duck;
           name = hostname;
 
