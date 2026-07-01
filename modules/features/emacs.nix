@@ -38,7 +38,7 @@
             in
             with melpa;
             [
-              ag
+              rg
               auto-complete
               # cider
               # clojure-mode

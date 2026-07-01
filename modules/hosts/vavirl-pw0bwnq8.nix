@@ -108,7 +108,7 @@ in
             git
             htop
             nh
-            silver-searcher
+            ripgrep
             sqlcmd
           ];
         };

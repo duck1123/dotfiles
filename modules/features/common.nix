@@ -59,7 +59,7 @@
             nixfmt
             # pear-desktop
             # radicle-node
-            silver-searcher
+            ripgrep
             # slack
             # simplex-chat-desktop
             unzip
