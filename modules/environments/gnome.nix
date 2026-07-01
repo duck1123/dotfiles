@@ -1,9 +1,9 @@
-{ ... }:
+{ lib, ... }:
 {
   flake.modules.homeManager.environments-gnome =
     { config, ... }:
     {
-      gtk.gtk4.theme = config.gtk.theme;
+      gtk.gtk4.theme = lib.mkDefault config.gtk.theme;
     };
 
   flake.modules.nixos.environments-gnome =
