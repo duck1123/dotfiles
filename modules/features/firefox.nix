@@ -19,7 +19,12 @@
     };
 
   flake.modules.nixos.firefox-feature =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       config = lib.mkIf config.host.features.firefox.enable {
         users.users."${config.host.identity.username}".packages = [ pkgs.firefox ];

@@ -65,9 +65,11 @@
             ];
           };
 
-          xdg.configFile."fish/completions/databricks.fish".source = pkgs.runCommand "databricks-fish-completions" { } ''
-            ${pkgs.databricks-cli}/bin/databricks completion fish > $out
-          '';
+          xdg.configFile."fish/completions/databricks.fish".source =
+            pkgs.runCommand "databricks-fish-completions" { }
+              ''
+                ${pkgs.databricks-cli}/bin/databricks completion fish > $out
+              '';
         };
     };
 }

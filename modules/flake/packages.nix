@@ -45,12 +45,14 @@ let
       cp src/soap $out/bin/soap
       chmod +x $out/bin/soap
       wrapProgram $out/bin/soap \
-        --prefix PATH : ${pkgs.lib.makeBinPath [
-          pkgs.curl
-          pkgs.libxml2.bin
-          pkgs.xmlstarlet
-          pkgs.gnugrep
-        ]}
+        --prefix PATH : ${
+          pkgs.lib.makeBinPath [
+            pkgs.curl
+            pkgs.libxml2.bin
+            pkgs.xmlstarlet
+            pkgs.gnugrep
+          ]
+        }
     '';
     meta.mainProgram = "soap";
   };
