@@ -147,14 +147,6 @@ in
               enable = true;
               enableSSHSupport = true;
             };
-
-            nix-ld = {
-              enable = true;
-              libraries = with pkgs; [
-                alsa-lib
-                libGL
-              ];
-            };
           };
 
           services = {
