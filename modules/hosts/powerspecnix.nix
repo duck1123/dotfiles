@@ -48,7 +48,7 @@ in
             kubernetes = {
               client.enable = true;
               gpu = "amd";
-              server.enable = true;
+              server.enable = false;
               serverAddr = "https://nasnix:6443";
               tokenFile = ./../../secrets/k3s-token.yaml;
             };
