@@ -59,6 +59,7 @@ in
           vim
           vscode
           waybar
+          wayle
           windmill
           zen-browser
           zsh

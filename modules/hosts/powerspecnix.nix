@@ -40,7 +40,7 @@ in
             git.enable = true;
             gnome.enable = true;
             hyprland.enable = true;
-            hyprpanel.enable = true;
+            hyprpanel.enable = false;
             i3.enable = false;
             java.enable = true;
             jujutsu.enable = true;
@@ -93,6 +93,7 @@ in
             vpn.enable = true;
             vscode.enable = false;
             waybar.enable = false;
+            wayle.enable = true;
             windmill.enable = true;
             xserver.enable = true;
             zen-browser.enable = true;
