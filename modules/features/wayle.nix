@@ -17,50 +17,68 @@
 
           settings = {
             # font + palette are managed by stylix's wayle target
-            bar.layout = [
-              {
-                monitor = "*";
+            bar = {
+              bg = "transparent";
+              border-location = "bottom";
+              button-icon-padding = 0.5;
+              button-icon-size = 0.8;
+              button-label-size = 0.8;
 
-                left = [
-                  "dashboard"
-                  "hyprland-workspaces"
-                  "window-title"
-                ];
+              layout = [
+                {
+                  monitor = "*";
 
-                center = [ "clock" ];
+                  left = [
+                    "dashboard"
+                    "hyprland-workspaces"
+                    "window-title"
+                  ];
 
-                right =
-                  let
-                    batteryEnabled = (config.host.features.battery or { enable = false; }).enable;
-                  in
-                  [
-                    "media"
-                    "network"
-                    "bluetooth"
-                  ]
-                  ++ (lib.optionals batteryEnabled [ "battery" ])
-                  ++ [
-                    "systray"
-                    "volume"
+                  center = [
+                    "clock"
+                    "weather"
                     "notifications"
                   ];
-              }
-            ];
+
+                  right =
+                    let
+                      batteryEnabled = (config.host.features.battery or { enable = false; }).enable;
+                    in
+                    [
+                      "media"
+                      "network"
+                      "bluetooth"
+                    ]
+                    ++ (lib.optionals batteryEnabled [ "battery" ])
+                    ++ [
+                      "netstat"
+                      "microphone"
+                      "volume"
+                      "systray"
+                    ];
+                }
+              ];
+            };
 
             modules = {
+              bluetooth.label-show = false;
+
               clock = {
                 format = "%b %d %I:%M:%S %p";
                 icon-show = false;
                 dropdown-show-seconds = false;
               };
 
+              dashboard.icon-bg-color = "bg-overlay";
+              media.label-show = false;
+              microphone.label-show = false;
+              network.label-show = false;
+              volume.label-show = false;
+
               weather = {
                 location = "Detroit";
                 units = "metric";
               };
-
-              media.label-show = false;
-              network.label-show = false;
             };
           };
         };
