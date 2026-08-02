@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Nix flake-based dotfiles/system configuration repo managing multiple NixOS hosts and home-manager configurations. It uses [flake-parts](https://github.com/hercules-ci/flake-parts) + [import-tree](https://github.com/vic/import-tree) to auto-import all modules from `./modules/`.
 
-The primary task runner is [nur](https://github.com/nickel-lang/nur) using Nushell, with tasks defined in `scripts/nur.nu`.
+The primary task runner is [nur](https://github.com/nur-taskrunner/nur) using Nushell, with tasks defined in `scripts/nur.nu`.
 
 ## Key Commands
 
@@ -72,14 +72,15 @@ Features are toggled with `enable = true/false` under `hosts.<hostname>.features
 
 | Hostname | Type | Notes |
 |----------|------|-------|
-| edgenix | NixOS x86_64 | Primary desktop, Plasma6 + specialisations |
+| edgenix | NixOS x86_64 | k3s node, Plasma6 + specialisations |
 | inspernix | NixOS x86_64 | |
-| nasnix | NixOS x86_64 | NAS + k3s server |
-| nixmini | NixOS x86_64 | |
+| nasnix | NixOS x86_64 | NAS + k3s node |
+| nixmini | NixOS x86_64 | k3s node |
 | powerspecnix | NixOS x86_64 | |
 | vidcentre | NixOS x86_64 | |
 | steamdeck | home-manager only | user: deck |
-| vavirl-pw0bwnq8 | home-manager only | WSL, user: drenfer |
+| vavirl-pw0bwnq8 | home-manager only | WSL, user: drenfer (NixOS/WSL build currently disabled in `nixosConfigurations.nix`) |
+| pixel8 | generic config only | Android phone; identity: duck; only feature flags + syncthing, no `nixosConfigurations`/`homeConfigurations` entry |
 
 ### Adding a New Host
 
@@ -96,6 +97,8 @@ Four files must be updated when adding a NixOS host. Missing any one causes eval
 
 4. **`modules/flake/homeConfigurations.nix`** — add a `"<user>@<hostname>"` entry importing `[base <hostname>]` from `homeManager`.
 
+A host that isn't built by Nix at all (e.g. `pixel8`, an Android phone tracked only for feature flags/syncthing) only needs steps 1–2 — skip the `nixosConfigurations`/`homeConfigurations` entries.
+
 ### Secrets
 
 Managed via [sops-nix](https://github.com/Mic92/sops-nix). Secret files live in `secrets/`. GPG keys are used for encryption (`nur secrets list-keys`).
@@ -106,6 +109,6 @@ Managed via [sops-nix](https://github.com/Mic92/sops-nix). Secret files live in 
 
 ### Task Runner (`nur`)
 
-[nur](https://github.com/nickel-lang/nur) is the task runner using Nushell. Tasks are defined in `scripts/nur.nu` as a Nushell module with `export def "nur <task>"` commands. **`scripts/nur.nu` is not deployed to systems** — it's local to this repo only.
+[nur](https://github.com/nur-taskrunner/nur) is the task runner using Nushell. Tasks are defined in `scripts/nur.nu` as a Nushell module with `export def "nur <task>"` commands. **`scripts/nur.nu` is not deployed to systems** — it's local to this repo only.
 
 `nurfile` (at repo root) simply does `overlay use scripts/nur.nu` to load the module. Tasks run with CWD as the repo root.

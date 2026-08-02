@@ -12,25 +12,19 @@ Nix flake-based system configuration managing multiple NixOS hosts and home-mana
 
 | Hostname | Type | Description |
 |----------|------|-------------|
-| edgenix | NixOS x86_64 | Server |
+| edgenix | NixOS x86_64 | k3s node, Plasma6 + specialisations |
 | inspernix | NixOS x86_64 | Laptop |
-| nasnix | NixOS x86_64 | Virtualized server on NAS, runs k3s |
+| nasnix | NixOS x86_64 | Virtualized server on NAS, k3s node |
+| nixmini | NixOS x86_64 | k3s node |
 | powerspecnix | NixOS x86_64 | Primary gaming PC |
 | vidcentre | NixOS x86_64 | |
 | steamdeck | home-manager only | user: deck |
-| vavirl-pw0bwnq8 | home-manager only | WSL, user: drenfer |
+| vavirl-pw0bwnq8 | home-manager only | WSL, user: drenfer (NixOS/WSL build currently disabled) |
+| pixel8 | feature/syncthing config only | Android phone; no NixOS or home-manager build target |
 
 ---
 
 ## Setup
-
-### Babashka
-
-The primary task runner. On NixOS it is available in the dev shell (`nix develop`). On other platforms install it directly:
-
-```sh
-bash < <(curl -s https://raw.githubusercontent.com/babashka/babashka/master/install)
-```
 
 ### Nix (non-NixOS only)
 
@@ -46,6 +40,18 @@ Flake support is enabled automatically via the `nixConfig` block in `flake.nix`.
 mkdir -p ~/.config/nix
 echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
 ```
+
+### Task runner
+
+Tasks are defined in `scripts/nur.nu` and run with [nur](https://github.com/nur-taskrunner/nur), a Nushell-based task runner (similar to `just`, but tasks are plain Nushell `def`s). The `nurfile` at the repo root loads the tasks module via `overlay use scripts/nur.nu`; `nur` discovers it automatically as long as your CWD is the repo root (or a subdirectory of it).
+
+On hosts with the `nushell` home-manager feature enabled, `nur` is already on `PATH`. On a fresh machine, before home-manager has been applied, get a Nushell session with the tasks preloaded instead:
+
+```sh
+nix run .#pnu
+```
+
+then run `nur <task>` inside that shell.
 
 ### Age key (sops-nix)
 
@@ -71,28 +77,22 @@ age-keygen -o ~/.config/sops/age/keys.txt
 
 ## Commands
 
-### List tasks
-
-```sh {"id":"01J9FJBMKK4X3G3KXBJSKAYT27","name":"tasks"}
-bb tasks
-```
-
 ### List age secret keys
 
-```sh {"id":"01J9FJC4985HK894NR72G3730R","interpreter":"","name":"list-secret-keys"}
-bb list-secret-keys
+```sh {"name":"list-secret-keys"}
+nur secrets list-keys
 ```
 
 ### Update flake inputs
 
-```sh {"id":"01JBQ87VEQZV4YCB22HYQEHGFS","name":"update-flakes"}
+```sh {"name":"update-flakes"}
 nix flake update
 ```
 
 ### Format Nix files
 
 ```sh
-bb format
+nur format
 ```
 
 ---
@@ -102,20 +102,10 @@ bb format
 ### Apply local configuration
 
 ```sh
-bb switch          # apply both home-manager and NixOS
-bb switch-home     # home-manager only
-bb switch-os       # NixOS only
-bb boot-os         # build NixOS and set as boot default (safe for slow activations)
-```
-
-Using `nh` directly:
-
-```sh {"name":"switch-home"}
-nh home switch . -b backup
-```
-
-```sh {"name":"switch-os"}
-nh os switch .
+nur switch                       # apply both home-manager and NixOS
+nur switch --home-only true      # home-manager only
+nur switch --os-only true        # NixOS only
+nur boot-os                      # build NixOS and set as boot default (safe for slow activations)
 ```
 
 ### Remote deployment
@@ -125,40 +115,36 @@ All builds happen locally (with `nom` for better progress display), then the res
 #### Build only (no activation)
 
 ```sh {"name":"build-remote"}
-bb build-remote-os-edgenix
-bb build-remote-os-nasnix
-
-bb build-remote-home-edgenix
-bb build-remote-home-nasnix
+nur build --host edgenix
+nur build --host nasnix
 ```
 
 #### Show package changes (diff)
 
 ```sh {"name":"diff-remote"}
-bb diff-remote-os-edgenix
-bb diff-remote-os-nasnix
+nur diff-os --host edgenix
+nur diff-os --host nasnix
 ```
 
 #### Dry run (preview without applying)
 
 ```sh {"name":"dry-run-remote"}
-bb dry-run-remote-os-edgenix
-bb dry-run-remote-os-nasnix
+nur dry-run-os --host edgenix
+nur dry-run-os --host nasnix
 ```
 
 #### Switch (build and activate)
 
 ```sh {"name":"switch-remote"}
-bb switch-remote               # both hosts, NixOS + home-manager
-bb switch-remote-edgenix       # edgenix only
-bb switch-remote-nasnix        # nasnix only
+nur switch --host edgenix                     # both home-manager and NixOS
+nur switch --host nasnix
 
-bb switch-remote-os-edgenix    # NixOS only
-bb switch-remote-home-edgenix  # home-manager only
+nur switch --host edgenix --os-only true      # NixOS only
+nur switch --host edgenix --home-only true    # home-manager only
 ```
 
 **Prerequisites:**
-- SSH key-based auth configured for `edgenix` and `nasnix`
+- SSH key-based auth configured for the target host (e.g. `edgenix`, `nasnix`)
 - Remote user has sudo access (tasks prompt for the sudo password when switching NixOS)
 
 ---
@@ -171,7 +157,7 @@ Kubernetes applications are defined in [k3s-fleetops](https://github.com/duck112
 k3s-fleetops/          ← application definitions, library (read-only dependency)
 dotfiles/
   modules/kubernetes/
-    env/dev.nix        ← cluster environment config (services, domains, storage)
+    _env/dev.nix        ← cluster environment config (services, domains, storage)
   secrets/k8s.enc.yaml ← encrypted cluster secrets (sops/age)
   kubernetes/manifests/← checkout of argo-manifests (gitignored here)
 ```
@@ -179,13 +165,13 @@ dotfiles/
 ### Ongoing workflow
 
 ```sh
-bb k8s-deploy          # build manifests + push to argo-manifests (most common)
+nur k8s deploy          # build manifests + push to argo-manifests (most common)
 
 # or step by step:
-bb k8s-switch-charts   # build nixidy manifests → write to kubernetes/manifests/
-bb k8s-push            # commit + push kubernetes/manifests/ to argo-manifests
+nur k8s switch-charts   # build nixidy manifests → write to kubernetes/manifests/
+nur k8s push            # commit + push kubernetes/manifests/ to argo-manifests
 
-bb k8s-edit-secrets    # edit cluster secrets in-place with sops
+nur k8s edit-secrets    # edit cluster secrets in-place with sops
 ```
 
 ### First-time setup on a new machine
@@ -207,7 +193,7 @@ sops --decrypt secrets/k8s.enc.yaml > /dev/null && echo "OK"
 #### 3. Build and push manifests
 
 ```sh
-bb k8s-deploy
+nur k8s deploy
 ```
 
 ### Bootstrap a new cluster
@@ -217,7 +203,7 @@ Run these steps when setting up ArgoCD on a fresh cluster for the first time.
 #### Install ArgoCD
 
 ```sh
-bb install-argocd
+nur install argocd
 ```
 
 #### Configure the argo-manifests deploy key
@@ -227,20 +213,20 @@ ArgoCD needs an SSH deploy key to pull from the private manifests repo. This cre
 **If you already have a deploy key stored in secrets:**
 
 ```sh
-bb k8s-bootstrap-argocd-repo
+nur k8s bootstrap-argocd-repo
 ```
 
 **If you need to create a new deploy key:**
 
 ```sh
 # 1. Generate the key pair
-bb k8s-generate-deploy-key
+nur k8s generate-deploy-key
 
 # 2. Add the printed PUBLIC key to GitHub:
 #    argo-manifests → Settings → Deploy keys → Add deploy key (read-only)
 
 # 3. Store the printed PRIVATE key in secrets:
-bb k8s-edit-secrets
+nur k8s edit-secrets
 #    Add under key:
 #    argocd:
 #      sshDeployKey: |
@@ -249,19 +235,19 @@ bb k8s-edit-secrets
 #        -----END OPENSSH PRIVATE KEY-----
 
 # 4. Apply the credential to the cluster
-bb k8s-bootstrap-argocd-repo
+nur k8s bootstrap-argocd-repo
 ```
 
 #### Push manifests and apply the master application
 
 ```sh
-bb k8s-deploy
+nur k8s deploy
 
-# Apply the root ArgoCD Application that points ArgoCD at the manifests repo
-bb apply-master-application
+# Apply the generated ArgoCD Application manifests so ArgoCD starts tracking them
+kubectl apply -f kubernetes/manifests/dev/apps/
 ```
 
-ArgoCD will now sync all applications from the manifests repo.
+Each `Application-*.yaml` is self-managed (automated sync + prune), so once applied ArgoCD will keep syncing all applications from the manifests repo on its own.
 
 #### Get the initial ArgoCD password
 
@@ -284,16 +270,16 @@ All cluster secrets live in `secrets/k8s.enc.yaml` (encrypted with sops/age).
 Edit in-place (no plaintext file written to disk):
 
 ```sh
-bb k8s-edit-secrets
+nur k8s edit-secrets
 # or directly: sops secrets/k8s.enc.yaml
 ```
 
 Decrypt → edit → re-encrypt:
 
 ```sh
-bb k8s-decrypt           # → secrets/k8s.yaml  (DO NOT commit)
+nur k8s decrypt           # → secrets/k8s.yaml  (DO NOT commit)
 # edit secrets/k8s.yaml
-bb k8s-encrypt           # → secrets/k8s.enc.yaml
+nur k8s encrypt           # → secrets/k8s.enc.yaml
 rm secrets/k8s.yaml
 ```
 
@@ -302,8 +288,8 @@ rm secrets/k8s.yaml
 ## Validation
 
 ```sh
-bb check      # nix flake check
-bb build-all  # build all configurations
+nur check              # nix flake check
+nur build --all true   # build all configurations
 ```
 
 ### Reboot
