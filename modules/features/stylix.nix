@@ -3,12 +3,12 @@ let
   image = ../../resources/wallpaper/nix-wallpaper-mosaic-blue.png;
 
   # https://tinted-theming.github.io/tinted-gallery/
-  theme = "3024";
+  # theme = "3024";
   # theme = "catppuccin-frappe";
   # theme = "catppuccin-latte";
   # theme = "evenok-dark";
   # theme = "humanoid-dark";
-  # theme = "oxocarbon-dark";
+  theme = "oxocarbon-dark";
   # theme = "still-alive";
 in
 {
