@@ -22,7 +22,6 @@ in
             git.enable = true;
             gnome.enable = false;
             hyprland.enable = false;
-            hyprpanel.enable = false;
             i3.enable = false;
             java.enable = false;
             jujutsu.enable = false;

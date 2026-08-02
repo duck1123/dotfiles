@@ -25,7 +25,6 @@ in
             gaming.enable = true;
             git.enable = true;
             hyprland.enable = true;
-            hyprpanel.enable = false;
 
             kubernetes = {
               client.enable = true;

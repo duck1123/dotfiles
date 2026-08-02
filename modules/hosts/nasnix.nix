@@ -25,7 +25,6 @@ in
             font.enable = true;
             git.enable = true;
             hyprland.enable = true;
-            hyprpanel.enable = true;
             jujutsu.enable = false;
 
             kubernetes = {
@@ -60,6 +59,7 @@ in
             };
 
             vscode.enable = false;
+            wayle.enable = true;
             xserver.enable = true;
             zen-browser.enable = false;
             zsh.enable = true;

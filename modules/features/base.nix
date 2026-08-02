@@ -42,7 +42,6 @@ in
           git
           gnome
           hyprland
-          hyprpanel
           i3
           java
           jujutsu

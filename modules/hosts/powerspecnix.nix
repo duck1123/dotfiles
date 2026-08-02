@@ -40,7 +40,6 @@ in
             git.enable = true;
             gnome.enable = true;
             hyprland.enable = true;
-            hyprpanel.enable = false;
             i3.enable = false;
             java.enable = true;
             jujutsu.enable = true;

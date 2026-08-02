@@ -29,7 +29,6 @@ in
             git.enable = true;
             gnome.enable = true;
             hyprland.enable = true;
-            hyprpanel.enable = true;
             java.enable = true;
             jujutsu.enable = true;
             kubernetes.client.enable = true;
@@ -59,6 +58,7 @@ in
             touch.enable = true;
             vpn.enable = true;
             vscode.enable = true;
+            wayle.enable = true;
             windmill.enable = true;
             xserver.enable = true;
             zen-browser.enable = true;

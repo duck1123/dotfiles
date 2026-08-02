@@ -20,7 +20,6 @@
           cascadia-code
           font-awesome
           grim
-          hyprpanel
           hyprpaper
           hyprshot
           jq
@@ -65,7 +64,6 @@
               "HYPRCURSOR_SIZE,24"
             ];
             exec = [
-              # "hyprpanel"
               # "waybar"
             ];
             decoration.rounding = 10;

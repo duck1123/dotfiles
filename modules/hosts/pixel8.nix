@@ -33,7 +33,6 @@ in
           git.enable = false;
           gnome.enable = true;
           hyprland.enable = false;
-          hyprpanel.enable = true;
           i3.enable = false;
           java.enable = false;
           jujutsu.enable = false;
@@ -81,6 +80,7 @@ in
           virtualization.enable = false;
           vscode.enable = true;
           waybar.enable = false;
+          wayle.enable = true;
           xserver.enable = false;
           zen-browser.enable = true;
           zsh.enable = true;

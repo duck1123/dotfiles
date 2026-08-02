@@ -25,7 +25,6 @@ in
             font.enable = true;
             git.enable = true;
             hyprland.enable = true;
-            hyprpanel.enable = true;
 
             kubernetes = {
               client.enable = true;
@@ -62,6 +61,7 @@ in
 
             tailscale.enable = true;
             vscode.enable = false;
+            wayle.enable = true;
             xserver.enable = true;
             zen-browser.enable = true;
             zsh.enable = true;
