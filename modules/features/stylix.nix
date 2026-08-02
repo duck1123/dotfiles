@@ -81,7 +81,6 @@ in
           #   package = pkgs.bibata-cursors;
           # };
 
-          targets.emacs.enable = false;
           targets.firefox.profileNames = [ "default" ];
           targets.hyprland.enable = false;
           targets.vscode.profileNames = [ "default" ];
