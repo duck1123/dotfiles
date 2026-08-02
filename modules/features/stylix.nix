@@ -1,6 +1,15 @@
 { ... }:
 let
   image = ../../resources/wallpaper/nix-wallpaper-mosaic-blue.png;
+
+  # https://tinted-theming.github.io/tinted-gallery/
+  theme = "3024";
+  # theme = "catppuccin-frappe";
+  # theme = "catppuccin-latte";
+  # theme = "evenok-dark";
+  # theme = "humanoid-dark";
+  # theme = "oxocarbon-dark";
+  # theme = "still-alive";
 in
 {
   flake.types.generic.feature-options.stylix =
@@ -21,15 +30,11 @@ in
       config = lib.mkIf config.host.features.stylix.enable {
         stylix = {
           inherit image;
-          enable = true;
           autoEnable = true;
+          base16Scheme = "${pkgs.base16-schemes}/share/themes/${theme}.yaml";
+          enable = true;
           imageScalingMode = "fit";
           polarity = "dark";
-          base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
-          # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-frappe.yaml";
-          # base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-latte.yaml";
-          # base16Scheme = "${pkgs.base16-schemes}/share/themes/evenok-dark.yaml";
-          # base16Scheme = "${pkgs.base16-schemes}/share/themes/still-alive.yaml";
 
           # cursor = {
           #   name = "Bibata-Modern-Ice";
@@ -69,7 +74,7 @@ in
           autoEnable = true;
           imageScalingMode = "fit";
           polarity = "dark";
-          base16Scheme = "${pkgs.base16-schemes}/share/themes/3024.yaml";
+          base16Scheme = "${pkgs.base16-schemes}/share/themes/${theme}.yaml";
 
           # cursor = {
           #   name = "Bibata-Modern-Ice";
