@@ -33,48 +33,17 @@
           };
         in
         lib.mkIf config.host.features.dbt.enable {
-          home = {
-            file.".dbt/profiles.yml".source = (pkgs.formats.yaml { }).generate "profiles.yml" {
-              default = {
-                target = "dev";
-                outputs = {
-                  dev = {
-                    type = "postgres";
-                    host = "localhost";
-                    user = "postgres";
-                    password = "hunter2";
-                    port = 5432;
-                    dbname = "st";
-                    schema = "schema_identifier";
-                    threads = 1;
-                  };
-
-                  prod = {
-                    type = "postgres";
-                    host = "localhost";
-                    user = "postgres";
-                    password = "hunter2";
-                    port = 5432;
-                    dbname = "prod_st";
-                    schema = "schema_identifier";
-                    threads = 1;
-                  };
-                };
-              };
-            };
-
-            packages = with pkgs; [
-              (azure-cli.withExtensions [
-                azure-cli-extensions.azure-devops
-                azure-cli-extensions.powerbidedicated
-              ])
-              databricks-cli
-              databricks-sql-cli
-              # dbt-semantic-interfaces (a dbt-core dependency) disables itself on
-              # Python 3.14, nixpkgs' current default python3; build against 3.12 instead.
-              (python312-dbt.pkgs.toPythonApplication python312-dbt.pkgs.dbt-core)
-            ];
-          };
+          home.packages = with pkgs; [
+            (azure-cli.withExtensions [
+              azure-cli-extensions.azure-devops
+              azure-cli-extensions.powerbidedicated
+            ])
+            databricks-cli
+            databricks-sql-cli
+            # dbt-semantic-interfaces (a dbt-core dependency) disables itself on
+            # Python 3.14, nixpkgs' current default python3; build against 3.12 instead.
+            (python312-dbt.pkgs.toPythonApplication python312-dbt.pkgs.dbt-core)
+          ];
 
           xdg.configFile."fish/completions/databricks.fish".source =
             pkgs.runCommand "databricks-fish-completions" { }
