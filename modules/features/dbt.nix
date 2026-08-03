@@ -21,17 +21,16 @@
           # whose pinned upper bounds lag behind what nixpkgs currently ships:
           # dbt-semantic-interfaces pins more-itertools<11.0 (nixpkgs has 11.1.0), and
           # dbt-common pins pathspec<1.1 (nixpkgs has 1.1.1). Relax both.
-          python312-dbt =
-            pkgs.python312.override {
-              packageOverrides = self: super: {
-                dbt-semantic-interfaces = super.dbt-semantic-interfaces.overridePythonAttrs (old: {
-                  pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "more-itertools" ];
-                });
-                dbt-common = super.dbt-common.overridePythonAttrs (old: {
-                  pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "pathspec" ];
-                });
-              };
+          python312-dbt = pkgs.python312.override {
+            packageOverrides = self: super: {
+              dbt-semantic-interfaces = super.dbt-semantic-interfaces.overridePythonAttrs (old: {
+                pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "more-itertools" ];
+              });
+              dbt-common = super.dbt-common.overridePythonAttrs (old: {
+                pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "pathspec" ];
+              });
             };
+          };
         in
         lib.mkIf config.host.features.dbt.enable {
           home = {

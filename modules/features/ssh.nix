@@ -35,9 +35,7 @@
 
       tailscale-hosts = lib.filterAttrs (
         _: host:
-        host.features.tailscale.enable
-        && host.features.ssh.enable
-        && host.hostname != config.host.hostname
+        host.features.tailscale.enable && host.features.ssh.enable && host.hostname != config.host.hostname
       ) config.hosts;
     in
     {
@@ -48,26 +46,27 @@
 
           # Aliases via Tailscale MagicDNS instead of LAN mDNS/avahi, which is
           # unreliable across WiFi APs/VLANs and doesn't work off the LAN.
-          settings = lib.mapAttrs (_: host: {
-            HostName = "${host.hostname}.${tailnet-domain}";
-            User = host.identity.username;
-          }) tailscale-hosts
-          // {
-            # Previous enableDefaultConfig defaults, kept explicitly since that
-            # option is being deprecated upstream.
-            "*" = {
-              ForwardAgent = false;
-              AddKeysToAgent = "no";
-              Compression = false;
-              ServerAliveInterval = 0;
-              ServerAliveCountMax = 3;
-              HashKnownHosts = false;
-              UserKnownHostsFile = "~/.ssh/known_hosts";
-              ControlMaster = "no";
-              ControlPath = "~/.ssh/master-%r@%n:%p";
-              ControlPersist = "no";
+          settings =
+            lib.mapAttrs (_: host: {
+              HostName = "${host.hostname}.${tailnet-domain}";
+              User = host.identity.username;
+            }) tailscale-hosts
+            // {
+              # Previous enableDefaultConfig defaults, kept explicitly since that
+              # option is being deprecated upstream.
+              "*" = {
+                ForwardAgent = false;
+                AddKeysToAgent = "no";
+                Compression = false;
+                ServerAliveInterval = 0;
+                ServerAliveCountMax = 3;
+                HashKnownHosts = false;
+                UserKnownHostsFile = "~/.ssh/known_hosts";
+                ControlMaster = "no";
+                ControlPath = "~/.ssh/master-%r@%n:%p";
+                ControlPersist = "no";
+              };
             };
-          };
         };
       };
     };
