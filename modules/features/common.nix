@@ -94,7 +94,7 @@
           tmux.enable = true;
         };
 
-        targets.genericLinux.enable = true;
+        targets.genericLinux.enable = !config.host.nixos.enable;
 
         xdg = {
           enable = true;
