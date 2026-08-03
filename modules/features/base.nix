@@ -53,6 +53,7 @@ in
           pictures
           python
           radio
+          ssh-feature
           starship
           stylix
           vim
