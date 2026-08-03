@@ -87,7 +87,6 @@
             (use-package clojure-mode :ensure t)
 
             (use-package company :ensure t)
-            (use-package earthfile-mode :ensure t)
 
             (use-package editorconfig
               :ensure t
@@ -307,7 +306,6 @@
               # cider
               # clojure-mode
               company
-              # earthfile-mode
               flycheck
               # flycheck-clj-kondo
               # flycheck-clojure

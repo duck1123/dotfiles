@@ -120,12 +120,6 @@ Custom keybindings that do not belong to a mode
     :ensure t)
 #+END_SRC
 
-** Earthfile
-
-#+BEGIN_SRC emacs-lisp
-  (use-package earthfile-mode :ensure t)
-#+END_SRC
-
 ** Nushell
 
 #+BEGIN_SRC emacs-lisp

@@ -27,7 +27,9 @@
           nufmt
           # nushellPlugins.highlight
           nushellPlugins.formats
-          nushellPlugins.polars
+          # nushellPlugins.polars: broken upstream, vendored ethnum 1.5.2 crate
+          # fails to compile under the current rustc (unsafe transmute size mismatch)
+          # nushellPlugins.polars
           nushellPlugins.gstat
           # nushellPlugins.units
           nushellPlugins.query

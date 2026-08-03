@@ -178,11 +178,13 @@ in
       in
       {
         _module.args = { inherit inputs; };
-        imports = specialisations.budgie.configuration.imports;
+        imports = specialisations.plasma6.configuration.imports;
         specialisation = {
+          # budgie disabled: nixpkgs' budgie module references pkgs.qogir-theme,
+          # which was removed upstream (depended on gtk-engine-murrine/GTK2)
           # inherit (specialisations) budgie;
-          # inherit (specialisations) gnome;
-          # inherit (specialisations) hyprland;
+          inherit (specialisations) gnome;
+          inherit (specialisations) hyprland;
           # inherit (specialisations) plasma6;
         };
       };

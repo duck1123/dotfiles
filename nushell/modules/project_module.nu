@@ -37,15 +37,6 @@ export def "project devspace vars list" [] {
     | reduce {|a b| $a | merge $b}
 }
 
-# List all tasks in an earthly file
-export def "project earthly tasks" [] {
-  earthly ls
-    | split row "\n"
-    | each {|target| { $target: (bb get-task-args --target $target) }}
-    | reduce {|a b| $a | merge $b }
-    | sort
-}
-
 # Parse a mssql cli query response
 export def "project mssql split result" [] {
   lines

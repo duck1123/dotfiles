@@ -47,8 +47,6 @@
 (use-package auto-complete
   :ensure t)
 
-(use-package earthfile-mode :ensure t)
-
 (use-package nushell-mode :ensure t)
 
 (add-to-list 'load-path (file-name-concat emacs-config-directory "personal/ag-and-a-half"))

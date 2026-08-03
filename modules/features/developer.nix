@@ -66,7 +66,6 @@
           docker
           # docker-compose
           doctl
-          earthly
           # extraNodePackages.prettier
           # fish
           # gcc9
