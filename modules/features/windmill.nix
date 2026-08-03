@@ -17,12 +17,12 @@
     }:
     {
       config = lib.mkIf config.host.features.windmill.enable {
-        home.packages = [ inputs.self.packages.${pkgs.system}.windmill-cli ];
+        home.packages = [ inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.windmill-cli ];
 
         xdg.configFile."fish/completions/wmill.fish".source =
           pkgs.runCommand "wmill-fish-completions" { }
             ''
-              ${inputs.self.packages.${pkgs.system}.windmill-cli}/bin/wmill completions fish > $out
+              ${inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.windmill-cli}/bin/wmill completions fish > $out
             '';
       };
     };
