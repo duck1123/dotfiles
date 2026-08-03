@@ -98,7 +98,7 @@ export def "nur build" [
       }
     )
 
-    ^nom build ...$args ...$installables
+    ^nom build ...$args --no-link ...$installables
   } else if ($host | is-empty) {
     if not $os_only { ^nh home build ...$args . }
     if not $home_only { ^nh os build ...$args . }
