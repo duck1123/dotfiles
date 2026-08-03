@@ -16,16 +16,12 @@ in
             battery.enable = true;
             bitcoin.enable = false;
             bluetooth.enable = true;
-            chm.enable = false;
             clojure.enable = true;
             common.enable = true;
             dbt.enable = true;
-            dconf.enable = false;
             developer.enable = true;
             docker.enable = true;
-            dunst.enable = false;
             emacs.enable = true;
-            emacs-prelude.enable = false;
             email.enable = false;
             firefox.enable = false;
             font.enable = true;
@@ -42,7 +38,6 @@ in
               server.enable = false;
             };
 
-            ncmpcpp.enable = false;
             nix.enable = true;
             nushell.enable = true;
             office.enable = false;

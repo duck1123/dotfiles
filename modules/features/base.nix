@@ -25,15 +25,11 @@ in
         ]
         ++ (with inputs.self.modules.homeManager; [
           backups
-          chm
           clojure
           common
           dbt
-          dconf
           developer
-          dunst
           emacs
-          emacs-prelude
           email
           environments-gnome
           firefox
@@ -46,7 +42,6 @@ in
           java
           jujutsu
           music
-          ncmpcpp
           nostr
           nushell
           office
