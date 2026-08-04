@@ -153,133 +153,22 @@ in
               ];
             };
           }
-          // lib.optionalAttrs mount-nas {
-            "/mnt/audiobooks" = {
-              device = "${nas-ip}:/volume1/Audiobooks";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "noexec"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
+          // lib.optionalAttrs mount-nas (
+            inputs.self.lib.nas-mounts {
+              ip = nas-ip;
+              shares = [
+                "Audiobooks"
+                "Books"
+                "Downloads"
+                "Movies"
+                "Music"
+                "Photos"
+                "Roms"
+                "TV"
+                "Videos"
               ];
-            };
-
-            "/mnt/books" = {
-              device = "${nas-ip}:/volume1/Books";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "noexec"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/downloads" = {
-              device = "${nas-ip}:/volume1/Downloads";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "noexec"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/movies" = {
-              device = "${nas-ip}:/volume1/Movies";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "noexec"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/music" = {
-              device = "${nas-ip}:/volume1/Music";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "noexec"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/photos" = {
-              device = "${nas-ip}:/volume1/Photos";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "noexec"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/roms" = {
-              device = "${nas-ip}:/volume1/Roms";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "noexec"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/tv" = {
-              device = "${nas-ip}:/volume1/TV";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "noexec"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-
-            "/mnt/videos" = {
-              device = "${nas-ip}:/volume1/Videos";
-              fsType = "nfs";
-              options = [
-                "nfsvers=3"
-                "rw"
-                "hard"
-                "noexec"
-                "timeo=600"
-                "retrans=2"
-                "_netdev"
-              ];
-            };
-          };
+            }
+          );
 
           swapDevices = [
             {

@@ -119,39 +119,26 @@ in
             kernelModules = [ "kvm-intel" ];
           };
 
-          fileSystems =
-            let
-              nasMount = location: {
-                device = "${nas-ip}:/volume1/${location}";
-                fsType = "nfs";
-                options = [
-                  "nfsvers=3"
-                  "rw"
-                  "hard"
-                  "noexec"
-                  "timeo=600"
-                  "retrans=2"
-                  "_netdev"
-                ];
-
-              };
-            in
-            {
-              "/" = {
-                device = "/dev/disk/by-uuid/1f61c6bf-be89-48fe-8081-7a74ec707a38";
-                fsType = "ext4";
-              };
-
-              "/mnt/audiobooks" = nasMount "Audiobooks";
-              "/mnt/books" = nasMount "Books";
-              "/mnt/downloads" = nasMount "Downloads";
-              "/mnt/movies" = nasMount "Movies";
-              "/mnt/music" = nasMount "Music";
-              "/mnt/photos" = nasMount "Photos";
-              "/mnt/roms" = nasMount "Roms";
-              "/mnt/tv" = nasMount "TV";
-              "/mnt/videos" = nasMount "Videos";
+          fileSystems = {
+            "/" = {
+              device = "/dev/disk/by-uuid/1f61c6bf-be89-48fe-8081-7a74ec707a38";
+              fsType = "ext4";
             };
+          }
+          // inputs.self.lib.nas-mounts {
+            ip = nas-ip;
+            shares = [
+              "Audiobooks"
+              "Books"
+              "Downloads"
+              "Movies"
+              "Music"
+              "Photos"
+              "Roms"
+              "TV"
+              "Videos"
+            ];
+          };
 
           swapDevices = [ ];
           networking.useDHCP = lib.mkDefault true;

@@ -137,49 +137,36 @@ in
             kernelModules = [ ];
           };
 
-          fileSystems =
-            let
-              nasMount = location: {
-                device = "${nas-ip}:/volume1/${location}";
-                fsType = "nfs";
-                options = [
-                  "nfsvers=3"
-                  "rw"
-                  "hard"
-                  "noexec"
-                  "timeo=600"
-                  "retrans=2"
-                  "_netdev"
-                ];
-
-              };
-            in
-            {
-              "/" = {
-                device = "/dev/disk/by-uuid/16510971-9a21-482a-ad63-1cff4f669212";
-                fsType = "ext4";
-              };
-
-              "/boot" = {
-                device = "/dev/disk/by-uuid/3453-AB06";
-                fsType = "vfat";
-                options = [
-                  "fmask=0077"
-                  "dmask=0077"
-                ];
-              };
-
-              "/mnt/audiobooks" = nasMount "Audiobooks";
-              "/mnt/books" = nasMount "Books";
-              "/mnt/downloads" = nasMount "Downloads";
-              "/mnt/movies" = nasMount "Movies";
-              "/mnt/music" = nasMount "Music";
-              "/mnt/photos" = nasMount "Photos";
-              "/mnt/roms" = nasMount "Roms";
-              "/mnt/slskd_downloads" = nasMount "slskd_downloads";
-              "/mnt/tv" = nasMount "TV";
-              "/mnt/videos" = nasMount "Videos";
+          fileSystems = {
+            "/" = {
+              device = "/dev/disk/by-uuid/16510971-9a21-482a-ad63-1cff4f669212";
+              fsType = "ext4";
             };
+
+            "/boot" = {
+              device = "/dev/disk/by-uuid/3453-AB06";
+              fsType = "vfat";
+              options = [
+                "fmask=0077"
+                "dmask=0077"
+              ];
+            };
+          }
+          // inputs.self.lib.nas-mounts {
+            ip = nas-ip;
+            shares = [
+              "Audiobooks"
+              "Books"
+              "Downloads"
+              "Movies"
+              "Music"
+              "Photos"
+              "Roms"
+              "slskd_downloads"
+              "TV"
+              "Videos"
+            ];
+          };
 
           hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
