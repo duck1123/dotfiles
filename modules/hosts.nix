@@ -12,7 +12,6 @@
         powerspecnix
         steamdeck
         vavirl-pw0bwnq8
-        vidcentre
       ];
     };
 }

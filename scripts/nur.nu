@@ -6,7 +6,6 @@ def nixos-hosts []: nothing -> list<string> {
     nasnix
     nixmini
     powerspecnix
-    vidcentre
   ]
 }
 
@@ -20,7 +19,6 @@ def home-hosts []: nothing -> list<string> {
     powerspecnix
     steamdeck
     vallen
-    vidcentre
   ]
 }
 

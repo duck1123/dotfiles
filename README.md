@@ -17,7 +17,6 @@ Nix flake-based system configuration managing multiple NixOS hosts and home-mana
 | nasnix | NixOS x86_64 | Virtualized server on NAS, k3s node |
 | nixmini | NixOS x86_64 | k3s node |
 | powerspecnix | NixOS x86_64 | Primary gaming PC |
-| vidcentre | NixOS x86_64 | |
 | steamdeck | home-manager only | user: deck |
 | vavirl-pw0bwnq8 | home-manager only | WSL, user: drenfer (NixOS/WSL build currently disabled) |
 | pixel8 | feature/syncthing config only | Android phone; no NixOS or home-manager build target |

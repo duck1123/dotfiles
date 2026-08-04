@@ -77,7 +77,6 @@ Features are toggled with `enable = true/false` under `hosts.<hostname>.features
 | nasnix | NixOS x86_64 | NAS + k3s node |
 | nixmini | NixOS x86_64 | k3s node |
 | powerspecnix | NixOS x86_64 | |
-| vidcentre | NixOS x86_64 | |
 | steamdeck | home-manager only | user: deck |
 | vavirl-pw0bwnq8 | home-manager only | WSL, user: drenfer (NixOS/WSL build currently disabled in `nixosConfigurations.nix`) |
 | pixel8 | generic config only | Android phone; identity: duck; only feature flags + syncthing, no `nixosConfigurations`/`homeConfigurations` entry |

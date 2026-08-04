@@ -71,14 +71,5 @@ in
         powerspecnix
       ];
     };
-
-    "duck@vidcentre" = homeManagerConfiguration {
-      inherit pkgs;
-      extraSpecialArgs = { inherit inputs pkgs; };
-      modules = with homeManager; [
-        base
-        vidcentre
-      ];
-    };
   };
 }
