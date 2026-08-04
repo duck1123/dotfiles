@@ -122,7 +122,9 @@
               :init
               (progn
                 (setq org-directory (expand-file-name "~/org-roam/")))
-                (setq org-agenda-files '("~/org-roam/" "~/org-roam/daily"))
+                (setq org-agenda-files
+                      (append (directory-files-recursively (expand-file-name "~/org-roam/daily/") "\\.org$")
+                              (directory-files-recursively (expand-file-name "~/org-roam/topics/") "\\.org$")))
                 (setq org-confirm-babel-evaluate nil)
                 (setq org-log-done 'time)
               :config
@@ -165,7 +167,7 @@
               (org-roam-directory (expand-file-name "~/org-roam/"))
               (org-roam-capture-templates
                `(("d" "default" plain "%?"
-                  :if-new (file+head "%<%Y%m%d%H%M%S>-$\{slug}.org" "#+title: $\{title}
+                  :if-new (file+head "topics/%<%Y>/%<%m>/%<%Y%m%d%H%M%S>-$\{slug}.org" "#+title: $\{title}
             ")
                   :unnarrowed t)))
 
@@ -183,7 +185,7 @@
             :PROPERTIES:
             :CREATED: %T
             :END:"
-                       :if-new (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>
+                       :if-new (file+head "%<%Y>/%<%m>/%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>
             "))))
               (setq org-roam-file-exclude-regexp
                  (concat "^" (expand-file-name org-roam-directory) "logseq/.*")))
