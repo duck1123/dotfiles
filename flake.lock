@@ -809,11 +809,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784602964,
-        "narHash": "sha256-GGEH1R25A9JIQxC15jOj9FUfUS2A5HT2uRRK1JUqqmI=",
+        "lastModified": 1785888476,
+        "narHash": "sha256-ZOWrkFcfPqZDyy/lfn97pa0PTd9nicZKYnRu6ugt4y0=",
         "owner": "duck1123",
         "repo": "k3s-fleetops",
-        "rev": "c4b682b2f3a0c44d0f1cc32724d4df210c217c38",
+        "rev": "8411194d120dc1dc77e1532ba07cfdbfa4e159ce",
         "type": "github"
       },
       "original": {
