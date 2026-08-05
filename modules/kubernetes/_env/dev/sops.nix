@@ -1,0 +1,4 @@
+{ ... }:
+{
+  services.sops.enable = true;
+}

@@ -1,0 +1,4 @@
+{ ... }:
+{
+  services.promtail.enable = true;
+}

@@ -1,0 +1,4 @@
+{ ... }:
+{
+  services.argocd.enable = true;
+}
