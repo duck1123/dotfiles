@@ -59,6 +59,7 @@ in
             nix.enable = true;
             nostr.enable = true;
             nushell.enable = true;
+            obsidian.enable = true;
             pictures.enable = true;
             python.enable = true;
             radio.enable = false;

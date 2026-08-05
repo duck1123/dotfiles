@@ -44,6 +44,7 @@ in
           music
           nostr
           nushell
+          obsidian
           office
           pictures
           python
