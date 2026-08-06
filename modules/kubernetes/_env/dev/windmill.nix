@@ -1,14 +1,15 @@
 { config, secrets, ... }:
 {
   services.windmill = {
-    enable = false;
-    hostAffinity = "edgenix";
+    enable = true;
+    hostAffinity = "nixmini";
     image = "ghcr.io/windmill-labs/windmill-full:latest";
 
     ingress = {
-      domain = "windmill.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "windmill.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      tls.enable = true;
     };
 
     database = {

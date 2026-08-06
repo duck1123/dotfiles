@@ -11,13 +11,14 @@
     };
 
     enable = true;
-    image = "linuxserver/sonarr:version-4.0.17.2952";
+    image = "linuxserver/sonarr:4.0.17.2952-ls312";
     hostAffinity = "edgenix";
 
     ingress = {
-      domain = "sonarr.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "sonarr.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      tls.enable = true;
     };
 
     nfs = {

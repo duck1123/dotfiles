@@ -8,9 +8,9 @@
     installAidot.enable = true;
 
     ingress = {
-      domain = "home-assistant.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "home-assistant.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
       tls.enable = true;
     };
 

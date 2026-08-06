@@ -4,9 +4,10 @@
     enable = true;
 
     ingress = {
-      domain = "slskd.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "slskd.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      tls.enable = true;
     };
 
     hostAffinity = "edgenix";

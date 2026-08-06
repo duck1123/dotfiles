@@ -5,9 +5,10 @@
     hostAffinity = "edgenix";
 
     ingress = {
-      domain = "audiobookshelf.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "audiobookshelf.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      tls.enable = true;
     };
 
     nfs = {

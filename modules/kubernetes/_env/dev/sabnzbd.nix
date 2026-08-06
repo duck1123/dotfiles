@@ -5,9 +5,10 @@
     hostAffinity = "edgenix";
 
     ingress = {
-      domain = "sabnzbd.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "sabnzbd.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      tls.enable = true;
     };
 
     nfs = {

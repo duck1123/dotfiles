@@ -7,9 +7,9 @@
     storageClassName = "longhorn";
 
     ingress = {
-      domain = "kite.${config.devDefaults.tailDomain}";
-      clusterIssuer = "tailscale";
-      ingressClassName = "tailscale";
+      domain = "kite.${config.devDefaults.homeDomain}";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      ingressClassName = "traefik";
       tls.enable = true;
     };
   };

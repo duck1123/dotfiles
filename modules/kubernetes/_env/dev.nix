@@ -37,6 +37,16 @@
   # FIXME: naughty config
   ageRecipients = "age1n372e8dgautnjhecllf7uvvldw9g6vyx3kggj0kyduz5jr2upvysue242c";
 
+  nodeGpuProfiles = {
+    edgenix = {
+      libvaDriverName = "radeonsi";
+      # WX 3200 (VAAPI card) is the second GPU on this node, enumerated as renderD129
+      vaapiRenderDevice = "renderD129";
+    };
+    nixmini.libvaDriverName = "iris";
+    powerspecnix.libvaDriverName = "radeonsi";
+  };
+
   nixidy = {
     defaults.syncPolicy.autoSync = {
       enable = true;

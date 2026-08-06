@@ -13,6 +13,12 @@
       description = "Tailscale MagicDNS domain for tailscale-routed ingresses";
     };
 
+    homeDomain = lib.mkOption {
+      type = lib.types.str;
+      default = "home.kronkltd.net";
+      description = "LAN-facing domain fronted by the Traefik ingress";
+    };
+
     clusterIssuer = lib.mkOption {
       type = lib.types.str;
       default = "letsencrypt-prod";

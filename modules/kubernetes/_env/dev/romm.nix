@@ -1,7 +1,7 @@
 { config, secrets, ... }:
 {
   services.romm = {
-    enable = false;
+    enable = true;
 
     admin = {
       username = secrets.romm.admin.username;
@@ -19,15 +19,16 @@
     };
 
     ingress = {
-      domain = "romm.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
-      # Optional: Enable local-only ingress using Traefik
-      localIngress = {
-        enable = true;
-        domain = "romm.local";
-        tls.enable = false; # Set to true if you have cert-manager configured for local domains
-      };
+      domain = "romm.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      tls.enable = true;
+    };
+
+    metadata.igdb = {
+      enable = true;
+      clientId = secrets.romm.metadata.igdb.clientId;
+      clientSecret = secrets.romm.metadata.igdb.clientSecret;
     };
 
     nfs = {

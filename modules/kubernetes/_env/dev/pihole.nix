@@ -6,24 +6,18 @@
     hostAffinity = "nasnix";
 
     ingress = {
-      domain = "pihole.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "pihole.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
       tls.enable = true;
     };
-
-    ingress.localIngress = {
-      enable = true;
-      serviceName = "pihole-web";
-      servicePort = 80;
-    };
-    serviceDnsLoadBalancerIP = "192.168.0.242";
+    serviceDnsLoadBalancerIP = "192.168.0.243";
     storageClassName = "longhorn";
-    # Wildcard: all *.local queries resolve to the Traefik LoadBalancer IP.
+    # Wildcard: dev/home zone queries resolve to the Traefik LoadBalancer IP.
     # Requires clients to use Pi-hole as their DNS server.
     customDnsEntries = [
-      "address=/.local/192.168.0.241"
-      "address=/.dev.kronkltd.net/192.168.0.241"
+      "address=/.dev.kronkltd.net/192.168.0.242"
+      "address=/.home.kronkltd.net/192.168.0.242"
     ];
   };
 }

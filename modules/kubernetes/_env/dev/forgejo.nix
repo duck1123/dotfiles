@@ -7,6 +7,12 @@
     ingress = {
       domain = "forgejo.${config.devDefaults.tailDomain}";
       ingressClassName = "tailscale";
+      localIngress = {
+        enable = true;
+        domain = "forgejo.${config.devDefaults.homeDomain}";
+        clusterIssuer = config.devDefaults.clusterIssuer;
+        tls.enable = true;
+      };
     };
 
     postgresql = {

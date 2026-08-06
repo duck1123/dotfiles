@@ -1,7 +1,7 @@
 { config, secrets, ... }:
 {
   services.qbittorrent = {
-    enable = false;
+    enable = true;
     hostAffinity = "nasnix";
 
     ingress = {

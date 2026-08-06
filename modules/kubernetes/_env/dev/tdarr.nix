@@ -2,15 +2,17 @@
 {
   services.tdarr = {
     enable = true;
+    image = "ghcr.io/haveagitgat/tdarr:2.81.01";
     healthcheckcpuWorkers = 0;
     healthcheckgpuWorkers = 1;
     # hostAffinity = "edgenix";
     hostAffinity = "powerspecnix";
 
     ingress = {
-      domain = "tdarr.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "tdarr.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      tls.enable = true;
     };
 
     nfs = {

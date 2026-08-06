@@ -13,9 +13,10 @@
     enable = true;
 
     ingress = {
-      clusterIssuer = "tailscale";
-      domain = "listenarr.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      domain = "listenarr.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      tls.enable = true;
     };
 
     nfs = {

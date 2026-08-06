@@ -1,16 +1,14 @@
 { config, ... }:
 {
-  services.cloudbeaver = {
+  services.uptime-kuma = {
     enable = true;
-    hostAffinity = "edgenix";
+    storageClassName = "longhorn";
 
     ingress = {
-      domain = "cloudbeaver.${config.devDefaults.homeDomain}";
+      domain = "uptime-kuma.${config.devDefaults.homeDomain}";
       ingressClassName = "traefik";
       clusterIssuer = config.devDefaults.clusterIssuer;
       tls.enable = true;
     };
-
-    storageClassName = "longhorn";
   };
 }

@@ -1,11 +1,10 @@
 { config, ... }:
 {
-  services.cloudbeaver = {
+  services.trilium = {
     enable = true;
-    hostAffinity = "edgenix";
 
     ingress = {
-      domain = "cloudbeaver.${config.devDefaults.homeDomain}";
+      domain = "trilium.${config.devDefaults.homeDomain}";
       ingressClassName = "traefik";
       clusterIssuer = config.devDefaults.clusterIssuer;
       tls.enable = true;

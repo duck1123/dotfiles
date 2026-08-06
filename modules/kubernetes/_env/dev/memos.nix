@@ -15,6 +15,12 @@
     ingress = {
       domain = "memos.${config.devDefaults.tailDomain}";
       ingressClassName = "tailscale";
+      localIngress = {
+        enable = true;
+        domain = "memos.${config.devDefaults.homeDomain}";
+        clusterIssuer = config.devDefaults.clusterIssuer;
+        tls.enable = true;
+      };
     };
   };
 }

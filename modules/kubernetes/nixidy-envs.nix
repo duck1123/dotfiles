@@ -23,6 +23,7 @@ in
             self.modules.generic.ageRecipients
             "${inputs.k3s-fleetops}/modules/secretManifest.nix"
             "${inputs.k3s-fleetops}/modules/secretSpecs.nix"
+            "${inputs.k3s-fleetops}/modules/nodeProfiles.nix"
           ];
         };
 

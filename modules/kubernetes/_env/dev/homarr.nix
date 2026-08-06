@@ -5,9 +5,10 @@
     hostAffinity = "edgenix";
 
     ingress = {
-      domain = "homarr.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "homarr.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      tls.enable = true;
     };
 
     secretEncryptionKey = secrets.homarr.secretEncryptionKey;

@@ -4,10 +4,10 @@
     enable = true;
 
     ingress = {
-      domain = "komga.${config.devDefaults.tailDomain}";
-      clusterIssuer = "tailscale";
-      ingressClassName = "tailscale";
-      localIngress.enable = true;
+      domain = "komga.${config.devDefaults.homeDomain}";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      ingressClassName = "traefik";
+      localIngress.enable = false;
       tls.enable = true;
     };
 

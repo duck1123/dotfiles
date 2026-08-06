@@ -13,6 +13,12 @@
         domain = "nocodb.${config.devDefaults.tailDomain}";
         ingressClassName = "tailscale";
         clusterIssuer = "tailscale";
+        localIngress = {
+          enable = true;
+          domain = "nocodb.${config.devDefaults.homeDomain}";
+          clusterIssuer = config.devDefaults.clusterIssuer;
+          tls.enable = true;
+        };
       };
 
       database = {

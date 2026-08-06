@@ -12,12 +12,13 @@
 
     enable = true;
     hostAffinity = "edgenix";
-    image = "linuxserver/radarr:6.0.4.10291-ls295";
+    image = "linuxserver/radarr:6.1.1.10360-ls304";
 
     ingress = {
-      domain = "radarr.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
+      domain = "radarr.${config.devDefaults.homeDomain}";
+      ingressClassName = "traefik";
+      clusterIssuer = config.devDefaults.clusterIssuer;
+      tls.enable = true;
     };
 
     nfs = {
