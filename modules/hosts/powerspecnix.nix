@@ -88,6 +88,7 @@ in
             vpn.enable = true;
             vscode.enable = false;
             waybar.enable = false;
+            waydroid.enable = true;
             wayle.enable = true;
             windmill.enable = true;
             xserver.enable = true;

@@ -100,6 +100,7 @@ in
           users
           vpn
           virtualization-feature
+          waydroid-feature
           xserver-feature
           zsh-feature
         ])
