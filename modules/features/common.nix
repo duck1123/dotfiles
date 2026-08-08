@@ -62,6 +62,7 @@
             ripgrep
             # slack
             # simplex-chat-desktop
+            smartmontools
             unzip
             xsel
           ];
