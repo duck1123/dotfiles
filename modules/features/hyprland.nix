@@ -14,6 +14,79 @@
       pkgs,
       ...
     }:
+    let
+      mkLuaInline = lib.generators.mkLuaInline;
+      toLua = lib.generators.toLua { };
+
+      mainMod = "SUPER";
+
+      # Renders a `hl.bind(...)` call. `mods` is a list of Hyprland modifier
+      # names (e.g. [ "SUPER" "SHIFT" ]); `dispatcher` is a raw Lua
+      # expression string, e.g. "hl.dsp.window.close()".
+      mkBind =
+        {
+          mods ? [ ],
+          key,
+          dispatcher,
+          opts ? null,
+        }:
+        {
+          _args = [
+            (if mods == [ ] then key else "${lib.concatStringsSep " + " mods} + ${key}")
+            (mkLuaInline dispatcher)
+          ]
+          ++ lib.optional (opts != null) opts;
+        };
+
+      # Maps a Hyprlang dispatcher name + arg to the equivalent hl.dsp.*
+      # Lua expression, verified against Hyprland's own Lua dispatcher
+      # bindings (src/config/lua/bindings/LuaBindingsDispatchers.cpp).
+      dispatcherFor =
+        command: arg:
+        {
+          exec = "hl.dsp.exec_cmd(${toLua arg})";
+          killactive = "hl.dsp.window.close()";
+          fullscreen = "hl.dsp.window.fullscreen()";
+          exit = "hl.dsp.exit()";
+          pseudo = "hl.dsp.window.pseudo()";
+          togglefloating = ''hl.dsp.window.float({ action = "toggle" })'';
+          movefocus = "hl.dsp.focus({ direction = ${toLua arg} })";
+          movewindow = "hl.dsp.window.move({ direction = ${toLua arg} })";
+          workspace = "hl.dsp.focus({ workspace = ${toLua arg} })";
+          movetoworkspace = "hl.dsp.window.move({ workspace = ${toLua arg} })";
+          cyclenext = "hl.dsp.window.cycle_next()";
+          bringactivetotop = "hl.dsp.window.bring_to_top()";
+        }
+        .${command} or (throw "hyprland: unmapped dispatcher '${command}'");
+
+      mkKeyBind =
+        {
+          mods ? [ ],
+          key,
+          command,
+          arg ? "",
+        }:
+        mkBind {
+          inherit mods key;
+          dispatcher = dispatcherFor command arg;
+        };
+
+      # Mouse binds: Hyprlang's `bindm` doesn't exist in Lua, mouse drag
+      # and resize are just `hl.bind(...)` calls with `{ mouse = true }`.
+      mkMouseBind =
+        {
+          mods ? [ ],
+          key,
+          command,
+        }:
+        mkBind {
+          inherit mods key;
+          dispatcher = if command == "movewindow" then "hl.dsp.window.drag()" else "hl.dsp.window.resize()";
+          opts = {
+            mouse = true;
+          };
+        };
+    in
     {
       config = lib.mkIf config.host.features.hyprland.enable {
         home.packages = with pkgs; [
@@ -39,309 +112,368 @@
 
         wayland.windowManager.hyprland = {
           enable = true;
-          # configType = "lua";
-          configType = "hyprlang";
+          configType = "lua";
           settings = {
-            "$fileManager" = "nautiulus";
-            "$menu" = "wofi --show drun";
-            "$mainMod" = "SUPER";
-            "$terminal" = "kitty";
+            mainMod._var = mainMod;
+            terminal._var = "kitty";
+            menu._var = "wofi --show drun";
+            fileManager._var = "nautiulus";
 
-            animations = {
-              enabled = true;
-              bezier = "ease, 0.4, 0.02, 0.21, 1";
-              animation = [
-                "windows, 1, 3.5, ease, slide"
-                "windowsOut, 1, 3.5, ease, slide"
-                "border, 1, 6, default"
-                "fade, 1, 3, ease"
-                "workspaces, 1, 3.5, ease"
+            config = {
+              general = {
+                gaps_in = 5;
+                gaps_out = 5;
+                border_size = 2;
+                layout = "dwindle";
+              };
+
+              decoration.rounding = 10;
+
+              dwindle."preserve_split" = true;
+
+              animations.enabled = true;
+            };
+
+            curve = {
+              _args = [
+                "ease"
+                {
+                  type = "bezier";
+                  points = [
+                    [
+                      0.4
+                      0.02
+                    ]
+                    [
+                      0.21
+                      1
+                    ]
+                  ];
+                }
               ];
             };
 
+            animation = [
+              {
+                leaf = "windows";
+                enabled = true;
+                speed = 3.5;
+                bezier = "ease";
+                style = "slide";
+              }
+              {
+                leaf = "windowsOut";
+                enabled = true;
+                speed = 3.5;
+                bezier = "ease";
+                style = "slide";
+              }
+              {
+                leaf = "border";
+                enabled = true;
+                speed = 6;
+                bezier = "default";
+              }
+              {
+                leaf = "fade";
+                enabled = true;
+                speed = 3;
+                bezier = "ease";
+              }
+              {
+                leaf = "workspaces";
+                enabled = true;
+                speed = 3.5;
+                bezier = "ease";
+              }
+            ];
+
             env = [
-              "XCURSOR_SIZE,24"
-              "HYPRCURSOR_SIZE,24"
+              {
+                _args = [
+                  "XCURSOR_SIZE"
+                  "24"
+                ];
+              }
+              {
+                _args = [
+                  "HYPRCURSOR_SIZE"
+                  "24"
+                ];
+              }
             ];
-            exec = [
-              # "waybar"
+
+            # FIXME: This is environment specific
+            monitor = [
+              {
+                output = "HDMI-A-1";
+                mode = "1920x1080";
+                position = "0x0";
+                scale = 1;
+              }
+              {
+                output = "DP-3";
+                mode = "1920x1080";
+                position = "1920x0";
+                scale = 1;
+              }
             ];
-            decoration.rounding = 10;
-
-            dwindle = {
-              # pseudotile = true;
-              "preserve_split" = true;
-            };
-
-            general = {
-              "gaps_in" = 5;
-              "gaps_out" = 5;
-              "border_size" = 2;
-              layout = "dwindle";
-            };
-
-            # gestures."workspace_swipe" = false;
 
             bind =
-              (map (x: "${x.mod},${x.key},${x.command},${x.arg}") [
+              (map mkKeyBind [
                 # Letter key bindings (sorted by key)
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "a";
                   command = "exec";
                   arg = "pear-desktop";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "b";
                   command = "exec";
                   arg = "zen-beta";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "c";
                   command = "killactive";
-                  arg = "";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "d";
                   command = "exec";
                   arg = ''nautilus "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "e";
                   command = "exec";
                   arg = ''emacsclient -c -a "" --eval "(magit-status \"$(cat ~/.last_dir 2>/dev/null || echo $HOME)\")"'';
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "f";
                   command = "fullscreen";
-                  arg = "";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "g";
                   command = "exec";
                   arg = "gossip";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "h";
                   command = "exec";
                   arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" htop'';
                 }
                 # {
-                #   mod = "$mainMod";
+                #   mods = [ mainMod ];
                 #   key = "j";
                 #   command = "togglesplit";
-                #   arg = "";
                 # }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "k";
                   command = "exec";
                   arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" k9s'';
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "l";
                   command = "exec";
                   arg = "lens";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "m";
                   command = "exit";
-                  arg = "";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "n";
                   command = "exec";
                   arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" pnu'';
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "p";
                   command = "pseudo";
-                  arg = "";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "r";
                   command = "exec";
                   arg = "rofiWindow";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "t";
                   command = "exec";
                   arg = "teams-for-linux";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "u";
                   command = "exec";
                   arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)" jjui'';
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "v";
                   command = "togglefloating";
-                  arg = "";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "w";
                   command = "exec";
                   arg = "nwg-drawer";
                 }
                 # Direction key bindings
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "down";
                   command = "movefocus";
                   arg = "d";
                 }
                 {
-                  mod = "SUPER_SHIFT";
+                  mods = [
+                    mainMod
+                    "SHIFT"
+                  ];
                   key = "down";
                   command = "movewindow";
                   arg = "d";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "left";
                   command = "movefocus";
                   arg = "l";
                 }
                 {
-                  mod = "SUPER_SHIFT";
+                  mods = [
+                    mainMod
+                    "SHIFT"
+                  ];
                   key = "left";
                   command = "movewindow";
                   arg = "l";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "right";
                   command = "movefocus";
                   arg = "r";
                 }
                 {
-                  mod = "SUPER_SHIFT";
+                  mods = [
+                    mainMod
+                    "SHIFT"
+                  ];
                   key = "right";
                   command = "movewindow";
                   arg = "r";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "up";
                   command = "movefocus";
                   arg = "u";
                 }
                 {
-                  mod = "SUPER_SHIFT";
+                  mods = [
+                    mainMod
+                    "SHIFT"
+                  ];
                   key = "up";
                   command = "movewindow";
                   arg = "u";
                 }
                 # Special key bindings
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "mouse_down";
                   command = "workspace";
                   arg = "e+1";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "mouse_up";
                   command = "workspace";
                   arg = "e-1";
                 }
                 {
-                  mod = "";
                   key = "Print";
                   command = "exec";
                   arg = "hyprshot -m region";
                 }
                 {
-                  mod = "SHIFT";
+                  mods = [ "SHIFT" ];
                   key = "Print";
                   command = "exec";
                   arg = ''grim -g "$(slurp)"'';
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "RETURN";
                   command = "exec";
                   arg = ''kitty --working-directory "$(cat ~/.last_dir 2>/dev/null || echo $HOME)"'';
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "SPACE";
                   command = "exec";
                   arg = "nwg-drawer";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "Tab";
                   command = "cyclenext";
-                  arg = "";
                 }
                 {
-                  mod = "$mainMod";
+                  mods = [ mainMod ];
                   key = "Tab";
                   command = "bringactivetotop";
-                  arg = "";
                 }
                 # Media keys
                 {
-                  mod = "";
                   key = "XF86AudioLowerVolume";
                   command = "exec";
                   arg = "pamixer -d 5";
                 }
                 {
-                  mod = "";
                   key = "XF86AudioMicMute";
                   command = "exec";
                   arg = "pamixer --default-source -t";
                 }
                 {
-                  mod = "";
                   key = "XF86AudioMute";
                   command = "exec";
                   arg = "pamixer -t";
                 }
                 {
-                  mod = "";
                   key = "XF86AudioPause";
                   command = "exec";
                   arg = "playerctl play-pause";
                 }
                 {
-                  mod = "";
                   key = "XF86AudioPlay";
                   command = "exec";
                   arg = "playerctl play-pause";
                 }
                 {
-                  mod = "";
                   key = "XF86AudioRaiseVolume";
                   command = "exec";
                   arg = "pamixer -i 5";
                 }
                 {
-                  mod = "";
                   key = "XF86MonBrightnessDown";
                   command = "exec";
                   arg = "light -U 20";
                 }
                 {
-                  mod = "";
                   key = "XF86MonBrightnessUp";
                   command = "exec";
                   arg = "light -A 20";
@@ -349,68 +481,80 @@
               ])
               ++ (
                 # workspaces
-                # binds $mainMod + [shift +] {1..9} to [move to] workspace {1..9}
-                builtins.concatLists (
-                  builtins.genList (
-                    i:
-                    let
-                      ws = i + 1;
-                    in
-                    [
-                      "$mainMod, code:1${toString i}, workspace, ${toString ws}"
-                      "$mainMod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
-                    ]
-                  ) 9
-                )
+                # binds mainMod + [shift +] {1..9} to [move to] workspace {1..9}
+                builtins.concatMap (
+                  i:
+                  let
+                    ws = i + 1;
+                  in
+                  [
+                    (mkKeyBind {
+                      mods = [ mainMod ];
+                      key = "code:1${toString i}";
+                      command = "workspace";
+                      arg = ws;
+                    })
+                    (mkKeyBind {
+                      mods = [
+                        mainMod
+                        "SHIFT"
+                      ];
+                      key = "code:1${toString i}";
+                      command = "movetoworkspace";
+                      arg = ws;
+                    })
+                  ]
+                ) (builtins.genList (i: i) 9)
+              )
+              ++ (
+                let
+                  left-click = "mouse:272";
+                  right-click = "mouse:273";
+                  back-thumb = "mouse:275";
+                  front-thumb = "mouse:276";
+                in
+                map mkMouseBind [
+                  {
+                    mods = [ mainMod ];
+                    key = left-click;
+                    command = "movewindow";
+                  }
+                  {
+                    mods = [ "ALT" ];
+                    key = left-click;
+                    command = "resizewindow";
+                  }
+                  {
+                    mods = [ mainMod ];
+                    key = right-click;
+                    command = "resizewindow";
+                  }
+                  {
+                    key = back-thumb;
+                    command = "movewindow";
+                  }
+                  {
+                    key = front-thumb;
+                    command = "resizewindow";
+                  }
+                ]
               );
 
-            bindm =
-              let
-                left-click = "mouse:272";
-                right-click = "mouse:273";
-                back-thumb = "mouse:275";
-                front-thumb = "mouse:276";
-              in
-              (map (x: "${x.mod},${x.key},${x.command}") [
-                {
-                  mod = "$mainMod";
-                  key = left-click;
-                  command = "movewindow";
-                }
-                {
-                  mod = "ALT";
-                  key = left-click;
-                  command = "resizewindow";
-                }
-                {
-                  mod = "$mainMod";
-                  key = right-click;
-                  command = "resizewindow";
-                }
-                {
-                  mod = "";
-                  key = back-thumb;
-                  command = "movewindow";
-                }
-                {
-                  mod = "";
-                  key = front-thumb;
-                  command = "resizewindow";
-                }
-              ]);
-
-            # FIXME: This is environment specific
-            monitor = [
-              "HDMI-A-1, 1920x1080, 0x0, 1"
-              "DP-3, 1920x1080, 1920x0, 1"
-            ];
-
-            windowrule = [
-              "match:class pavucontrol float"
-              "match:class blueman-manager float"
-              "match:class mpv size 934 525"
-              "match:class mpv float"
-              "match:class mpv center"
+            window_rule = [
+              {
+                match.class = "pavucontrol";
+                float = true;
+              }
+              {
+                match.class = "blueman-manager";
+                float = true;
+              }
+              {
+                match.class = "mpv";
+                float = true;
+                center = true;
+                size = "934 525";
+              }
             ];
           };
         };

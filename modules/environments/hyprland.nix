@@ -1,9 +1,15 @@
 { ... }:
 {
   flake.modules.nixos.environments-hyprland =
-    { inputs, pkgs, ... }:
+    {
+      config,
+      inputs,
+      pkgs,
+      ...
+    }:
     let
       system = pkgs.stdenv.hostPlatform.system;
+      inherit (config.host.identity) username;
     in
     {
       environment = {
@@ -33,6 +39,26 @@
         portalPackage = inputs.hyprland.packages.${system}.xdg-desktop-portal-hyprland;
       };
 
-      services.displayManager.defaultSession = "hyprland";
+      # Force the session to load our home-manager-managed hyprland.lua
+      # explicitly, rather than relying on Hyprland's default config
+      # auto-search (which regenerates its own example hyprland.lua on
+      # every launch and can shadow ours).
+      services.displayManager.sessionPackages = [
+        (pkgs.writeTextFile {
+          name = "hyprland-explicit-config-session";
+          destination = "/share/wayland-sessions/hyprland-explicit-config.desktop";
+          text = ''
+            [Desktop Entry]
+            Name=Hyprland
+            Comment=An intelligent dynamic tiling Wayland compositor
+            Exec=start-hyprland -- --config /home/${username}/.config/hypr/hyprland.lua
+            Type=Application
+            DesktopNames=Hyprland
+          '';
+          passthru.providedSessions = [ "hyprland-explicit-config" ];
+        })
+      ];
+
+      services.displayManager.defaultSession = "hyprland-explicit-config";
     };
 }
