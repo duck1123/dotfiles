@@ -46,7 +46,7 @@
             # nushellPlugins.dbus
             nushellPlugins.skim
             # nushellPlugins.net
-            inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.nur-taskrunner
+            inputs.nur-taskrunner.packages.${pkgs.stdenv.hostPlatform.system}.default
             inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.pnu
           ];
 

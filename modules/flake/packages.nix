@@ -79,20 +79,6 @@ let
     '';
   };
 
-  nur-taskrunner = pkgs.rustPlatform.buildRustPackage {
-    pname = "nur";
-    version = "0.28.1+0.113.1";
-    # https://github.com/nur-taskrunner/nur
-    src = pkgs.fetchFromGitHub {
-      owner = "nur-taskrunner";
-      repo = "nur";
-      rev = "v0.28.1+0.113.1";
-      hash = "sha256-ON6E4tbaWabHejkzakGZQiKOmd3teZZMPKCM8LwVNoY=";
-    };
-    cargoHash = "sha256-Kcs9+53y/+Qrd4+18N9QTYiGdQjjjDaUJxdl+xBZPuo=";
-    meta.mainProgram = "nur";
-  };
-
 in
 {
   perSystem =
@@ -101,7 +87,6 @@ in
       {
         packages = {
           inherit
-            nur-taskrunner
             pnu
             soap-cli
             windmill-cli

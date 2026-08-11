@@ -33,7 +33,7 @@
           ssh-to-pgp
           vals
           wget
-        ];
+        ] ++ [ inputs.nur-taskrunner.packages.${system}.default ];
       };
     };
 }

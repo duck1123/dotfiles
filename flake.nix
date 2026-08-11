@@ -4,12 +4,14 @@
   nixConfig = {
     allow-import-from-derivation = true;
     extra-experimental-features = "nix-command flakes";
-    # extra-substituters =
-    #   [ "https://duck1123.cachix.org" "https://nix-community.cachix.org" ];
-    # extra-trusted-public-keys = [
-    #   "duck1123.cachix.org-1:Cj3r3BH7Xuy0zFWy8V/VIB3F7+Gi1m9HB302E9UGV3E="
-    #   "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-    # ];
+    extra-substituters = [
+      "https://duck1123.cachix.org"
+      "https://nix-community.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "duck1123.cachix.org-1:Cj3r3BH7Xuy0zFWy8V/VIB3F7+Gi1m9HB302E9UGV3E="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
   };
 
   inputs = {
@@ -141,6 +143,14 @@
         nixpkgs.follows = "nixpkgs";
       };
       url = "github:nix-community/NUR";
+    };
+
+    nur-taskrunner = {
+      inputs = {
+        flake-utils.follows = "flake-utils";
+        nixpkgs.follows = "nixpkgs";
+      };
+      url = "github:duck1123/nur";
     };
 
     pre-commit-hooks = {

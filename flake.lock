@@ -1076,6 +1076,29 @@
         "type": "github"
       }
     },
+    "nur-taskrunner": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786413819,
+        "narHash": "sha256-P/6hD6az4gYqyr6EvTR91ZP/pC+cNKUpNj0h8oyrp6A=",
+        "owner": "duck1123",
+        "repo": "nur",
+        "rev": "b96411248a712b69dfd6b5e243a9da552334491a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "duck1123",
+        "repo": "nur",
+        "type": "github"
+      }
+    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": [
@@ -1173,6 +1196,7 @@
         "nixpkgs": "nixpkgs",
         "nixpkgs-lib": "nixpkgs-lib_2",
         "nur": "nur",
+        "nur-taskrunner": "nur-taskrunner",
         "pre-commit-hooks": "pre-commit-hooks",
         "sddm-sugar-candy-nix": "sddm-sugar-candy-nix",
         "sops-nix": "sops-nix",
