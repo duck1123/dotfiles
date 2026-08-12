@@ -15,6 +15,11 @@
   };
 
   inputs = {
+    attic = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:zhaofengli/attic";
+    };
+
     clj-nix = {
       inputs = {
         devshell.follows = "devshell";
