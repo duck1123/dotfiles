@@ -56,7 +56,10 @@ in
             music.enable = false;
             network.enable = true;
             nfs.enable = false;
-            nix.enable = true;
+            nix = {
+              atticPush.enable = true;
+              enable = true;
+            };
             nostr.enable = true;
             nushell.enable = true;
             obsidian.enable = true;

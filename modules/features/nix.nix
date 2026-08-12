@@ -2,10 +2,26 @@
 {
   flake.types.generic.feature-options.nix =
     { inputs, lib }:
+    with lib;
     let
       inherit (inputs.self.types.generic) simpleFeature;
     in
-    simpleFeature { inherit inputs lib; } "nix feature";
+    mkOption {
+      type = types.submodule {
+        options = {
+          enable = mkOption {
+            type = types.bool;
+            default = false;
+            description = "Enable nix feature";
+          };
+          atticPush = simpleFeature {
+            inherit inputs lib;
+          } "automatic push-on-build to the Attic cache via attic watch-store";
+        };
+      };
+      default = { };
+      description = "nix feature configuration";
+    };
 
   flake.modules.nixos.nix-feature =
     {
@@ -15,50 +31,90 @@
       pkgs,
       ...
     }:
+    let
+      atticClient = inputs.attic.packages.${pkgs.stdenv.hostPlatform.system}.attic-client;
+      atticEndpoint = "https://attic.home.kronkltd.net";
+      atticCache = "nixos";
+    in
     {
-      config = lib.mkIf config.host.features.nix.enable {
-        environment.systemPackages = [
-          inputs.attic.packages.${pkgs.stdenv.hostPlatform.system}.attic-client
-        ];
+      config = lib.mkMerge [
+        (lib.mkIf config.host.features.nix.enable {
+          environment.systemPackages = [ atticClient ];
 
-        nix = {
-          extraOptions = ''
-            experimental-features = nix-command flakes
-          '';
+          nix = {
+            extraOptions = ''
+              experimental-features = nix-command flakes
+            '';
 
-          gc = {
-            automatic = true;
-            options = "--delete-older-than 14d";
+            gc = {
+              automatic = true;
+              options = "--delete-older-than 14d";
+            };
+
+            optimise.automatic = true;
+
+            settings = {
+              auto-optimise-store = true;
+              experimental-features = [
+                "nix-command"
+                "flakes"
+              ];
+              substituters = [
+                "https://duck1123.cachix.org"
+                "https://hyprland.cachix.org"
+                "https://nix-community.cachix.org"
+                "${atticEndpoint}/${atticCache}"
+              ];
+              trusted-public-keys = [
+                "duck1123.cachix.org-1:Cj3r3BH7Xuy0zFWy8V/VIB3F7+Gi1m9HB302E9UGV3E="
+                "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+                "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+                "nixos:6s8iAyKEnH2z4spigUdDmt1VwiAwrvPA9vQNUd9if1k="
+              ];
+              trusted-users = [
+                "root"
+                "duck"
+              ];
+            };
           };
 
-          optimise.automatic = true;
+          nixpkgs.config.allowUnfree = true;
+        })
 
-          settings = {
-            auto-optimise-store = true;
-            experimental-features = [
-              "nix-command"
-              "flakes"
-            ];
-            substituters = [
-              "https://duck1123.cachix.org"
-              "https://hyprland.cachix.org"
-              "https://nix-community.cachix.org"
-              "https://attic.home.kronkltd.net/nixos"
-            ];
-            trusted-public-keys = [
-              "duck1123.cachix.org-1:Cj3r3BH7Xuy0zFWy8V/VIB3F7+Gi1m9HB302E9UGV3E="
-              "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
-              "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-              "nixos:6s8iAyKEnH2z4spigUdDmt1VwiAwrvPA9vQNUd9if1k="
-            ];
-            trusted-users = [
-              "root"
-              "duck"
-            ];
+        (lib.mkIf (config.host.features.nix.enable && config.host.features.nix.atticPush.enable) {
+          sops.secrets.attic-push-token = {
+            sopsFile = ./../../secrets/attic-token.yaml;
+            key = "attic_push_token";
+            path = "/run/secrets/attic-push-token";
+            mode = "0400";
+            owner = "duck";
+            group = "users";
+            restartUnits = [ "attic-watch-store.service" ];
           };
-        };
 
-        nixpkgs.config.allowUnfree = true;
-      };
+          systemd.services.attic-watch-store = {
+            description = "Auto-push newly built store paths to the Attic cache";
+            after = [
+              "network-online.target"
+              "sops-nix.service"
+            ];
+            wants = [ "network-online.target" ];
+            wantedBy = [ "multi-user.target" ];
+
+            path = [ atticClient ];
+
+            script = ''
+              attic login ${atticCache} ${atticEndpoint} "$(cat ${config.sops.secrets.attic-push-token.path})"
+              exec attic watch-store ${atticCache}
+            '';
+
+            serviceConfig = {
+              User = "duck";
+              Restart = "on-failure";
+              RestartSec = "10s";
+            };
+          };
+        })
+      ];
     };
 }
