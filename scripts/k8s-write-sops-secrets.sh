@@ -127,6 +127,7 @@ ${string_data_lines}"
         --encrypted-regex '^(stringData)$' \
         --input-type yaml \
         --output-type yaml \
+        --filename-override secrets/k8s.enc.yaml \
         /dev/stdin \
     > "$output_file"
 
