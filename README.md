@@ -94,6 +94,12 @@ nix flake update
 nur format
 ```
 
+### Lint Nix files
+
+```sh
+nur lint
+```
+
 ---
 
 ## NixOS / home-manager
@@ -288,6 +294,7 @@ rm secrets/k8s.yaml
 
 ```sh
 nur check              # nix flake check
+nur lint               # lint .nix files with statix
 nur build --all true   # build all configurations
 ```
 

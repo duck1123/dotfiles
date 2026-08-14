@@ -21,6 +21,7 @@ nur boot-os                      # build NixOS and set as boot default (safe for
 # Validation and formatting
 nur check           # run nix flake check
 nur format          # format all .nix files with nixfmt
+nur lint            # lint all .nix files with statix
 
 # Remote deployment (builds locally, copies + activates remotely)
 nur switch --host edgenix    # deploy to edgenix

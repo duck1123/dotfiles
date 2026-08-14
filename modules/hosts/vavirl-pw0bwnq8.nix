@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   hostname = "vavirl-pw0bwnq8";
   system = "x86_64-linux";

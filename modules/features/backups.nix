@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.feature-options.backups =
     { inputs, lib }:
     let

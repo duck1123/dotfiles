@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.feature-options.bluetooth =
     { inputs, lib }:
     let

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.android-submodule =
     { lib, ... }:
     with lib;

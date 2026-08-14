@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   hostname = "nixmini";
   system = "x86_64-linux";

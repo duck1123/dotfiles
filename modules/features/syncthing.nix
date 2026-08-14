@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   feature-name = "syncthing";
 in
@@ -121,9 +121,9 @@ in
 
             settings = {
               devices = attrsets.mapAttrs' (name: value: {
-                name = value.name;
+                inherit (value) name;
                 value = {
-                  id = value.id;
+                  inherit (value) id;
                   autoAcceptFolders = true;
                 };
               }) config.hosts;
@@ -142,7 +142,7 @@ in
                         devices = getDevicesForShare shareName;
                       }
                       // optionalAttrs (shareConfig ? label) {
-                        label = shareConfig.label;
+                        inherit (shareConfig) label;
                       }
                       // optionalAttrs (shareConfig ? versioning) {
                         inherit (shareConfig) versioning;

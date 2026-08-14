@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   hostname = "pixel8";
   system = "x86_64-linux";

@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   unified-modules = [
     "bitcoin"

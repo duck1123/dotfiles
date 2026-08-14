@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   hostname = "nasnix";
   nas-ip = "192.168.0.124";

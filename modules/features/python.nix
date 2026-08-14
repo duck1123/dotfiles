@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   name = "python";
 in

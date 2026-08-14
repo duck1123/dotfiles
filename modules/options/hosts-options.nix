@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.modules.generic.hosts-options =
     { inputs, lib, ... }:
     let

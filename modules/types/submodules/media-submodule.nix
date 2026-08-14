@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.media-submodule =
     { lib, ... }:
     with lib;

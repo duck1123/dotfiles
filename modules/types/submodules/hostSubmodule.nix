@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.hostSubmodule =
     { inputs, lib, ... }:
     let

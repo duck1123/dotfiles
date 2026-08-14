@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.loki = {
     enable = true;
     hostAffinity = "edgenix";

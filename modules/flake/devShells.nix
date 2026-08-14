@@ -12,28 +12,32 @@
         # See https://github.com/disassembler/network/blob/c341a3af27611390f13f86d966767ea30c726a92/shell.nix
         sopsPGPKeyDirs = [ "../../secrets/keys" ];
 
-        buildInputs = with pkgs; [
-          age
-          babashka
-          cachix
-          clojure
-          emacs
-          git
-          home-manager
-          keepassxc
-          kubectl
-          nh
-          nix
-          nix-output-monitor
-          nixpkgs-fmt
-          nmap
-          runme
-          sops
-          ssh-to-age
-          ssh-to-pgp
-          vals
-          wget
-        ] ++ [ inputs.nur-taskrunner.packages.${system}.default ];
+        buildInputs =
+          with pkgs;
+          [
+            age
+            babashka
+            cachix
+            clojure
+            emacs
+            git
+            home-manager
+            keepassxc
+            kubectl
+            nh
+            nix
+            nix-output-monitor
+            nixpkgs-fmt
+            nmap
+            runme
+            sops
+            ssh-to-age
+            ssh-to-pgp
+            statix
+            vals
+            wget
+          ]
+          ++ [ inputs.nur-taskrunner.packages.${system}.default ];
       };
     };
 }

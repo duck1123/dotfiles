@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.feature-options.font =
     { inputs, lib }:
     let
@@ -23,16 +22,8 @@
           earlySetup = true;
         };
 
-        fonts.packages =
-          with pkgs;
-          [
-            # nerd-fonts.adwaita-mono
-            # nerd-fonts.atkynson-mono
-            # nerd-fonts.caskaydia-mono
-            # nerd-fonts.fira-code
-            # nerd-fonts.inconsolata
-          ]
-          ++ builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
+        # e.g. nerd-fonts.adwaita-mono, nerd-fonts.atkynson-mono, nerd-fonts.caskaydia-mono, nerd-fonts.fira-code, nerd-fonts.inconsolata
+        fonts.packages = builtins.filter lib.attrsets.isDerivation (builtins.attrValues pkgs.nerd-fonts);
       };
     };
 }

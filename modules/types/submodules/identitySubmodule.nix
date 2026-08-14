@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.identitySubmodule =
     { lib, ... }:
     with lib;

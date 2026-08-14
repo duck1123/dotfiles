@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.modules.nixos.environments-i3 =
     { pkgs, ... }:
     {

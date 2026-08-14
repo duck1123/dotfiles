@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   feature-name = "bitcoin";
 in

@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   image = ../../resources/wallpaper/nix-wallpaper-mosaic-blue.png;
 

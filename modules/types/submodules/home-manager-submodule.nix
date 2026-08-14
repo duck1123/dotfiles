@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.home-manager-submodule =
     { lib, ... }:
     with lib;

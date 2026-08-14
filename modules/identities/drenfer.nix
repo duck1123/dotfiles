@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.modules.generic.identity-drenfer =
     { config, ... }:
     {

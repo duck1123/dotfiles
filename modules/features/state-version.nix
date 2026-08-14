@@ -1,14 +1,9 @@
-{ ... }:
-{
-  flake.modules.nixos.state-version =
-    { ... }:
-    {
-      system.stateVersion = "26.05";
-    };
+_: {
+  flake.modules.nixos.state-version = _: {
+    system.stateVersion = "26.05";
+  };
 
-  flake.modules.homeManager.state-version =
-    { ... }:
-    {
-      home.stateVersion = "21.11";
-    };
+  flake.modules.homeManager.state-version = _: {
+    home.stateVersion = "21.11";
+  };
 }

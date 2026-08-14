@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.feature-options.kubernetes =
     { inputs, lib }:
     with lib;
@@ -197,10 +196,10 @@
                 tokenFile = tokenPath;
               }
               // lib.optionalAttrs (tokenPath == null && kubernetes.token != null) {
-                token = kubernetes.token;
+                inherit (kubernetes) token;
               }
               // lib.optionalAttrs (kubernetes.serverAddr != null) {
-                serverAddr = kubernetes.serverAddr;
+                inherit (kubernetes) serverAddr;
               }
               // {
                 extraFlags = baseFlags;

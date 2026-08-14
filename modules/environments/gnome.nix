@@ -6,12 +6,10 @@
       gtk.gtk4.theme = lib.mkDefault config.gtk.theme;
     };
 
-  flake.modules.nixos.environments-gnome =
-    { ... }:
-    {
-      services = {
-        desktopManager.gnome.enable = true;
-        displayManager.defaultSession = "gnome";
-      };
+  flake.modules.nixos.environments-gnome = _: {
+    services = {
+      desktopManager.gnome.enable = true;
+      displayManager.defaultSession = "gnome";
     };
+  };
 }

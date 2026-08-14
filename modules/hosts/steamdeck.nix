@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   hostname = "steamdeck";
   system = "x86_64-linux";

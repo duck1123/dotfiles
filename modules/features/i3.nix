@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   enable-polybar = false;
 in

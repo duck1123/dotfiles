@@ -11,8 +11,7 @@ in
     else
       let
         # CRD generators from k3s-fleetops, using dotfiles' (shared) inputs for nixidy/nixhelm deps.
-        crdImports =
-          (import "${inputs.k3s-fleetops}/generators" { inherit inputs system pkgs; }).crdImports;
+        inherit (import "${inputs.k3s-fleetops}/generators" { inherit inputs system pkgs; }) crdImports;
 
         devEnv = inputs.nixidy.lib.mkEnvs {
           inherit pkgs;

@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   hostname = "powerspecnix";
   mount-nas = true;

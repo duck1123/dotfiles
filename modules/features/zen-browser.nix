@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.types.generic.feature-options.zen-browser =
     { inputs, lib }:
     let

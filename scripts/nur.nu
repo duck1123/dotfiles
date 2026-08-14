@@ -129,6 +129,11 @@ export def "nur format" []: nothing -> nothing {
   ^find . -name '*.nix' -exec nixfmt {} + # nu-lint-ignore: unhandled_external_error
 }
 
+# Lint all .nix files using statix
+export def "nur lint" []: nothing -> nothing {
+  ^statix check .
+}
+
 # Install cert-manager into the current cluster
 export def "nur install cert-manager" []: nothing -> nothing {
   let version = "1.14.4"
