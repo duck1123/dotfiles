@@ -48,19 +48,30 @@ Flake support is enabled automatically by the Determinate installer. If you ever
 
 ### WSL — NixOS image setup
 
-`vavirl-pw0bwnq8` runs as a NixOS-WSL distro, replacing the plain Ubuntu WSL base. Build the tarball from this flake and import it:
+`vavirl-pw0bwnq8` runs as a NixOS-WSL distro, replacing the plain Ubuntu WSL base.
 
-```sh {"name":"build-wsl-image"}
+**Step 1** — build the tarball builder:
+
+```sh {"name":"build-wsl-builder"}
 nur build --tarball --host vavirl-pw0bwnq8
 ```
 
-Then import it from inside the Ubuntu WSL shell (not PowerShell — bash glob expansion and `wslpath` make path handling much cleaner):
+This produces `result/bin/nixos-wsl-tarball-builder` — a self-contained script.
+
+**Step 2** — run the builder as root to produce the image (writes `nixos.wsl` to the current directory):
+
+```sh {"name":"build-wsl-image"}
+sudo result/bin/nixos-wsl-tarball-builder
+```
+
+**Step 3** — import it into WSL from inside the Ubuntu WSL shell:
 
 ```sh {"name":"import-wsl-image"}
-# Resolve the symlink and convert to a Windows path that wsl.exe can read
-tarball=$(wslpath -w "$(readlink -f result/tarball/*.tar.gz)")
-# $USERPROFILE is the Windows home dir (e.g. C:\Users\drenfer), available in WSL
-wsl.exe --import NixOS "$USERPROFILE\\wsl\\NixOS" "$tarball"
+# cmd.exe is always available in WSL; tr strips the Windows carriage return
+WIN_HOME=$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null | tr -d '\r')
+mkdir -p "$(wslpath "$WIN_HOME")/wsl/NixOS"
+wsl.exe --unregister NixOS 2>/dev/null || true   # remove any previous failed import
+wsl.exe --import NixOS "$WIN_HOME\\wsl\\NixOS" "$(wslpath -w "$(pwd)/nixos.wsl")"
 wsl.exe -s NixOS   # set as default distro (optional)
 ```
 

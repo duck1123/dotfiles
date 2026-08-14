@@ -10,7 +10,6 @@
         inputs.self.modules.nixos.users
         inputs.self.modules.nixos.zsh-feature
         inputs.self.modules.generic.options
-        inputs.sops-nix.nixosModules.sops
       ];
 
       wsl.enable = true;

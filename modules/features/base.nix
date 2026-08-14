@@ -87,6 +87,7 @@ in
           kubernetes-feature
           nfs-feature
           nix-feature
+          nix-feature-attic
           radio
           samba
           sddm

@@ -21,3 +21,4 @@ kubernetes/manifests/
 # plaintext decrypted secrets (never commit)
 secrets/k8s.yaml
 .claude/settings.local.json
+nixos.wsl
