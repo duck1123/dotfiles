@@ -22,13 +22,18 @@ if [[ ! -d "$MANIFESTS_DIR/.git" ]]; then
   exit 1
 fi
 
+SOPS=(sops)
+if ! command -v sops >/dev/null 2>&1; then
+  SOPS=(nix run nixpkgs#sops --)
+fi
+
 # ---------------------------------------------------------------------------
 # 1. Decrypt kubernetes secrets to a temp file
 # ---------------------------------------------------------------------------
 TMP="$(mktemp)"
 trap 'rm -f "$TMP"' EXIT
 
-sops --decrypt "$DOTFILES_ROOT/secrets/k8s.enc.yaml" > "$TMP"
+"${SOPS[@]}" --decrypt "$DOTFILES_ROOT/secrets/k8s.enc.yaml" > "$TMP"
 export DECRYPTED_SECRET_FILE="$TMP"
 
 # ---------------------------------------------------------------------------

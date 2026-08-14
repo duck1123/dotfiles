@@ -21,6 +21,11 @@ DOTFILES_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 MANIFESTS_DIR="$DOTFILES_ROOT/kubernetes/manifests/dev"
 SYSTEM="${SYSTEM:-x86_64-linux}"
 
+SOPS=(sops)
+if ! command -v sops >/dev/null 2>&1; then
+  SOPS=(nix run nixpkgs#sops --)
+fi
+
 if [[ ! -d "$MANIFESTS_DIR" ]]; then
   echo "k8s-write-sops-secrets: $MANIFESTS_DIR not found, skipping" >&2
   echo "Run bb k8s-switch-charts first to generate manifests." >&2
@@ -33,7 +38,7 @@ fi
 TMP="$(mktemp)"
 trap 'rm -f "$TMP"' EXIT
 
-sops --decrypt "$DOTFILES_ROOT/secrets/k8s.enc.yaml" > "$TMP"
+"${SOPS[@]}" --decrypt "$DOTFILES_ROOT/secrets/k8s.enc.yaml" > "$TMP"
 export DECRYPTED_SECRET_FILE="$TMP"
 
 # ---------------------------------------------------------------------------
@@ -79,7 +84,7 @@ while IFS= read -r spec; do
   output_file="$MANIFESTS_DIR/$namespace/SopsSecret-${secret_name}.yaml"
 
   if [[ -f "$output_file" ]]; then
-    existing_plaintext="$(sops --decrypt --input-type yaml --output-type json "$output_file" | jq '.spec.secretTemplates[0].stringData')"
+    existing_plaintext="$("${SOPS[@]}" --decrypt --input-type yaml --output-type json "$output_file" | jq '.spec.secretTemplates[0].stringData')"
     if [[ "$existing_plaintext" == "$values" ]]; then
       echo "k8s-write-sops-secrets: skipping unchanged secret: $secret_name"
       continue
@@ -117,7 +122,7 @@ ${metadata_yaml}spec:
 ${string_data_lines}"
 
   echo "$plaintext_yaml" \
-    | sops --encrypt \
+    | "${SOPS[@]}" --encrypt \
         --age "$AGE_RECIPIENTS" \
         --encrypted-regex '^(stringData)$' \
         --input-type yaml \
