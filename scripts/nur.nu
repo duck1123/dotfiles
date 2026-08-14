@@ -399,6 +399,21 @@ export def "nur k3s wipe" [] {
   ^sudo rm -rf /var/lib/rancher/k3s
 }
 
+# Clone the private manifests repo into kubernetes/manifests/ (one-time setup)
+export def "nur k8s manifests init" []: nothing -> nothing {
+  ^git clone git@github.com:duck1123/argo-manifests.git kubernetes/manifests
+}
+
+# Pull the latest changes into the kubernetes/manifests/ checkout
+export def "nur k8s manifests sync" []: nothing -> nothing {
+  if not ("kubernetes/manifests/.git" | path exists) {
+    error make {
+      msg: "kubernetes/manifests is not a git repository. Run 'nur k8s manifests init' first."
+    }
+  }
+  ^git -C kubernetes/manifests pull
+}
+
 # Build nixidy manifests and write to kubernetes/manifests/
 export def "nur k8s switch-charts" [] {
   ^sh scripts/k8s-switch-charts.sh

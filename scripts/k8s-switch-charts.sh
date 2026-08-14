@@ -18,8 +18,7 @@ SHOW_TRACE="${SHOW_TRACE:-false}"
 
 if [[ ! -d "$MANIFESTS_DIR/.git" ]]; then
   echo "ERROR: $MANIFESTS_DIR is not a git repository." >&2
-  echo "Clone your private manifests repo there first:" >&2
-  echo "  git clone <your-private-manifests-repo> kubernetes/manifests" >&2
+  echo "Run 'nur k8s manifests init' first (or 'git clone git@github.com:duck1123/argo-manifests.git kubernetes/manifests')." >&2
   exit 1
 fi
 
