@@ -57,25 +57,58 @@ def all-os-installables []: nothing -> list<string> {
   ]
 }
 
-def all-installables []: nothing -> list<string> {
-  [...(all-home-installables) ...(all-os-installables)]
-}
+# Valid target names for build/switch (tab completion)
+def only-targets []: nothing -> list<string> { [os home k8s] }
 
-# Build configurations (local, --host <name>, or --all). Use --os-only or --home-only to restrict.
-export def "nur build" [
-  --all = false
-  --fallback = false
-  --home-only = false
-  --host: string@home-hosts = ""
-  --os-only = false
-]: nothing -> nothing {
-  if $os_only and $home_only {
+# Validate target names and resolve which targets are selected.
+# No targets means the historical default: os and home (k8s is opt-in only).
+def parse-only [only: list<string>]: nothing -> record<os: bool, home: bool, k8s: bool> {
+  let invalid = ($only | where {|o| $o not-in (only-targets)})
+
+  if ($invalid | is-not-empty) {
     error make {
-      msg: "--os-only and --home-only are mutually exclusive"
-      label: {text: "conflicting flags", span: (metadata $os_only).span}
+      msg: $"invalid target: ($invalid | str join ', ') \(expected one of: os, home, k8s\)"
     }
   }
 
+  if ($only | is-empty) {
+    {os: true, home: true, k8s: false}
+  } else {
+    {os: ("os" in $only), home: ("home" in $only), k8s: ("k8s" in $only)}
+  }
+}
+
+# Whether this machine is a NixOS system (has os-level Nix configuration to switch/build).
+def is-nixos-host []: nothing -> bool {
+  "/etc/NIXOS" | path exists
+}
+
+# Validate and resolve which targets to act on.
+# When no target was explicitly requested, on a purely local invocation (no --host, no --all)
+# silently drop os on hosts that aren't NixOS (e.g. vallen, steamdeck) instead of failing for
+# lack of support. An explicit target, or --host/--all, is a deliberate request and still fails loudly.
+def resolve-targets [
+  only: list<string>
+  host: string
+  --all = false
+]: nothing -> record<os: bool, home: bool, k8s: bool> {
+  mut targets = (parse-only $only)
+
+  if ($only | is-empty) and ($host | is-empty) and (not $all) and $targets.os and not (is-nixos-host) {
+    print "note: this host has no NixOS configuration, skipping os"
+    $targets.os = false
+  }
+
+  $targets
+}
+
+# Build configurations (local, --host <name>, or --all). Pass os/home/k8s to restrict, e.g. `nur build home k8s`.
+export def "nur build" [
+  --all = false
+  --fallback = false
+  --host: string@home-hosts = ""
+  ...only: string@only-targets
+]: nothing -> nothing {
   if $all and ($host | is-not-empty) {
     error make {
       msg: "--all and --host are mutually exclusive"
@@ -83,33 +116,43 @@ export def "nur build" [
     }
   }
 
+  let targets = (resolve-targets $only $host --all $all)
+
+  if $targets.k8s and ($host | is-not-empty) {
+    error make {
+      msg: "k8s target cannot be combined with --host (k8s has no remote build)"
+      label: {text: "--host provided here", span: (metadata $host).span}
+    }
+  }
+
   let args = (if $fallback { ["--fallback"] } else { [] })
 
   if $all {
-    let installables = (
-      if $os_only {
-        all-os-installables
-      } else if $home_only {
-        all-home-installables
-      } else {
-        all-installables
-      }
-    )
+    let installables = [
+      ...(if $targets.os { all-os-installables } else { [] })
+      ...(if $targets.home { all-home-installables } else { [] })
+    ]
 
-    ^nom build ...$args --no-link ...$installables
+    if ($installables | is-not-empty) {
+      ^nom build ...$args --no-link ...$installables
+    }
   } else if ($host | is-empty) {
-    if not $os_only { ^nh home build ...$args . }
-    if not $home_only { ^nh os build ...$args . }
+    if $targets.home { ^nh home build ...$args . }
+    if $targets.os { ^nh os build ...$args . }
   } else {
-    if not $os_only {
+    if $targets.home {
       let user = (host-user $host)
       let flake_host = (host-flake-name $host)
       ^nom build ...$args $".#homeConfigurations.($user)@($flake_host).activationPackage"
     }
 
-    if not $home_only {
+    if $targets.os {
       ^nom build ...$args $".#nixosConfigurations.($host).config.system.build.toplevel"
     }
+  }
+
+  if $targets.k8s {
+    nur k8s switch-charts
   }
 }
 
@@ -158,18 +201,31 @@ export def "nur secrets windows-key" []: nothing -> string {
   sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM
 }
 
-# Switch home-manager and/or NixOS configurations (local if no --host, otherwise remote).
-# Use --os-only or --home-only to restrict which configs are switched.
+# Switch home-manager, NixOS, and/or k8s manifests (local if no --host, otherwise remote).
+# Pass os/home/k8s to restrict which targets are switched, e.g. `nur switch home k8s`.
+# Use --boot to set the os target as boot default instead of activating immediately (safe for slow activations).
 export def "nur switch" [
-  --home-only = false
+  --boot
   --host: string@home-hosts = ""
-  --os-only = false
+  ...only: string@only-targets
 ]: nothing -> nothing {
-  if $os_only and $home_only {
-    error make { msg: "--os-only and --home-only are mutually exclusive" }
+  let targets = (resolve-targets $only $host)
+
+  if $targets.k8s and ($host | is-not-empty) {
+    error make {
+      msg: "k8s target cannot be combined with --host (k8s has no remote switch)"
+      label: {text: "--host provided here", span: (metadata $host).span}
+    }
   }
 
-  if not $os_only {
+  if $boot and not $targets.os {
+    error make {
+      msg: "--boot only applies to the os target"
+      label: {text: "--boot provided here", span: (metadata $boot).span}
+    }
+  }
+
+  if $targets.home {
     if ($host | is-empty) {
       let ts = (date now | format date '%s')
       ^home-manager switch --flake . -b $"backup.($ts)" --show-trace
@@ -178,32 +234,33 @@ export def "nur switch" [
     }
   }
 
-  if not $home_only {
+  if $targets.os {
     if ($host | is-empty) {
-      try {
-        ^sudo nixos-rebuild switch --flake . --show-trace
-      } catch {|e|
-        print "\n=== systemd journal (last 50 lines) ==="
-        ^journalctl -xe --no-pager -n 50
-        error make {
-          msg: $e.msg
-          label: {text: "nixos-rebuild switch failed", span: (metadata $host).span}
+      if $boot {
+        ^sudo nixos-rebuild boot --flake . --show-trace
+      } else {
+        try {
+          ^sudo nixos-rebuild switch --flake . --show-trace
+        } catch {|e|
+          print "\n=== systemd journal (last 50 lines) ==="
+          ^journalctl -xe --no-pager -n 50
+          error make {
+            msg: $e.msg
+            label: {text: "nixos-rebuild switch failed", span: (metadata $host).span}
+          }
         }
       }
     } else {
-      do-switch-remote-os $host
+      if $boot {
+        do-boot-remote-os $host
+      } else {
+        do-switch-remote-os $host
+      }
     }
   }
-}
 
-# Build NixOS config and set as boot default (local if no --host, otherwise remote)
-export def "nur boot-os" [
-  --host: string@nixos-hosts = ""
-]: nothing -> nothing {
-  if ($host | is-empty) {
-    ^sudo nixos-rebuild boot --flake . --show-trace
-  } else {
-    do-boot-remote-os $host
+  if $targets.k8s {
+    nur k8s deploy
   }
 }
 
@@ -354,8 +411,8 @@ export def "nur k8s push" [] {
 
 # Build manifests and push to private repo (switch-charts + push)
 export def "nur k8s deploy" [] {
-  nur k8s-switch-charts
-  nur k8s-push
+  nur k8s switch-charts
+  nur k8s push
 }
 
 # Decrypt kubernetes secrets to secrets/k8s.yaml (plaintext — do not commit)

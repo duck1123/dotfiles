@@ -108,9 +108,10 @@ nur lint
 
 ```sh
 nur switch                       # apply both home-manager and NixOS
-nur switch --home-only true      # home-manager only
-nur switch --os-only true        # NixOS only
-nur boot-os                      # build NixOS and set as boot default (safe for slow activations)
+nur switch home                  # home-manager only
+nur switch os                    # NixOS only
+nur switch k8s                   # build and push k8s manifests only (no --host)
+nur switch os --boot             # set NixOS as boot default instead of activating (safe for slow activations)
 ```
 
 ### Remote deployment
@@ -144,8 +145,8 @@ nur dry-run-os --host nasnix
 nur switch --host edgenix                     # both home-manager and NixOS
 nur switch --host nasnix
 
-nur switch --host edgenix --os-only true      # NixOS only
-nur switch --host edgenix --home-only true    # home-manager only
+nur switch --host edgenix os                  # NixOS only
+nur switch --host edgenix home                # home-manager only
 ```
 
 **Prerequisites:**

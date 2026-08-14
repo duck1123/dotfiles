@@ -14,9 +14,10 @@ The primary task runner is [nur](https://github.com/nur-taskrunner/nur) using Nu
 # Build and apply local configuration
 nur build                        # build current home + OS configs
 nur switch                       # switch both home-manager and NixOS
-nur switch --home-only true      # apply home-manager config only
-nur switch --os-only true        # apply NixOS config only
-nur boot-os                      # build NixOS and set as boot default (safe for slow activations)
+nur switch home                  # apply home-manager config only
+nur switch os                    # apply NixOS config only
+nur switch k8s                   # build and push k8s manifests only (no --host)
+nur switch os --boot             # set NixOS as boot default instead of activating (safe for slow activations)
 
 # Validation and formatting
 nur check           # run nix flake check
