@@ -40,21 +40,17 @@ def host-user [host: string]: nothing -> string {
 }
 
 def all-home-installables []: nothing -> list<string> {
-  [
-    ".#homeConfigurations.duck@inspernix.activationPackage"
-    ".#homeConfigurations.duck@nasnix.activationPackage"
-    ".#homeConfigurations.duck@powerspecnix.activationPackage"
-    ".#homeConfigurations.deck@steamdeck.activationPackage"
-    ".#homeConfigurations.drenfer@VAVIRL-PW0BWNQ8.activationPackage"
-  ]
+  home-hosts | each {|host|
+    let flake_host = (host-flake-name $host)
+    let user = (host-user $host)
+    $".#homeConfigurations.($user)@($flake_host).activationPackage"
+  }
 }
 
 def all-os-installables []: nothing -> list<string> {
-  [
-    ".#nixosConfigurations.inspernix.config.system.build.toplevel"
-    ".#nixosConfigurations.nasnix.config.system.build.toplevel"
-    ".#nixosConfigurations.powerspecnix.config.system.build.toplevel"
-  ]
+  nixos-hosts | each {|host|
+    $".#nixosConfigurations.($host).config.system.build.toplevel"
+  }
 }
 
 # Valid target names for build/switch (tab completion)
