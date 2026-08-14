@@ -135,5 +135,6 @@ use ~/nushell/modules/nostr_module.nu *
 use ~/nushell/modules/pj_module.nu *
 use ~/nushell/modules/platform_module.nu *
 use ~/nushell/modules/project_module.nu *
+use ~/nushell/modules/roam_module.nu *
 
 # use kubernetes *
