@@ -33,8 +33,8 @@ def host-flake-name [host: string]: nothing -> string {
 # Map a host to its primary user
 def host-user [host: string]: nothing -> string {
   match $host {
-    steamdeck => deck
-    vallen | "VAVIRL-PW0BWNQ8" => drenfer,
+    steamdeck => "deck"
+    vallen | "VAVIRL-PW0BWNQ8" => "drenfer",
     _ => "duck"
   }
 }
