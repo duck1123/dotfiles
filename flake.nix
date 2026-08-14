@@ -71,9 +71,11 @@
 
     k3s-fleetops = {
       inputs = {
+        attic.follows = "attic";
         clj-nix.follows = "clj-nix";
         flake-parts.follows = "flake-parts";
         flake-utils.follows = "flake-utils";
+        import-tree.follows = "import-tree";
         make-shell.follows = "make-shell";
         nix-csi.follows = "nix-csi";
         nix-fetcher-data.follows = "nix-fetcher-data";
@@ -137,6 +139,14 @@
     };
 
     nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
+
+    nixos-wsl = {
+      inputs = {
+        flake-compat.follows = "flake-compat";
+        nixpkgs.follows = "nixpkgs";
+      };
+      url = "github:nix-community/NixOS-WSL";
+    };
 
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 

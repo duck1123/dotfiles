@@ -55,8 +55,6 @@ const NU_LIB_DIRS = [
   '~/.nix-profile/share/nu_scripts/modules'
 ]
 
-const DOTFILES_DIR = "~/dotfiles"
-
 def save_last_dir [] {
   pwd | save --force ~/.last_dir
 }

@@ -27,6 +27,11 @@ _: {
 
           pulseaudio.enable = false;
         };
+
+        users.users.${config.host.identity.username}.extraGroups = [
+          "jackaudio"
+          "realtime"
+        ];
       };
     };
 }

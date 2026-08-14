@@ -73,8 +73,16 @@ in
           identity = config.identities.drenfer;
           name = "VallenPC";
           home-manager.enable = true;
-          nixos.enable = false;
+          nixos.enable = true;
         };
+      };
+
+    nixos.${hostname} =
+      { config, ... }:
+      {
+        host = config.hosts.${hostname};
+        time.timeZone = "America/Detroit";
+        wsl.defaultUser = config.hosts.${hostname}.identity.username;
       };
 
     homeManager.vavirl-pw0bwnq8 =

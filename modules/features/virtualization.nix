@@ -10,7 +10,10 @@ _: {
     { config, lib, ... }:
     {
       config = lib.mkIf config.host.features.virtualization.enable {
-        users.extraGroups.vboxusers.members = [ config.host.identity.username ];
+        users = {
+          extraGroups.vboxusers.members = [ config.host.identity.username ];
+          users.${config.host.identity.username}.extraGroups = [ "libvirtd" ];
+        };
 
         virtualisation.virtualbox.host = {
           addNetworkInterface = false;

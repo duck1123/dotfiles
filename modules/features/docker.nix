@@ -10,6 +10,7 @@ _: {
     { config, lib, ... }:
     {
       config = lib.mkIf config.host.features.docker.enable {
+        users.users.${config.host.identity.username}.extraGroups = [ "docker" ];
         virtualisation.docker.enable = true;
       };
     };

@@ -9,6 +9,6 @@ in
     nasnix = linux "nasnix";
     powerspecnix = linux "powerspecnix";
     nixmini = linux "nixmini";
-    # vavirl-pw0bwnq8 = wsl "vavirl-pw0bwnq8";
+    vavirl-pw0bwnq8 = wsl "vavirl-pw0bwnq8";
   };
 }

@@ -65,6 +65,8 @@ in
             openFirewall = true;
           };
         };
+
+        users.users.${config.host.identity.username}.extraGroups = [ "networkmanager" ];
       };
     };
 }

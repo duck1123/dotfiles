@@ -11,18 +11,7 @@ _: {
         description = name;
         extraGroups = [
           "dialout"
-          "docker"
-          "jackaudio"
-          "libvirtd"
-          "networkmanager"
-          "plugdev"
-          "realtime"
-          "vboxusers"
           "wheel"
-        ];
-        packages = with pkgs; [
-          appimage-run
-          emacs
         ];
         shell = pkgs.zsh;
       };

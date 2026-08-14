@@ -18,27 +18,59 @@ Nix flake-based system configuration managing multiple NixOS hosts and home-mana
 | nixmini | NixOS x86_64 | k3s node |
 | powerspecnix | NixOS x86_64 | Primary gaming PC |
 | steamdeck | home-manager only | user: deck |
-| vavirl-pw0bwnq8 | home-manager only | WSL, user: drenfer (NixOS/WSL build currently disabled) |
+| vavirl-pw0bwnq8 | NixOS-WSL | WSL on Ubuntu, user: drenfer |
 | pixel8 | feature/syncthing config only | Android phone; no NixOS or home-manager build target |
 
 ---
 
 ## Setup
 
+### Clone location
+
+The default and recommended location is `~/dotfiles`. The Nushell config derives all internal paths from `$env.DOTFILES_DIR`, which defaults to `~/dotfiles` but can be overridden by setting it in the environment before launching Nushell.
+
+```sh
+git clone git@github.com:duck1123/dotfiles.git ~/dotfiles
+```
+
 ### Nix (non-NixOS only)
 
-NixOS machines already have Nix. For home-manager-only hosts (steamdeck, WSL):
+NixOS machines already have Nix. For non-NixOS hosts (steamdeck), use the [Determinate Nix installer](https://github.com/DeterminateSystems/nix-installer), which handles upgrades cleanly and supports WSL out of the box:
 
 ```sh {"name":"install-nix"}
-sh <(curl -L https://nixos.org/nix/install) --daemon
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install \
+  --extra-conf "trusted-users = root $USER"
 ```
 
-Flake support is enabled automatically via the `nixConfig` block in `flake.nix`. If you are on a plain Nix install that does not read `nixConfig`, enable it manually:
+The `trusted-users` flag is required to allow this user to specify substituters (binary caches). Without it, cachix/attic caches are silently ignored and every package builds from source.
 
-```sh {"name":"set-nix-conf"}
-mkdir -p ~/.config/nix
-echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+Flake support is enabled automatically by the Determinate installer. If you ever need to add local Nix settings, edit `/etc/nix/nix.custom.conf` (Determinate's user-editable overlay — `/etc/nix/nix.conf` is managed by the installer and will be overwritten on upgrade).
+
+### WSL — NixOS image setup
+
+`vavirl-pw0bwnq8` runs as a NixOS-WSL distro, replacing the plain Ubuntu WSL base. Build the tarball from this flake and import it:
+
+```sh {"name":"build-wsl-image"}
+nix build .#nixosConfigurations.vavirl-pw0bwnq8.config.system.build.tarball
 ```
+
+Then import it from inside the Ubuntu WSL shell (not PowerShell — bash glob expansion and `wslpath` make path handling much cleaner):
+
+```sh {"name":"import-wsl-image"}
+# Resolve the symlink and convert to a Windows path that wsl.exe can read
+tarball=$(wslpath -w "$(readlink -f result/tarball/*.tar.gz)")
+# $USERPROFILE is the Windows home dir (e.g. C:\Users\drenfer), available in WSL
+wsl.exe --import NixOS "$USERPROFILE\\wsl\\NixOS" "$tarball"
+wsl.exe -s NixOS   # set as default distro (optional)
+```
+
+After first boot, apply the home-manager config from inside the NixOS WSL shell:
+
+```sh
+nur switch home
+```
+
+Subsequent NixOS updates deploy via the normal `nur switch os` command.
 
 ### Task runner
 
