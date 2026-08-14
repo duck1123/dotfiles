@@ -6,6 +6,7 @@ def nixos-hosts []: nothing -> list<string> {
     nasnix
     nixmini
     powerspecnix
+    vavirl-pw0bwnq8
   ]
 }
 
@@ -103,8 +104,23 @@ export def "nur build" [
   --all
   --fallback
   --host: string@home-hosts = ""
+  --tarball  # Build the NixOS-WSL tarball for importing with wsl --import
   ...only: string@only-targets
 ]: nothing -> nothing {
+  if $tarball {
+    if $all {
+      error make {msg: "--tarball and --all are mutually exclusive"}
+    }
+    let resolved = if ($host | is-not-empty) {
+      host-flake-name $host | str lowercase
+    } else {
+      sys host | get hostname | str lowercase
+    }
+    let args = (if $fallback { ["--fallback"] } else { [] })
+    ^nom build ...$args $".#nixosConfigurations.($resolved).config.system.build.tarballBuilder"
+    return
+  }
+
   if $all and ($host | is-not-empty) {
     error make {
       msg: "--all and --host are mutually exclusive"

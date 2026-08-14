@@ -51,7 +51,7 @@ Flake support is enabled automatically by the Determinate installer. If you ever
 `vavirl-pw0bwnq8` runs as a NixOS-WSL distro, replacing the plain Ubuntu WSL base. Build the tarball from this flake and import it:
 
 ```sh {"name":"build-wsl-image"}
-nix build .#nixosConfigurations.vavirl-pw0bwnq8.config.system.build.tarball
+nur build --tarball --host vavirl-pw0bwnq8
 ```
 
 Then import it from inside the Ubuntu WSL shell (not PowerShell — bash glob expansion and `wslpath` make path handling much cleaner):
