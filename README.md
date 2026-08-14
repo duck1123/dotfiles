@@ -84,6 +84,20 @@ nix run .#pnu
 
 then run `nur <task>` inside that shell.
 
+### direnv
+
+`.envrc` is gitignored — copy the example and edit it before allowing:
+
+```sh
+cp .envrc.example .envrc
+# Review and fill in any secrets (e.g. TAILSCALE_API_KEY)
+direnv allow
+```
+
+`use flake` in the file loads the repo's devShell, which provides `nur`, `nh`, `sops`, `age`, `kubectl`, and the other tools listed in `modules/flake/devShells.nix`. Entering the directory activates the environment; leaving it deactivates it.
+
+If direnv is not yet installed, the `direnv` home-manager feature handles that on managed hosts. On a fresh machine before home-manager has run, use `nix run .#pnu` to get a shell with the tools available instead.
+
 ### Age key (sops-nix)
 
 All secrets are encrypted with [sops](https://github.com/getsops/sops) using age keys. You need the private key available for decryption.
