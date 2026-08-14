@@ -296,7 +296,7 @@ rm secrets/k8s.yaml
 ```sh
 nur check              # nix flake check
 nur lint               # lint .nix files with statix
-nur build --all true   # build all configurations
+nur build --all        # build all configurations
 ```
 
 ### Reboot

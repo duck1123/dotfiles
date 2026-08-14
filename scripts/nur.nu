@@ -90,7 +90,7 @@ def is-nixos-host []: nothing -> bool {
 def resolve-targets [
   only: list<string>
   host: string
-  --all = false
+  --all
 ]: nothing -> record<os: bool, home: bool, k8s: bool> {
   mut targets = (parse-only $only)
 
@@ -104,8 +104,8 @@ def resolve-targets [
 
 # Build configurations (local, --host <name>, or --all). Pass os/home/k8s to restrict, e.g. `nur build home k8s`.
 export def "nur build" [
-  --all = false
-  --fallback = false
+  --all
+  --fallback
   --host: string@home-hosts = ""
   ...only: string@only-targets
 ]: nothing -> nothing {
@@ -116,7 +116,7 @@ export def "nur build" [
     }
   }
 
-  let targets = (resolve-targets $only $host --all $all)
+  let targets = (if $all { resolve-targets $only $host --all } else { resolve-targets $only $host })
 
   if $targets.k8s and ($host | is-not-empty) {
     error make {
@@ -164,7 +164,7 @@ export def "nur check" []: nothing -> nothing {
 # Build all targets (check + build --all)
 export def "nur ci" []: nothing -> nothing {
   nur check
-  nur build --all true
+  nur build --all
 }
 
 # Format all .nix files using nixfmt
