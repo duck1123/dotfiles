@@ -93,6 +93,8 @@ while IFS= read -r spec; do
 
   echo "k8s-write-sops-secrets: encrypting $secret_name"
 
+  mkdir -p "$(dirname "$output_file")"
+
   string_data_lines="$(echo "$values" | jq -r 'to_entries[] | "        \(.key): \(.value | tostring)"')"
 
   metadata_yaml=""
