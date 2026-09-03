@@ -186,6 +186,16 @@ _: {
                       ++ lib.optional isDualStack "--flannel-ipv6-masq"
                       ++ lib.optional kubernetes.clusterInit "--cluster-init"
                   )
+                  # Applies to every role (agent and server both run a kubelet). Without this,
+                  # kubepods.slice's memory.max equals the node's full physical RAM with zero
+                  # headroom for the OS/kubelet/containerd — under heavy pod + build memory
+                  # pressure the kernel cgroup OOM-killer intervenes blindly instead of kubelet's
+                  # own eviction manager getting a chance to react first. Sized as a modest slice
+                  # of the ~32Gi typical node in this cluster; revisit if a much smaller node joins.
+                  ++ [
+                    "--kubelet-arg=system-reserved=cpu=500m,memory=1Gi"
+                    "--kubelet-arg=kube-reserved=cpu=500m,memory=1Gi"
+                  ]
                   ++ kubernetes.extraK3sFlags;
               in
               {
