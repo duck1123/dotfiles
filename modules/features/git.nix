@@ -7,9 +7,17 @@ _: {
     simpleFeature { inherit inputs lib; } "git feature";
 
   flake.modules.homeManager.git =
-    { config, lib, ... }:
+    {
+      config,
+      inputs,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       config = lib.mkIf config.host.features.git.enable {
+        home.packages = [ inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ngit ];
+
         programs =
           let
             inherit (config.host.identity) email gpgKey name;

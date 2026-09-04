@@ -57,6 +57,25 @@ let
     meta.mainProgram = "soap";
   };
 
+  ngit =
+    let
+      version = "2.6.2";
+      src = pkgs.fetchCrate {
+        pname = "ngit";
+        inherit version;
+        hash = "sha256-SxPYYgfPf13GxFGdECAMh08J9vfGxIEXhIc28AbWJDc=";
+      };
+    in
+    pkgs.rustPlatform.buildRustPackage {
+      pname = "ngit";
+      inherit version src;
+      cargoLock.lockFile = "${src}/Cargo.lock";
+      nativeBuildInputs = [ pkgs.pkg-config ];
+      buildInputs = [ pkgs.openssl ];
+      doCheck = false;
+      meta.mainProgram = "ngit";
+    };
+
   pnu = pkgs.writeShellApplication {
     name = "pnu";
     runtimeInputs = [ pkgs.nushell ];
@@ -87,6 +106,7 @@ in
       {
         packages = {
           inherit
+            ngit
             pnu
             soap-cli
             windmill-cli
