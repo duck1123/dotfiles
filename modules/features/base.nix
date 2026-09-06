@@ -83,6 +83,7 @@ in
           flipper
           font-feature
           gaming-feature
+          glances-feature
           i18n
           kubernetes-feature
           nfs-feature

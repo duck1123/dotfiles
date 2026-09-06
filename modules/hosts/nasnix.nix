@@ -24,6 +24,7 @@ in
             firefox.enable = true;
             font.enable = true;
             git.enable = true;
+            glances.enable = true;
             hyprland.enable = true;
             jujutsu.enable = false;
 
@@ -98,6 +99,22 @@ in
 
           host = config.hosts.${hostname};
           time.timeZone = "America/Detroit";
+
+          # Pin the LAN IP so it doesn't drift under DHCP -- other hosts/services
+          # (k3s serverAddr, ssh known_hosts, homepage widgets) reference it by IP.
+          networking.networkmanager.ensureProfiles.profiles."Wired connection 1" = {
+            connection = {
+              id = "Wired connection 1";
+              type = "ethernet";
+              interface-name = "ens3";
+            };
+            ipv4 = {
+              method = "manual";
+              addresses = "192.168.0.16/24";
+              gateway = "192.168.0.1";
+              dns = "192.168.0.1;";
+            };
+          };
         };
         hardware-configuration = {
           imports = [ (modulesPath + "/profiles/qemu-guest.nix") ];

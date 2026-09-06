@@ -27,6 +27,7 @@ in
             font.enable = true;
             gaming.enable = true;
             git.enable = true;
+            glances.enable = true;
             gnome.enable = true;
             hyprland.enable = true;
             java.enable = true;
