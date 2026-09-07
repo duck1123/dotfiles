@@ -42,6 +42,7 @@ in
           java
           jujutsu
           music
+          nix-feature
           nostr
           nushell
           obsidian
