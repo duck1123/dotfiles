@@ -35,7 +35,10 @@ in
             kubernetes.client.enable = true;
             network.enable = true;
             nfs.enable = true;
-            nix.enable = true;
+            nix = {
+              atticPush.enable = true;
+              enable = true;
+            };
             nostr.enable = true;
             nushell.enable = true;
             sddm.enable = true;

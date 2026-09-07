@@ -41,7 +41,10 @@ in
             };
 
             network.enable = true;
-            nix.enable = true;
+            nix = {
+              atticPush.enable = true;
+              enable = true;
+            };
             nushell.enable = true;
             sddm.enable = true;
             sound.enable = true;
