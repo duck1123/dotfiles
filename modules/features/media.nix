@@ -57,7 +57,7 @@ in
         };
 
         system.activationScripts.plexStatePermissions.text = ''
-          if [ -d /var/lib/plex ]; then
+          if [ -d /var/lib/plex ] && [ "$(stat -c '%U:%G' /var/lib/plex)" != "${username}:${primaryGroup}" ]; then
             chown -R ${username}:${primaryGroup} /var/lib/plex
           fi
         '';
