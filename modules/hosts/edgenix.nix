@@ -181,6 +181,7 @@ in
               "Movies"
               "Music"
               "Photos"
+              "Pinchflat"
               "Roms"
               "slskd_downloads"
               "TV"

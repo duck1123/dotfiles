@@ -220,6 +220,7 @@ in
                 "Movies"
                 "Music"
                 "Photos"
+                "Pinchflat"
                 "Roms"
                 "TV"
                 "Videos"
