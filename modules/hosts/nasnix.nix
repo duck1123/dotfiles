@@ -150,6 +150,7 @@ in
             shares = [
               "Audiobooks"
               "Books"
+              "Comedy"
               "Downloads"
               "Movies"
               "Music"
