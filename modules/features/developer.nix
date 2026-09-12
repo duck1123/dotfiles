@@ -49,6 +49,7 @@ _: {
           # argo-workflows
           # argocd
           # arkade
+          autokuma # provides the `kuma` CLI, used by `nur kuma-cli config`
           # colmena
           # dbx
           dbeaver-bin

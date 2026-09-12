@@ -32,6 +32,17 @@ nur diff-os --host edgenix   # show package changes before deploying
 # Flake maintenance
 nix flake update    # update flake.lock
 nur build --all     # build all configurations
+
+# Cluster operations (see modules/kubernetes/docs/, carried over from k3s-fleetops)
+nur apps list                # list app names known to the cluster
+nur apps restart <name>      # roll an app's Deployment/StatefulSet
+nur argocd sync [name]       # trigger an ArgoCD sync (all apps, or just <name>)
+nur argocd refresh [name]    # force ArgoCD to re-diff against git
+nur postgres list            # list PostgreSQL databases + sizes
+nur postgres backup          # dump all PostgreSQL databases to ./backups/postgresql
+nur mariadb list-backups     # list MariaDB backups on the mariadb-backups PVC
+nur kuma-cli config          # write ~/.config/kuma/config.toml from cluster secrets
+nur forward argocd           # port-forward the ArgoCD UI to localhost:8080
 ```
 
 ## Architecture
