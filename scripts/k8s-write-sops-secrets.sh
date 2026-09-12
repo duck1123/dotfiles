@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Write SopsSecret YAML manifests to kubernetes/manifests/dev/<namespace>/ using sops.
+# Write SopsSecret YAML manifests to kubernetes/manifests/dev/<app>/ using sops.
 #
 # Adapted from k3s-fleetops/scripts/write-sops-secrets.sh for use from the dotfiles repo.
 #
@@ -60,8 +60,12 @@ declare -A desired_files
 
 while IFS= read -r spec; do
   secret_name="$(echo "$spec" | jq -r '.secretName')"
-  namespace="$(echo "$spec" | jq -r '.namespace')"
-  desired_files["$MANIFESTS_DIR/$namespace/SopsSecret-${secret_name}.yaml"]=1
+  app="$(echo "$spec" | jq -r '.app')"
+  # Directory must match the app name, not the k8s namespace -- ArgoCD's
+  # per-app Application syncs manifests/dev/<app>/, and those can differ
+  # (e.g. app "longhorn" lives in namespace "longhorn-system"). A secret
+  # written under the namespace name instead would silently never sync.
+  desired_files["$MANIFESTS_DIR/$app/SopsSecret-${secret_name}.yaml"]=1
 done < <(echo "$SPECS_JSON" | jq -c '.secrets[]')
 
 # ---------------------------------------------------------------------------
@@ -79,9 +83,10 @@ done < <(find "$MANIFESTS_DIR" -name "SopsSecret-*.yaml" 2>/dev/null)
 # ---------------------------------------------------------------------------
 while IFS= read -r spec; do
   secret_name="$(echo "$spec" | jq -r '.secretName')"
+  app="$(echo "$spec" | jq -r '.app')"
   namespace="$(echo "$spec" | jq -r '.namespace')"
   values="$(echo "$spec" | jq '.values')"
-  output_file="$MANIFESTS_DIR/$namespace/SopsSecret-${secret_name}.yaml"
+  output_file="$MANIFESTS_DIR/$app/SopsSecret-${secret_name}.yaml"
 
   if [[ -f "$output_file" ]]; then
     existing_plaintext="$("${SOPS[@]}" --decrypt --input-type yaml --output-type json "$output_file" | jq '.spec.secretTemplates[0].stringData')"

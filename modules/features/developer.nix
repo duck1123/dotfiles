@@ -110,6 +110,7 @@ _: {
           # tilt
           # vcluster
           # virtualbox
+          yq-go # used by scripts/k8s-bootstrap-argocd-repo.sh and post-process-manifests
         ];
       };
     };
