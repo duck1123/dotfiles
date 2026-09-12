@@ -50,27 +50,12 @@
 
     import-tree.url = "github:vic/import-tree";
 
-    k3s-fleetops = {
-      inputs = {
-        attic.follows = "attic";
-        flake-compat.follows = "flake-compat";
-        flake-parts.follows = "flake-parts";
-        flake-utils.follows = "flake-utils";
-        import-tree.follows = "import-tree";
-        nix-csi.follows = "nix-csi";
-        nix-kube-generators.follows = "nix-kube-generators";
-        nixidy.follows = "nixidy";
-        nixhelm.follows = "nixhelm";
-        nixpkgs.follows = "nixpkgs";
-      };
-      url = "github:duck1123/k3s-fleetops";
-    };
-
-    # Intentionally pinned rather than tracking upstream master -- k3s-fleetops'
-    # applications/nix-csi.nix (see modules/kubernetes/docs/nix-csi-and-binary-cache.md,
-    # carried over from k3s-fleetops) is written/tested against this exact commit and
-    # broke evaluation entirely when this had drifted forward via a routine `nix flake
-    # update`. Don't update this input without also verifying `nix build
+    # Intentionally pinned rather than tracking upstream master -- the vendored
+    # modules/kubernetes/_vendor/applications/nix-csi.nix (originally from
+    # k3s-fleetops, see modules/kubernetes/docs/nix-csi-and-binary-cache.md) is
+    # written/tested against this exact commit and broke evaluation entirely
+    # when this had drifted forward via a routine `nix flake update`. Don't
+    # update this input without also verifying `nix build
     # .#nixidyEnvs.x86_64-linux.dev.activationPackage --impure` still evaluates.
     nix-csi = {
       inputs.nixpkgs.follows = "nixpkgs";

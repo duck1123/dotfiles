@@ -505,24 +505,13 @@ export def "nur k8s bootstrap-argocd-repo" [] {
 }
 
 # ─── App management (ported from k3s-fleetops) ──────────────────────────────
-# Application templates still live in the k3s-fleetops flake input (see
-# modules/kubernetes/default.nix) rather than locally under applications/,
-# so these resolve the flake input's store path first instead of reading a
-# local applications/default.nix like the fleetops original did.
+# Application templates are vendored locally under
+# modules/kubernetes/_vendor/applications/ (see modules/kubernetes/default.nix).
 
-def k3s-fleetops-path []: nothing -> string {
-  try {
-    ^nix eval --raw --impure --expr 'let flake = builtins.getFlake (toString ./.); in flake.inputs.k3s-fleetops.outPath'
-    | str trim
-  } catch { |err|
-    error make {msg: $"Failed to resolve k3s-fleetops flake input path: ($err.msg)"}
-  }
-}
-
-# Every app name registered in k3s-fleetops' applications/default.nix imports list
+# Every app name registered in modules/kubernetes/_vendor/applications/default.nix's imports list
 def "nu-complete apps" []: nothing -> list<string> {
   try {
-    open --raw $"(k3s-fleetops-path)/applications/default.nix"
+    open --raw modules/kubernetes/_vendor/applications/default.nix
     | lines
     | each { str trim }
     | where {|line| $line | str starts-with './' }
@@ -530,7 +519,7 @@ def "nu-complete apps" []: nothing -> list<string> {
     | uniq
     | sort
   } catch { |err|
-    error make {msg: $"Failed to read applications/default.nix: ($err.msg)"}
+    error make {msg: $"Failed to read modules/kubernetes/_vendor/applications/default.nix: ($err.msg)"}
   }
 }
 
@@ -652,10 +641,10 @@ export def "nur kuma-cli config" [] {
 
 # ─── ArgoCD (ported from k3s-fleetops) ───────────────────────────────────────
 # Bootstrap manifests live in kubernetes/infra-manifests/ (mirrors fleetops'
-# infra-manifests/, copied in ahead of the GitOps cutover). The live 00-master
-# Application still points at k3s-fleetops today -- see the consolidation plan --
-# so `nur argocd apply-master` here is not yet a functional replacement for
-# that until the cutover happens.
+# infra-manifests/). The live 00-master Application now points at
+# argo-manifests (the GitOps cutover is done -- see the consolidation plan),
+# so `nur argocd apply-master` re-applies kubernetes/infra-manifests/00-master.yaml
+# for real.
 
 # Download latest stable ArgoCD install manifest to kubernetes/infra-manifests/argocd/install.yaml
 export def "nur argocd update-manifest" [] {

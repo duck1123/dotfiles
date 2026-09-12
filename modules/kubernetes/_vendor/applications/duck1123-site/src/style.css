@@ -1,0 +1,263 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #666666;
+  --border: #e2e2e2;
+  --accent: #7c3aed;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --fg: #f0f0f0;
+    --muted: #9a9a9a;
+    --border: #2a2a2a;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 1.5rem;
+  max-width: 640px;
+  margin-inline: auto;
+  background: var(--bg);
+  color: var(--fg);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+}
+
+#profile {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+#profile img.banner {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+#profile .profile-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+#profile img.avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+#profile h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+#profile p.about {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+#profile p.nip05 {
+  margin: 0.15rem 0 0;
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+#profile a.website {
+  display: block;
+  margin: 0.25rem 0 0;
+  color: var(--accent);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+#profile a.website:hover {
+  text-decoration: underline;
+}
+
+#profile p.lightning {
+  margin: 0.15rem 0 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+#auth {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.note {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.note .content {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.note-link {
+  color: var(--accent);
+}
+
+.hashtag {
+  color: var(--accent);
+}
+
+.mention {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.note-image-link {
+  display: block;
+  margin: 0.5rem 0;
+}
+
+.note-image {
+  max-width: 100%;
+  max-height: 360px;
+  border-radius: 8px;
+  display: block;
+}
+
+.note-media {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  margin: 0.5rem 0;
+  border-radius: 8px;
+}
+
+.note-emoji {
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.note .meta {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.engagement {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.pill {
+  background: var(--border);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.pill.zap {
+  background: rgba(124, 58, 237, 0.15);
+  color: var(--accent);
+}
+
+.replies {
+  margin-top: 0.75rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--border);
+}
+
+.reply {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.reply-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.15rem;
+}
+
+.reply-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--border);
+}
+
+.reply-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.reply .meta {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.reply-form {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.reply-form textarea {
+  flex: 1;
+  min-height: 2.5rem;
+  resize: vertical;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--fg);
+  padding: 0.4rem;
+  font-family: inherit;
+}
+
+.loading,
+.error {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.error {
+  color: #d33;
+}

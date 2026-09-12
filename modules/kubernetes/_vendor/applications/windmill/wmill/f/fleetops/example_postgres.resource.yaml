@@ -1,0 +1,13 @@
+resource_type: postgresql
+value:
+  host: postgresql.postgresql
+  port: 5432
+  user: windmill_example
+  dbname: example
+  sslmode: disable
+  password: $var:f/fleetops/example_postgres_password
+description: >-
+  Example Postgres connection managed declaratively from k3s-fleetops -- replace
+  with real databases (or delete) and add more *.resource.yaml files under
+  f/fleetops/ the same way. Pushed by the windmill-sync ArgoCD hook job on every
+  sync; see applications/windmill/default.nix.

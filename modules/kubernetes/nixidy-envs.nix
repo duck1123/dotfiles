@@ -10,8 +10,8 @@ in
       { }
     else
       let
-        # CRD generators from k3s-fleetops, using dotfiles' (shared) inputs for nixidy/nixhelm deps.
-        inherit (import "${inputs.k3s-fleetops}/generators" { inherit inputs system pkgs; }) crdImports;
+        # CRD generators vendored from k3s-fleetops, using dotfiles' (shared) inputs for nixidy/nixhelm deps.
+        inherit (import ./_vendor/generators { inherit inputs system pkgs; }) crdImports;
 
         devEnv = inputs.nixidy.lib.mkEnvs {
           inherit pkgs;
@@ -20,13 +20,13 @@ in
           extraSpecialArgs = { inherit self crdImports; };
           modules = (builtins.attrValues self.nixidyApps) ++ [
             self.modules.generic.ageRecipients
-            "${inputs.k3s-fleetops}/modules/secretManifest.nix"
-            "${inputs.k3s-fleetops}/modules/secretSpecs.nix"
-            "${inputs.k3s-fleetops}/modules/nodeProfiles.nix"
-            "${inputs.k3s-fleetops}/modules/homepageGroups.nix"
-            "${inputs.k3s-fleetops}/modules/ingressProviders.nix"
-            "${inputs.k3s-fleetops}/modules/databaseProviders.nix"
-            "${inputs.k3s-fleetops}/modules/nfsTargets.nix"
+            ./_vendor/modules/secretManifest.nix
+            ./_vendor/modules/secretSpecs.nix
+            ./_vendor/modules/nodeProfiles.nix
+            ./_vendor/modules/homepageGroups.nix
+            ./_vendor/modules/ingressProviders.nix
+            ./_vendor/modules/databaseProviders.nix
+            ./_vendor/modules/nfsTargets.nix
           ];
         };
 

@@ -681,75 +681,6 @@
         "type": "github"
       }
     },
-    "k3s-fleetops": {
-      "inputs": {
-        "attic": [
-          "attic"
-        ],
-        "flake-compat": [
-          "flake-compat"
-        ],
-        "flake-parts": [
-          "flake-parts"
-        ],
-        "flake-utils": [
-          "flake-utils"
-        ],
-        "import-tree": [
-          "import-tree"
-        ],
-        "make-shell": "make-shell",
-        "nix-csi": [
-          "nix-csi"
-        ],
-        "nix-kube-generators": [
-          "nix-kube-generators"
-        ],
-        "nixhelm": [
-          "nixhelm"
-        ],
-        "nixidy": [
-          "nixidy"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1789228712,
-        "narHash": "sha256-1rRS4PG95FnBgZU3DsFtaJtooIWeiD223BTmYTL+700=",
-        "owner": "duck1123",
-        "repo": "k3s-fleetops",
-        "rev": "006cf1210efb9a1b548189a9243a569a45e0b677",
-        "type": "github"
-      },
-      "original": {
-        "owner": "duck1123",
-        "repo": "k3s-fleetops",
-        "type": "github"
-      }
-    },
-    "make-shell": {
-      "inputs": {
-        "flake-compat": [
-          "k3s-fleetops",
-          "flake-compat"
-        ]
-      },
-      "locked": {
-        "lastModified": 1733933815,
-        "narHash": "sha256-9JjM7eT66W4NJAXpGUsdyAFXhBxFWR2Z9LZwUa7Hli0=",
-        "owner": "nicknovitski",
-        "repo": "make-shell",
-        "rev": "ffeceae9956df03571ea8e96ef77c2924f13a63c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nicknovitski",
-        "repo": "make-shell",
-        "type": "github"
-      }
-    },
     "nix-csi": {
       "inputs": {
         "dinix": "dinix",
@@ -1067,7 +998,6 @@
         "home-manager": "home-manager",
         "hyprland": "hyprland",
         "import-tree": "import-tree",
-        "k3s-fleetops": "k3s-fleetops",
         "nix-csi": "nix-csi",
         "nix-kube-generators": "nix-kube-generators",
         "nixhelm": "nixhelm",

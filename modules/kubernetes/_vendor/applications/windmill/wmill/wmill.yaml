@@ -1,0 +1,16 @@
+defaultTs: bun
+includes:
+  - f/**
+skipVariables: false
+skipResources: false
+skipResourceTypes: false
+skipScripts: false
+skipFlows: false
+skipApps: false
+# Secret *values* never round-trip through git either direction -- variable
+# definitions (path/is_secret/description) sync normally, but wmill sync push
+# always omits the value of anything with is_secret: true. Actual values are
+# seeded via the Windmill API by the windmill-sync ArgoCD hook job, sourced
+# from secrets.enc.yaml (see applications/windmill/default.nix). Left at the
+# CLI's own default -- listed here so it's not mistaken for an oversight.
+skipSecrets: true
