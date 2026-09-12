@@ -1,12 +1,15 @@
----
-runme:
-  id: 01J9FJ90VF5CQ5QE6TE6JQ4GR0
-  version: v3
----
-
 # Duck's dotfiles
 
-Nix flake-based system configuration managing multiple NixOS hosts and home-manager configurations. Uses [flake-parts](https://github.com/hercules-ci/flake-parts) + [import-tree](https://github.com/vic/import-tree) to auto-import all modules from `./modules/`. Also manages Kubernetes manifests via [nixidy](https://github.com/arnarg/nixidy), pushing generated YAML to a private [argo-manifests](https://github.com/duck1123/argo-manifests) repo for ArgoCD to sync.
+This is a single Nix flake that defines an entire personal computing fleet — every NixOS machine, every home-manager profile, and the Kubernetes cluster they all talk to — as one evaluated, reproducible whole. There's no separate "dotfiles" repo plus a separate "infra" repo plus a separate "k8s" repo drifting out of sync with each other; a change here can touch a laptop's window manager config, a server's systemd units, and a cluster app's ingress domain, and all of it is checked, built, and applied through the same handful of commands.
+
+The flake is assembled with [flake-parts](https://github.com/hercules-ci/flake-parts) and [import-tree](https://github.com/vic/import-tree), which auto-imports every module under `./modules/` — adding a new host, feature, or identity is mostly a matter of dropping a file in the right place rather than wiring it into a central list by hand. Everything is driven through one task runner, [nur](https://github.com/nur-taskrunner/nur) (Nushell-based, tasks defined in `scripts/nur.nu`), so `nur switch`, `nur build`, `nur check` and friends work the same way whether the target is a NixOS host, a home-manager profile, or the Kubernetes cluster.
+
+### What's in here
+
+- **NixOS + home-manager** configs for every machine in the fleet — see [Hosts](#hosts) below for the current list, and `CLAUDE.md` for how the module system is organized.
+- **Kubernetes fleet management**: application definitions, environment config, secrets, and the automation to build and deploy manifests via ArgoCD/nixidy. See [Kubernetes manifests](#kubernetes-manifests). This used to live in a separate repo (`k3s-fleetops`); it's since been folded in here so the whole fleet — machines and cluster alike — is defined in one place.
+- **Secrets management** via [sops-nix](https://github.com/Mic92/sops-nix) with age keys, covering both host-level and cluster secrets.
+- **Nushell configuration** (`nushell/`) shared across every machine, plus the `nur` task definitions that drive everything above.
 
 ## Hosts
 
@@ -37,7 +40,7 @@ git clone git@github.com:duck1123/dotfiles.git ~/dotfiles
 
 NixOS machines already have Nix. For non-NixOS hosts (steamdeck), use the [Determinate Nix installer](https://github.com/DeterminateSystems/nix-installer), which handles upgrades cleanly and supports WSL out of the box:
 
-```sh {"name":"install-nix"}
+```sh
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install \
   --extra-conf "trusted-users = root $USER"
 ```
@@ -52,7 +55,7 @@ Flake support is enabled automatically by the Determinate installer. If you ever
 
 **Step 1** — build the tarball builder:
 
-```sh {"name":"build-wsl-builder"}
+```sh
 nur build --tarball --host vavirl-pw0bwnq8
 ```
 
@@ -60,13 +63,13 @@ This produces `result/bin/nixos-wsl-tarball-builder` — a self-contained script
 
 **Step 2** — run the builder as root to produce the image (writes `nixos.wsl` to the current directory):
 
-```sh {"name":"build-wsl-image"}
+```sh
 sudo result/bin/nixos-wsl-tarball-builder
 ```
 
 **Step 3** — import it into WSL from inside the Ubuntu WSL shell:
 
-```sh {"name":"import-wsl-image"}
+```sh
 # cmd.exe is always available in WSL; tr strips the Windows carriage return
 WIN_HOME=$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null | tr -d '\r')
 mkdir -p "$(wslpath "$WIN_HOME")/wsl/NixOS"
@@ -115,7 +118,7 @@ All secrets are encrypted with [sops](https://github.com/getsops/sops) using age
 
 #### Restore existing key from KeePass
 
-```sh {"name":"restore-age-key"}
+```sh
 export KEEPASS_DB_PATH="${HOME}/keepass/passwords.kdbx"
 export SECRET_PATH="/Kubernetes/Age-key"
 mkdir -p ~/.config/sops/age
@@ -124,7 +127,7 @@ keepassxc-cli show -s -a Password ${KEEPASS_DB_PATH?} ${SECRET_PATH?} > ~/.confi
 
 #### Or generate a new key
 
-```sh {"name":"create-age-key"}
+```sh
 mkdir -p ~/.config/sops/age
 age-keygen -o ~/.config/sops/age/keys.txt
 ```
@@ -135,13 +138,13 @@ age-keygen -o ~/.config/sops/age/keys.txt
 
 ### List age secret keys
 
-```sh {"name":"list-secret-keys"}
+```sh
 nur secrets list-keys
 ```
 
 ### Update flake inputs
 
-```sh {"name":"update-flakes"}
+```sh
 nix flake update
 ```
 
@@ -177,28 +180,28 @@ All builds happen locally (with `nom` for better progress display), then the res
 
 #### Build only (no activation)
 
-```sh {"name":"build-remote"}
+```sh
 nur build --host edgenix
 nur build --host nasnix
 ```
 
 #### Show package changes (diff)
 
-```sh {"name":"diff-remote"}
+```sh
 nur diff-os --host edgenix
 nur diff-os --host nasnix
 ```
 
 #### Dry run (preview without applying)
 
-```sh {"name":"dry-run-remote"}
+```sh
 nur dry-run-os --host edgenix
 nur dry-run-os --host nasnix
 ```
 
 #### Switch (build and activate)
 
-```sh {"name":"switch-remote"}
+```sh
 nur switch --host edgenix                     # both home-manager and NixOS
 nur switch --host nasnix
 
@@ -214,15 +217,17 @@ nur switch --host edgenix home                # home-manager only
 
 ## Kubernetes manifests
 
-Kubernetes applications are defined in [k3s-fleetops](https://github.com/duck1123/k3s-fleetops) (app definitions + library). This repo holds the environment configuration, secrets, and automation for building and pushing generated YAML manifests to the private [argo-manifests](https://github.com/duck1123/argo-manifests) repo. ArgoCD on the cluster syncs from there.
+The cluster's application definitions, generators, and shared library code live under `modules/kubernetes/_vendor/`; the environment-specific config (which apps are enabled, their domains, storage, secrets wiring) lives in `modules/kubernetes/_env/dev/`. Building that config produces Kubernetes manifests via [nixidy](https://github.com/arnarg/nixidy), which get pushed to a private [argo-manifests](https://github.com/duck1123/argo-manifests) repo; ArgoCD on the cluster syncs from there. See `modules/kubernetes/docs/` for the deployment workflow in more depth, the pinned-volumes convention, and a troubleshooting playbook.
 
 ```
-k3s-fleetops/          ← application definitions, library (read-only dependency)
 dotfiles/
   modules/kubernetes/
-    _env/dev.nix        ← cluster environment config (services, domains, storage)
-  secrets/k8s.enc.yaml ← encrypted cluster secrets (sops/age)
-  kubernetes/manifests/← checkout of argo-manifests (gitignored here)
+    _vendor/              ← application definitions, generators, shared library code
+    _env/dev/              ← this environment's config (services, domains, storage)
+  secrets/k8s.enc.yaml     ← encrypted cluster secrets (sops/age)
+  kubernetes/
+    infra-manifests/       ← ArgoCD bootstrap manifests (install, 00-master app-of-apps)
+    manifests/              ← checkout of argo-manifests (gitignored here)
 ```
 
 ### Ongoing workflow
@@ -236,6 +241,8 @@ nur k8s push            # commit + push kubernetes/manifests/ to argo-manifests
 
 nur k8s edit-secrets    # edit cluster secrets in-place with sops
 ```
+
+Cluster operations beyond deploying — restarting an app, ArgoCD sync/refresh, port-forwarding, database backup/restore — are also `nur` tasks; see `CLAUDE.md`'s Key Commands for a starting list, or `nur --help` for the full set.
 
 ### First-time setup on a new machine
 
@@ -314,13 +321,13 @@ Each `Application-*.yaml` is self-managed (automated sync + prune), so once appl
 
 #### Get the initial ArgoCD password
 
-```sh {"id":"01J9HAPD89ZH24ER7CPMKQ1FJW","name":"get-initial-password"}
+```sh
 argocd admin initial-password -n argocd
 ```
 
 #### Forward the ArgoCD UI (before ingress is ready)
 
-```sh {"background":"true","id":"01J9HAPD89ZH24ER7CPRARMG51","interactive":"false","name":"forward-argocd-ports"}
+```sh
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 ```
 
@@ -358,6 +365,6 @@ nur build --all        # build all configurations
 
 ### Reboot
 
-```sh {"name": "reboot"}
+```sh
 sudo reboot
 ```
