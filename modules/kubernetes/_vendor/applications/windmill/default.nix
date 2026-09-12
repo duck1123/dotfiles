@@ -15,6 +15,7 @@
       shared-work-volume = "windmill-db-url-work";
       superadmin-secret = "windmill-superadmin-secret";
       secret-vars-secret = "windmill-secret-variables";
+      connections-secret = "windmill-postgres-connections";
 
       # The declarative sync tooling -- the `wmill` CLI, its shell dependencies,
       # and applications/windmill/wmill/** itself -- is built as the
@@ -123,6 +124,37 @@
           --base-url "$base_url" \
           --config-dir /tmp/wmill-config \
           --yes
+
+        # Runs *after* wmill sync push, not before: push treats
+        # applications/windmill/wmill/f/** as authoritative for the whole f/
+        # folder and deletes any remote resource under it that isn't checked
+        # into git -- which is everywhere db_<name> resources live, since
+        # their values are real per-app secrets that can't round-trip through
+        # git the way example_postgres.resource.yaml's placeholder can.
+        # Registering them after push means each run's leftovers from the
+        # *previous* run get pruned by push and then immediately recreated
+        # here, rather than deleted and left gone.
+        conn_count=$(echo "''${CONNECTIONS_JSON:-[]}" | jq 'length')
+        for i in $(seq 0 $((conn_count - 1))); do
+          conn=$(echo "$CONNECTIONS_JSON" | jq -c ".[$i]")
+          conn_name=$(echo "$conn" | jq -r '.name')
+          resource_path="f/fleetops/db_$conn_name"
+
+          # update_if_exists means one call handles both create and update --
+          # no separate existence check needed (unlike superset/metabase,
+          # which register connections through their own app APIs instead of
+          # Windmill's).
+          body=$(echo "$conn" | jq \
+            --arg path "$resource_path" \
+            --arg desc "Reporting connection for the $conn_name database on the shared postgresql instance -- managed by the windmill-sync ArgoCD hook job, sourced from env/dev/windmill.nix's reportingConnections." \
+            '{path: $path, resource_type: "postgresql", description: $desc, value: {host: .host, port: .port, user: .username, dbname: .name, sslmode: "disable", password: .password}}')
+
+          echo "Registering Windmill resource \"$resource_path\""
+          curl -sf -X POST "$base_url/api/w/$WORKSPACE/resources/create?update_if_exists=true" \
+            -H "Authorization: Bearer $SUPERADMIN_SECRET" \
+            -H "Content-Type: application/json" \
+            -d "$body" >/dev/null
+        done
       '';
     in
     self.lib.mkArgoApp
@@ -160,6 +192,15 @@
             ${secret-vars-secret} = {
               SECRET_VARIABLES_JSON = builtins.toJSON (
                 map (v: { inherit (v) path value; }) cfg.secretVariables
+              );
+            };
+          }
+          // lib.optionalAttrs (cfg.reportingConnections != [ ]) {
+            ${connections-secret} = {
+              CONNECTIONS_JSON = builtins.toJSON (
+                map (c: {
+                  inherit (c) name host port username password;
+                }) cfg.reportingConnections
               );
             };
           };
@@ -247,6 +288,50 @@
                   value = mkOption {
                     type = types.str;
                     description = mdDoc "Secret value.";
+                  };
+                };
+              }
+            );
+            default = [ ];
+          };
+
+          reportingConnections = mkOption {
+            description = mdDoc ''
+              Postgres databases to register as Windmill `postgresql` resources, one
+              entry per database (Postgres has no cross-database queries, so a single
+              connection can't cover multiple databases on the same instance).
+              Registered declaratively by the windmill-sync job, which calls
+              Windmill's REST API (POST /resources/create?update_if_exists=true)
+              since these are real per-app databases, unlike the static example
+              checked in at wmill/f/fleetops/example_postgres.resource.yaml -- see
+              env/dev/windmill.nix, which populates this from
+              config.services.postgresql.extraDatabases so it stays in sync with
+              that list automatically. Each entry should use that database's own
+              least-privilege role rather than the Postgres admin role. Registered
+              at path f/fleetops/db_<name>.
+            '';
+            type = types.listOf (
+              types.submodule {
+                options = {
+                  name = mkOption {
+                    type = types.str;
+                    description = mdDoc "Database name -- also used as the resource's dbname and the db_<name> path suffix.";
+                  };
+                  host = mkOption {
+                    type = types.str;
+                    description = mdDoc "Postgres host.";
+                  };
+                  port = mkOption {
+                    type = types.port;
+                    description = mdDoc "Postgres port.";
+                  };
+                  username = mkOption {
+                    type = types.str;
+                    description = mdDoc "Role to connect as.";
+                  };
+                  password = mkOption {
+                    type = types.str;
+                    description = mdDoc "Password for that role.";
                   };
                 };
               }
@@ -690,6 +775,9 @@
                     ]
                     ++ lib.optionals (cfg.secretVariables != [ ]) [
                       { secretRef.name = secret-vars-secret; }
+                    ]
+                    ++ lib.optionals (cfg.reportingConnections != [ ]) [
+                      { secretRef.name = connections-secret; }
                     ];
                     volumeMounts = [
                       {
