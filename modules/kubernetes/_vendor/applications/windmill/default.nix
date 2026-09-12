@@ -138,7 +138,36 @@
         for i in $(seq 0 $((conn_count - 1))); do
           conn=$(echo "$CONNECTIONS_JSON" | jq -c ".[$i]")
           conn_name=$(echo "$conn" | jq -r '.name')
+          conn_password=$(echo "$conn" | jq -r '.password')
           resource_path="f/fleetops/db_$conn_name"
+          password_var_path="f/fleetops/db_''${conn_name}_password"
+
+          # The password is stored as its own secret Windmill variable
+          # (encrypted at rest by Windmill) and the resource references it
+          # via $var:, exactly like the checked-in
+          # example_postgres.resource.yaml / _password.variable.yaml pair --
+          # never as a raw string in the resource's own value, which
+          # round-trips through plain (unencrypted-by-Windmill) resource
+          # storage and export.
+          var_body=$(jq -n --arg path "$password_var_path" --arg value "$conn_password" \
+            --arg desc "Password for $resource_path.resource.yaml, managed by the windmill-sync ArgoCD hook job." \
+            '{path: $path, value: $value, is_secret: true, description: $desc}')
+
+          var_status=$(curl -s -o /tmp/resp -w '%{http_code}' -X POST \
+            "$base_url/api/w/$WORKSPACE/variables/create" \
+            -H "Authorization: Bearer $SUPERADMIN_SECRET" \
+            -H "Content-Type: application/json" -d "$var_body")
+
+          if [ "$var_status" = "409" ]; then
+            curl -sf -X POST "$base_url/api/w/$WORKSPACE/variables/update/$password_var_path" \
+              -H "Authorization: Bearer $SUPERADMIN_SECRET" \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg value "$conn_password" '{value: $value}')" >/dev/null
+          elif [ "''${var_status:0:1}" != "2" ]; then
+            echo "Failed to create Windmill variable \"$password_var_path\" (HTTP $var_status)" >&2
+            cat /tmp/resp >&2
+            exit 1
+          fi
 
           # update_if_exists means one call handles both create and update --
           # no separate existence check needed (unlike superset/metabase,
@@ -147,7 +176,8 @@
           body=$(echo "$conn" | jq \
             --arg path "$resource_path" \
             --arg desc "Reporting connection for the $conn_name database on the shared postgresql instance -- managed by the windmill-sync ArgoCD hook job, sourced from env/dev/windmill.nix's reportingConnections." \
-            '{path: $path, resource_type: "postgresql", description: $desc, value: {host: .host, port: .port, user: .username, dbname: .name, sslmode: "disable", password: .password}}')
+            --arg password_ref "\$var:$password_var_path" \
+            '{path: $path, resource_type: "postgresql", description: $desc, value: {host: .host, port: .port, user: .username, dbname: .name, sslmode: "disable", password: $password_ref}}')
 
           echo "Registering Windmill resource \"$resource_path\""
           curl -sf -X POST "$base_url/api/w/$WORKSPACE/resources/create?update_if_exists=true" \
