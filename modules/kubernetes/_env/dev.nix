@@ -113,6 +113,11 @@ in
     target = {
       branch = "master";
       repository = "git@github.com:duck1123/argo-manifests.git";
+      # Deliberately a subdirectory, not "./" -- nixidy's activate step rsyncs
+      # rootPath with --delete and no .git exclusion (see modules/build/
+      # emit-environment.nix upstream), so rootPath = "./" against a git
+      # checkout root deletes .git itself. Confirmed the hard way against the
+      # real checkout (recovered via a clean re-clone -- nothing was pushed).
       # Manifests are written to <manifests-repo-checkout>/dev/
       # Activation must run from the kubernetes/manifests/ checkout directory.
       rootPath = "dev";
