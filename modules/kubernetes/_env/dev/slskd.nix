@@ -1,28 +1,14 @@
 { config, secrets, ... }:
 {
   services.slskd = {
-    enable = true;
-
-    ingress = {
-      domain = "slskd.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      tls.enable = true;
-    };
-
-    hostAffinity = "edgenix";
-
-    webAuth = {
-      username = (secrets.slskd or { }).username or "";
-      password = (secrets.slskd or { }).password or "";
-    };
-
     apiKey = (secrets.slskd or { }).apiKey or "";
+    enable = true;
+    # hostAffinity = "edgenix";
 
-    vpn = {
-      enable = true;
-      sharedGluetunService = "gluetun.gluetun";
-    };
+    homepage.group = "Download";
+
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
 
     nfs = {
       enable = true;
@@ -30,14 +16,29 @@
       path = "${config.devDefaults.nasBase}/slskd_downloads";
     };
 
+    replicas = 1;
+
     shares = {
       enable = true;
       server = config.devDefaults.nasHost;
       path = "${config.devDefaults.nasBase}/Music";
     };
 
-    replicas = 1;
     storageClassName = "longhorn";
     useProbes = false;
+
+    vpn = {
+      enable = true;
+      sharedGluetunService = "gluetun.gluetun";
+    };
+
+    webAuth = {
+      username = (secrets.slskd or { }).username or "";
+      password = (secrets.slskd or { }).password or "";
+    };
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.config.volumeHandle = "pvc-3daa90da-e4b2-4dd2-8cfe-9a1f98764991";
   };
 }

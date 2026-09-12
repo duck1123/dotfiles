@@ -1,25 +1,17 @@
 { config, secrets, ... }:
 {
   services.radarr = {
-    database = {
-      enable = true;
-      host = "postgresql.postgresql";
-      port = 5432;
-      name = "radarr";
-      username = "radarr";
-      password = secrets.postgresql.userPassword;
-    };
+    databaseTarget = "postgresql";
+    database.enable = true;
 
     enable = true;
+    apiKey = secrets.radarr.key;
     hostAffinity = "edgenix";
-    image = "linuxserver/radarr:6.1.1.10360-ls304";
+    image = "linuxserver/radarr:6.3.0.10514-ls315";
 
-    ingress = {
-      domain = "radarr.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      tls.enable = true;
-    };
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
+    homepage.group = "Arr";
 
     nfs = {
       enable = true;
@@ -30,5 +22,9 @@
     replicas = 1;
     storageClassName = "longhorn";
     vpn.enable = false;
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.config.volumeHandle = "pvc-979d8477-4390-4d8e-b559-7839008e080b";
   };
 }

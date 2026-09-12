@@ -1,0 +1,4 @@
+{ ... }:
+{
+  services.satisfactory.enable = false;
+}

@@ -25,5 +25,9 @@
 
     scriptInterval = 300;
     storageClassName = "longhorn";
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.config.volumeHandle = "pvc-25589b0e-1276-441e-a91a-2e4e78ec378c";
   };
 }

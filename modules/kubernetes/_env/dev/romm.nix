@@ -10,20 +10,14 @@
 
     authSecretKey = secrets.romm.authSecretKey;
 
+    databaseTarget = "mariadb";
     database = {
-      host = "mariadb.mariadb";
-      name = "romm";
       password = secrets.mariadb.password;
-      port = 3306;
       username = "mariadb";
     };
 
-    ingress = {
-      domain = "romm.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      tls.enable = true;
-    };
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
 
     metadata.igdb = {
       enable = true;
@@ -37,6 +31,13 @@
       libraryPath = "${config.devDefaults.nasBase}/Roms";
       assetsPath = "${config.devDefaults.nasBase}/Roms/assets";
       resourcesPath = "${config.devDefaults.nasBase}/Roms/resources";
+    };
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides = {
+      data.volumeHandle = "pvc-c41afd8b-9c13-4cff-b8a3-5f9023fb7681";
+      config.volumeHandle = "pvc-79977181-2377-4be5-8218-a19774c66c15";
     };
   };
 }

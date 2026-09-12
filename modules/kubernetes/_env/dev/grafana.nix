@@ -1,21 +1,17 @@
-{ config, secrets, ... }:
+{
+  config,
+  lib,
+  secrets,
+  ...
+}:
 {
   services.grafana = {
+    inherit (config.devDefaults) enableLogging;
     adminPassword = secrets.grafana.password or "";
-    enable = true;
+    enable = false;
     hostAffinity = "edgenix";
 
-    ingress = {
-      clusterIssuer = "tailscale";
-      domain = "grafana.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      localIngress = {
-        enable = true;
-        domain = "grafana.${config.devDefaults.homeDomain}";
-        clusterIssuer = config.devDefaults.clusterIssuer;
-        tls.enable = true;
-      };
-    };
+    ingressProvider = "traefik-lan";
 
     additionalDatasources = [
       {
@@ -27,6 +23,8 @@
         editable = true;
         jsonData.httpMethod = "POST";
       }
+    ]
+    ++ lib.optionals config.devDefaults.enableLogging [
       {
         name = "Loki";
         type = "loki";

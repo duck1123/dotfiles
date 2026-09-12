@@ -2,15 +2,15 @@
 {
   services.kite = {
     inherit (secrets.kite) encryptKey jwtSecret;
-    enable = true;
-    hostAffinity = "edgenix";
+    enable = false;
+    # hostAffinity = "edgenix";
     storageClassName = "longhorn";
 
-    ingress = {
-      domain = "kite.${config.devDefaults.homeDomain}";
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      ingressClassName = "traefik";
-      tls.enable = true;
-    };
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.data.volumeHandle = "pvc-0ef43a60-ec9c-4a49-8da3-a38827d3c53a";
   };
 }

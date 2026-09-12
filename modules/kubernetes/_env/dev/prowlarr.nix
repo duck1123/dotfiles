@@ -1,25 +1,26 @@
 { config, secrets, ... }:
 {
   services.prowlarr = {
+    databaseTarget = "postgresql";
     database = {
-      enable = false;
-      host = "postgresql.postgresql";
-      port = 5432;
+      enable = true;
       name = "prowlarr-main";
-      username = "prowlarr";
-      password = secrets.postgresql.userPassword;
     };
 
     enable = true;
+    apiKey = secrets.prowlarr.key;
     hostAffinity = "edgenix";
+    image = "linuxserver/prowlarr:2.5.2.5491-ls156";
 
-    ingress = {
-      domain = "prowlarr.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
-    };
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
+    homepage.group = "Arr";
 
     replicas = 1;
     vpn.enable = false;
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.config.volumeHandle = "pvc-ee5907d3-b4e4-4da5-91dc-d013f243b741";
   };
 }

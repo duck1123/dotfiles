@@ -1,62 +1,42 @@
 { config, secrets, ... }:
 {
-  services.nocodb =
-    let
-      storage-backend = "rustfs";
-    in
-    {
-      allowLocalExternalDatabases = true;
-      auth.jwtSecret = (secrets.nocodb or { }).jwtSecret or "";
-      enable = true;
+  services.nocodb = {
+    allowLocalExternalDatabases = true;
+    auth.jwtSecret = (secrets.nocodb or { }).jwtSecret or "";
+    enable = false;
 
-      ingress = {
-        domain = "nocodb.${config.devDefaults.tailDomain}";
-        ingressClassName = "tailscale";
-        clusterIssuer = "tailscale";
-        localIngress = {
-          enable = true;
-          domain = "nocodb.${config.devDefaults.homeDomain}";
-          clusterIssuer = config.devDefaults.clusterIssuer;
-          tls.enable = true;
-        };
-      };
+    homepage.group = "Database";
 
-      database = {
-        host = "postgresql.postgresql";
-        port = 5432;
-        name = "nocodb";
-        username = "nocodb";
-        password = (secrets.nocodb.postgresql or { }).password or secrets.postgresql.userPassword;
-      };
+    ingressProvider = "traefik-lan";
 
-      redis = {
-        host = "redis.redis";
-        port = 6379;
-        password = secrets.redis.password;
-      };
+    databaseTarget = "postgresql";
+    database.password = (secrets.nocodb.postgresql or { }).password or secrets.postgresql.userPassword;
 
-      storage =
-        if storage-backend == "rustfs" then
-          {
-            enable = true;
-            backend = "rustfs";
-            bucketName = (secrets.rustfs or { }).bucketName or "nocodb";
-            endpoint = "http://rustfs.rustfs:9000";
-            region = (secrets.rustfs or { }).region or "us-east-1";
-            accessKey = (secrets.rustfs or { }).accessKey or "";
-            secretKey = (secrets.rustfs or { }).secretKey or "";
-          }
-        else
-          {
-            enable = true;
-            backend = "minio";
-            bucketName = (secrets.nocodb.minio or { }).bucketName or "nocodb";
-            endpoint = "http://minio.minio:9000";
-            region = (secrets.nocodb.minio or { }).region or "us-east-1";
-            accessKey = (secrets.nocodb.minio or { }).rootUser or "";
-            secretKey = (secrets.nocodb.minio or { }).rootPassword or "";
-          };
-
-      publicUrl = "https://nocodb.${config.devDefaults.tailDomain}";
+    redis = {
+      host = "redis.redis";
+      port = 6379;
+      password = secrets.redis.password;
     };
+
+    # Shared garage bucket/credentials (see env/dev/garage.nix) -- garage only
+    # auto-creates one "default" bucket on boot (same bucket attic/xyops use).
+    # Endpoint must be garage's ingress domain, not the in-cluster
+    # garage.garage ClusterIP -- see the `storage.endpoint` option doc in
+    # applications/nocodb.nix for why (presigned URLs go to the browser).
+    storage = {
+      enable = true;
+      backend = "garage";
+      bucketName = "default";
+      endpoint = "https://${config.services.garage.ingress.domain}";
+      region = "us-east-1";
+      accessKey = (secrets.garage or { }).accessKey or "";
+      secretKey = (secrets.garage or { }).secretKey or "";
+    };
+
+    publicUrl = "https://nocodb.${config.devDefaults.homeDomain}";
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.data.volumeHandle = "pvc-31a2f2bc-8818-4500-ab0a-88f2db40d7b7";
+  };
 }

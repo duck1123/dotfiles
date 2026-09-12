@@ -1,19 +1,18 @@
 { config, secrets, ... }:
 {
   services.lidarr = {
+    databaseTarget = "postgresql";
+    database.enable = true;
+
     enable = true;
+    apiKey = secrets.lidarr.key;
+    hostAffinity = "edgenix";
 
-    ingress = {
-      domain = "lidarr.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      tls.enable = true;
-    };
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
+    homepage.group = "Arr";
 
-    vpn = {
-      enable = false;
-      sharedGluetunService = "gluetun.gluetun";
-    };
+    monitoring.autokuma.enable = true;
 
     nfs = {
       enable = true;
@@ -26,18 +25,16 @@
       };
     };
 
-    database = {
-      enable = true;
-      host = "postgresql.postgresql";
-      port = 5432;
-      name = "lidarr";
-      username = "lidarr";
-      password = secrets.postgresql.userPassword;
-    };
-
-    hostAffinity = "edgenix";
-
     replicas = 1;
     storageClassName = "longhorn";
+
+    vpn = {
+      enable = false;
+      sharedGluetunService = "gluetun.gluetun";
+    };
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.config.volumeHandle = "pvc-fbb22ab2-e000-4d67-a760-1d14cac3bdc9";
   };
 }

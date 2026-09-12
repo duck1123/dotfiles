@@ -1,7 +1,8 @@
-_: {
-  # FIXME: nix-csi's own flake is currently broken when consumed as a flake
-  # input (pkgs/default.nix does `builtins.pathExists ../../pynixd`, which
-  # resolves outside the source tree and throws instead of returning false).
-  # Disabled until that's fixed upstream.
-  services.nix-csi.enable = false;
+{ ... }:
+{
+  services.nix-csi.enable = true;
+  services.nix-csi.cache.storageClassName = "longhorn";
+  services.nix-csi.authorizedKeys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDW6736YDTONCvxi0JKBXpQ2XNHnUIv1yA8XDDtKrTRp duck@powerspecnix"
+  ];
 }

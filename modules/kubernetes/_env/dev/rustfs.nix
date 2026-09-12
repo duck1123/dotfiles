@@ -2,25 +2,34 @@
 {
   services.rustfs = {
     accessKey = (secrets.rustfs or { }).accessKey or "";
-    enable = true;
+    enable = false;
     hostAffinity = "nasnix";
 
+    ingressProvider = "traefik-lan";
     ingress = {
-      domain = "rustfs.${config.devDefaults.homeDomain}";
       api-domain = "api-rustfs.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      clusterIssuer = config.devDefaults.clusterIssuer;
       tls.enable = true;
+    };
+
+    # "/" requires auth and correctly 403s when healthy -- not a usable
+    # unauthenticated health check. "/health" returns a plain 200 on both
+    # the console and S3 API ports without needing credentials.
+    monitoring.autokuma = {
+      enable = true;
+      url = "https://rustfs.${config.devDefaults.homeDomain}/health";
     };
 
     mode = "standalone";
 
-    # NFS-backed rather than Longhorn: rustfs is Longhorn's own S3 backup
-    # target, so its storage shouldn't depend on Longhorn itself.
+    # Matches duck's NAS account uid/gid so NFS writes are actually authorized
+    # server-side (the NFS export's "no mapping" squash passes the client uid
+    # through as-is — it doesn't grant access on its own).
+    uid = 1000;
+
     nfs = {
       enable = true;
       server = config.devDefaults.nasHost;
-      path = "${config.devDefaults.nasBase}/LonghornBackups";
+      path = "${config.devDefaults.nasBase}/RustFS";
     };
 
     secretKey = (secrets.rustfs or { }).secretKey or "";

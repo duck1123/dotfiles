@@ -52,6 +52,7 @@ Key subdirectories:
 - `modules/options/` — NixOS option declarations (host, hosts, identities, simpleFeature type)
 - `modules/types/` — custom Nix types/submodules for hosts, identities, features
 - `modules/identities/` — per-user identity definitions (duck, deck, drenfer)
+- `modules/kubernetes/` — the k3s fleet-ops integration: `_env/dev/` has the per-app instance config for the `dev` nixidy environment (application library/generators still come from the `k3s-fleetops` flake input). See `modules/kubernetes/docs/` for deployment workflow, the two-module-system gotcha, pinned-volume handling, and a troubleshooting playbook — carried over from k3s-fleetops as it consolidates into this repo.
 
 ### Host Configuration Pattern
 

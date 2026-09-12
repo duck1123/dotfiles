@@ -1,23 +1,13 @@
-{ config, secrets, ... }:
+{ config, ... }:
 {
   services.listenarr = {
-    database = {
-      enable = true;
-      host = "postgresql.postgresql";
-      name = "listenarr";
-      password = secrets.postgresql.userPassword;
-      port = 5432;
-      username = "listenarr";
-    };
+    databaseTarget = "postgresql";
+    database.enable = true;
 
-    enable = true;
+    enable = false;
 
-    ingress = {
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      domain = "listenarr.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      tls.enable = true;
-    };
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
 
     nfs = {
       enable = true;
@@ -37,5 +27,9 @@
       enable = false;
       sharedGluetunService = "gluetun.gluetun";
     };
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.config.volumeHandle = "pvc-39d3b055-b19f-4454-b84a-0609fdae6109";
   };
 }

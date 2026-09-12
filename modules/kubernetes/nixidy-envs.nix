@@ -23,6 +23,10 @@ in
             "${inputs.k3s-fleetops}/modules/secretManifest.nix"
             "${inputs.k3s-fleetops}/modules/secretSpecs.nix"
             "${inputs.k3s-fleetops}/modules/nodeProfiles.nix"
+            "${inputs.k3s-fleetops}/modules/homepageGroups.nix"
+            "${inputs.k3s-fleetops}/modules/ingressProviders.nix"
+            "${inputs.k3s-fleetops}/modules/databaseProviders.nix"
+            "${inputs.k3s-fleetops}/modules/nfsTargets.nix"
           ];
         };
 

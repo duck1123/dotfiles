@@ -2,25 +2,20 @@
 {
   services.windmill = {
     enable = true;
-    hostAffinity = "nixmini";
+    # hostAffinity = "nixmini";
     image = "ghcr.io/windmill-labs/windmill-full:latest";
 
-    ingress = {
-      domain = "windmill.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      tls.enable = true;
-    };
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
 
+    databaseTarget = "postgresql";
     database = {
-      host = "postgresql.postgresql";
-      port = 5432;
-      name = "windmill";
-      username = secrets.windmill.database.username;
-      password = secrets.windmill.database.password;
+      inherit (secrets.windmill.database) username password;
     };
 
     storageClassName = "longhorn";
     replicas = 1;
+
+    inherit (secrets.windmill) superadminSecret superadminEmail superadminPassword;
   };
 }

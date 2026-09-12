@@ -7,10 +7,6 @@
 
     encryptionKey = (secrets.n8n or { }).encryptionKey or "";
 
-    ingress = {
-      domain = "n8n.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
-    };
+    ingressProvider = "traefik-lan";
   };
 }

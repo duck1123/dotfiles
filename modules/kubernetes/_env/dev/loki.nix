@@ -1,6 +1,8 @@
-_: {
+{ config, ... }:
+{
   services.loki = {
-    enable = true;
+    inherit (config.devDefaults) enableLogging;
+    enable = config.devDefaults.enableLogging;
     hostAffinity = "edgenix";
     retention = "720h"; # 30 days
     storageClassName = "longhorn";

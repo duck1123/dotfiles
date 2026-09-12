@@ -1,29 +1,28 @@
 { config, secrets, ... }:
 {
+  # ../../applications/immich.nix
   services.immich = {
-    enable = true;
+    adminApiKey = secrets.immich.adminApiKey;
 
     database = {
       inherit (secrets.immich.database) password username;
-      host = "postgresql.postgresql";
-      port = 5432;
-      name = "immich";
     };
 
-    ingress = {
-      domain = "immich.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      tls.enable = true;
-    };
-
-    nfs.enable = false;
+    databaseTarget = "postgresql";
+    enable = true;
 
     externalLibrary = {
       enable = true;
       server = config.devDefaults.nasHost;
       path = "${config.devDefaults.nasBase}/Photos";
     };
+
+    hostAffinity = "nixmini";
+    ingress.tls.enable = true;
+    ingressProvider = "traefik-lan";
+    monitoring.autokuma.enable = true;
+    homepage.group = "Media";
+    nfs.enable = false;
 
     redis = {
       inherit (secrets.immich.redis) password;
@@ -33,5 +32,10 @@
     };
 
     storageClassName = "longhorn";
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster. Only takes
+    # effect while nfs.enable is false, as above.
+    libraryVolumeHandle = "pvc-d794cdee-ffa7-4885-a2be-b741de8dd416";
   };
 }

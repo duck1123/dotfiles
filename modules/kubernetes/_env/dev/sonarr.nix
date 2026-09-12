@@ -1,33 +1,26 @@
-{ config, secrets, ... }:
+{ secrets, ... }:
 {
   services.sonarr = {
-    database = {
-      enable = true;
-      host = "postgresql.postgresql";
-      port = 5432;
-      name = "sonarr";
-      username = "sonarr";
-      password = secrets.postgresql.userPassword;
-    };
+    databaseTarget = "postgresql";
+    database.enable = true;
 
     enable = true;
-    image = "linuxserver/sonarr:4.0.17.2952-ls312";
+    apiKey = secrets.sonarr.key;
+    image = "linuxserver/sonarr:4.0.19.2979-ls323";
     hostAffinity = "edgenix";
 
-    ingress = {
-      domain = "sonarr.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      tls.enable = true;
-    };
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
+    homepage.group = "Arr";
 
-    nfs = {
-      enable = true;
-      server = config.devDefaults.nasHost;
-      path = "${config.devDefaults.nasBase}";
-    };
+    nfsTarget = "nas";
+    nfs.enable = true;
 
     replicas = 1;
     vpn.enable = false;
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.config.volumeHandle = "pvc-bda437d3-382b-4c6b-bbd1-3982593d07fb";
   };
 }

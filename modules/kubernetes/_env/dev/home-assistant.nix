@@ -1,19 +1,20 @@
 { config, ... }:
 {
   services.home-assistant = {
-    enable = true;
+    enable = false;
     # hostAffinity = "edgenix";
 
     # https://github.com/AiDot-Development-Team/hass-AiDot
     installAidot.enable = true;
 
-    ingress = {
-      domain = "home-assistant.${config.devDefaults.homeDomain}";
-      ingressClassName = "traefik";
-      clusterIssuer = config.devDefaults.clusterIssuer;
-      tls.enable = true;
-    };
+    ingressProvider = "traefik-lan";
+    ingress.tls.enable = true;
 
+    monitoring.autokuma.enable = true;
     storageClassName = "longhorn";
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.config.volumeHandle = "pvc-fbf41b36-718b-4942-bbe1-adf65e5bc7d1";
   };
 }

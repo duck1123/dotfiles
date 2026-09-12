@@ -716,11 +716,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787787561,
-        "narHash": "sha256-8wcj3eYTkR3FF2pCgzNc1cfYAj1sfldpBEGuB5fw6ww=",
+        "lastModified": 1789228712,
+        "narHash": "sha256-1rRS4PG95FnBgZU3DsFtaJtooIWeiD223BTmYTL+700=",
         "owner": "duck1123",
         "repo": "k3s-fleetops",
-        "rev": "7e23d0c9532494780e119e8a3b7298abb5cec306",
+        "rev": "006cf1210efb9a1b548189a9243a569a45e0b677",
         "type": "github"
       },
       "original": {

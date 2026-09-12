@@ -1,0 +1,4 @@
+{ ... }:
+{
+  services.mssql.enable = false;
+}

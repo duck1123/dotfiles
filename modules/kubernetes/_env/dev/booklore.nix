@@ -1,38 +1,26 @@
-{ config, secrets, ... }:
+{ ... }:
 {
   services.booklore = {
     enable = false;
-    hostAffinity = "edgenix";
+    # hostAffinity = "edgenix";
 
-    database = {
-      host = "mariadb.mariadb";
-      password = secrets.booklore.database.password;
-      port = 3306;
-      name = "booklore";
-      username = "booklore";
-    };
+    databaseTarget = "mariadb";
 
     gid = "0";
 
-    ingress = {
-      domain = "booklore.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
-      # Optional: Enable local-only ingress using Traefik
-      localIngress = {
-        enable = true;
-        domain = "booklore.local";
-        tls.enable = false; # Set to true if you have cert-manager configured for local domains
-      };
-    };
+    ingressProvider = "traefik-lan";
 
-    nfs = {
-      enable = true;
-      server = config.devDefaults.nasHost;
-      path = "${config.devDefaults.nasBase}/Books";
-    };
+    nfsTarget = "nas";
+    nfsSubPath = "Books";
+    nfs.enable = true;
 
-    storageClassName = "longhorn";
     uid = "0";
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides = {
+      data.volumeHandle = "pvc-da71c5a0-68e9-48f0-a8a2-e71d5a8adccc";
+      bookdrop.volumeHandle = "pvc-b8bc2a4f-b836-4142-a5cf-c513c51f5422";
+    };
   };
 }

@@ -1,0 +1,4 @@
+{ ... }:
+{
+  services.lldap.enable = false;
+}

@@ -1,22 +1,12 @@
-{ config, secrets, ... }:
+{ config, ... }:
 {
   services.whisparr = {
-    database = {
-      enable = true;
-      host = "postgresql.postgresql";
-      port = 5432;
-      name = "whisparr";
-      username = "whisparr";
-      password = secrets.postgresql.userPassword;
-    };
+    databaseTarget = "postgresql";
+    database.enable = true;
 
     enable = false;
 
-    ingress = {
-      domain = "whisparr.${config.devDefaults.tailDomain}";
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
-    };
+    ingressProvider = "traefik-lan";
 
     nfs = {
       enable = true;
@@ -25,5 +15,9 @@
     };
 
     replicas = 1;
+
+    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
+    # -- see docs/pinned-volumes.md. Specific to this cluster.
+    volumeOverrides.config.volumeHandle = "pvc-7635e288-2ecd-476b-9cc8-e6355eb2ee27";
   };
 }
