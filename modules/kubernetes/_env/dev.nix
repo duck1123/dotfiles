@@ -112,8 +112,10 @@ in
 
     target = {
       branch = "master";
-      repository = "https://github.com/duck1123/k3s-fleetops.git";
-      rootPath = "./manifests/dev";
+      repository = "git@github.com:duck1123/argo-manifests.git";
+      # Manifests are written to <manifests-repo-checkout>/dev/
+      # Activation must run from the kubernetes/manifests/ checkout directory.
+      rootPath = "dev";
     };
   };
 }

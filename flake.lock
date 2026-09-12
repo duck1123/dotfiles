@@ -211,11 +211,11 @@
     "flake-compatish": {
       "flake": false,
       "locked": {
-        "lastModified": 1771176559,
-        "narHash": "sha256-V07a8KsYGj8nvMuBfF7PO88Tzqg3LJjxuIasgR5Mx3o=",
+        "lastModified": 1768889023,
+        "narHash": "sha256-g1gcagOt283Mv51FSAy8YCPWosMjsW+icP4Vrt5/3jY=",
         "owner": "lillecarl",
         "repo": "flake-compatish",
-        "rev": "d8c944d4df613d47a3dc7b800c7531c33323c845",
+        "rev": "c3accc4dfe4ae0b1311ae61d8d5431c87b5dcd84",
         "type": "github"
       },
       "original": {
@@ -763,16 +763,17 @@
         ]
       },
       "locked": {
-        "lastModified": 1784284372,
-        "narHash": "sha256-++Zvhc4AwJPNOgqOdMWZ28VWsTsaAL8lYnT5JUlpblU=",
+        "lastModified": 1772057487,
+        "narHash": "sha256-8E558MZicDnxuCYtVlT5fkOOvnTsjfZ2hLoU3L86ZtQ=",
         "owner": "Lillecarl",
         "repo": "nix-csi",
-        "rev": "f6734bfb931550e9cfefd9aa763f73c0ac9fb06c",
+        "rev": "7ddae07bf04c9540084d649a9404900d94adc2fd",
         "type": "github"
       },
       "original": {
         "owner": "Lillecarl",
         "repo": "nix-csi",
+        "rev": "7ddae07bf04c9540084d649a9404900d94adc2fd",
         "type": "github"
       }
     },

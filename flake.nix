@@ -66,10 +66,16 @@
       url = "github:duck1123/k3s-fleetops";
     };
 
+    # Intentionally pinned rather than tracking upstream master -- k3s-fleetops'
+    # applications/nix-csi.nix (see modules/kubernetes/docs/nix-csi-and-binary-cache.md,
+    # carried over from k3s-fleetops) is written/tested against this exact commit and
+    # broke evaluation entirely when this had drifted forward via a routine `nix flake
+    # update`. Don't update this input without also verifying `nix build
+    # .#nixidyEnvs.x86_64-linux.dev.activationPackage --impure` still evaluates.
     nix-csi = {
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.treefmt-nix.follows = "treefmt-nix";
-      url = "github:Lillecarl/nix-csi";
+      url = "github:Lillecarl/nix-csi/7ddae07bf04c9540084d649a9404900d94adc2fd";
     };
 
     nix-kube-generators.url = "github:farcaller/nix-kube-generators";
