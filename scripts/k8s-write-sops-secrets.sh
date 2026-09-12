@@ -100,7 +100,13 @@ while IFS= read -r spec; do
 
   mkdir -p "$(dirname "$output_file")"
 
-  string_data_lines="$(echo "$values" | jq -r 'to_entries[] | "        \(.key): \(.value | tostring)"')"
+  # @json (not tostring/raw interpolation) is required: a value that is itself
+  # a JSON string (e.g. superset/metabase's CONNECTIONS_JSON, a
+  # builtins.toJSON-encoded list) starts with `[` or `{` and, embedded
+  # unquoted, gets parsed by the YAML loader as a nested flow sequence/mapping
+  # instead of staying a scalar string -- which desyncs the app in ArgoCD and
+  # is unreadable by the container expecting a plain env var string.
+  string_data_lines="$(echo "$values" | jq -r 'to_entries[] | "        \(.key): \(.value | @json)"')"
 
   metadata_yaml=""
   if echo "$spec" | jq -e '.metadata.annotations? != null' >/dev/null 2>&1; then
