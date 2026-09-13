@@ -156,7 +156,7 @@
                             value = ''
                               experimental-features = nix-command flakes
                               extra-substituters = https://attic.home.kronkltd.net/nixos
-                              extra-trusted-public-keys = nixos:6s8iAyKEnH2z4spigUdDmt1VwiAwrvPA9vQNUd9if1k=
+                              extra-trusted-public-keys = nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4=
                               store = local?root=/var/lib/nix-scratch
                               sandbox = false
                               build-users-group =

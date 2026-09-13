@@ -46,7 +46,7 @@
           let
             atticSettings = {
               substituters = [ "https://attic.home.kronkltd.net/nixos" ];
-              trusted-public-keys = [ "nixos:6s8iAyKEnH2z4spigUdDmt1VwiAwrvPA9vQNUd9if1k=" ];
+              trusted-public-keys = [ "nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4=" ];
             };
             # Lets a workstation push locally-signed store paths directly via
             # `nix copy --to ssh-ng://nix@...` — otherwise nix-daemon rejects unsigned
