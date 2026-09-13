@@ -33,9 +33,11 @@
         '';
         true;
 
-      nixExpr = ''
-        (builtins.getFlake "github:duck1123/k3s-fleetops").packages.x86_64-linux.attic-server-bundle
-      '';
+      # Vendored into this repo's own flake outputs (see modules/kubernetes/docs/)
+      # rather than fetched from the external k3s-fleetops flake -- resolved
+      # locally at `nur switch` time and handed to nix-csi via its per-system
+      # storePath convention, same as applications/duck1123/default.nix.
+      atticServerBundle = self.packages.x86_64-linux.attic-server-bundle;
 
       serverConfig = cfg: ''
         listen = "[::]:${toString cfg.service.port}"
@@ -236,7 +238,7 @@
                       name = "nix";
                       csi = {
                         driver = "nix.csi.store";
-                        volumeAttributes.nixExpr = nixExpr;
+                        volumeAttributes."x86_64-linux" = "${atticServerBundle}";
                       };
                     }
                     {

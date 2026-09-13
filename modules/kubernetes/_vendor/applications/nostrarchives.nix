@@ -29,9 +29,11 @@
         else
           "redis://${cfg.redis.host}:${toString cfg.redis.port}";
 
-      nixExpr = ''
-        (builtins.getFlake "github:duck1123/k3s-fleetops").packages.x86_64-linux.nostrarchives-api-bundle
-      '';
+      # Vendored into this repo's own flake outputs (see modules/kubernetes/docs/)
+      # rather than fetched from the external k3s-fleetops flake -- resolved
+      # locally at `nur switch` time and handed to nix-csi via its per-system
+      # storePath convention, same as applications/duck1123/default.nix.
+      nostrarchivesApiBundle = self.packages.x86_64-linux.nostrarchives-api-bundle;
     in
     self.lib.mkArgoApp
       {
@@ -201,7 +203,7 @@
                       name = "nix";
                       csi = {
                         driver = "nix.csi.store";
-                        volumeAttributes.nixExpr = nixExpr;
+                        volumeAttributes."x86_64-linux" = "${nostrarchivesApiBundle}";
                       };
                     }
                   ];

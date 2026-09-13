@@ -27,13 +27,12 @@
       # even a maintained Docker image tag) -- it's a bun/TypeScript project
       # with no build step (bun runs the sources directly), packaged here as
       # the `ditto-relay-bundle` flake output (modules/pkgs/ditto-relay.nix).
-      # nix-csi fetches this repo's own flake by GitHub reference for it, same
-      # as applications/nostrarchives.nix and applications/duck1123/default.nix
-      # -- meaning a bump of the pinned `rev` in modules/pkgs/ditto-relay.nix
-      # needs pushing before nix-csi picks it up.
-      nixExpr = ''
-        (builtins.getFlake "github:duck1123/k3s-fleetops").packages.x86_64-linux.ditto-relay-bundle
-      '';
+      # Resolved locally at `nur switch` time and handed to nix-csi via its
+      # per-system storePath convention, same as applications/nostrarchives.nix
+      # and applications/duck1123/default.nix -- meaning a bump of the pinned
+      # `rev` in modules/pkgs/ditto-relay.nix needs pushing to Attic before
+      # nix-csi picks it up.
+      dittoRelayBundle = self.packages.x86_64-linux.ditto-relay-bundle;
     in
     self.lib.mkArgoApp
       {
@@ -194,7 +193,7 @@
                       name = "nix";
                       csi = {
                         driver = "nix.csi.store";
-                        volumeAttributes.nixExpr = nixExpr;
+                        volumeAttributes."x86_64-linux" = "${dittoRelayBundle}";
                       };
                     }
                   ];
