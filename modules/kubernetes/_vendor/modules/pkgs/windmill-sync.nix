@@ -50,5 +50,26 @@
           '')
         ];
       };
+
+      # nix build .#windmill-worker-native-tools
+      # Mounted at /nix inside the windmill-worker-native container
+      # (applications/windmill/default.nix) so "native"-tagged Windmill
+      # scripts have a small toolset to work with beyond the windmill-labs
+      # image itself. Resolved via the same storePath convention as
+      # windmill-sync-bundle above -- see that package's comment, and
+      # applications/duck1123/default.nix's duck1123Runtime, for why this is
+      # a real flake package rather than a nixExpr string.
+      packages.windmill-worker-native-tools = pkgs.buildEnv {
+        name = "windmill-worker-native-tools";
+        paths = with pkgs; [
+          bash
+          coreutils
+          git
+          curl
+          jq
+          nushell
+          nix
+        ];
+      };
     };
 }

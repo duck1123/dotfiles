@@ -34,6 +34,18 @@
       # nix-csi has nothing to substitute it from.
       windmillSyncBundle = self.packages.x86_64-linux.windmill-sync-bundle;
 
+      # Small toolset (bash/coreutils/git/curl/jq/nushell/nix) mounted at /nix
+      # inside the ${name}-worker-native container so "native"-tagged Windmill
+      # scripts have something to run beyond the windmill-labs image itself --
+      # built as the `windmill-worker-native-tools` flake package
+      # (modules/pkgs/windmill-sync.nix) and resolved via the same
+      # storePath convention as windmillSyncBundle above, rather than a
+      # nixExpr string nix-csi would have to fetch nixpkgs and re-evaluate
+      # for on every mount (the pattern applications/xysat.nix uses instead,
+      # justified there by per-node customization -- not needed here since
+      # this toolset is fixed).
+      windmillWorkerTools = self.packages.x86_64-linux.windmill-worker-native-tools;
+
       # Runs on every ArgoCD sync (see the Job's hook annotations below), so
       # editing applications/windmill/wmill/** and pushing is the only step
       # needed to change scripts/flows/apps/resources/variables -- same "one
@@ -347,6 +359,23 @@
                               name = "WORKER_TAGS";
                               value = "native";
                             }
+                            {
+                              name = "PATH";
+                              value = "/nix/var/result/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+                            }
+                            {
+                              # See applications/xysat.nix for why store/sandbox/build-users-group
+                              # are set this way -- same rationale applies here.
+                              name = "NIX_CONFIG";
+                              value = ''
+                                experimental-features = nix-command flakes
+                                extra-substituters = https://attic.home.kronkltd.net/nixos
+                                extra-trusted-public-keys = nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4=
+                                store = local?root=/var/lib/nix-scratch
+                                sandbox = false
+                                build-users-group =
+                              '';
+                            }
                           ];
                         }
                         // lib.optionalAttrs (cfg.database.password != "") {
@@ -355,12 +384,26 @@
                             "-c"
                             "export DATABASE_URL=$(cat /work/database_url) && exec windmill"
                           ];
-                          volumeMounts = [
-                            {
-                              mountPath = "/work";
-                              name = shared-work-volume;
-                            }
-                          ];
+                        }
+                        // {
+                          volumeMounts =
+                            lib.optionals (cfg.database.password != "") [
+                              {
+                                mountPath = "/work";
+                                name = shared-work-volume;
+                              }
+                            ]
+                            ++ [
+                              {
+                                mountPath = "/nix";
+                                name = "nix";
+                                subPath = "nix";
+                              }
+                              {
+                                mountPath = "/var/lib/nix-scratch";
+                                name = "nix-scratch";
+                              }
+                            ];
                         }
                       )
                     ];
@@ -368,6 +411,21 @@
                     volumes = lib.optionals (cfg.database.password != "") [
                       {
                         name = shared-work-volume;
+                        emptyDir = { };
+                      }
+                    ]
+                    ++ [
+                      {
+                        name = "nix";
+                        csi = {
+                          driver = "nix.csi.store";
+                          volumeAttributes."x86_64-linux" = "${windmillWorkerTools}";
+                        };
+                      }
+                      {
+                        # Writable, node-local, wiped on pod restart -- see the
+                        # NIX_CONFIG `store` setting above.
+                        name = "nix-scratch";
                         emptyDir = { };
                       }
                     ];
