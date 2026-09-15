@@ -29,7 +29,7 @@ if git diff --cached --quiet; then
 fi
 
 echo "Changes staged:"
-git diff --cached --stat
+git --no-pager diff --cached --stat
 
 COMMIT_MSG="${COMMIT_MSG:-Update manifests $(date -u +%Y-%m-%dT%H:%M:%SZ)}"
 git commit -m "$COMMIT_MSG"
