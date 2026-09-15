@@ -4,7 +4,7 @@
     enable = true;
     image = "ghcr.io/haveagitgat/tdarr:2.86.01";
     healthcheckcpuWorkers = 1;
-    healthcheckgpuWorkers = 0;
+    healthcheckgpuWorkers = 1;
     # hostAffinity = "nasnix";
 
     ingressProvider = "traefik-lan";
@@ -24,7 +24,7 @@
     storageClassName = "longhorn";
     useProbes = false;
     vpn.enable = false;
-    enableGPU = false;
+    enableGPU = true;
     enableNvidiaGPU = false;
     transcodecpuWorkers = 0;
     transcodegpuWorkers = 0;
