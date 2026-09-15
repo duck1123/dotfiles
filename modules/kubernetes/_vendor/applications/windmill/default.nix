@@ -653,6 +653,24 @@
                               name = "WORKER_TAGS";
                               value = "deno,python3,bash,go,dependency,flow,hub";
                             }
+                            {
+                              # Gives this pod's own worker (the one that actually
+                              # runs bash/nu-tagged jobs, unlike windmill-worker-native
+                              # below which Windmill forces into a fixed "native jobs
+                              # only" mode -- see the PATH-prepending command below for
+                              # why nix isn't just added to PATH here directly) access
+                              # to `nix`. See applications/xysat.nix for why
+                              # store/sandbox/build-users-group are set this way.
+                              name = "NIX_CONFIG";
+                              value = ''
+                                experimental-features = nix-command flakes
+                                extra-substituters = https://attic.home.kronkltd.net/nixos
+                                extra-trusted-public-keys = nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4=
+                                store = local?root=/var/lib/nix-scratch
+                                sandbox = false
+                                build-users-group =
+                              '';
+                            }
                           ]
                           ++ lib.optionals (cfg.superadminSecret != "") [
                             {
@@ -697,12 +715,25 @@
                           command = [
                             "/bin/sh"
                             "-c"
-                            "export DATABASE_URL=$(cat /work/database_url) && exec windmill standalone"
+                            # Prepend rather than replace PATH -- unlike
+                            # windmill-worker-native's container (which has no other
+                            # runtime to preserve), this pod's default PATH still needs
+                            # to resolve the image's own bundled deno/python3/go/etc.
+                            "export DATABASE_URL=$(cat /work/database_url) && export PATH=\"/nix/var/result/bin:$PATH\" && exec windmill standalone"
                           ];
                           volumeMounts = [
                             {
                               mountPath = "/work";
                               name = shared-work-volume;
+                            }
+                            {
+                              mountPath = "/nix";
+                              name = "nix";
+                              subPath = "nix";
+                            }
+                            {
+                              mountPath = "/var/lib/nix-scratch";
+                              name = "nix-scratch";
                             }
                           ];
                         }
@@ -712,6 +743,17 @@
                     volumes = lib.optionals (cfg.database.password != "") [
                       {
                         name = shared-work-volume;
+                        emptyDir = { };
+                      }
+                      {
+                        name = "nix";
+                        csi = {
+                          driver = "nix.csi.store";
+                          volumeAttributes."x86_64-linux" = "${windmillWorkerTools}";
+                        };
+                      }
+                      {
+                        name = "nix-scratch";
                         emptyDir = { };
                       }
                     ];
