@@ -52,17 +52,19 @@ in
   # New groups go on the left (nearer the front of this list) until per-group
   # column placement exists.
   homepageGroups = [
+    "Nodes"
+    "Media"
+    "Organization"
+    "Analytics"
+    "Automation"
+    "Finance"
+    "Notes"
+    "Arr"
+    "Apps"
+    "Download"
+    "Nostr"
     "Storage"
     "Database"
-    "Download"
-    "Apps"
-    "Arr"
-    "Media"
-    "Notes"
-    "Finance"
-    "Automation"
-    "Nostr"
-    "Nodes"
   ];
 
   ingressProviders = {
