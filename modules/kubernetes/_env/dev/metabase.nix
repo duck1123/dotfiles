@@ -1,7 +1,7 @@
 { secrets, config, ... }:
 {
   services.metabase = {
-    enable = true;
+    enable = false;
 
     ingressProvider = "traefik-lan";
     homepage.group = "Database";

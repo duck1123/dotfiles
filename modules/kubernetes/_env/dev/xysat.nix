@@ -10,7 +10,7 @@ in
     #    token in the UI's own "Add Server" install command).
     # 2. `nur secrets edit`, add `xysat.setupApiKey: <the key>`.
     # 3. Set enable = true here and `nur switch`.
-    enable = true;
+    enable = false;
 
     setupUrl =
       if apiKey == "" then "" else "http://xyops.xyops:5522/api/app/satellite/config?t=${apiKey}";

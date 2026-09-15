@@ -47,6 +47,50 @@
       # this toolset is fixed).
       windmillWorkerTools = self.packages.x86_64-linux.windmill-worker-native-tools;
 
+      # The NAS (config.nfsTargets.nas, 192.168.0.124:/volume1) only grants
+      # NFS access per top-level shared folder -- /volume1 itself is denied
+      # by the server ("access denied by server while mounting
+      # 192.168.0.124:/volume1"), which is what a single whole-basePath mount
+      # hit here previously. Every other app on this NAS works around the
+      # same restriction by mounting one specific child folder per
+      # PV/PVC (see applications/radarr.nix, mediamanager.nix); this mounts
+      # every such folder individually so windmill workers see the same
+      # library any *arr app does, none of it as a single denied root mount.
+      mediaFolders = [
+        "Downloads"
+        "Movies"
+        "TV"
+        "Music"
+        "Podcasts"
+        "Youtube"
+        "YT-Cache"
+        "Videos"
+        "Books"
+        "slskd_downloads"
+      ];
+      mediaSlug = folder: builtins.replaceStrings [ "_" ] [ "-" ] (lib.toLower folder);
+      mediaVolumeName = folder: "media-${mediaSlug folder}";
+      mediaPvcName = folder: "${name}-${name}-media-${mediaSlug folder}";
+      mediaPvName = folder: "${mediaPvcName folder}-nfs";
+
+      mediaVolumes =
+        cfg:
+        lib.optionals cfg.nfs.enable (
+          map (folder: {
+            name = mediaVolumeName folder;
+            persistentVolumeClaim.claimName = mediaPvcName folder;
+          }) mediaFolders
+        );
+
+      mediaVolumeMounts =
+        cfg:
+        lib.optionals cfg.nfs.enable (
+          map (folder: {
+            mountPath = "/media/${folder}";
+            name = mediaVolumeName folder;
+          }) mediaFolders
+        );
+
       # Runs on every ArgoCD sync (see the Job's hook annotations below), so
       # editing applications/windmill/wmill/** and pushing is the only step
       # needed to change scripts/flows/apps/resources/variables -- same "one
@@ -524,12 +568,7 @@
                                 name = "nix-scratch";
                               }
                             ]
-                            ++ lib.optionals cfg.nfs.enable [
-                              {
-                                mountPath = "/media";
-                                name = "media";
-                              }
-                            ];
+                            ++ mediaVolumeMounts cfg;
                         }
                       )
                     ];
@@ -555,12 +594,7 @@
                         emptyDir = { };
                       }
                     ]
-                    ++ lib.optionals cfg.nfs.enable [
-                      {
-                        name = "media";
-                        persistentVolumeClaim.claimName = "${name}-${name}-media";
-                      }
-                    ];
+                    ++ mediaVolumes cfg;
                   };
                 };
               };
@@ -753,12 +787,7 @@
                               name = "nix-scratch";
                             }
                           ]
-                          ++ lib.optionals cfg.nfs.enable [
-                            {
-                              mountPath = "/media";
-                              name = "media";
-                            }
-                          ];
+                          ++ mediaVolumeMounts cfg;
                         }
                       )
                     ];
@@ -780,12 +809,7 @@
                         emptyDir = { };
                       }
                     ]
-                    ++ lib.optionals cfg.nfs.enable [
-                      {
-                        name = "media";
-                        persistentVolumeClaim.claimName = "${name}-${name}-media";
-                      }
-                    ];
+                    ++ mediaVolumes cfg;
                   };
                 };
               };
@@ -843,33 +867,43 @@
           };
         }
         // lib.optionalAttrs cfg.nfs.enable {
-          persistentVolumes."${name}-${name}-media-nfs" = {
-            apiVersion = "v1";
-            kind = "PersistentVolume";
-            metadata.name = "${name}-${name}-media-nfs";
-            spec = {
-              capacity.storage = "1Ti";
-              accessModes = [ "ReadWriteMany" ];
-              mountOptions = [
-                "nolock"
-                "noexec"
-                "soft"
-                "timeo=30"
-              ];
-              nfs = {
-                server = cfg.nfs.server;
-                path = cfg.nfs.path;
+          persistentVolumes = lib.listToAttrs (
+            map (folder: {
+              name = mediaPvName folder;
+              value = {
+                apiVersion = "v1";
+                kind = "PersistentVolume";
+                metadata.name = mediaPvName folder;
+                spec = {
+                  capacity.storage = "1Ti";
+                  accessModes = [ "ReadWriteMany" ];
+                  mountOptions = [
+                    "nolock"
+                    "noexec"
+                    "soft"
+                    "timeo=30"
+                  ];
+                  nfs = {
+                    server = cfg.nfs.server;
+                    path = "${cfg.nfs.path}/${folder}";
+                  };
+                  persistentVolumeReclaimPolicy = "Retain";
+                };
               };
-              persistentVolumeReclaimPolicy = "Retain";
-            };
-          };
+            }) mediaFolders
+          );
 
-          persistentVolumeClaims."${name}-${name}-media".spec = {
-            accessModes = [ "ReadWriteMany" ];
-            resources.requests.storage = "1Gi";
-            storageClassName = "";
-            volumeName = "${name}-${name}-media-nfs";
-          };
+          persistentVolumeClaims = lib.listToAttrs (
+            map (folder: {
+              name = mediaPvcName folder;
+              value.spec = {
+                accessModes = [ "ReadWriteMany" ];
+                resources.requests.storage = "1Gi";
+                storageClassName = "";
+                volumeName = mediaPvName folder;
+              };
+            }) mediaFolders
+          );
         }
         // lib.optionalAttrs (cfg.superadminSecret != "") {
           jobs."${name}-sync" = {

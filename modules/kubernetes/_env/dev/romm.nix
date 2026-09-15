@@ -1,7 +1,7 @@
 { config, secrets, ... }:
 {
   services.romm = {
-    enable = true;
+    enable = false;
 
     admin = {
       username = secrets.romm.admin.username;

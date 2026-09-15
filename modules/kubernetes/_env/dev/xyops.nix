@@ -1,7 +1,7 @@
 { secrets, ... }:
 {
   services.xyops = {
-    enable = true;
+    enable = false;
 
     databaseTarget = "postgresql";
 
