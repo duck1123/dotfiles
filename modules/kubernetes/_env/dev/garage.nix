@@ -3,6 +3,15 @@
   services.garage = {
     enable = true;
 
+    # Pin to the node its RWO Longhorn volumes' replicas actually live on --
+    # without this, a reschedule to a different node forces those volumes
+    # through a detach/reattach cycle, which is what triggered both the
+    # 2026-09-13 garage-meta LMDB corruption incident (see
+    # docs/nix-csi-and-binary-cache.md) and a live FailedAttachVolume storm
+    # on garage-meta found 2026-09-14. Update this if the volumes are ever
+    # deliberately moved to a different node.
+    hostAffinity = "nasnix";
+
     adminToken = (secrets.garage or { }).adminToken or "";
     rpcSecret = (secrets.garage or { }).rpcSecret or "";
     accessKey = (secrets.garage or { }).accessKey or "";
