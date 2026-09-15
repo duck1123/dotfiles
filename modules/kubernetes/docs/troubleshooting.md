@@ -71,6 +71,34 @@ An `Unknown parameter name` parse error here (not a network/disk problem) is the
 
 **Why it can recur:** `openiscsi` isn't version-pinned in dotfiles, so it drifts with flake bumps; a future nixpkgs bump could ship a build that writes this parameter again. Not something that happens on every deploy, but worth a quick recheck after a nixpkgs/flake bump that touches a node's generation.
 
+## Longhorn: single volume stuck `detaching`/`faulted` forever — stale `tgtd` iSCSI target blocks re-attach
+
+**Symptom:** One specific PVC's pod stuck `ContainerCreating` indefinitely (unlike the mass-failure case above, this doesn't spread to other apps). `kubectl get volumes.longhorn.io <name>` cycles `detaching`/`faulted` → `attaching`/`unknown` → back to `detaching`/`faulted` every ~10-20s, never settling. The volume's replica CR reports `currentState: running` the whole time (the data itself is fine) — only the engine CR flaps, `currentState: starting` → `error` → `starting`, with `errorMsg: exit status 1` and a `generation` counter in the thousands from retrying for hours. The Volume CR's `lastAutoSalvagedAt` may show Longhorn already tried and failed to self-heal.
+
+Seen taking down `garage`'s `garage-meta` PVC (2Gi, on `nasnix`), which cascades into Attic/nix-csi build failures since Garage backs the self-hosted binary cache — see [nix-csi-and-binary-cache.md](nix-csi-and-binary-cache.md).
+
+**Root cause:** `tgtd` (the iSCSI target daemon Longhorn's engine shells out to via `tgtadm`, running inside the node's `instance-manager` pod and shared across every engine on that node) is left holding a half-torn-down target from an earlier crash — the controller LUN (LUN 0) still exists but the data LUN (LUN 1) is already gone. Every new engine attempt tries to clean up the stale target *before* creating a fresh one, calls `tgtadm --op delete --mode logicalunit --tid <N> --lun 1`, gets `tgtadm: can't find the logical unit` (exit 22) because LUN 1 is already gone, and aborts the whole frontend-init step instead of proceeding past it — so the engine process exits 1 and Longhorn retries from scratch, forever, without ever getting a working device.
+
+**Diagnose:** The real error is buried among routine `Creating volume controller`/`Starting with replicas` lines from every retry — filter those out:
+```sh
+kubectl logs -n longhorn-system <instance-manager-pod-on-that-node> --since=90s | grep -v level=info
+```
+Look for `failed to init frontend: ... failed to delete target ... tgtadm: can't find the logical unit`. Cross-check the stale target directly:
+```sh
+kubectl exec -n longhorn-system <instance-manager-pod> -- tgtadm --lld iscsi --op show --mode target
+```
+The volume's target (`iqn.2019-10.io.longhorn:<volume-name>`) shows only `LUN: 0` (the controller LUN) and no `ACL information: ALL` line — a healthy target always has both.
+
+**Fix:** Manual `tgtadm` cleanup (delete connection, then LUN, then target, in that order) is unreliable once a target is in this state — deleting the target itself reliably fails with `tgtadm: this target is still active` even after its connection/nexus is already gone. The fix that actually works is a full restart of that node's `instance-manager` pod, which restarts `tgtd` from scratch:
+```sh
+kubectl delete pod -n longhorn-system <instance-manager-pod-on-that-node>
+```
+Longhorn recreates it automatically (same name). Confirm with `kubectl get volumes.longhorn.io <name>` → `state: attached`, `robustness: healthy`.
+
+**Caveat:** That instance-manager hosts *every* engine/replica scheduled on that node, not just the stuck one — deleting it briefly disrupts every other volume there too, not just a targeted fix. They re-attach automatically once the new instance-manager pod starts; confirmed safe in practice (`garage-data`, on the same node, round-tripped through `attached`/`healthy` with no data loss).
+
+**Why it can recur:** Nothing here is pinned to a specific trigger — any abrupt engine kill mid-teardown (OOM, node pressure, a race during a previous recovery attempt) can leave `tgtd` in this half-deleted state. If it recurs often for the same volume, worth checking whether something keeps SIGKILLing the engine process rather than treating each occurrence as isolated.
+
 ## Gluetun: `Unhealthy`/`0/1 Ready` with HTTP 500 readiness probe, even though the VPN works fine
 
 **Symptom:** `gluetun` stuck not-Ready for hours. Readiness probe fails (`HTTP probe failed with statuscode: 500`), but the control-server API (`/v1/vpn/status` → `running`, `/v1/publicip/ip` → correct exit IP) and actual proxied HTTP traffic both work the whole time. Cascades: any app gated behind gluetun's proxy (e.g. `slskd`'s `wait-for-gluetun` init container polling gluetun's Service on port 8888) hangs forever waiting for it to go Ready.
