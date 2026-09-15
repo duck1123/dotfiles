@@ -6,7 +6,7 @@
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
-    homepage.group = "Notes";
+    homepage.group = "Organization";
 
     storageClassName = "longhorn";
 

@@ -7,6 +7,7 @@
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
+    homepage.group = "Automation";
 
     databaseTarget = "postgresql";
     database = {

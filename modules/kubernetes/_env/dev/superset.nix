@@ -25,7 +25,7 @@
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
-    homepage.group = "Apps";
+    homepage.group = "Analytics";
 
     # One SQL Lab connection per database on the shared postgres instance (Postgres has
     # no cross-database queries, so one connection can't cover all of them -- see

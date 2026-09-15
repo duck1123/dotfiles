@@ -37,7 +37,7 @@
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
-    homepage.group = "Finance";
+    homepage.group = "Organization";
 
     storageClassName = "longhorn";
 

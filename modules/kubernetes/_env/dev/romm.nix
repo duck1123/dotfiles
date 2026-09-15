@@ -18,6 +18,7 @@
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
+    homepage.group = "Media";
 
     metadata.igdb = {
       enable = true;

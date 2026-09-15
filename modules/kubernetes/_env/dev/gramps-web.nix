@@ -11,6 +11,7 @@
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
+    homepage.group = "Organization";
 
     # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
     # -- see docs/pinned-volumes.md. Specific to this cluster.
