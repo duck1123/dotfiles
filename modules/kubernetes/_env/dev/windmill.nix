@@ -17,6 +17,11 @@
     storageClassName = "longhorn";
     replicas = 1;
 
+    # nfsTarget defaults to "nas" and nfsSubPath defaults to "", so this mounts
+    # the whole nasnix media export at /media in both worker deployments --
+    # the same library every *arr app sees.
+    nfs.enable = true;
+
     inherit (secrets.windmill) superadminSecret superadminEmail superadminPassword;
 
     # One Windmill resource per database on the shared postgres instance,

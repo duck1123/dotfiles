@@ -200,6 +200,11 @@
         inherit name;
         uses-ingress = true;
         uses-database = true;
+        # nfsSubPath left at its "" default, so cfg.nfs.path resolves to the
+        # whole nfsTarget basePath (all of nasnix:/mnt/media) rather than one
+        # category subfolder -- windmill workers get the same media library
+        # every *arr app sees, not a curated slice of it.
+        uses-nfs = true;
 
         # Store only the raw password; init container builds DATABASE_URL at runtime with proper URL encoding.
         sopsSecrets =
@@ -518,6 +523,12 @@
                                 mountPath = "/var/lib/nix-scratch";
                                 name = "nix-scratch";
                               }
+                            ]
+                            ++ lib.optionals cfg.nfs.enable [
+                              {
+                                mountPath = "/media";
+                                name = "media";
+                              }
                             ];
                         }
                       )
@@ -542,6 +553,12 @@
                         # NIX_CONFIG `store` setting above.
                         name = "nix-scratch";
                         emptyDir = { };
+                      }
+                    ]
+                    ++ lib.optionals cfg.nfs.enable [
+                      {
+                        name = "media";
+                        persistentVolumeClaim.claimName = "${name}-${name}-media";
                       }
                     ];
                   };
@@ -735,6 +752,12 @@
                               mountPath = "/var/lib/nix-scratch";
                               name = "nix-scratch";
                             }
+                          ]
+                          ++ lib.optionals cfg.nfs.enable [
+                            {
+                              mountPath = "/media";
+                              name = "media";
+                            }
                           ];
                         }
                       )
@@ -755,6 +778,12 @@
                       {
                         name = "nix-scratch";
                         emptyDir = { };
+                      }
+                    ]
+                    ++ lib.optionals cfg.nfs.enable [
+                      {
+                        name = "media";
+                        persistentVolumeClaim.claimName = "${name}-${name}-media";
                       }
                     ];
                   };
@@ -811,6 +840,35 @@
             };
 
             type = "ClusterIP";
+          };
+        }
+        // lib.optionalAttrs cfg.nfs.enable {
+          persistentVolumes."${name}-${name}-media-nfs" = {
+            apiVersion = "v1";
+            kind = "PersistentVolume";
+            metadata.name = "${name}-${name}-media-nfs";
+            spec = {
+              capacity.storage = "1Ti";
+              accessModes = [ "ReadWriteMany" ];
+              mountOptions = [
+                "nolock"
+                "noexec"
+                "soft"
+                "timeo=30"
+              ];
+              nfs = {
+                server = cfg.nfs.server;
+                path = cfg.nfs.path;
+              };
+              persistentVolumeReclaimPolicy = "Retain";
+            };
+          };
+
+          persistentVolumeClaims."${name}-${name}-media".spec = {
+            accessModes = [ "ReadWriteMany" ];
+            resources.requests.storage = "1Gi";
+            storageClassName = "";
+            volumeName = "${name}-${name}-media-nfs";
           };
         }
         // lib.optionalAttrs (cfg.superadminSecret != "") {
