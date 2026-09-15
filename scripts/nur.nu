@@ -469,8 +469,11 @@ export def "nur k8s push" [] {
   ^sh scripts/k8s-push-manifests.sh
 }
 
-# Build manifests and push to private repo (switch-charts + push)
+# Build manifests and push to private repo (sync + switch-charts + push).
+# Syncing first keeps the local checkout from being stale relative to origin,
+# so `git push` in `nur k8s push` doesn't get rejected as non-fast-forward.
 export def "nur k8s deploy" [] {
+  nur k8s manifests sync
   nur k8s switch-charts
   nur k8s push
 }
