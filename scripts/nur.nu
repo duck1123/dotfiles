@@ -164,7 +164,7 @@ export def "nur build" [
   }
 
   if $targets.k8s {
-    nur k8s switch-charts
+    if $fallback { nur k8s switch-charts --fallback } else { nur k8s switch-charts }
   }
 }
 
@@ -460,8 +460,12 @@ export def "nur k8s manifests sync" []: nothing -> nothing {
 }
 
 # Build nixidy manifests and write to kubernetes/manifests/
-export def "nur k8s switch-charts" [] {
-  ^sh scripts/k8s-switch-charts.sh
+export def "nur k8s switch-charts" [
+  --fallback  # Pass --fallback to the underlying nix build (rebuild locally if a substituter is unavailable)
+] {
+  with-env {FALLBACK: ($fallback | into string)} {
+    ^sh scripts/k8s-switch-charts.sh
+  }
 }
 
 # Commit and push generated manifests to the private manifests repo

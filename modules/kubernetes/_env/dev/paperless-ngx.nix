@@ -1,7 +1,7 @@
 { secrets, ... }:
 {
   services.paperless-ngx = {
-    enable = false;
+    enable = true;
 
     databaseTarget = "postgresql";
 

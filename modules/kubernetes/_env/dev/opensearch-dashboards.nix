@@ -1,7 +1,7 @@
 { ... }:
 {
   services.opensearch-dashboards = {
-    enable = false;
+    enable = true;
 
     ingressProvider = "traefik-lan";
 

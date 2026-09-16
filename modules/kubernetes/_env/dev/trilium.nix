@@ -1,7 +1,7 @@
 { secrets, ... }:
 {
   services.trilium = {
-    enable = true;
+    enable = false;
     apiKey = secrets.trilium.key;
 
     ingressProvider = "traefik-lan";

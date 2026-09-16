@@ -15,6 +15,7 @@ DOTFILES_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 MANIFESTS_DIR="$DOTFILES_ROOT/kubernetes/manifests"
 SYSTEM="${SYSTEM:-x86_64-linux}"
 SHOW_TRACE="${SHOW_TRACE:-false}"
+FALLBACK="${FALLBACK:-false}"
 
 if [[ ! -d "$MANIFESTS_DIR/.git" ]]; then
   echo "ERROR: $MANIFESTS_DIR is not a git repository." >&2
@@ -42,6 +43,9 @@ export DECRYPTED_SECRET_FILE="$TMP"
 EXTRA_ARGS=()
 if [[ "$SHOW_TRACE" == "true" ]]; then
   EXTRA_ARGS+=(--show-trace)
+fi
+if [[ "$FALLBACK" == "true" ]]; then
+  EXTRA_ARGS+=(--fallback)
 fi
 
 echo "Building nixidy activation package..."
