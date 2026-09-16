@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # mkArgoApp
   #
   # Takes the current config and lib and returns a function that creates a nixidy application with defaults
@@ -129,9 +128,9 @@
         else
           lib.mapAttrsToList (secretName: data: {
             inherit secretName;
+            inherit (cfg) namespace;
             app = name;
-            namespace = cfg.namespace;
-            values = if data ? values then data.values else data;
+            values = data.values or data;
           }) combinedSopsSecrets;
 
       # Inject hostAffinity nodeSelector into all deployment and statefulSet pod specs
@@ -605,10 +604,10 @@
             (mkIf (combinedSopsSecrets != { }) {
               services.${name} = {
                 sopsSecretsManifest = lib.mapAttrsToList (sn: data: {
+                  inherit (cfg) namespace;
                   app = name;
                   secretName = sn;
-                  namespace = cfg.namespace;
-                  keys = lib.attrNames (if data ? values then data.values else data);
+                  keys = lib.attrNames (data.values or data);
                 }) combinedSopsSecrets;
                 sopsSecretsSpec = secretSpecsList;
               };

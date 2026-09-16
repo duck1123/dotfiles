@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # because I want yaml, not "um, json is valid yaml actually"
   flake.lib.toYAML =
     { pkgs, value }:

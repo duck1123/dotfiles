@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.argo-workflows =
     {
       config,

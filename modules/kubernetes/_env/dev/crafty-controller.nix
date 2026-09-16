@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.crafty-controller = {
     enable = false;
 

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # https://www.keycloak.org/
   flake.nixidyApps.keycloak =
     {

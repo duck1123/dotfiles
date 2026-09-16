@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.autokuma =
     {
       config,
@@ -84,24 +83,25 @@
         inherit name;
 
         extraOptions = {
-          kuma.url = mkOption {
-            description = mdDoc "Uptime Kuma URL (Socket.IO endpoint) AutoKuma connects to.";
-            type = types.str;
-            default = "http://uptime-kuma.uptime-kuma:3001";
-          };
+          kuma = {
+            url = mkOption {
+              description = mdDoc "Uptime Kuma URL (Socket.IO endpoint) AutoKuma connects to.";
+              type = types.str;
+              default = "http://uptime-kuma.uptime-kuma:3001";
+            };
 
-          kuma.username = mkOption {
-            description = mdDoc "Uptime Kuma login username. Stored in a SOPS secret.";
-            type = types.str;
-            default = "";
-          };
+            username = mkOption {
+              description = mdDoc "Uptime Kuma login username. Stored in a SOPS secret.";
+              type = types.str;
+              default = "";
+            };
 
-          kuma.password = mkOption {
-            description = mdDoc "Uptime Kuma login password. Stored in a SOPS secret.";
-            type = types.str;
-            default = "";
+            password = mkOption {
+              description = mdDoc "Uptime Kuma login password. Stored in a SOPS secret.";
+              type = types.str;
+              default = "";
+            };
           };
-
         };
 
         sopsSecrets =

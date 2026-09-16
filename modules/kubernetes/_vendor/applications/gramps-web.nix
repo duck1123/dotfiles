@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.gramps-web =
     {
       config,
@@ -226,7 +225,7 @@
                     containers = [
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         env = sharedEnv;
                         ports = [
@@ -240,7 +239,7 @@
                       }
                       {
                         name = "${name}-celery";
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         # `args`, not `command` -- k8s `command` overrides the image's
                         # ENTRYPOINT (docker-entrypoint.sh), which is what generates/exports

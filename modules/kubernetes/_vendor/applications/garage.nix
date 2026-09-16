@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.garage =
     {
       config,
@@ -173,8 +172,8 @@
                 accessModes = [ "ReadWriteOnce" ];
                 storageClassName = "";
                 claimRef = {
+                  inherit (cfg) namespace;
                   name = "${name}-data";
-                  namespace = cfg.namespace;
                 };
                 mountOptions = [
                   "nolock"
@@ -252,7 +251,7 @@
                     containers = [
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         command = [
                           "/garage"

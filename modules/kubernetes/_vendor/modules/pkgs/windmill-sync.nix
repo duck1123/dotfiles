@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   perSystem =
     { pkgs, ... }:
     let
@@ -25,51 +24,53 @@
       };
     in
     {
-      # nix build .#wmill-cli
-      packages.wmill-cli = wmill-cli;
+      packages = {
+        # nix build .#wmill-cli
+        inherit wmill-cli;
 
-      # nix build .#windmill-sync-bundle
-      # symlinkJoin of the wmill CLI, the shell tools the sync job's script
-      # needs, and applications/windmill/wmill (this repo's declarative
-      # resources/scripts/flows/variables tree) at share/windmill-wmill --
-      # same self-referential-flake bundling as applications/duck1123's
-      # site+python3 and applications/nostrarchives's compiled binary. Since
-      # nix-csi fetches this flake fresh from GitHub, the synced content
-      # always reflects the last-*pushed* commit, not local uncommitted edits.
-      packages.windmill-sync-bundle = pkgs.symlinkJoin {
-        name = "windmill-sync-bundle";
-        paths = [
-          wmill-cli
-          pkgs.bash
-          pkgs.curl
-          pkgs.jq
-          pkgs.coreutils
-          (pkgs.runCommand "windmill-wmill-config" { } ''
-            mkdir -p $out/share
-            cp -r ${../../applications/windmill/wmill} $out/share/windmill-wmill
-          '')
-        ];
-      };
+        # nix build .#windmill-sync-bundle
+        # symlinkJoin of the wmill CLI, the shell tools the sync job's script
+        # needs, and applications/windmill/wmill (this repo's declarative
+        # resources/scripts/flows/variables tree) at share/windmill-wmill --
+        # same self-referential-flake bundling as applications/duck1123's
+        # site+python3 and applications/nostrarchives's compiled binary. Since
+        # nix-csi fetches this flake fresh from GitHub, the synced content
+        # always reflects the last-*pushed* commit, not local uncommitted edits.
+        windmill-sync-bundle = pkgs.symlinkJoin {
+          name = "windmill-sync-bundle";
+          paths = [
+            wmill-cli
+            pkgs.bash
+            pkgs.curl
+            pkgs.jq
+            pkgs.coreutils
+            (pkgs.runCommand "windmill-wmill-config" { } ''
+              mkdir -p $out/share
+              cp -r ${../../applications/windmill/wmill} $out/share/windmill-wmill
+            '')
+          ];
+        };
 
-      # nix build .#windmill-worker-native-tools
-      # Mounted at /nix inside the windmill-worker-native container
-      # (applications/windmill/default.nix) so "native"-tagged Windmill
-      # scripts have a small toolset to work with beyond the windmill-labs
-      # image itself. Resolved via the same storePath convention as
-      # windmill-sync-bundle above -- see that package's comment, and
-      # applications/duck1123/default.nix's duck1123Runtime, for why this is
-      # a real flake package rather than a nixExpr string.
-      packages.windmill-worker-native-tools = pkgs.buildEnv {
-        name = "windmill-worker-native-tools";
-        paths = with pkgs; [
-          bash
-          coreutils
-          git
-          curl
-          jq
-          nushell
-          nix
-        ];
+        # nix build .#windmill-worker-native-tools
+        # Mounted at /nix inside the windmill-worker-native container
+        # (applications/windmill/default.nix) so "native"-tagged Windmill
+        # scripts have a small toolset to work with beyond the windmill-labs
+        # image itself. Resolved via the same storePath convention as
+        # windmill-sync-bundle above -- see that package's comment, and
+        # applications/duck1123/default.nix's duck1123Runtime, for why this is
+        # a real flake package rather than a nixExpr string.
+        windmill-worker-native-tools = pkgs.buildEnv {
+          name = "windmill-worker-native-tools";
+          paths = with pkgs; [
+            bash
+            coreutils
+            git
+            curl
+            jq
+            nushell
+            nix
+          ];
+        };
       };
     };
 }

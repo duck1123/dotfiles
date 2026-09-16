@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # mkPinnedVolume
   #
   # Returns a { persistentVolumeClaims; persistentVolumes; } fragment binding

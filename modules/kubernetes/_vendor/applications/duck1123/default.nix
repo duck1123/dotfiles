@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.duck1123 =
     {
       config,
@@ -124,7 +123,7 @@
               ports = [
                 {
                   name = "http";
-                  port = port;
+                  inherit port;
                   targetPort = port;
                   protocol = "TCP";
                 }

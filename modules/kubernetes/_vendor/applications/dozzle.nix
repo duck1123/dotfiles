@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.dozzle =
     {
       config,
@@ -54,8 +53,7 @@
         serviceAccounts = {
           ${name} = {
             metadata = {
-              name = name;
-              namespace = cfg.namespace;
+              inherit (cfg) name namespace;
             };
           };
         };
@@ -63,7 +61,7 @@
         clusterRoles = {
           ${name} = {
             metadata = {
-              name = name;
+              inherit name;
             };
             rules = [
               {
@@ -102,19 +100,19 @@
         clusterRoleBindings = {
           ${name} = {
             metadata = {
-              name = name;
+              inherit name;
             };
             roleRef = {
+              inherit name;
               apiGroup = "rbac.authorization.k8s.io";
               kind = "ClusterRole";
-              name = name;
             };
             subjects = [
               {
+                inherit name;
+                inherit (cfg) namespace;
                 apiGroup = "";
                 kind = "ServiceAccount";
-                name = name;
-                namespace = cfg.namespace;
               }
             ];
           };
@@ -146,7 +144,7 @@
                   containers = [
                     {
                       inherit name;
-                      image = cfg.image;
+                      inherit (cfg) image;
                       imagePullPolicy = "IfNotPresent";
                       env = [
                         {

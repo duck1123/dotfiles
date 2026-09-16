@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.memos = {
     enable = false;
     # hostAffinity = "edgenix";

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.radarr =
     {
       config,
@@ -151,7 +150,7 @@
               };
 
               spec = {
-                replicas = cfg.replicas;
+                inherit (cfg) replicas;
                 selector.matchLabels = {
                   "app.kubernetes.io/instance" = name;
                   "app.kubernetes.io/name" = name;
@@ -169,7 +168,7 @@
                     containers = [
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         env = [
                           {
@@ -388,8 +387,8 @@
           services.${name}.spec = {
             ports = [
               {
+                inherit (cfg.service) port;
                 name = "http";
-                port = cfg.service.port;
                 protocol = "TCP";
                 targetPort = "http";
               }
@@ -404,18 +403,14 @@
           };
 
           # Create NFS PersistentVolumes for downloads and movies when NFS is enabled
-          persistentVolumes = lib.optionalAttrs (cfg.nfs.enable) {
+          persistentVolumes = lib.optionalAttrs cfg.nfs.enable {
             "${name}-${name}-downloads-nfs" = {
               apiVersion = "v1";
               kind = "PersistentVolume";
-              metadata = {
-                name = "${name}-${name}-downloads-nfs";
-              };
+              metadata.name = "${name}-${name}-downloads-nfs";
               spec = {
-                capacity = {
-                  storage = "1Ti";
-                };
                 accessModes = [ "ReadWriteMany" ];
+                capacity.storage = "1Ti";
                 mountOptions = [
                   "nolock"
                   "noexec"

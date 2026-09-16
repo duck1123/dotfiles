@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.hivemq =
     {
       config,
@@ -77,7 +76,7 @@
           };
 
           spec = {
-            replicas = svc.replicas;
+            inherit (svc) replicas;
             strategy.type = "Recreate";
 
             selector.matchLabels = {
@@ -99,7 +98,7 @@
                 containers = [
                   {
                     inherit name;
-                    image = svc.image;
+                    inherit (svc) image;
                     imagePullPolicy = "IfNotPresent";
 
                     ports = [
@@ -181,7 +180,7 @@
           type = svc.serviceType;
         }
         // optionalAttrs (svc.loadBalancerIP != null) {
-          loadBalancerIP = svc.loadBalancerIP;
+          inherit (svc) loadBalancerIP;
         };
 
         persistentVolumeClaims."${name}-${name}-data".spec = {

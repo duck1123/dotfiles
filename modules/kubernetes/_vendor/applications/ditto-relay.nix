@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.ditto-relay =
     {
       config,
@@ -162,7 +161,7 @@
                       readinessProbe = {
                         httpGet = {
                           path = "/";
-                          port = port;
+                          inherit port;
                         };
                         initialDelaySeconds = 10;
                         periodSeconds = 10;
@@ -172,7 +171,7 @@
                       livenessProbe = {
                         httpGet = {
                           path = "/";
-                          port = port;
+                          inherit port;
                         };
                         initialDelaySeconds = 30;
                         periodSeconds = 30;
@@ -211,7 +210,7 @@
               ports = [
                 {
                   name = "http";
-                  port = port;
+                  inherit port;
                   targetPort = port;
                   protocol = "TCP";
                 }

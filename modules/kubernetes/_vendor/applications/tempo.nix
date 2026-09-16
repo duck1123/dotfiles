@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.tempo =
     {
       charts,
@@ -19,8 +18,8 @@
 
       defaultValues = cfg: {
         persistence = {
+          inherit (cfg) storageClassName;
           enabled = true;
-          storageClassName = cfg.storageClassName;
         };
 
         tempo.retention = "72h";

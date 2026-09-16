@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.homepage =
     {
       config,
@@ -208,7 +207,7 @@
               };
 
               spec = {
-                replicas = cfg.replicas;
+                inherit (cfg) replicas;
                 strategy.type = "Recreate";
                 selector.matchLabels = labels;
 
@@ -218,7 +217,7 @@
                     initContainers = [
                       {
                         name = "config-init";
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         # homepage lazily copies its own bundled skeleton default
                         # for whatever config file it needs the first time it's
@@ -254,7 +253,7 @@
                     containers = [
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         # ping issues real ICMP echo requests, which needs raw-socket
                         # access the container doesn't have by default.

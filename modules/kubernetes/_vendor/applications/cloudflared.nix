@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.cloudflared =
     {
       config,
@@ -82,7 +81,7 @@
           cfg:
           optionalAttrs (cfg.tunnelToken != "") {
             deployments.${name}.spec = {
-              replicas = cfg.replicas;
+              inherit (cfg) replicas;
               selector.matchLabels = labels;
               template = {
                 metadata.labels = labels;

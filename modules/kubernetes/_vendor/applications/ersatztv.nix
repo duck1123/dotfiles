@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.ersatztv =
     {
       config,
@@ -85,8 +84,8 @@
 
                   initContainers = [
                     {
+                      inherit (cfg) image;
                       name = "db-init";
-                      image = cfg.image;
                       imagePullPolicy = "IfNotPresent";
                       command = [ "sh" ];
                       args = [
@@ -105,7 +104,7 @@
                   containers = [
                     {
                       inherit name;
-                      image = cfg.image;
+                      inherit (cfg) image;
                       imagePullPolicy = "IfNotPresent";
                       env = [
                         {

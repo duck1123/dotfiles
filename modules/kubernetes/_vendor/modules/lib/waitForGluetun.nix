@@ -1,7 +1,6 @@
-{ ... }:
-{
+_: {
   flake.lib.waitForGluetun =
-    { ... }:
+    _:
     # Creates an init container that waits for gluetun to be ready.
     # Uses the proxy (8888) rather than the auth-protected control API (8000).
     # gluetunService: service name, e.g. "gluetun.gluetun"

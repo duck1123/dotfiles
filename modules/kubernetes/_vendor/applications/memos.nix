@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.memos =
     {
       config,
@@ -109,7 +108,7 @@
                   tls = [
                     {
                       hosts = [ domain ];
-                      secretName = tls.secretName;
+                      inherit (tls) secretName;
                     }
                   ];
                 };

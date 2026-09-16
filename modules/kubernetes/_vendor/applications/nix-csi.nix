@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.nix-csi =
     {
       config,
@@ -65,18 +64,25 @@
                 { _module.args.curPkgs = mkForce nixcsi.pkgs; }
                 {
                   nix-csi = {
-                    authorizedKeys = cfg.authorizedKeys;
-                    cache.storageClassName = cfg.cache.storageClassName;
-                    # Bootstrap components (cache-init-env, proxy-env, etc.) aren't
-                    # published to nix-csi.cachix.org for every commit — our own
-                    # cache closes that gap so cold-starts don't depend on upstream CI.
-                    cache.nixConfig.settings = cacheSettings;
+                    inherit (cfg) authorizedKeys;
+
+                    builders = {
+                      # Gives cache/node/proxy a local-build fallback (via SSH-ng,
+                      # discovered dynamically by builders.py) for bootstrap *-init-env
+                      # paths that are missing from Attic, instead of hard-failing.
+                      deployments.amd64.enable = true;
+                      nixConfig.settings = atticSettings;
+                    };
+
+                    cache = {
+                      # Bootstrap components (cache-init-env, proxy-env, etc.) aren't
+                      # published to nix-csi.cachix.org for every commit — our own
+                      # cache closes that gap so cold-starts don't depend on upstream CI.
+                      nixConfig.settings = cacheSettings;
+                      storageClassName = cfg.cache.storageClassName;
+                    };
+
                     node.nixConfig.settings = atticSettings;
-                    builders.nixConfig.settings = atticSettings;
-                    # Gives cache/node/proxy a local-build fallback (via SSH-ng,
-                    # discovered dynamically by builders.py) for bootstrap *-init-env
-                    # paths that are missing from Attic, instead of hard-failing.
-                    builders.deployments.amd64.enable = true;
                   };
                 }
               ];

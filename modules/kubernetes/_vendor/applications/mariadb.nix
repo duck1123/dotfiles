@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.mariadb =
     {
       config,
@@ -49,26 +48,28 @@
             };
           };
 
-        sopsSecrets = cfg: {
-          ${password-secret} = {
-            "root-password" = cfg.auth.rootPassword;
-            "user-password" = cfg.auth.password;
-            username = cfg.auth.username;
-            database = cfg.auth.database;
+        sopsSecrets =
+          cfg:
+          {
+            ${password-secret} = {
+              "root-password" = cfg.auth.rootPassword;
+              "user-password" = cfg.auth.password;
+              username = cfg.auth.username;
+              database = cfg.auth.database;
+            };
+          }
+          // lib.optionalAttrs (cfg.extraDatabases != [ ]) {
+            # One key per extra database, e.g. "booklore-password" -- kept out
+            # of the customScripts ConfigMap (which is plaintext, committed to
+            # git) and injected into the mariadb container as env vars instead
+            # (see defaultValues.env below and extraDbEnvVar).
+            ${extra-db-secret} = lib.listToAttrs (
+              map (db: {
+                name = "${db.name}-password";
+                value = db.password;
+              }) cfg.extraDatabases
+            );
           };
-        }
-        // lib.optionalAttrs (cfg.extraDatabases != [ ]) {
-          # One key per extra database, e.g. "booklore-password" -- kept out
-          # of the customScripts ConfigMap (which is plaintext, committed to
-          # git) and injected into the mariadb container as env vars instead
-          # (see defaultValues.env below and extraDbEnvVar).
-          ${extra-db-secret} = lib.listToAttrs (
-            map (db: {
-              name = "${db.name}-password";
-              value = db.password;
-            }) cfg.extraDatabases
-          );
-        };
 
         # https://github.com/groundhog2k/helm-charts (chart "mariadb") -- bitnami/mariadb
         # was frozen behind Bitnami's Aug 2025 paid-tier restructuring (both the chart and

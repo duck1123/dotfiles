@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.openldap =
     { config, lib, ... }:
     let
@@ -52,7 +51,7 @@
       };
 
       values = lib.attrsets.recursiveUpdate defaultValues cfg.values;
-      namespace = cfg.namespace;
+      inherit (cfg) namespace;
     in
     with lib;
     {

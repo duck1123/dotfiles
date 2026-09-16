@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.uptime-kuma =
     {
       config,
@@ -59,7 +58,7 @@
                 containers = [
                   {
                     inherit name;
-                    image = cfg.image;
+                    inherit (cfg) image;
                     imagePullPolicy = "IfNotPresent";
 
                     ports = [

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.xyops =
     {
       config,
@@ -279,7 +278,7 @@
                     containers = [
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         env = envVars;
 

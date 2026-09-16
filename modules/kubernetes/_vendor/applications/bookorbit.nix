@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.bookorbit =
     {
       config,
@@ -133,7 +132,7 @@
                   containers = [
                     {
                       inherit name;
-                      image = cfg.image;
+                      inherit (cfg) image;
                       imagePullPolicy = "IfNotPresent";
                       env = [
                         {
@@ -296,31 +295,30 @@
             };
           };
 
-          persistentVolumeClaims =
-            {
-              "${name}-${name}-books".spec =
-                if cfg.nfs.enable then
-                  {
-                    accessModes = [ "ReadWriteMany" ];
-                    resources.requests.storage = "1Gi";
-                    storageClassName = "";
-                    volumeName = "${name}-${name}-books-nfs";
-                  }
-                else
-                  {
-                    inherit (cfg) storageClassName;
-                    accessModes = [ "ReadWriteOnce" ];
-                    resources.requests.storage = "100Gi";
-                  };
-            }
-            // optionalAttrs (cfg.nfs.enable && cfg.nfs.audiobooksPath != "") {
-              "${name}-${name}-audiobooks".spec = {
-                accessModes = [ "ReadWriteMany" ];
-                resources.requests.storage = "1Gi";
-                storageClassName = "";
-                volumeName = "${name}-${name}-audiobooks-nfs";
-              };
+          persistentVolumeClaims = {
+            "${name}-${name}-books".spec =
+              if cfg.nfs.enable then
+                {
+                  accessModes = [ "ReadWriteMany" ];
+                  resources.requests.storage = "1Gi";
+                  storageClassName = "";
+                  volumeName = "${name}-${name}-books-nfs";
+                }
+              else
+                {
+                  inherit (cfg) storageClassName;
+                  accessModes = [ "ReadWriteOnce" ];
+                  resources.requests.storage = "100Gi";
+                };
+          }
+          // optionalAttrs (cfg.nfs.enable && cfg.nfs.audiobooksPath != "") {
+            "${name}-${name}-audiobooks".spec = {
+              accessModes = [ "ReadWriteMany" ];
+              resources.requests.storage = "1Gi";
+              storageClassName = "";
+              volumeName = "${name}-${name}-audiobooks-nfs";
             };
+          };
 
           services.${name}.spec = {
             ports = [

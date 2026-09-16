@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.gluetun =
     {
       config,
@@ -47,9 +46,8 @@
                   ));
               in
               {
-                username = cfg.controlServer.username;
-                password = cfg.controlServer.password;
-                authHeader = authHeader;
+                inherit authHeader;
+                inherit (cfg.controlServer) username password;
               };
           };
 

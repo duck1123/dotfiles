@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.pinchflat =
     {
       config,
@@ -66,7 +65,7 @@
                 containers = [
                   {
                     inherit name;
-                    image = cfg.image;
+                    inherit (cfg) image;
                     imagePullPolicy = "IfNotPresent";
                     env = lib.optionals (cfg.secretKeyBase != "") [
                       {

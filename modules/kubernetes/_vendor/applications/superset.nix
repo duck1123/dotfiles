@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.superset =
     {
       config,
@@ -75,7 +74,13 @@
             ${connections-secret} = {
               CONNECTIONS_JSON = builtins.toJSON (
                 map (c: {
-                  inherit (c) name host port username password;
+                  inherit (c)
+                    name
+                    host
+                    port
+                    username
+                    password
+                    ;
                 }) cfg.reportingConnections
               );
             };
@@ -275,168 +280,169 @@
         };
 
         extraResources = cfg: {
-          jobs = optionalAttrs (cfg.admin.password != "") {
-            "${name}-create-admin" = {
-              metadata.annotations = {
-                "argocd.argoproj.io/hook" = "Sync";
-                "argocd.argoproj.io/hook-delete-policy" = "BeforeHookCreation,HookSucceeded";
-                # Runs after the chart's own init-db job (implicit wave "0") has upgraded the
-                # schema and initialized roles -- ArgoCD waits for wave 0 to be Healthy (the
-                # init-db Job Succeeded) before starting wave 1.
-                "argocd.argoproj.io/sync-wave" = "1";
+          jobs =
+            optionalAttrs (cfg.admin.password != "") {
+              "${name}-create-admin" = {
+                metadata.annotations = {
+                  "argocd.argoproj.io/hook" = "Sync";
+                  "argocd.argoproj.io/hook-delete-policy" = "BeforeHookCreation,HookSucceeded";
+                  # Runs after the chart's own init-db job (implicit wave "0") has upgraded the
+                  # schema and initialized roles -- ArgoCD waits for wave 0 to be Healthy (the
+                  # init-db Job Succeeded) before starting wave 1.
+                  "argocd.argoproj.io/sync-wave" = "1";
+                };
+                spec = {
+                  backoffLimit = 3;
+                  template.spec = {
+                    restartPolicy = "OnFailure";
+                    securityContext.runAsUser = 0;
+                    containers = [
+                      {
+                        name = "create-admin";
+                        image = "apachesuperset.docker.scarf.sh/apache/superset:${cfg.imageTag}";
+                        imagePullPolicy = "IfNotPresent";
+                        envFrom = [ { secretRef.name = env-secret; } ];
+                        env = [
+                          {
+                            name = "ADMIN_USERNAME";
+                            valueFrom.secretKeyRef = {
+                              name = admin-secret;
+                              key = "username";
+                            };
+                          }
+                          {
+                            name = "ADMIN_EMAIL";
+                            valueFrom.secretKeyRef = {
+                              name = admin-secret;
+                              key = "email";
+                            };
+                          }
+                          {
+                            name = "ADMIN_PASSWORD";
+                            valueFrom.secretKeyRef = {
+                              name = admin-secret;
+                              key = "password";
+                            };
+                          }
+                        ];
+                        command = [
+                          "/bin/sh"
+                          "-c"
+                          ''
+                            . /app/pythonpath/superset_bootstrap.sh
+                            superset fab create-admin \
+                              --username "$ADMIN_USERNAME" \
+                              --firstname Superset \
+                              --lastname Admin \
+                              --email "$ADMIN_EMAIL" \
+                              --password "$ADMIN_PASSWORD" || true
+                          ''
+                        ];
+                        volumeMounts = [
+                          {
+                            name = "superset-config";
+                            mountPath = "/app/pythonpath";
+                            readOnly = true;
+                          }
+                        ];
+                      }
+                    ];
+                    volumes = [
+                      {
+                        name = "superset-config";
+                        secret.secretName = "${name}-config";
+                      }
+                    ];
+                  };
+                };
               };
-              spec = {
-                backoffLimit = 3;
-                template.spec = {
-                  restartPolicy = "OnFailure";
-                  securityContext.runAsUser = 0;
-                  containers = [
-                    {
-                      name = "create-admin";
-                      image = "apachesuperset.docker.scarf.sh/apache/superset:${cfg.imageTag}";
-                      imagePullPolicy = "IfNotPresent";
-                      envFrom = [ { secretRef.name = env-secret; } ];
-                      env = [
-                        {
-                          name = "ADMIN_USERNAME";
-                          valueFrom.secretKeyRef = {
-                            name = admin-secret;
-                            key = "username";
-                          };
-                        }
-                        {
-                          name = "ADMIN_EMAIL";
-                          valueFrom.secretKeyRef = {
-                            name = admin-secret;
-                            key = "email";
-                          };
-                        }
-                        {
-                          name = "ADMIN_PASSWORD";
-                          valueFrom.secretKeyRef = {
-                            name = admin-secret;
-                            key = "password";
-                          };
-                        }
-                      ];
-                      command = [
-                        "/bin/sh"
-                        "-c"
-                        ''
-                          . /app/pythonpath/superset_bootstrap.sh
-                          superset fab create-admin \
-                            --username "$ADMIN_USERNAME" \
-                            --firstname Superset \
-                            --lastname Admin \
-                            --email "$ADMIN_EMAIL" \
-                            --password "$ADMIN_PASSWORD" || true
-                        ''
-                      ];
-                      volumeMounts = [
-                        {
-                          name = "superset-config";
-                          mountPath = "/app/pythonpath";
-                          readOnly = true;
-                        }
-                      ];
-                    }
-                  ];
-                  volumes = [
-                    {
-                      name = "superset-config";
-                      secret.secretName = "${name}-config";
-                    }
-                  ];
+            }
+            // optionalAttrs (cfg.reportingConnections != [ ]) {
+              "${name}-register-connections" = {
+                metadata.annotations = {
+                  "argocd.argoproj.io/hook" = "Sync";
+                  "argocd.argoproj.io/hook-delete-policy" = "BeforeHookCreation,HookSucceeded";
+                  # Same wave as superset-create-admin -- both only need the chart's own
+                  # init-db job (wave "0") to have finished, and don't depend on each other.
+                  "argocd.argoproj.io/sync-wave" = "1";
+                };
+                spec = {
+                  backoffLimit = 3;
+                  template.spec = {
+                    restartPolicy = "OnFailure";
+                    securityContext.runAsUser = 0;
+                    containers = [
+                      {
+                        name = "register-connections";
+                        image = "apachesuperset.docker.scarf.sh/apache/superset:${cfg.imageTag}";
+                        imagePullPolicy = "IfNotPresent";
+                        envFrom = [
+                          { secretRef.name = env-secret; }
+                          { secretRef.name = connections-secret; }
+                        ];
+                        command = [
+                          "/bin/sh"
+                          "-c"
+                          ''
+                            set -e
+                            . /app/pythonpath/superset_bootstrap.sh
+                            python3 - <<'PYEOF'
+                            import json
+                            import os
+
+                            from sqlalchemy.engine import URL
+
+                            from superset.app import create_app
+
+                            app = create_app()
+                            with app.app_context():
+                                from superset import db
+                                from superset.models.core import Database
+
+                                conns = json.loads(os.environ["CONNECTIONS_JSON"])
+                                for c in conns:
+                                    uri = str(
+                                        URL.create(
+                                            "postgresql+psycopg2",
+                                            username=c["username"],
+                                            password=c["password"],
+                                            host=c["host"],
+                                            port=c["port"],
+                                            database=c["name"],
+                                        )
+                                    )
+                                    existing = (
+                                        db.session.query(Database)
+                                        .filter_by(database_name=c["name"])
+                                        .one_or_none()
+                                    )
+                                    if existing is None:
+                                        existing = Database(database_name=c["name"])
+                                        db.session.add(existing)
+                                    existing.set_sqlalchemy_uri(uri)
+                                db.session.commit()
+                            PYEOF
+                          ''
+                        ];
+                        volumeMounts = [
+                          {
+                            name = "superset-config";
+                            mountPath = "/app/pythonpath";
+                            readOnly = true;
+                          }
+                        ];
+                      }
+                    ];
+                    volumes = [
+                      {
+                        name = "superset-config";
+                        secret.secretName = "${name}-config";
+                      }
+                    ];
+                  };
                 };
               };
             };
-          }
-          // optionalAttrs (cfg.reportingConnections != [ ]) {
-            "${name}-register-connections" = {
-              metadata.annotations = {
-                "argocd.argoproj.io/hook" = "Sync";
-                "argocd.argoproj.io/hook-delete-policy" = "BeforeHookCreation,HookSucceeded";
-                # Same wave as superset-create-admin -- both only need the chart's own
-                # init-db job (wave "0") to have finished, and don't depend on each other.
-                "argocd.argoproj.io/sync-wave" = "1";
-              };
-              spec = {
-                backoffLimit = 3;
-                template.spec = {
-                  restartPolicy = "OnFailure";
-                  securityContext.runAsUser = 0;
-                  containers = [
-                    {
-                      name = "register-connections";
-                      image = "apachesuperset.docker.scarf.sh/apache/superset:${cfg.imageTag}";
-                      imagePullPolicy = "IfNotPresent";
-                      envFrom = [
-                        { secretRef.name = env-secret; }
-                        { secretRef.name = connections-secret; }
-                      ];
-                      command = [
-                        "/bin/sh"
-                        "-c"
-                        ''
-                          set -e
-                          . /app/pythonpath/superset_bootstrap.sh
-                          python3 - <<'PYEOF'
-                          import json
-                          import os
-
-                          from sqlalchemy.engine import URL
-
-                          from superset.app import create_app
-
-                          app = create_app()
-                          with app.app_context():
-                              from superset import db
-                              from superset.models.core import Database
-
-                              conns = json.loads(os.environ["CONNECTIONS_JSON"])
-                              for c in conns:
-                                  uri = str(
-                                      URL.create(
-                                          "postgresql+psycopg2",
-                                          username=c["username"],
-                                          password=c["password"],
-                                          host=c["host"],
-                                          port=c["port"],
-                                          database=c["name"],
-                                      )
-                                  )
-                                  existing = (
-                                      db.session.query(Database)
-                                      .filter_by(database_name=c["name"])
-                                      .one_or_none()
-                                  )
-                                  if existing is None:
-                                      existing = Database(database_name=c["name"])
-                                      db.session.add(existing)
-                                  existing.set_sqlalchemy_uri(uri)
-                              db.session.commit()
-                          PYEOF
-                        ''
-                      ];
-                      volumeMounts = [
-                        {
-                          name = "superset-config";
-                          mountPath = "/app/pythonpath";
-                          readOnly = true;
-                        }
-                      ];
-                    }
-                  ];
-                  volumes = [
-                    {
-                      name = "superset-config";
-                      secret.secretName = "${name}-config";
-                    }
-                  ];
-                };
-              };
-            };
-          };
         };
       };
 }

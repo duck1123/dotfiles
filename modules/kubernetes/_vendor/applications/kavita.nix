@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # https://wiki.kavitareader.com/
   flake.nixidyApps.kavita =
     {
@@ -128,14 +127,14 @@
 
         persistentVolumeClaims = {
           "${name}-${name}-books".spec = {
+            inherit (cfg) storageClassName;
             accessModes = [ "ReadWriteOnce" ];
             resources.requests.storage = "5Gi";
-            storageClassName = cfg.storageClassName;
           };
           "${name}-${name}-config".spec = {
+            inherit (cfg) storageClassName;
             accessModes = [ "ReadWriteOnce" ];
             resources.requests.storage = "5Gi";
-            storageClassName = cfg.storageClassName;
           };
         };
 

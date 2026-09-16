@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.booklore = {
     enable = false;
     # hostAffinity = "edgenix";

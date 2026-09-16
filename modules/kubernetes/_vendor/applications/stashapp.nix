@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.stashapp =
     {
       config,
@@ -116,7 +115,7 @@
             };
 
             spec = {
-              replicas = cfg.replicas;
+              inherit (cfg) replicas;
               strategy.type = "Recreate";
               selector.matchLabels = {
                 "app.kubernetes.io/instance" = name;
@@ -138,7 +137,7 @@
                     (
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         env = [
                           {

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.tunarr =
     {
       config,
@@ -130,7 +129,7 @@
               };
 
               spec = {
-                replicas = cfg.replicas;
+                inherit (cfg) replicas;
                 selector.matchLabels = {
                   "app.kubernetes.io/instance" = name;
                   "app.kubernetes.io/name" = name;
@@ -161,7 +160,7 @@
                     containers = [
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         command = [
                           "sh"

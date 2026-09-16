@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.romm =
     {
       config,
@@ -42,9 +41,8 @@
               password = cfg.database.password;
             };
             ${admin-secret} = {
-              username = cfg.admin.username;
-              password = cfg.admin.password;
-              authSecretKey = cfg.authSecretKey;
+              inherit (cfg) authSecretKey;
+              inherit (cfg.admin) username password;
             };
           }
           //
@@ -250,7 +248,7 @@
                   containers = [
                     {
                       inherit name;
-                      image = cfg.image;
+                      inherit (cfg) image;
                       imagePullPolicy = "IfNotPresent";
                       env = [
                         # Try DB_* format (without DATABASE_ prefix)
@@ -588,9 +586,9 @@
                 }
               else
                 {
+                  inherit (cfg) storageClassName;
                   accessModes = [ "ReadWriteOnce" ];
                   resources.requests.storage = "5Gi";
-                  storageClassName = cfg.storageClassName;
                 };
             "${name}-assets".spec =
               if cfg.nfs.enable then
@@ -602,9 +600,9 @@
                 }
               else
                 {
+                  inherit (cfg) storageClassName;
                   accessModes = [ "ReadWriteOnce" ];
                   resources.requests.storage = "5Gi";
-                  storageClassName = cfg.storageClassName;
                 };
             "${name}-resources".spec =
               if cfg.nfs.enable then
@@ -616,9 +614,9 @@
                 }
               else
                 {
+                  inherit (cfg) storageClassName;
                   accessModes = [ "ReadWriteOnce" ];
                   resources.requests.storage = "5Gi";
-                  storageClassName = cfg.storageClassName;
                 };
           };
 

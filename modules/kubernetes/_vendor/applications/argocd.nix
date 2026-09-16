@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.argocd =
     {
       config,

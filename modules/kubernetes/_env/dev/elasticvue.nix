@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.elasticvue = {
     enable = false;
 

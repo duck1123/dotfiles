@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.nocodb =
     {
       config,
@@ -185,7 +184,7 @@
             };
 
             spec = {
-              replicas = cfg.replicas;
+              inherit (cfg) replicas;
 
               strategy.type = "Recreate";
 
@@ -284,7 +283,7 @@
                     (
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         env = [
                           {
@@ -451,8 +450,8 @@
               ];
               tls = [
                 {
+                  inherit (tls) secretName;
                   hosts = [ domain ];
-                  secretName = tls.secretName;
                 }
               ];
             };

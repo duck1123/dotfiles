@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.redis =
     {
       config,
@@ -26,7 +25,7 @@
 
         sopsSecrets = cfg: {
           ${password-secret} = {
-            password = cfg.password;
+            inherit (cfg) password;
           };
         };
 
@@ -81,7 +80,7 @@
                   };
 
                   spec = {
-                    replicas = cfg.replicas;
+                    inherit (cfg) replicas;
                     selector.matchLabels = {
                       "app.kubernetes.io/instance" = name;
                       "app.kubernetes.io/name" = name;
@@ -98,8 +97,8 @@
                         serviceAccountName = "default";
                         containers = [
                           {
+                            inherit (cfg) image;
                             name = "redis";
-                            image = cfg.image;
                             imagePullPolicy = "IfNotPresent";
                             command = [
                               "sh"
@@ -170,8 +169,8 @@
                 redis.spec = {
                   ports = [
                     {
+                      inherit (cfg) port;
                       name = "redis";
-                      port = cfg.port;
                       protocol = "TCP";
                       targetPort = "redis";
                     }
@@ -198,8 +197,8 @@
                       ];
                       containers = [
                         {
+                          inherit (cfg) image;
                           name = "aof-repair";
-                          image = cfg.image;
                           imagePullPolicy = "IfNotPresent";
                           command = [
                             "sh"

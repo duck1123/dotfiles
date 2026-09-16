@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.securo =
     {
       config,
@@ -206,10 +205,9 @@
                     name = "${name}-${suffix}";
                     image = "ghcr.io/securo-finance/securo-backend:${cfg.image.tag}";
                     imagePullPolicy = "IfNotPresent";
-                    inherit command;
+                    inherit command ports;
                     env = backendEnv cfg;
                     volumeMounts = backendVolumeMounts cfg;
-                    ports = ports;
                   }
                 ];
 

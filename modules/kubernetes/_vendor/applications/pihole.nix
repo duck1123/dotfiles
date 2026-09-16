@@ -163,7 +163,7 @@
 
               tls = [
                 {
-                  secretName = tls.secretName;
+                  inherit (cfg.ingress.tls) secretName;
                   hosts = [ domain ];
                 }
               ];

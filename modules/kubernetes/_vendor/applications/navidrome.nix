@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.navidrome =
     {
       config,
@@ -60,7 +59,7 @@
           };
 
           spec = {
-            replicas = cfg.replicas;
+            inherit (cfg) replicas;
             strategy.type = "Recreate";
             selector.matchLabels = {
               "app.kubernetes.io/instance" = name;
@@ -85,7 +84,7 @@
                 containers = [
                   {
                     inherit name;
-                    image = cfg.image;
+                    inherit (cfg) image;
                     imagePullPolicy = "IfNotPresent";
                     env = [
                       {

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.metabase =
     {
       config,
@@ -203,7 +202,13 @@
             ${connections-secret} = {
               CONNECTIONS_JSON = builtins.toJSON (
                 map (c: {
-                  inherit (c) name host port username password;
+                  inherit (c)
+                    name
+                    host
+                    port
+                    username
+                    password
+                    ;
                 }) cfg.reportingConnections
               );
             };

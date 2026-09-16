@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.hivemq = {
     enable = false;
     hostAffinity = "nixmini";

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.elasticvue =
     {
       config,
@@ -68,7 +67,9 @@
             ${clustersSecret}.ELASTICVUE_CLUSTERS = builtins.toJSON (
               map (
                 c:
-                { inherit (c) name uri; }
+                {
+                  inherit (c) name uri;
+                }
                 // optionalAttrs (c.username != "") { inherit (c) username; }
                 // optionalAttrs (c.password != "") { inherit (c) password; }
               ) cfg.clusters
@@ -84,7 +85,7 @@
                 containers = [
                   {
                     inherit name;
-                    image = cfg.image;
+                    inherit (cfg) image;
                     imagePullPolicy = "IfNotPresent";
                     env = lib.optionals (cfg.clusters != [ ]) [
                       {

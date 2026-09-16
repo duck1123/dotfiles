@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.mindsdb =
     {
       config,
@@ -38,7 +37,7 @@
           ];
           tls = mkIf tls.enable [
             {
-              secretName = tls.secretName;
+              inherit (tls) secretName;
               hosts = [ domain ];
             }
           ];

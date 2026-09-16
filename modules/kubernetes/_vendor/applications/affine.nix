@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.affine =
     {
       config,
@@ -102,7 +101,7 @@
                 containers = [
                   {
                     name = "migration";
-                    image = cfg.image;
+                    inherit (cfg) image;
                     imagePullPolicy = "IfNotPresent";
                     command = [
                       "sh"
@@ -157,7 +156,7 @@
                   containers = [
                     {
                       inherit name;
-                      image = cfg.image;
+                      inherit (cfg) image;
                       imagePullPolicy = "IfNotPresent";
                       ports = [
                         {
@@ -277,7 +276,7 @@
             tls = [
               {
                 hosts = [ domain ];
-                secretName = tls.secretName;
+                inherit (tls) secretName;
               }
             ];
           };

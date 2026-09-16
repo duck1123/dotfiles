@@ -1,4 +1,4 @@
-{ ... }:
+_:
 let
   name = "postgresql";
   password-secret = "${name}-password";
@@ -13,8 +13,6 @@ in
       ...
     }:
     with lib;
-    let
-    in
     self.lib.mkArgoApp
       {
         inherit
@@ -279,8 +277,8 @@ in
           jobs = lib.optionalAttrs (cfg.extraDatabases != [ ]) {
             "${name}-init-databases" = {
               metadata = {
+                inherit (cfg) namespace;
                 name = "${name}-init-databases";
-                namespace = cfg.namespace;
                 annotations = {
                   "argocd.argoproj.io/hook" = "PostSync";
                   "argocd.argoproj.io/hook-delete-policy" = "HookSucceeded";
@@ -293,7 +291,7 @@ in
                     containers = [
                       {
                         name = "init-databases";
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         env = [
                           {
@@ -376,7 +374,7 @@ in
             "${name}-backup" = {
               metadata = {
                 name = "${name}-backup";
-                namespace = cfg.namespace;
+                inherit (cfg) namespace;
                 labels = {
                   "app.kubernetes.io/name" = name;
                   "app.kubernetes.io/component" = "backup";
@@ -394,7 +392,7 @@ in
                         containers = [
                           {
                             name = "backup";
-                            image = cfg.image;
+                            inherit (cfg) image;
                             command = [
                               "sh"
                               "-c"

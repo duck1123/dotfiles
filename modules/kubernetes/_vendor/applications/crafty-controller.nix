@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.crafty-controller =
     {
       config,
@@ -119,7 +118,7 @@
           }) mcPorts;
           mcServicePorts = map (port: {
             name = "mc-${toString port}";
-            port = port;
+            inherit port;
             protocol = "TCP";
             targetPort = "mc-${toString port}";
           }) mcPorts;
@@ -132,7 +131,7 @@
             };
 
             spec = {
-              replicas = cfg.replicas;
+              inherit (cfg) replicas;
               strategy.type = "Recreate";
               selector.matchLabels = {
                 "app.kubernetes.io/instance" = name;
@@ -152,7 +151,7 @@
                   containers = [
                     {
                       inherit name;
-                      image = cfg.image;
+                      inherit (cfg) image;
                       imagePullPolicy = "IfNotPresent";
 
                       env = [
@@ -248,42 +247,41 @@
             };
           };
 
-          services.${name}.spec =
-            {
-              ports = [
-                {
-                  name = "panel";
-                  port = cfg.panelPort;
-                  protocol = "TCP";
-                  targetPort = "panel";
-                }
-                {
-                  name = "dynmap";
-                  port = cfg.dynmapPort;
-                  protocol = "TCP";
-                  targetPort = "dynmap";
-                }
-              ]
-              ++ mcServicePorts
-              ++ lib.optionals cfg.enableBedrock [
-                {
-                  name = "bedrock";
-                  port = cfg.bedrockPort;
-                  protocol = "UDP";
-                  targetPort = "bedrock";
-                }
-              ];
+          services.${name}.spec = {
+            ports = [
+              {
+                name = "panel";
+                port = cfg.panelPort;
+                protocol = "TCP";
+                targetPort = "panel";
+              }
+              {
+                name = "dynmap";
+                port = cfg.dynmapPort;
+                protocol = "TCP";
+                targetPort = "dynmap";
+              }
+            ]
+            ++ mcServicePorts
+            ++ lib.optionals cfg.enableBedrock [
+              {
+                name = "bedrock";
+                port = cfg.bedrockPort;
+                protocol = "UDP";
+                targetPort = "bedrock";
+              }
+            ];
 
-              selector = {
-                "app.kubernetes.io/instance" = name;
-                "app.kubernetes.io/name" = name;
-              };
-
-              type = cfg.serviceType;
-            }
-            // optionalAttrs (cfg.loadBalancerIP != null) {
-              loadBalancerIP = cfg.loadBalancerIP;
+            selector = {
+              "app.kubernetes.io/instance" = name;
+              "app.kubernetes.io/name" = name;
             };
+
+            type = cfg.serviceType;
+          }
+          // optionalAttrs (cfg.loadBalancerIP != null) {
+            inherit (cfg) loadBalancerIP;
+          };
         };
     };
 }

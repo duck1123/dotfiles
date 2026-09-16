@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.qbittorrent =
     {
       config,
@@ -369,7 +368,7 @@
                     containers = [
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         env = [
                           {
@@ -522,7 +521,7 @@
           };
 
           # Create NFS PersistentVolume for downloads when NFS is enabled
-          persistentVolumes = lib.optionalAttrs (cfg.nfs.enable) {
+          persistentVolumes = lib.optionalAttrs cfg.nfs.enable {
             "${name}-${name}-downloads-nfs" = {
               apiVersion = "v1";
               kind = "PersistentVolume";

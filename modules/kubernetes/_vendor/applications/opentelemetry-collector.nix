@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.opentelemetry-collector =
     {
       config,
@@ -154,7 +153,7 @@
       };
 
       values = lib.attrsets.recursiveUpdate defaultValues cfg.values;
-      namespace = cfg.namespace;
+      inherit (cfg) namespace;
     in
     with lib;
     {

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.prometheus =
     {
       config,
@@ -44,9 +43,9 @@
           };
 
           storage.volumeClaimTemplate.spec = {
+            inherit (cfg) storageClassName;
             accessModes = [ "ReadWriteOnce" ];
             resources.requests.storage = "10Gi";
-            storageClassName = cfg.storageClassName;
           };
         };
 
@@ -85,7 +84,7 @@
             storageSpec.volumeClaimTemplate.spec = {
               accessModes = [ "ReadWriteOnce" ];
               resources.requests.storage = cfg.prometheusStorageSize;
-              storageClassName = cfg.storageClassName;
+              inherit (cfg) storageClassName;
             };
 
             resources = {

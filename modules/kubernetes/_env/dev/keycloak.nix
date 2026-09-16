@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.keycloak = {
     enable = false;
     ingressProvider = "traefik-dev";

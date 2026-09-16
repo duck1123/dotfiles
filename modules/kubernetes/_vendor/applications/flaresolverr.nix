@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.flaresolverr =
     {
       config,
@@ -59,7 +58,7 @@
                   containers = [
                     {
                       inherit name;
-                      image = cfg.image;
+                      inherit (cfg) image;
                       imagePullPolicy = "IfNotPresent";
                       env = [
                         {

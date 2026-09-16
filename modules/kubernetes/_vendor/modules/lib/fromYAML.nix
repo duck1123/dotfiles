@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.lib.fromYAML =
     { pkgs, value }:
     let

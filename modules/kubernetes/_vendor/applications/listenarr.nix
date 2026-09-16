@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.listenarr =
     {
       config,
@@ -137,7 +136,7 @@
               };
 
               spec = {
-                replicas = cfg.replicas;
+                inherit (cfg) replicas;
                 selector.matchLabels = {
                   "app.kubernetes.io/instance" = name;
                   "app.kubernetes.io/name" = name;
@@ -160,7 +159,7 @@
                     containers = [
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         env = [
                           {
@@ -411,7 +410,7 @@
 
           # Create NFS PersistentVolumes for downloads and podcasts when NFS is enabled
           persistentVolumes =
-            lib.optionalAttrs (cfg.nfs.enable) {
+            lib.optionalAttrs cfg.nfs.enable {
               "${name}-${name}-downloads-nfs" = {
                 apiVersion = "v1";
                 kind = "PersistentVolume";

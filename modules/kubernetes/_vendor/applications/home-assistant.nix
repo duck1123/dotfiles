@@ -185,7 +185,7 @@
                 containers = [
                   {
                     inherit name;
-                    image = cfg.image;
+                    inherit (cfg) image;
                     imagePullPolicy = "IfNotPresent";
 
                     env = [

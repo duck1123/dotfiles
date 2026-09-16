@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.homer =
     {
       config,
@@ -87,7 +86,7 @@
             ];
             tls = [
               {
-                secretName = tls.secretName;
+                inherit secretName;
                 hosts = [ domain ];
               }
             ];

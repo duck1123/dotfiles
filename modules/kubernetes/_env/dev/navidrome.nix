@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.navidrome = {
     enable = false;
 

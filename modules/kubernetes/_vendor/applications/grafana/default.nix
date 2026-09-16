@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.grafana =
     {
       charts,
@@ -92,8 +91,8 @@
           nodeSelector."kubernetes.io/hostname" = cfg.hostAffinity;
 
           persistence = {
+            inherit (cfg) storageClassName;
             enabled = true;
-            storageClassName = cfg.storageClassName;
           };
 
           resources = {

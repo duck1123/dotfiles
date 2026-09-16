@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.longhorn =
     {
       charts,

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   imports = [
     ./affine.nix
     ./audiobookshelf.nix

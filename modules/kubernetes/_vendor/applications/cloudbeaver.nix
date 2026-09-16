@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.cloudbeaver =
     {
       config,

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   services.opensearch-dashboards = {
     enable = true;
 

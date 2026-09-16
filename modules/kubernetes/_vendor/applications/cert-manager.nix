@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.cert-manager =
     {
       charts,
@@ -42,7 +41,7 @@
         optionalAttrs (cfg.cloudflare.token != "" && cfg.email != "") {
           clusterIssuers.letsencrypt-prod.spec = {
             acme = {
-              email = cfg.email;
+              inherit (cfg) email;
               server = "https://acme-v02.api.letsencrypt.org/directory";
               privateKeySecretRef.name = "letsencrypt-prod-key";
               solvers = [

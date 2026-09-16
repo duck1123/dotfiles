@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.opensearch-dashboards =
     {
       config,
@@ -126,7 +125,7 @@
                   containers = [
                     {
                       inherit name;
-                      image = cfg.image;
+                      inherit (cfg) image;
                       imagePullPolicy = "IfNotPresent";
                       env = [
                         {
@@ -151,8 +150,8 @@
                       ];
                       readinessProbe = {
                         httpGet = {
+                          inherit port;
                           path = "/api/status";
-                          port = port;
                         };
                         initialDelaySeconds = 20;
                         periodSeconds = 10;
@@ -161,8 +160,8 @@
                       };
                       livenessProbe = {
                         httpGet = {
+                          inherit port;
                           path = "/api/status";
-                          port = port;
                         };
                         initialDelaySeconds = 30;
                         periodSeconds = 30;
@@ -213,8 +212,8 @@
               selector = labels;
               ports = [
                 {
+                  inherit port;
                   name = "http";
-                  port = port;
                   targetPort = port;
                   protocol = "TCP";
                 }
@@ -253,10 +252,10 @@
                               # the same saved object instead of piling up duplicates.
                               id = builtins.replaceStrings [ "*" ] [ "" ] p.title;
                               attributes = {
-                                title = p.title;
+                                inherit (p) title;
                               }
                               // optionalAttrs (p.timeFieldName != null) {
-                                timeFieldName = p.timeFieldName;
+                                inherit (p) timeFieldName;
                               };
                             }) cfg.indexPatterns
                           );

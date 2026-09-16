@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   flake.nixidyApps.kapowarr =
     {
       config,
@@ -127,7 +126,7 @@
               };
 
               spec = {
-                replicas = cfg.replicas;
+                inherit (cfg) replicas;
                 selector.matchLabels = {
                   "app.kubernetes.io/instance" = name;
                   "app.kubernetes.io/name" = name;
@@ -150,7 +149,7 @@
                     containers = [
                       {
                         inherit name;
-                        image = cfg.image;
+                        inherit (cfg) image;
                         imagePullPolicy = "IfNotPresent";
                         env = [
                           {
@@ -322,7 +321,7 @@
 
           # Create NFS PersistentVolumes for downloads/comics and the comics library when NFS is enabled
           persistentVolumes =
-            lib.optionalAttrs (cfg.nfs.enable) {
+            lib.optionalAttrs cfg.nfs.enable {
               "${name}-${name}-downloads-nfs" = {
                 apiVersion = "v1";
                 kind = "PersistentVolume";
