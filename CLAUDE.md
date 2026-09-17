@@ -33,7 +33,7 @@ nur diff-os --host edgenix   # show package changes before deploying
 nix flake update    # update flake.lock
 nur build --all     # build all configurations
 
-# Cluster operations (see modules/kubernetes/docs/, carried over from k3s-fleetops)
+# Cluster operations (see modules/kubernetes/docs/)
 nur apps list                # list app names known to the cluster
 nur apps restart <name>      # roll an app's Deployment/StatefulSet
 nur argocd sync [name]       # trigger an ArgoCD sync (all apps, or just <name>)
@@ -63,7 +63,7 @@ Key subdirectories:
 - `modules/options/` — NixOS option declarations (host, hosts, identities, simpleFeature type)
 - `modules/types/` — custom Nix types/submodules for hosts, identities, features
 - `modules/identities/` — per-user identity definitions (duck, deck, drenfer)
-- `modules/kubernetes/` — the k3s fleet-ops integration: `_env/dev/` has the per-app instance config for the `dev` nixidy environment (application library/generators still come from the `k3s-fleetops` flake input). See `modules/kubernetes/docs/` for deployment workflow, the two-module-system gotcha, pinned-volume handling, and a troubleshooting playbook — carried over from k3s-fleetops as it consolidates into this repo.
+- `modules/kubernetes/` — the k3s fleet-ops integration, fully consolidated into this repo (the `k3s-fleetops` flake input is gone; there is no external dependency left). `_vendor/applications/` and `_vendor/generators/`/`_vendor/lib/`/`_vendor/modules/` hold the application library/generators (edit these directly — "_vendor" is a historical name, not a sync boundary); `_env/dev/` has the per-app instance config for the `dev` nixidy environment. See `modules/kubernetes/docs/` for deployment workflow, the two-module-system gotcha, pinned-volume handling, and a troubleshooting playbook.
 
 ### Host Configuration Pattern
 
