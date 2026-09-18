@@ -1,7 +1,7 @@
 { secrets, ... }:
 {
   services.gramps-web = {
-    enable = false;
+    enable = true;
 
     redis = {
       host = "redis.redis";
