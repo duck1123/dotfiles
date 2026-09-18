@@ -264,7 +264,7 @@ _: {
           image.tag = mkOption {
             description = mdDoc "The securo-backend/securo-frontend docker image tag (both track the same release version)";
             type = types.str;
-            default = "0.15.1";
+            default = "0.16.0";
           };
 
           secretKey = mkOption {
