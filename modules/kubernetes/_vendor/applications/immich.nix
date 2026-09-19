@@ -245,10 +245,12 @@ _: {
           };
 
           server = {
-            # Single-replica deployment backed by a ReadWriteOnce volume: RollingUpdate
-            # can deadlock (new pod can't attach the volume until the old one releases it).
-            controllers.main.strategy = "Recreate";
-            controllers.main.replicas = cfg.replicas;
+            controllers.main = {
+              # Single-replica deployment backed by a ReadWriteOnce volume: RollingUpdate
+              # can deadlock (new pod can't attach the volume until the old one releases it).
+              strategy = "Recreate";
+              replicas = cfg.replicas;
+            };
           }
           // lib.optionalAttrs cfg.externalLibrary.enable {
             persistence.external-library = {
