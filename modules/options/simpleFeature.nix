@@ -1,7 +1,8 @@
-_: {
-  flake.types.generic.simpleFeature =
+_:
+let
+  simpleFeatureWith =
     { lib, ... }:
-    description:
+    description: extraOptions:
     with lib;
     mkOption {
       type = types.submodule {
@@ -11,9 +12,18 @@ _: {
             default = false;
             description = "Enable ${description}";
           };
-        };
+        }
+        // extraOptions;
       };
       default = { };
       description = "${description} configuration";
     };
+in
+{
+  flake.types.generic = {
+    # `enable` plus any extra per-feature options
+    inherit simpleFeatureWith;
+
+    simpleFeature = args: description: simpleFeatureWith args description { };
+  };
 }

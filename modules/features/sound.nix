@@ -1,15 +1,8 @@
 _: {
-  flake.types.generic.feature-options.sound =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "sound feature";
-
-  flake.modules.nixos.sound-feature =
-    { config, lib, ... }:
-    {
-      config = lib.mkIf config.host.features.sound.enable {
+  features.sound = {
+    nixos =
+      { config, ... }:
+      {
         security.rtkit.enable = true;
 
         services = {
@@ -33,5 +26,5 @@ _: {
           "realtime"
         ];
       };
-    };
+  };
 }

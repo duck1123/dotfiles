@@ -1,20 +1,8 @@
 _: {
-  flake.types.generic.feature-options.music =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "music feature";
-
-  flake.modules.homeManager.music =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      config = lib.mkIf config.host.features.music.enable {
+  features.music = {
+    homeManager =
+      { pkgs, ... }:
+      {
         home.packages = with pkgs; [
           # Multi-track hard disk recording software
           ardour
@@ -50,5 +38,5 @@ _: {
           vmpk
         ];
       };
-    };
+  };
 }

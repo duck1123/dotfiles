@@ -1,39 +1,21 @@
 _: {
-  flake = {
-    types.generic.feature-options.radio =
-      { inputs, lib }:
-      let
-        inherit (inputs.self.types.generic) simpleFeature;
-      in
-      simpleFeature { inherit inputs lib; } "radio feature";
-
-    modules.homeManager.radio =
+  features.radio = {
+    homeManager =
+      { pkgs, ... }:
       {
-        config,
-        lib,
-        pkgs,
-        ...
-      }:
-      {
-        config = lib.mkIf config.host.features.radio.enable {
-          home.packages = with pkgs; [
-            cubicsdr
-            gnuradio
-            gqrx
-            rtl-sdr
-            sdr-j-fm
-            sdrangel
-            sdrpp
-          ];
-        };
+        home.packages = with pkgs; [
+          cubicsdr
+          gnuradio
+          gqrx
+          rtl-sdr
+          sdr-j-fm
+          sdrangel
+          sdrpp
+        ];
       };
 
-    modules.nixos.radio =
-      { config, lib, ... }:
-      {
-        config = lib.mkIf config.host.features.radio.enable {
-          hardware.rtl-sdr.enable = true;
-        };
-      };
+    nixos = _: {
+      hardware.rtl-sdr.enable = true;
+    };
   };
 }

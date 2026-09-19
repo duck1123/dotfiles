@@ -1,15 +1,8 @@
 _: {
-  flake.types.generic.feature-options.wayle =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "wayle feature";
-
-  flake.modules.homeManager.wayle =
-    { config, lib, ... }:
-    {
-      config = lib.mkIf config.host.features.wayle.enable {
+  features.wayle = {
+    homeManager =
+      { config, lib, ... }:
+      {
         # https://github.com/nix-community/home-manager/blob/master/modules/services/wayle.nix
         services.wayle = {
           enable = true;
@@ -82,5 +75,5 @@ _: {
           };
         };
       };
-    };
+  };
 }

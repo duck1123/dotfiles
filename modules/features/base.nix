@@ -1,120 +1,45 @@
-_:
-let
-  unified-modules = [
-    "bitcoin"
-    "chat"
-    "media"
-    "network"
-    "syncthing"
-  ];
-in
-{
-  flake.types.generic.feature-options.base =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "base feature";
+_: {
+  # Options-only: declares `hosts.<host>.features.base`
+  features.base = { };
 
   flake.modules = {
     homeManager.base =
       { inputs, ... }:
+      let
+        inherit (inputs.self.modules) generic homeManager;
+      in
       {
         imports = [
-          inputs.self.modules.homeManager.state-version
-        ]
-        ++ (with inputs.self.modules.homeManager; [
-          backups
-          clojure
-          common
-          dbt
-          developer
-          emacs
-          email
-          environments-gnome
-          firefox
-          flipper
-          gaming
-          git
-          gnome
-          hyprland
-          i3
-          java
-          jujutsu
-          music
-          nix-feature
-          nostr
-          nushell
-          obsidian
-          office
-          pictures
-          python
-          radio
-          ssh-feature
-          starship
-          stylix
-          vim
-          vscode
-          waybar
-          wayle
-          windmill
-          zen-browser
-          zsh
-        ])
-        ++ (map (name: inputs.self.modules.homeManager.${name}) unified-modules)
-        ++ [
-          inputs.self.modules.generic.options
+          homeManager.state-version
+          homeManager.environments-gnome
+          generic.options
           inputs.stylix.homeModules.stylix
           inputs.zen-browser.homeModules.beta
-        ];
+        ]
+        # Every feature registered via `features.<name>` (see modules/flake/features.nix)
+        ++ builtins.attrValues homeManager.features;
       };
 
     nixos.base =
       { inputs, ... }:
+      let
+        inherit (inputs.self.modules) generic nixos;
+      in
       {
         imports = [
-          inputs.self.modules.nixos.state-version
-        ]
-        ++ (with inputs.self.modules.nixos; [
-          battery-feature
-          bluetooth-feature
-          boot
-          docker-feature
-          firefox-feature
-          flipper
-          font-feature
-          gaming-feature
-          glances-feature
-          i18n
-          kubernetes-feature
-          nfs-feature
-          nix-feature
-          nix-feature-attic
-          radio
-          samba
-          sddm
-          sddm-feature
-          sleep-feature
-          sound-feature
-          ssh-feature
-          stylix-feature
-          tailscale-feature
-          touch-feature
-          users
-          vpn
-          virtualization-feature
-          waydroid-feature
-          xserver-feature
-          zsh-feature
-        ])
-        ++ (map (name: inputs.self.modules.nixos.${name}) unified-modules)
-        ++ [
+          nixos.state-version
+          nixos.boot
+          nixos.i18n
+          nixos.nix-attic
+          nixos.sddm
+          nixos.users
+          generic.options
           inputs.home-manager.nixosModules.home-manager
           inputs.sddm-sugar-candy-nix.nixosModules.default
-          inputs.self.modules.generic.options
           inputs.sops-nix.nixosModules.sops
           inputs.stylix.nixosModules.stylix
-        ];
+        ]
+        ++ builtins.attrValues nixos.features;
       };
   };
 }

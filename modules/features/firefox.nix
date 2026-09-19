@@ -1,34 +1,18 @@
 _: {
-  flake = {
-    types.generic.feature-options.firefox =
-      { inputs, lib }:
-      let
-        inherit (inputs.self.types.generic) simpleFeature;
-      in
-      simpleFeature { inherit inputs lib; } "firefox feature";
-
-    modules.homeManager.firefox =
-      { config, lib, ... }:
+  features.firefox = {
+    homeManager =
+      { config, ... }:
       {
-        config = lib.mkIf config.host.features.firefox.enable {
-          programs.firefox = {
-            configPath = "${config.xdg.configHome}/mozilla/firefox";
-            enable = true;
-          };
+        programs.firefox = {
+          configPath = "${config.xdg.configHome}/mozilla/firefox";
+          enable = true;
         };
       };
 
-    modules.nixos.firefox-feature =
+    nixos =
+      { config, pkgs, ... }:
       {
-        config,
-        lib,
-        pkgs,
-        ...
-      }:
-      {
-        config = lib.mkIf config.host.features.firefox.enable {
-          users.users."${config.host.identity.username}".packages = [ pkgs.firefox ];
-        };
+        users.users."${config.host.identity.username}".packages = [ pkgs.firefox ];
       };
   };
 }

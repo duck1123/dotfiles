@@ -1,57 +1,50 @@
 _: {
-  flake.types.generic.feature-options.waydroid =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "waydroid feature";
+  features.waydroid = {
+    nixos =
+      {
+        config,
+        lib,
+        pkgs,
+        ...
+      }:
+      let
+        cfg = config.virtualisation.waydroid;
 
-  flake.modules.nixos.waydroid-feature =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    let
-      cfg = config.virtualisation.waydroid;
+        # `waydroid prop set` and `waydroid shell` both need the Android
+        # container booted, which only happens once a session is started
+        # (not at boot). Poll `waydroid status` (pure system-bus call) and
+        # reapply on every STOPPED -> RUNNING transition, so this covers
+        # the "session died, restarted via waydroid-helper" cycle too.
+        # `shell` requires root, and `prop set` needs a reachable session
+        # bus (unused otherwise) - both are satisfied by running as root
+        # with DBUS_SESSION_BUS_ADDRESS pointed at the session user found
+        # in the status output.
+        tweaks = pkgs.writeShellApplication {
+          name = "waydroid-tweaks";
+          runtimeInputs = [ cfg.package ];
+          text = ''
+            prev_state="STOPPED"
 
-      # `waydroid prop set` and `waydroid shell` both need the Android
-      # container booted, which only happens once a session is started
-      # (not at boot). Poll `waydroid status` (pure system-bus call) and
-      # reapply on every STOPPED -> RUNNING transition, so this covers
-      # the "session died, restarted via waydroid-helper" cycle too.
-      # `shell` requires root, and `prop set` needs a reachable session
-      # bus (unused otherwise) - both are satisfied by running as root
-      # with DBUS_SESSION_BUS_ADDRESS pointed at the session user found
-      # in the status output.
-      tweaks = pkgs.writeShellApplication {
-        name = "waydroid-tweaks";
-        runtimeInputs = [ cfg.package ];
-        text = ''
-          prev_state="STOPPED"
+            while true; do
+              status="$(waydroid status 2>/dev/null || true)"
+              state="$(printf '%s\n' "$status" | awk -F'\t' '/^Session:/{print $2}')"
 
-          while true; do
-            status="$(waydroid status 2>/dev/null || true)"
-            state="$(printf '%s\n' "$status" | awk -F'\t' '/^Session:/{print $2}')"
-
-            if [[ "$state" == "RUNNING" && "$prev_state" != "RUNNING" ]]; then
-              uid="$(printf '%s\n' "$status" | awk -F'[()]' '/^Session user:/{print $2}')"
-              if [[ -n "$uid" ]]; then
-                export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus"
-                waydroid prop set persist.waydroid.multi_windows true || true
-                waydroid shell settings put system screen_off_timeout 2147483647 || true
+              if [[ "$state" == "RUNNING" && "$prev_state" != "RUNNING" ]]; then
+                uid="$(printf '%s\n' "$status" | awk -F'[()]' '/^Session user:/{print $2}')"
+                if [[ -n "$uid" ]]; then
+                  export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus"
+                  waydroid prop set persist.waydroid.multi_windows true || true
+                  waydroid shell settings put system screen_off_timeout 2147483647 || true
+                fi
               fi
-            fi
 
-            prev_state="$state"
-            sleep 5
-          done
-        '';
-      };
-    in
-    {
-      config = lib.mkIf config.host.features.waydroid.enable {
+              prev_state="$state"
+              sleep 5
+            done
+          '';
+        };
+      in
+      {
         # Enable clipboard sharing
         environment.systemPackages = with pkgs; [
           waydroid-helper
@@ -85,5 +78,5 @@ _: {
           package = pkgs.waydroid-nftables;
         };
       };
-    };
+  };
 }

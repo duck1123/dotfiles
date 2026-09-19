@@ -1,76 +1,79 @@
 _: {
-  flake.types.generic.feature-options.kubernetes =
-    { inputs, lib }:
-    with lib;
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    mkOption {
-      type = types.submodule {
-        options = {
-          client = simpleFeature { inherit inputs lib; } "kubernetes client";
-          clusterInit = mkOption {
-            type = types.bool;
-            default = false;
-            description = "Initialize a new HA embedded-etcd cluster (passes --cluster-init to k3s). Enable on exactly one server per cluster. Incompatible with serverAddr — this node becomes the bootstrap server that others join.";
-          };
-          controlPlane = mkOption {
-            type = types.bool;
-            default = false;
-            description = "Join an existing cluster as a control plane (server) node rather than a worker agent. Requires serverAddr and token/tokenFile. The first server in the cluster must have clusterInit = true.";
-          };
-          dualStack = simpleFeature { inherit inputs lib; } "IPv6 dual-stack networking";
-          gpu = mkOption {
-            type = types.nullOr (
-              types.enum [
-                "amd"
-                "nvidia"
-              ]
-            );
-            default = null;
-            description = "Enable GPU support for Kubernetes pods (amd or nvidia)";
-          };
-          server = simpleFeature { inherit inputs lib; } "kubernetes server";
-          serverAddr = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            description = "Server address (hostname or IP) for joining an existing k3s cluster";
-          };
-          token = mkOption {
-            type = types.nullOr types.str;
-            default = null;
-            description = "Token for joining an existing k3s cluster as an agent (plain text, not recommended)";
-          };
-          tokenFile = mkOption {
-            type = types.nullOr types.path;
-            default = null;
-            description = "Path to sops-encrypted secrets file containing k3s_token key";
-            example = ./../../secrets/k3s-token.yaml;
-          };
-          extraK3sFlags = mkOption {
-            type = types.listOf types.str;
-            default = [ ];
-            description = ''
-              Extra k3s CLI flags appended after the defaults. For dual-stack, you often need a
-              host IPv6 address on some interface; if k3s fails with "no IPv6 address was found on node",
-              enable IPv6 on the NIC or set e.g. "--node-ip=192.168.0.1,2001:db8:…" here (see k3s dual-stack docs).
-            '';
+  features.kubernetes = {
+    description = "Kubernetes configuration";
+    gated = false;
+
+    option =
+      { inputs, lib }:
+      with lib;
+      let
+        inherit (inputs.self.types.generic) simpleFeature;
+      in
+      mkOption {
+        type = types.submodule {
+          options = {
+            client = simpleFeature { inherit inputs lib; } "kubernetes client";
+            clusterInit = mkOption {
+              type = types.bool;
+              default = false;
+              description = "Initialize a new HA embedded-etcd cluster (passes --cluster-init to k3s). Enable on exactly one server per cluster. Incompatible with serverAddr — this node becomes the bootstrap server that others join.";
+            };
+            controlPlane = mkOption {
+              type = types.bool;
+              default = false;
+              description = "Join an existing cluster as a control plane (server) node rather than a worker agent. Requires serverAddr and token/tokenFile. The first server in the cluster must have clusterInit = true.";
+            };
+            dualStack = simpleFeature { inherit inputs lib; } "IPv6 dual-stack networking";
+            gpu = mkOption {
+              type = types.nullOr (
+                types.enum [
+                  "amd"
+                  "nvidia"
+                ]
+              );
+              default = null;
+              description = "Enable GPU support for Kubernetes pods (amd or nvidia)";
+            };
+            server = simpleFeature { inherit inputs lib; } "kubernetes server";
+            serverAddr = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "Server address (hostname or IP) for joining an existing k3s cluster";
+            };
+            token = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = "Token for joining an existing k3s cluster as an agent (plain text, not recommended)";
+            };
+            tokenFile = mkOption {
+              type = types.nullOr types.path;
+              default = null;
+              description = "Path to sops-encrypted secrets file containing k3s_token key";
+              example = ./../../secrets/k3s-token.yaml;
+            };
+            extraK3sFlags = mkOption {
+              type = types.listOf types.str;
+              default = [ ];
+              description = ''
+                Extra k3s CLI flags appended after the defaults. For dual-stack, you often need a
+                host IPv6 address on some interface; if k3s fails with "no IPv6 address was found on node",
+                enable IPv6 on the NIC or set e.g. "--node-ip=192.168.0.1,2001:db8:…" here (see k3s dual-stack docs).
+              '';
+            };
           };
         };
+        default = { };
+        description = "Kubernetes configuration";
       };
-      default = { };
-      description = "Kubernetes configuration";
-    };
 
-  flake.modules.nixos.kubernetes-feature =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      config = lib.mkMerge [
+    nixos =
+      {
+        config,
+        lib,
+        pkgs,
+        ...
+      }:
+      lib.mkMerge [
         # Declared unconditionally (whenever tokenFile is set) rather than nested under the
         # server.enable check below: NixOS's module merge has to force the *shape* of
         # services.k3s (it's built with `//`/optionalAttrs) to push mkIf down onto its leaves,
@@ -227,5 +230,5 @@ _: {
           '';
         })
       ];
-    };
+  };
 }

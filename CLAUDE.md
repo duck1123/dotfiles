@@ -57,7 +57,7 @@ outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.imp
 Key subdirectories:
 - `modules/flake/` — flake outputs: `nixosConfigurations`, `homeConfigurations`, `devShells`, `packages`, and the `lib/+mk-os.nix` helpers
 - `modules/hosts/` — per-host module definitions (one `.nix` per host, e.g. `edgenix.nix`)
-- `modules/features/` — feature modules enabled/disabled per host (bluetooth, hyprland, kubernetes, etc.)
+- `modules/features/` — features enabled/disabled per host (bluetooth, hyprland, kubernetes, etc.), each self-registering via `features.<name>` (see Feature System)
 - `modules/environments/` — desktop environment modules (gnome, hyprland, i3, plasma6, budgie)
 - `modules/nixos/` — NixOS-specific modules (boot, users, i18n, sddm, etc.)
 - `modules/options/` — NixOS option declarations (host, hosts, identities, simpleFeature type)
@@ -78,9 +78,32 @@ Each host file (e.g., `modules/hosts/edgenix.nix`) defines three namespaced modu
 
 ### Feature System
 
-Features are toggled with `enable = true/false` under `hosts.<hostname>.features.<name>`. The `simpleFeature` type (in `modules/options/simpleFeature.nix`) provides the standard `{ enable = false; }` submodule pattern. Some features have richer submodules (e.g., `kubernetes`, `syncthing`, `media`).
+Features are toggled with `enable = true/false` under `hosts.<hostname>.features.<name>`.
 
-`modules/features/base.nix` defines what's included by default in both `homeManager.base` and `nixos.base` — all feature modules are imported here, then individually toggled per-host.
+Each feature is declared **once**, in `modules/features/<name>.nix`, by setting `features.<name>` in the registry defined in `modules/flake/features.nix`. That single declaration generates:
+- the `hosts.<host>.features.<name>` option (via `simpleFeatureWith` in `modules/options/simpleFeature.nix`)
+- `modules.homeManager.features.<name>` and `modules.nixos.features.<name>`, each wrapped in `mkIf hosts.<host>.features.<name>.enable`
+- their inclusion in `homeManager.base` / `nixos.base` (which import every registered feature; there is no list to edit)
+
+```nix
+_: {
+  features.vim = {
+    # description = "...";            # optional; defaults to "<name> feature"
+    homeManager = { pkgs, ... }: { home.packages = [ pkgs.neovim ]; };  # body only: no `config =` / `mkIf`
+    nixos = _: { programs.vim.enable = true; };                         # optional, either class may be omitted
+  };
+}
+```
+
+Registry knobs beyond the two bodies (a body may also be a list of bodies):
+- `extraOptions = { inputs, lib }: { foo = mkOption ...; };` — extra options next to `enable` (see `tailscale`, `nix`, `hyprland`)
+- `option = { inputs, lib }: mkOption ...;` — replace the whole generated option with a custom type (see `media`, `kubernetes`)
+- `gated = false` — skip the automatic `enable` gate when the feature has no plain `enable` or gates differently per class; the bodies then return their own `mkIf`/`mkMerge` (see `media`, `kubernetes`)
+
+Gotchas:
+- flake-parts types `flake.modules.<class>.<name>` as a `deferredModule`, so `features.<name>` can't be nested there. The registry writes the nested `features` attrset into the *published* flake output through `touchup.attr.modules.finish`, so it is visible as `inputs.self.modules.<class>.features.<name>` but **not** in `config.flake.modules` inside flake-parts modules.
+- A body that sets options which only exist in some hosts (e.g. `sops.*`) can't live in a feature that WSL also imports, because `mkIf false` still errors on an undeclared option. That is why `modules/features/nix-attic.nix` stays a standalone `modules.nixos.nix-attic` imported directly by `nixos.base`.
+- Non-feature modules (`state-version`, `boot`, `i18n`, `users`, `sddm`, `environments-*`) are still plain `flake.modules.<class>.<name>` and are listed explicitly in `base.nix`.
 
 ### Hosts
 

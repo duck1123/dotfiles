@@ -1,20 +1,8 @@
 _: {
-  flake.types.generic.feature-options.nostr =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "nostr feature";
-
-  flake.modules.homeManager.nostr =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      config = lib.mkIf config.host.features.nostr.enable {
+  features.nostr = {
+    homeManager =
+      { pkgs, ... }:
+      {
         home.packages = with pkgs; [
           algia
           # gossip
@@ -22,5 +10,5 @@ _: {
           nostui
         ];
       };
-    };
+  };
 }

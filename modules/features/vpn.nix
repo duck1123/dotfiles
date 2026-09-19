@@ -1,20 +1,13 @@
 _: {
-  flake.types.generic.feature-options.vpn =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "vpn feature";
-
-  flake.modules.nixos.vpn =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      config = lib.mkIf config.host.features.vpn.enable {
+  features.vpn = {
+    nixos =
+      {
+        config,
+        lib,
+        pkgs,
+        ...
+      }:
+      {
         boot.kernelModules = [ "wireguard" ];
 
         # Ensure networking is properly configured for WireGuard
@@ -46,5 +39,5 @@ _: {
           };
         };
       };
-    };
+  };
 }

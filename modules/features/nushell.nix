@@ -1,21 +1,13 @@
 _: {
-  flake.types.generic.feature-options.nushell =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "nushell feature";
-
-  flake.modules.homeManager.nushell =
-    {
-      config,
-      inputs,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      config = lib.mkIf config.host.features.nushell.enable {
+  features.nushell = {
+    homeManager =
+      {
+        config,
+        inputs,
+        pkgs,
+        ...
+      }:
+      {
         home = {
           file = {
             "nushell/completions".source = ../../nushell/completions;
@@ -74,5 +66,5 @@ _: {
           };
         };
       };
-    };
+  };
 }

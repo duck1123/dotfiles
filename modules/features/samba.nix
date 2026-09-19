@@ -1,20 +1,9 @@
 _: {
-  flake.types.generic.feature-options.samba =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "Samba support";
-
-  flake.modules.nixos.samba =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      config = lib.mkIf config.host.features.samba.enable {
+  features.samba = {
+    description = "Samba support";
+    nixos =
+      { config, pkgs, ... }:
+      {
         environment.systemPackages = with pkgs; [ samba ];
         networking.firewall.allowedTCPPorts = [ 445 ];
 
@@ -30,5 +19,5 @@ _: {
 
         users.users.${config.host.identity.username}.extraGroups = [ "samba" ];
       };
-    };
+  };
 }

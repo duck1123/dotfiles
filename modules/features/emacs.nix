@@ -1,20 +1,8 @@
 _: {
-  flake.types.generic.feature-options.emacs =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "emacs feature";
-
-  flake.modules.homeManager.emacs =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      config = lib.mkIf config.host.features.emacs.enable {
+  features.emacs = {
+    homeManager =
+      { config, pkgs, ... }:
+      {
         programs.ripgrep.enable = true;
 
         xdg.desktopEntries.emacsclient = {
@@ -392,5 +380,5 @@ _: {
             ];
         };
       };
-    };
+  };
 }

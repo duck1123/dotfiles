@@ -1,27 +1,9 @@
-_:
-let
-  name = "python";
-in
-{
-  flake.types.generic.feature-options.${name} =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "${name} feature";
-
-  flake.modules.homeManager.${name} =
+_: {
+  features.python.homeManager =
+    { pkgs, ... }:
     {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      config = lib.mkIf config.host.features.${name}.enable {
-        home.packages = with pkgs; [
-          python3
-        ];
-      };
+      home.packages = with pkgs; [
+        python3
+      ];
     };
 }

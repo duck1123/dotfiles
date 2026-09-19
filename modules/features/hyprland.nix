@@ -1,131 +1,121 @@
 _: {
-  flake.types.generic.feature-options.hyprland =
-    { lib, ... }:
-    with lib;
-    mkOption {
-      type = types.submodule {
-        options = {
-          enable = mkOption {
-            type = types.bool;
-            default = false;
-            description = "Enable hyprland feature";
-          };
+  features.hyprland = {
+    description = "hyprland feature";
 
-          monitor = mkOption {
-            type = types.listOf (
-              types.submodule {
-                options = {
-                  output = mkOption {
-                    type = types.str;
-                    description = "The monitor output name (e.g. HDMI-A-1, DP-3)";
-                  };
-                  mode = mkOption {
-                    type = types.str;
-                    description = "The monitor resolution/refresh mode (e.g. 1920x1080)";
-                  };
-                  position = mkOption {
-                    type = types.str;
-                    description = "The monitor position (e.g. 0x0)";
-                  };
-                  scale = mkOption {
-                    type = types.numbers.positive;
-                    default = 1;
-                    description = "The monitor scale factor";
-                  };
+    extraOptions =
+      { lib, ... }:
+      with lib;
+      {
+        monitor = mkOption {
+          type = types.listOf (
+            types.submodule {
+              options = {
+                output = mkOption {
+                  type = types.str;
+                  description = "The monitor output name (e.g. HDMI-A-1, DP-3)";
                 };
-              }
-            );
-            default = [ ];
-            description = "Monitor layout for hyprland";
-          };
+                mode = mkOption {
+                  type = types.str;
+                  description = "The monitor resolution/refresh mode (e.g. 1920x1080)";
+                };
+                position = mkOption {
+                  type = types.str;
+                  description = "The monitor position (e.g. 0x0)";
+                };
+                scale = mkOption {
+                  type = types.numbers.positive;
+                  default = 1;
+                  description = "The monitor scale factor";
+                };
+              };
+            }
+          );
+          default = [ ];
+          description = "Monitor layout for hyprland";
         };
       };
-      default = { };
-      description = "hyprland feature configuration";
-    };
 
-  flake.modules.homeManager.hyprland =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    let
-      mkLuaInline = lib.generators.mkLuaInline;
-      toLua = lib.generators.toLua { };
+    homeManager =
+      {
+        config,
+        lib,
+        pkgs,
+        ...
+      }:
+      let
+        mkLuaInline = lib.generators.mkLuaInline;
+        toLua = lib.generators.toLua { };
 
-      mainMod = "SUPER";
+        mainMod = "SUPER";
 
-      # Renders a `hl.bind(...)` call. `mods` is a list of Hyprland modifier
-      # names (e.g. [ "SUPER" "SHIFT" ]); `dispatcher` is a raw Lua
-      # expression string, e.g. "hl.dsp.window.close()".
-      mkBind =
-        {
-          mods ? [ ],
-          key,
-          dispatcher,
-          opts ? null,
-        }:
-        {
-          _args = [
-            (if mods == [ ] then key else "${lib.concatStringsSep " + " mods} + ${key}")
-            (mkLuaInline dispatcher)
-          ]
-          ++ lib.optional (opts != null) opts;
-        };
-
-      # Maps a Hyprlang dispatcher name + arg to the equivalent hl.dsp.*
-      # Lua expression, verified against Hyprland's own Lua dispatcher
-      # bindings (src/config/lua/bindings/LuaBindingsDispatchers.cpp).
-      dispatcherFor =
-        command: arg:
-        {
-          exec = "hl.dsp.exec_cmd(${toLua arg})";
-          killactive = "hl.dsp.window.close()";
-          fullscreen = "hl.dsp.window.fullscreen()";
-          exit = "hl.dsp.exit()";
-          pseudo = "hl.dsp.window.pseudo()";
-          togglefloating = ''hl.dsp.window.float({ action = "toggle" })'';
-          movefocus = "hl.dsp.focus({ direction = ${toLua arg} })";
-          movewindow = "hl.dsp.window.move({ direction = ${toLua arg} })";
-          workspace = "hl.dsp.focus({ workspace = ${toLua arg} })";
-          movetoworkspace = "hl.dsp.window.move({ workspace = ${toLua arg} })";
-          cyclenext = "hl.dsp.window.cycle_next()";
-          bringactivetotop = "hl.dsp.window.bring_to_top()";
-        }
-        .${command} or (throw "hyprland: unmapped dispatcher '${command}'");
-
-      mkKeyBind =
-        {
-          mods ? [ ],
-          key,
-          command,
-          arg ? "",
-        }:
-        mkBind {
-          inherit mods key;
-          dispatcher = dispatcherFor command arg;
-        };
-
-      # Mouse binds: Hyprlang's `bindm` doesn't exist in Lua, mouse drag
-      # and resize are just `hl.bind(...)` calls with `{ mouse = true }`.
-      mkMouseBind =
-        {
-          mods ? [ ],
-          key,
-          command,
-        }:
-        mkBind {
-          inherit mods key;
-          dispatcher = if command == "movewindow" then "hl.dsp.window.drag()" else "hl.dsp.window.resize()";
-          opts = {
-            mouse = true;
+        # Renders a `hl.bind(...)` call. `mods` is a list of Hyprland modifier
+        # names (e.g. [ "SUPER" "SHIFT" ]); `dispatcher` is a raw Lua
+        # expression string, e.g. "hl.dsp.window.close()".
+        mkBind =
+          {
+            mods ? [ ],
+            key,
+            dispatcher,
+            opts ? null,
+          }:
+          {
+            _args = [
+              (if mods == [ ] then key else "${lib.concatStringsSep " + " mods} + ${key}")
+              (mkLuaInline dispatcher)
+            ]
+            ++ lib.optional (opts != null) opts;
           };
-        };
-    in
-    {
-      config = lib.mkIf config.host.features.hyprland.enable {
+
+        # Maps a Hyprlang dispatcher name + arg to the equivalent hl.dsp.*
+        # Lua expression, verified against Hyprland's own Lua dispatcher
+        # bindings (src/config/lua/bindings/LuaBindingsDispatchers.cpp).
+        dispatcherFor =
+          command: arg:
+          {
+            exec = "hl.dsp.exec_cmd(${toLua arg})";
+            killactive = "hl.dsp.window.close()";
+            fullscreen = "hl.dsp.window.fullscreen()";
+            exit = "hl.dsp.exit()";
+            pseudo = "hl.dsp.window.pseudo()";
+            togglefloating = ''hl.dsp.window.float({ action = "toggle" })'';
+            movefocus = "hl.dsp.focus({ direction = ${toLua arg} })";
+            movewindow = "hl.dsp.window.move({ direction = ${toLua arg} })";
+            workspace = "hl.dsp.focus({ workspace = ${toLua arg} })";
+            movetoworkspace = "hl.dsp.window.move({ workspace = ${toLua arg} })";
+            cyclenext = "hl.dsp.window.cycle_next()";
+            bringactivetotop = "hl.dsp.window.bring_to_top()";
+          }
+          .${command} or (throw "hyprland: unmapped dispatcher '${command}'");
+
+        mkKeyBind =
+          {
+            mods ? [ ],
+            key,
+            command,
+            arg ? "",
+          }:
+          mkBind {
+            inherit mods key;
+            dispatcher = dispatcherFor command arg;
+          };
+
+        # Mouse binds: Hyprlang's `bindm` doesn't exist in Lua, mouse drag
+        # and resize are just `hl.bind(...)` calls with `{ mouse = true }`.
+        mkMouseBind =
+          {
+            mods ? [ ],
+            key,
+            command,
+          }:
+          mkBind {
+            inherit mods key;
+            dispatcher = if command == "movewindow" then "hl.dsp.window.drag()" else "hl.dsp.window.resize()";
+            opts = {
+              mouse = true;
+            };
+          };
+      in
+      {
         home.packages = with pkgs; [
           cascadia-code
           font-awesome
@@ -582,5 +572,5 @@ _: {
           };
         };
       };
-    };
+  };
 }

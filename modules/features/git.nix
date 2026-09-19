@@ -1,21 +1,13 @@
 _: {
-  flake.types.generic.feature-options.git =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "git feature";
-
-  flake.modules.homeManager.git =
-    {
-      config,
-      inputs,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      config = lib.mkIf config.host.features.git.enable {
+  features.git = {
+    homeManager =
+      {
+        config,
+        inputs,
+        pkgs,
+        ...
+      }:
+      {
         home.packages = [ inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ngit ];
 
         programs =
@@ -45,5 +37,5 @@ _: {
             };
           };
       };
-    };
+  };
 }

@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.nix-feature-attic =
+  flake.modules.nixos.nix-attic =
     {
       config,
       inputs,

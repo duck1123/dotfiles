@@ -1,15 +1,8 @@
 _: {
-  flake.types.generic.feature-options.waybar =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "waybar feature";
-
-  flake.modules.homeManager.waybar =
-    { config, lib, ... }:
-    {
-      config = lib.mkIf config.host.features.waybar.enable {
+  features.waybar = {
+    homeManager =
+      { config, lib, ... }:
+      {
         programs.waybar = {
           enable = true;
 
@@ -68,5 +61,5 @@ _: {
           };
         };
       };
-    };
+  };
 }

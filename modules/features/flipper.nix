@@ -1,39 +1,16 @@
 _: {
-  flake = {
-    types.generic.feature-options.flipper =
-      { inputs, lib }:
-      let
-        inherit (inputs.self.types.generic) simpleFeature;
-      in
-      simpleFeature { inherit inputs lib; } "flipper feature";
+  features.flipper = {
+    homeManager =
+      { pkgs, ... }:
+      {
+        home.packages = with pkgs; [ qFlipper ];
+      };
 
-    modules = {
-      homeManager.flipper =
-        {
-          config,
-          lib,
-          pkgs,
-          ...
-        }:
-        {
-          config = lib.mkIf config.host.features.flipper.enable {
-            home.packages = with pkgs; [ qFlipper ];
-          };
-        };
-
-      nixos.flipper =
-        {
-          config,
-          lib,
-          pkgs,
-          ...
-        }:
-        {
-          config = lib.mkIf config.host.features.flipper.enable {
-            hardware.flipperzero.enable = true;
-            users.users.${config.host.identity.username}.extraGroups = [ "plugdev" ];
-          };
-        };
-    };
+    nixos =
+      { config, ... }:
+      {
+        hardware.flipperzero.enable = true;
+        users.users.${config.host.identity.username}.extraGroups = [ "plugdev" ];
+      };
   };
 }
