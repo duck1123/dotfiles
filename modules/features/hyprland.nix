@@ -1,10 +1,48 @@
 _: {
   flake.types.generic.feature-options.hyprland =
-    { inputs, lib }:
-    let
-      inherit (inputs.self.types.generic) simpleFeature;
-    in
-    simpleFeature { inherit inputs lib; } "hyprland feature";
+    { lib, ... }:
+    with lib;
+    mkOption {
+      type = types.submodule {
+        options = {
+          enable = mkOption {
+            type = types.bool;
+            default = false;
+            description = "Enable hyprland feature";
+          };
+
+          monitor = mkOption {
+            type = types.listOf (
+              types.submodule {
+                options = {
+                  output = mkOption {
+                    type = types.str;
+                    description = "The monitor output name (e.g. HDMI-A-1, DP-3)";
+                  };
+                  mode = mkOption {
+                    type = types.str;
+                    description = "The monitor resolution/refresh mode (e.g. 1920x1080)";
+                  };
+                  position = mkOption {
+                    type = types.str;
+                    description = "The monitor position (e.g. 0x0)";
+                  };
+                  scale = mkOption {
+                    type = types.numbers.positive;
+                    default = 1;
+                    description = "The monitor scale factor";
+                  };
+                };
+              }
+            );
+            default = [ ];
+            description = "Monitor layout for hyprland";
+          };
+        };
+      };
+      default = { };
+      description = "hyprland feature configuration";
+    };
 
   flake.modules.homeManager.hyprland =
     {
@@ -202,21 +240,7 @@ _: {
               }
             ];
 
-            # FIXME: This is environment specific
-            monitor = [
-              {
-                output = "HDMI-A-1";
-                mode = "1920x1080";
-                position = "0x0";
-                scale = 1;
-              }
-              {
-                output = "DP-3";
-                mode = "1920x1080";
-                position = "1920x0";
-                scale = 1;
-              }
-            ];
+            monitor = config.host.features.hyprland.monitor;
 
             bind =
               (map mkKeyBind [

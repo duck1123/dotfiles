@@ -36,7 +36,23 @@ in
             git.enable = true;
             glances.enable = true;
             gnome.enable = true;
-            hyprland.enable = true;
+            hyprland = {
+              enable = true;
+              monitor = [
+                {
+                  output = "HDMI-A-1";
+                  mode = "1920x1080";
+                  position = "0x0";
+                  scale = 1;
+                }
+                {
+                  output = "DP-3";
+                  mode = "1920x1080";
+                  position = "1920x0";
+                  scale = 1;
+                }
+              ];
+            };
             i3.enable = false;
             java.enable = true;
             jujutsu.enable = true;
