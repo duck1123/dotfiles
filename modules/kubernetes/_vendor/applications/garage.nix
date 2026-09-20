@@ -193,7 +193,11 @@ _: {
             configMaps."${name}-config".data."garage.toml" = ''
               metadata_dir = "/data/meta"
               data_dir = "/data/data"
-              db_engine = "lmdb"
+              # sqlite rather than lmdb: LMDB's metadata DB was corrupted twice
+              # (2026-09-13, 2026-09-20) by unclean pod/node shutdowns on
+              # Longhorn -- see docs/nix-csi-and-binary-cache.md. sqlite is
+              # slower but survives those.
+              db_engine = "sqlite"
 
               replication_factor = 1
 
