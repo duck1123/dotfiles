@@ -64,6 +64,12 @@ _: {
           "--entryPoints.web.transport.respondingTimeouts.readTimeout=600s"
           "--entryPoints.web.transport.respondingTimeouts.writeTimeout=600s"
           "--entryPoints.web.transport.respondingTimeouts.idleTimeout=600s"
+          # websecure serves the HTTPS ingresses (attic included) and otherwise gets
+          # traefik's 60s default read timeout, which kills large `attic push`
+          # uploads (e.g. a lix NAR) with HTTP 499. Match the web entrypoint.
+          "--entryPoints.websecure.transport.respondingTimeouts.readTimeout=600s"
+          "--entryPoints.websecure.transport.respondingTimeouts.writeTimeout=600s"
+          "--entryPoints.websecure.transport.respondingTimeouts.idleTimeout=600s"
         ];
       };
 
