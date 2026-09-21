@@ -1,7 +1,7 @@
 { config, secrets, ... }:
 {
   services.bookorbit = {
-    enable = true;
+    enable = false;
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
