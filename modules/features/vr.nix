@@ -18,7 +18,7 @@ _: {
             patch = pkgs.fetchpatch {
               name = "cap_sys_nice_begone.patch";
               url = "https://github.com/Frogging-Family/community-patches/raw/master/linux61-tkg/cap_sys_nice_begone.mypatch";
-              hash = "sha256-B6Hoy2+bz2jaOiZUxBkR0pvO+Y0D+22iX5JZUAdZRnk=";
+              hash = "sha256-Y3a0+x2xvHsfLax/uwycdJf3xLxvVfkfDVqjkxNaYEo=";
             };
           }
         ];
