@@ -94,6 +94,9 @@ _: {
           };
         }
         (lib.mkIf config.host.features.kubernetes.server.enable {
+          # Read access to the k3s journal without sudo
+          users.users.${config.host.identity.username}.extraGroups = [ "systemd-journal" ];
+
           environment.systemPackages =
             with pkgs;
             [
