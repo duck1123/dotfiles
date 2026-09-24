@@ -95,6 +95,11 @@
 
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+    # Kernel source for hosts with the `vr` feature. Its amdgpu patch means the
+    # kernel has to be compiled locally (~2h), so it's pinned by rev to keep
+    # `nix flake update` from triggering a rebuild. Bump the rev on purpose.
+    nixpkgs-kernel.url = "github:nixos/nixpkgs/e554fab72f81915600f3f449b786fd9af40439a5";
+
     nixpkgs-lib.url = "github:nix-community/nixpkgs.lib";
 
     nur = {

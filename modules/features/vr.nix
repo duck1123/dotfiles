@@ -3,8 +3,13 @@ _: {
     description = "SteamVR / Steam Frame support";
 
     nixos =
-      { pkgs, ... }:
+      { inputs, pkgs, ... }:
       {
+        # Pinned separately from nixpkgs so the patched kernel below isn't
+        # rebuilt on every flake update (see the nixpkgs-kernel input).
+        boot.kernelPackages =
+          inputs.nixpkgs-kernel.legacyPackages.${pkgs.stdenv.hostPlatform.system}.linuxPackages;
+
         # SteamVR's vrsetup.sh tries to `pkexec setcap CAP_SYS_NICE+ep` the
         # vrcompositor-launcher so it can request a high-priority GPU queue
         # (async reprojection). That can't work on NixOS: Steam runs inside
