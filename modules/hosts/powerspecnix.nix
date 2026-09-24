@@ -105,6 +105,7 @@ in
             touch.enable = false;
             vim.enable = false;
             virtualization.enable = false;
+            vr.enable = true;
             vpn.enable = true;
             vscode.enable = false;
             waybar.enable = false;
