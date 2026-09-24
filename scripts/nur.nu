@@ -272,6 +272,8 @@ export def "nur switch" [
 
   if $targets.home {
     if ($host | is-empty) {
+      # Build with nom first so progress is visible; home-manager then finds it all in the store.
+      ^nom build $".#homeConfigurations.($env.USER)@((sys host).hostname).activationPackage" --no-link --show-trace
       let ts = (date now | format date '%s')
       ^home-manager switch --flake . -b $"backup.($ts)" --show-trace
     } else {
@@ -281,6 +283,8 @@ export def "nur switch" [
 
   if $targets.os {
     if ($host | is-empty) {
+      # Build with nom first so progress is visible; nixos-rebuild then finds it all in the store.
+      ^nom build $".#nixosConfigurations.((sys host).hostname).config.system.build.toplevel" --no-link --show-trace
       if $boot {
         ^sudo nixos-rebuild boot --flake . --show-trace
       } else {
