@@ -7,8 +7,10 @@ _: {
       {
         # Pinned separately from nixpkgs so the patched kernel below isn't
         # rebuilt on every flake update (see the nixpkgs-kernel input).
+        # Needs >= 7.0: the Steam Frame wireless adapter (28de:2432) is driven
+        # by rtw89_8852cu, which only gained Valve's USB ID in 7.0.
         boot.kernelPackages =
-          inputs.nixpkgs-kernel.legacyPackages.${pkgs.stdenv.hostPlatform.system}.linuxPackages;
+          inputs.nixpkgs-kernel.legacyPackages.${pkgs.stdenv.hostPlatform.system}.linuxPackages_latest;
 
         # SteamVR's vrsetup.sh tries to `pkexec setcap CAP_SYS_NICE+ep` the
         # vrcompositor-launcher so it can request a high-priority GPU queue
