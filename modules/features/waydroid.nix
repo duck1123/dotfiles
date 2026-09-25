@@ -21,7 +21,11 @@ _: {
         # in the status output.
         tweaks = pkgs.writeShellApplication {
           name = "waydroid-tweaks";
-          runtimeInputs = [ cfg.package ];
+          runtimeInputs = [
+            cfg.package
+            pkgs.coreutils
+            pkgs.gawk
+          ];
           text = ''
             prev_state="STOPPED"
 
