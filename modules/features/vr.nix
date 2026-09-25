@@ -12,6 +12,13 @@ _: {
         boot.kernelPackages =
           inputs.nixpkgs-kernel.legacyPackages.${pkgs.stdenv.hostPlatform.system}.linuxPackages_latest;
 
+        # The headset hosts a hidden 6 GHz network for the adapter to join. With
+        # no country set, the kernel uses the world regdomain (00), which disables
+        # 6 GHz entirely, so the adapter never finds it.
+        boot.extraModprobeConfig = ''
+          options cfg80211 ieee80211_regdom=US
+        '';
+
         # SteamVR's vrsetup.sh tries to `pkexec setcap CAP_SYS_NICE+ep` the
         # vrcompositor-launcher so it can request a high-priority GPU queue
         # (async reprojection). That can't work on NixOS: Steam runs inside
