@@ -6,7 +6,6 @@ _: {
         host-options
         hosts-options
         identities-options
-        hosts
       ];
     };
 }

@@ -9,8 +9,9 @@ _: {
     {
       options.hosts = mkOption {
         type = types.attrsOf hostSubmodule;
-        description = "Map of hosts with their configurations";
-        default = { };
+        description = "Map of hosts with their configurations (defined in hosts/, read-only here)";
+        default = inputs.self.hosts;
+        readOnly = true;
       };
     };
 }

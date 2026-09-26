@@ -37,6 +37,7 @@ in
   imports = lib.mapAttrsToList loadRegistry {
     environments = ../../environments;
     features = ../../features;
+    hosts = ../../hosts;
     identities = ../../identities;
   };
 }

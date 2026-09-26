@@ -58,10 +58,10 @@ Top-level registry directories (auto-loaded, see Registries):
 - `features/` — features enabled/disabled per host (bluetooth, hyprland, kubernetes, etc.), one `<name>.nix` per feature (see Feature System)
 - `environments/` — desktop environments (budgie, gnome, hyprland, i3, niri, plasma6), one `<name>.nix` per environment (see Environment System)
 - `identities/` — per-user identities (duck, deck, drenfer)
+- `hosts/` — one `<hostname>.nix` per host (see Host Configuration Pattern)
 
 Key subdirectories of `modules/`:
 - `modules/flake/` — flake outputs: `nixosConfigurations`, `homeConfigurations`, `devShells`, `packages`, and the `lib/+mk-os.nix` helpers
-- `modules/hosts/` — per-host module definitions (one `.nix` per host, e.g. `edgenix.nix`)
 - `modules/nixos/` — NixOS-specific modules (boot, users, i18n, sddm, etc.)
 - `modules/options/` — NixOS option declarations (host, hosts, identities, simpleFeature type)
 - `modules/types/` — custom Nix types/submodules for hosts, identities, features
@@ -70,14 +70,32 @@ Key subdirectories of `modules/`:
 
 ### Host Configuration Pattern
 
-Each host file (e.g., `modules/hosts/edgenix.nix`) defines three namespaced modules in `flake.modules`:
-1. `generic.<hostname>` — shared config: features enabled/disabled, identity assignment, syncthing shares
-2. `homeManager.<hostname>` — home-manager extras: extra packages, session paths
-3. `nixos.<hostname>` — NixOS hardware config (specialisations are generated from `hosts.<hostname>.environments`, see Environment System)
+Each host is one file, `hosts/<hostname>.nix`, in the `hosts` registry (`modules/flake/hosts.nix`). It holds the host's data (the `hostSubmodule` options) plus its own modules:
 
-`modules/flake/nixosConfigurations.nix` builds hosts using helpers from `lib/+mk-os.nix`:
-- `linux "hostname"` → `nixpkgs.lib.nixosSystem` with `modules.nixos.base` + `modules.nixos.<hostname>`
-- `wsl "hostname"` → WSL variant
+```nix
+# hosts/edgenix.nix
+{ config, ... }:            # flake-parts args, for config.identities
+{
+  system = "x86_64-linux";  # hostname defaults to the file name, name to hostname
+  identity = config.identities.duck;
+  id = "...";               # Syncthing device ID
+  environments.primary = "plasma6";
+  features = { git.enable = true; ... };
+  nixos.enable = true;      # build nixosConfigurations.<hostname>
+
+  modules.homeManager = { pkgs, ... }: { home.packages = [ pkgs.guake ]; };
+  modules.nixos = { config, lib, modulesPath, ... }: { ... };  # hardware, boot, imports nixos.base
+  # homeConfigurationName = "user@HOST";  # default "<identity.username>@<hostname>"
+}
+```
+
+From that the registry generates:
+- `inputs.self.hosts.<hostname>` (the data, evaluated once), exposed read-only to generic/NixOS/home-manager modules as `config.hosts` (`modules/options/hosts-options.nix`)
+- `modules.homeManager.<hostname>` / `modules.nixos.<hostname>` (published unwrapped, so merge order matches a hand-written module)
+- `homeConfigurations.<homeConfigurationName>` for every host with `modules.homeManager` (`[ base <hostname> ]`, plus `host = config.hosts.<hostname>`)
+- `nixosConfigurations.<hostname>` for every host with `modules.nixos` and `nixos.enable`, via `mkNixos` from `modules/flake/lib/+mk-os.nix`, plus `host = config.hosts.<hostname>`. A WSL host imports `inputs.self.modules.nixos.wsl` from its own `modules.nixos` (see `vavirl-pw0bwnq8`).
+
+Host modules don't set `host` themselves; anything else importing `modules.<class>.<hostname>` has to.
 
 ### Feature System
 
@@ -156,7 +174,7 @@ Some core types live in top-level directories outside `modules/` and are auto-lo
 The registry's option is declared in `modules/flake/<attr>.nix` and evaluated once at the flake level. To add a new registry, add a `<attr> = ../../<dir>;` line to the table in `registries.nix` and declare the option.
 
 Current registries:
-- `features/`, `environments/` — see Feature System and Environment System.
+- `features/`, `environments/`, `hosts/` — see Feature System, Environment System and Host Configuration Pattern.
 - `identities/` — per-user identities (duck, deck, drenfer). Declared in `modules/flake/identities.nix`, published as `inputs.self.identities`, and exposed read-only to generic/NixOS/home-manager modules as `config.identities` (`modules/options/identities-options.nix`). Hosts pick one with `identity = config.identities.<name>`.
 
 ### Hosts
@@ -169,25 +187,14 @@ Current registries:
 | nixmini | NixOS x86_64 | k3s node |
 | powerspecnix | NixOS x86_64 | |
 | steamdeck | home-manager only | user: deck |
-| vavirl-pw0bwnq8 | home-manager only | WSL, user: drenfer (NixOS/WSL build currently disabled in `nixosConfigurations.nix`) |
+| vavirl-pw0bwnq8 | NixOS-WSL + home-manager | WSL, user: drenfer; home config is `drenfer@VAVIRL-PW0BWNQ8` |
 | pixel8 | generic config only | Android phone; identity: duck; only feature flags + syncthing, no `nixosConfigurations`/`homeConfigurations` entry |
 
 ### Adding a New Host
 
-Four files must be updated when adding a NixOS host. Missing any one causes evaluation errors (e.g. `attribute '<hostname>' missing`).
+Create `hosts/<hostname>.nix` (copy an existing one); nothing else needs registering. Set `modules.nixos` + `nixos.enable = true` to get a `nixosConfigurations` entry and `modules.homeManager` (even `{ }`, see `steamdeck`) to get a `homeConfigurations` entry. A host that isn't built by Nix at all (e.g. `pixel8`, an Android phone tracked only for feature flags/syncthing) sets neither.
 
-1. **`modules/hosts/<hostname>.nix`** — create the host file with three modules:
-   - `generic.<hostname>` — feature flags, identity, syncthing shares, pubkey, Syncthing device ID
-   - `homeManager.<hostname>` — extra packages, sessionPath
-   - `nixos.<hostname>` — hardware config (UUIDs, kernel modules, CPU type), boot loader, timezone, specialisations
-
-2. **`modules/hosts.nix`** — add `<hostname>` to the `imports` list inside `generic.hosts`. This is what makes `config.hosts.<hostname>` available everywhere (home-manager, NixOS, etc.). **Forgetting this causes the `attribute '<hostname>' missing` error.**
-
-3. **`modules/flake/nixosConfigurations.nix`** — add `<hostname> = linux "<hostname>";` (or `wsl`/`linux-arm` as appropriate).
-
-4. **`modules/flake/homeConfigurations.nix`** — add a `"<user>@<hostname>"` entry importing `[base <hostname>]` from `homeManager`.
-
-A host that isn't built by Nix at all (e.g. `pixel8`, an Android phone tracked only for feature flags/syncthing) only needs steps 1–2 — skip the `nixosConfigurations`/`homeConfigurations` entries.
+`scripts/nur.nu` still has its own hardcoded host lists (`nixos-hosts`, `home-hosts`, `host-flake-name`, `host-user`) for tab completion; add the host there too.
 
 ### Secrets
 
