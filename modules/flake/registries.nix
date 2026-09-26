@@ -35,6 +35,8 @@ let
 in
 {
   imports = lib.mapAttrsToList loadRegistry {
+    environments = ../../environments;
+    features = ../../features;
     identities = ../../identities;
   };
 }

@@ -1,6 +1,6 @@
 # Query org-roam's SQLite cache directly rather than parsing org-mode
 # syntax. Cache location set by `user-emacs-directory` in
-# modules/features/emacs.nix, kept live by `org-roam-db-autosync-mode`.
+# features/emacs.nix, kept live by `org-roam-db-autosync-mode`.
 def db-path []: nothing -> string {
     $env.ORG_ROAM_DB? | default ($env.HOME | path join ".cache" "emacs" "org-roam.db")
 }

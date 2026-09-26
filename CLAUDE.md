@@ -54,14 +54,18 @@ The flake outputs are assembled from modules under `modules/`, auto-imported via
 outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 ```
 
-Key subdirectories:
+Top-level registry directories (auto-loaded, see Registries):
+- `features/` — features enabled/disabled per host (bluetooth, hyprland, kubernetes, etc.), one `<name>.nix` per feature (see Feature System)
+- `environments/` — desktop environments (budgie, gnome, hyprland, i3, niri, plasma6), one `<name>.nix` per environment (see Environment System)
+- `identities/` — per-user identities (duck, deck, drenfer)
+
+Key subdirectories of `modules/`:
 - `modules/flake/` — flake outputs: `nixosConfigurations`, `homeConfigurations`, `devShells`, `packages`, and the `lib/+mk-os.nix` helpers
 - `modules/hosts/` — per-host module definitions (one `.nix` per host, e.g. `edgenix.nix`)
-- `modules/features/` — features enabled/disabled per host (bluetooth, hyprland, kubernetes, etc.), each self-registering via `features.<name>` (see Feature System)
-- `modules/environments/` — desktop environments (budgie, gnome, hyprland, i3, niri, plasma6), each self-registering via `environments.<name>` (see Environment System)
 - `modules/nixos/` — NixOS-specific modules (boot, users, i18n, sddm, etc.)
 - `modules/options/` — NixOS option declarations (host, hosts, identities, simpleFeature type)
 - `modules/types/` — custom Nix types/submodules for hosts, identities, features
+- `modules/base.nix`, `modules/state-version.nix` — the `homeManager.base`/`nixos.base` entry modules and state versions
 - `modules/kubernetes/` — the k3s fleet-ops integration, fully consolidated into this repo (the `k3s-fleetops` flake input is gone; there is no external dependency left). `_vendor/applications/` and `_vendor/generators/`/`_vendor/lib/`/`_vendor/modules/` hold the application library/generators (edit these directly — "_vendor" is a historical name, not a sync boundary); `_env/dev/` has the per-app instance config for the `dev` nixidy environment. See `modules/kubernetes/docs/` for deployment workflow, the two-module-system gotcha, pinned-volume handling, and a troubleshooting playbook.
 
 ### Host Configuration Pattern
@@ -79,18 +83,17 @@ Each host file (e.g., `modules/hosts/edgenix.nix`) defines three namespaced modu
 
 Features are toggled with `enable = true/false` under `hosts.<hostname>.features.<name>`.
 
-Each feature is declared **once**, in `modules/features/<name>.nix`, by setting `features.<name>` in the registry defined in `modules/flake/features.nix`. That single declaration generates:
+Each feature is declared **once**, in `features/<name>.nix`, which holds the body of `features.<name>` in the registry defined in `modules/flake/features.nix`. That single declaration generates:
 - the `hosts.<host>.features.<name>` option (via `simpleFeatureWith` in `modules/options/simpleFeature.nix`)
 - `modules.homeManager.features.<name>` and `modules.nixos.features.<name>`, each wrapped in `mkIf hosts.<host>.features.<name>.enable`
 - their inclusion in `homeManager.base` / `nixos.base` (which import every registered feature; there is no list to edit)
 
 ```nix
-_: {
-  features.vim = {
-    # description = "...";            # optional; defaults to "<name> feature"
-    homeManager = { pkgs, ... }: { home.packages = [ pkgs.neovim ]; };  # body only: no `config =` / `mkIf`
-    nixos = _: { programs.vim.enable = true; };                         # optional, either class may be omitted
-  };
+# features/vim.nix
+{
+  # description = "...";            # optional; defaults to "<name> feature"
+  homeManager = { pkgs, ... }: { home.packages = [ pkgs.neovim ]; };  # body only: no `config =` / `mkIf`
+  nixos = _: { programs.vim.enable = true; };                         # optional, either class may be omitted
 }
 ```
 
@@ -101,21 +104,20 @@ Registry knobs beyond the two bodies (a body may also be a list of bodies):
 
 Gotchas:
 - flake-parts types `flake.modules.<class>.<name>` as a `deferredModule`, so `features.<name>` can't be nested there. The registry sets `nestedModules.<class>.features` (`modules/flake/nested-modules.nix`), which is written into the *published* flake output through `touchup.attr.modules.finish`, so it is visible as `inputs.self.modules.<class>.features.<name>` but **not** in `config.flake.modules` inside flake-parts modules. `finish` only takes one definition, so any other nested group must go through `nestedModules` too.
-- A body that sets options which only exist in some hosts (e.g. `sops.*`) can't live in a feature that WSL also imports, because `mkIf false` still errors on an undeclared option. That is why `modules/features/nix-attic.nix` stays a standalone `modules.nixos.nix-attic` imported directly by `nixos.base`.
-- Non-feature modules (`state-version`, `boot`, `i18n`, `users`, `sddm`, `environments-*`) are still plain `flake.modules.<class>.<name>` and are listed explicitly in `base.nix`.
+- A body that sets options which only exist in some hosts (e.g. `sops.*`) can't live in a feature that WSL also imports, because `mkIf false` still errors on an undeclared option. That is why `modules/nixos/nix-attic.nix` stays a standalone `modules.nixos.nix-attic` imported directly by `nixos.base`.
+- Non-feature modules (`state-version`, `boot`, `i18n`, `users`, `sddm`, `environments-*`) are still plain `flake.modules.<class>.<name>` and are listed explicitly in `modules/base.nix`.
 
 ### Environment System
 
-Desktop environments work like features. Each is declared once in `modules/environments/<name>.nix` by setting `environments.<name>` in the registry in `modules/flake/environments.nix`:
+Desktop environments work like features. Each is declared once in `environments/<name>.nix`, which holds the body of `environments.<name>` in the registry in `modules/flake/environments.nix`:
 
 ```nix
-_: {
-  environments.niri = {
-    features = [ "wayle" ];      # features turned on for hosts using this environment
-    desktopNames = [ "niri" ];   # XDG_CURRENT_DESKTOP of the session
-    nixos = { pkgs, ... }: { programs.niri.enable = true; };  # body only, like features
-    # homeManager = ...;                                      # optional
-  };
+# environments/niri.nix
+{
+  features = [ "wayle" ];      # features turned on for hosts using this environment
+  desktopNames = [ "niri" ];   # XDG_CURRENT_DESKTOP of the session
+  nixos = { pkgs, ... }: { programs.niri.enable = true; };  # body only, like features
+  # homeManager = ...;                                      # optional
 }
 ```
 
@@ -141,7 +143,7 @@ How it fits together:
 
 ### Registries (top-level directories)
 
-Some core types live in top-level directories outside `modules/` and are auto-loaded by `modules/flake/registries.nix`: every `<dir>/<name>.nix` becomes a flake-parts definition of `<attr>.<name>`, so adding one means dropping in a file (files starting with `_` are skipped). A file holds only the entry's body, either a plain value or a function of flake-parts module args when it needs to reference other entries:
+Some core types live in top-level directories outside `modules/` and are auto-loaded by `modules/flake/registries.nix`: every `<dir>/<name>.nix` becomes a flake-parts definition of `<attr>.<name>`, so adding one means dropping in a file (files starting with `_` are skipped). A file holds only the entry's body, either a plain value or a function of flake-parts module args (`config`, `lib`, `inputs`, ...) when it needs them, e.g. to reference other entries. Note that such a function gets the *flake-parts* args, not NixOS/home-manager ones; those belong to the nested `nixos`/`homeManager` bodies. Relative paths are relative to the registry directory (e.g. `../resources/...`).
 
 ```nix
 # identities/deck.nix
@@ -154,6 +156,7 @@ Some core types live in top-level directories outside `modules/` and are auto-lo
 The registry's option is declared in `modules/flake/<attr>.nix` and evaluated once at the flake level. To add a new registry, add a `<attr> = ../../<dir>;` line to the table in `registries.nix` and declare the option.
 
 Current registries:
+- `features/`, `environments/` — see Feature System and Environment System.
 - `identities/` — per-user identities (duck, deck, drenfer). Declared in `modules/flake/identities.nix`, published as `inputs.self.identities`, and exposed read-only to generic/NixOS/home-manager modules as `config.identities` (`modules/options/identities-options.nix`). Hosts pick one with `identity = config.identities.<name>`.
 
 ### Hosts

@@ -1,0 +1,43 @@
+{
+  description = "Tailscale feature";
+
+  extraOptions =
+    { lib, ... }:
+    {
+      advertiseRoutes = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = ''
+          CIDR subnets to advertise into the Tailnet as subnet routes.
+          When non-empty, enables IP forwarding and passes --advertise-routes to tailscale up.
+          Routes still require approval in the Tailscale admin console.
+        '';
+      };
+    };
+
+  nixos =
+    { config, lib, ... }:
+    let
+      cfg = config.host.features.tailscale;
+      routesFlag = lib.optionalString (cfg.advertiseRoutes != [ ]) (
+        "--advertise-routes=" + lib.concatStringsSep "," cfg.advertiseRoutes
+      );
+    in
+    {
+      services.tailscale = {
+        enable = true;
+        # Prevent tailscaled from pushing its split-DNS nameserver (a Tailscale
+        # infrastructure IP only reachable from Tailscale IPs) directly into
+        # systemd-resolved, which would query it from the LAN IP and get REFUSED.
+        # Instead we point resolved at 100.100.100.100 (tailscaled's local proxy)
+        # which routes queries through the tunnel from the correct Tailscale IP.
+        extraUpFlags = [ "--accept-dns=false" ] ++ lib.optional (routesFlag != "") routesFlag;
+        useRoutingFeatures = lib.mkIf (cfg.advertiseRoutes != [ ]) "server";
+      };
+
+      services.resolved.settings.Resolve = {
+        DNS = "100.100.100.100";
+        Domains = "~ts.net";
+      };
+    };
+}
