@@ -246,10 +246,10 @@ _: {
 
           server = {
             controllers.main = {
+              inherit (cfg) replicas;
               # Single-replica deployment backed by a ReadWriteOnce volume: RollingUpdate
               # can deadlock (new pod can't attach the volume until the old one releases it).
               strategy = "Recreate";
-              replicas = cfg.replicas;
             };
           }
           // lib.optionalAttrs cfg.externalLibrary.enable {
