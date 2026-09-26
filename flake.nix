@@ -6,10 +6,12 @@
     extra-experimental-features = "nix-command flakes";
     extra-substituters = [
       "https://duck1123.cachix.org"
+      "https://look.cachix.org"
       "https://nix-community.cachix.org"
     ];
     extra-trusted-public-keys = [
       "duck1123.cachix.org-1:Cj3r3BH7Xuy0zFWy8V/VIB3F7+Gi1m9HB302E9UGV3E="
+      "look.cachix.org-1:8elPCeSVBzlDZXqIRKBK9GyLIK/Hoe1xiWZF0ir7uX4="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
@@ -51,6 +53,11 @@
     };
 
     import-tree.url = "github:vic/import-tree";
+
+    # Deliberately not following our nixpkgs: Look pins its own rust toolchain
+    # via rust-overlay, and keeping its lock intact is what lets the build come
+    # from look.cachix.org instead of compiling from source.
+    look.url = "github:kunkka19xx/look?dir=apps/linows";
 
     # Intentionally pinned rather than tracking upstream master -- the vendored
     # modules/kubernetes/_vendor/applications/nix-csi.nix (originally from
