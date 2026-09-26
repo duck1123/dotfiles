@@ -1,0 +1,18 @@
+--- a/src/input/mod.rs
++++ b/src/input/mod.rs
+@@ -2876,10 +2876,12 @@
+             if let Some(mapped) = self.niri.window_under_cursor() {
+                 let window = mapped.window.clone();
+ 
+-                // Check if we need to start an interactive move.
+-                if button == Some(MouseButton::Left) && !pointer.is_grabbed() {
++                // Check if we need to start an interactive move. The back side button
++                // drags without a modifier, like Hyprland's `bindm = , mouse:275`.
++                let is_side_drag = button == Some(MouseButton::Back);
++                if (button == Some(MouseButton::Left) || is_side_drag) && !pointer.is_grabbed() {
+                     let mod_down = modifiers_from_state(mods).contains(mod_key.to_modifiers());
+-                    if is_overview_open || mod_down {
++                    if is_overview_open || mod_down || is_side_drag {
+                         let location = pointer.current_location();
+ 
+                         if !is_overview_open {

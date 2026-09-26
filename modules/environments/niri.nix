@@ -25,7 +25,14 @@ _: {
 
         programs = {
           lookapp.enable = true;
-          niri.enable = true;
+          niri = {
+            enable = true;
+            # Lets the back side button drag windows like Mod+LMB, which niri
+            # hardcodes and can't bind from config.
+            package = pkgs.niri.overrideAttrs (old: {
+              patches = (old.patches or [ ]) ++ [ ./niri-side-button-drag.patch ];
+            });
+          };
         };
 
         services.displayManager.defaultSession = "niri";
@@ -212,7 +219,15 @@ _: {
           # relative to this file.
           "niri/config.kdl".source = pkgs.runCommand "niri-config.kdl" { } ''
             cat ${pkgs.niri.src}/resources/default-config.kdl > $out
-            printf '\ninclude "look.kdl"\ninclude "binds.kdl"\n' >> $out
+            printf '\ninclude "input.kdl"\ninclude "look.kdl"\ninclude "binds.kdl"\n' >> $out
+          '';
+
+          # Like Hyprland's follow_mouse, but only for windows already fully on
+          # screen, so moving the mouse never scrolls the layout.
+          "niri/input.kdl".text = ''
+            input {
+                focus-follows-mouse max-scroll-amount="0%"
+            }
           '';
 
           "niri/look.kdl".text = ''
