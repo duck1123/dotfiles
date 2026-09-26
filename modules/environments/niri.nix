@@ -4,13 +4,39 @@ _: {
     desktopNames = [ "niri" ];
 
     nixos =
+      { inputs, pkgs, ... }:
       {
-        config,
-        inputs,
-        lib,
-        pkgs,
-        ...
-      }:
+        imports = [ inputs.look.nixosModules.default ];
+
+        environment = {
+          sessionVariables.NIXOS_OZONE_WL = "1";
+
+          # niri's stock config binds Mod+T to alacritty and Mod+D to fuzzel;
+          # keep both around so it stays usable if home-manager hasn't written
+          # its config yet.
+          # niri spawns xwayland-satellite on demand for X11 apps when it's on
+          # PATH.
+          systemPackages = with pkgs; [
+            alacritty
+            fuzzel
+            xwayland-satellite
+          ];
+        };
+
+        programs = {
+          lookapp.enable = true;
+          niri.enable = true;
+        };
+
+        services.displayManager.defaultSession = "niri";
+      };
+
+    # All of niri's config lives in ~/.config/niri, so a home-manager switch is
+    # enough to change it; niri reloads it on its own. niri prefers this path
+    # over /etc/niri/config.kdl, and would otherwise write its stock config
+    # here on first start.
+    homeManager =
+      { lib, pkgs, ... }:
       let
         kdlStr = s: ''"${lib.escape [ "\\" "\"" ] s}"'';
 
@@ -181,70 +207,36 @@ _: {
           "    ${key}${lib.optionalString (props != "") " ${props}"} { ${action}; }";
       in
       {
-        imports = [ inputs.look.nixosModules.default ];
+        xdg.configFile = {
+          # The stock config with our files included last; includes resolve
+          # relative to this file.
+          "niri/config.kdl".source = pkgs.runCommand "niri-config.kdl" { } ''
+            cat ${pkgs.niri.src}/resources/default-config.kdl > $out
+            printf '\ninclude "look.kdl"\ninclude "binds.kdl"\n' >> $out
+          '';
 
-        environment = {
-          sessionVariables.NIXOS_OZONE_WL = "1";
+          "niri/look.kdl".text = ''
+            spawn-at-startup "lookapp"
 
-          # niri's stock config binds Mod+T to alacritty and Mod+D to fuzzel;
-          # keep both around so it stays usable if binds.kdl isn't loaded.
-          # niri spawns xwayland-satellite on demand for X11 apps when it's on
-          # PATH.
-          systemPackages = with pkgs; [
-            alacritty
-            fuzzel
-            xwayland-satellite
-          ];
+            // Look floats itself over niri IPC; this only drops the decorations.
+            window-rule {
+                match app-id="^lookapp$"
+                open-floating true
+                focus-ring { off; }
+                shadow { off; }
+            }
+          '';
 
-          etc = {
-            # niri reads ~/.config/niri/config.kdl if it exists, else this file.
-            # The homeManager body below points the user path back here, so a
-            # stale user config can't shadow it.
-            "niri/config.kdl".source = pkgs.runCommand "niri-config.kdl" { } ''
-              cat ${config.programs.niri.package.src}/resources/default-config.kdl > $out
-              printf '\ninclude "/etc/niri/look.kdl"\ninclude "/etc/niri/binds.kdl"\n' >> $out
-            '';
-
-            "niri/look.kdl".text = ''
-              spawn-at-startup "lookapp"
-
-              // Look floats itself over niri IPC; this only drops the decorations.
-              window-rule {
-                  match app-id="^lookapp$"
-                  open-floating true
-                  focus-ring { off; }
-                  shadow { off; }
-              }
-            '';
-
-            # niri has no IPC for adding binds, so these have to be included from
-            # config.kdl; binds from a later include override earlier ones, so
-            # these win over the stock binds on the same keys (Mod+D fuzzel,
-            # Mod+T alacritty, the media keys, ...) without editing them out.
-            "niri/binds.kdl".text = ''
-              binds {
-              ${lib.concatMapStringsSep "\n" renderBind binds}
-              }
-            '';
-          };
+          # niri has no IPC for adding binds, so these have to be included from
+          # config.kdl; binds from a later include override earlier ones, so
+          # these win over the stock binds on the same keys (Mod+D fuzzel,
+          # Mod+T alacritty, the media keys, ...) without editing them out.
+          "niri/binds.kdl".text = ''
+            binds {
+            ${lib.concatMapStringsSep "\n" renderBind binds}
+            }
+          '';
         };
-
-        programs = {
-          lookapp.enable = true;
-          niri.enable = true;
-        };
-
-        services.displayManager.defaultSession = "niri";
       };
-
-    # ~/.config is shared by every specialisation, and niri prefers it over
-    # /etc/niri/config.kdl, so own it and defer to the system config. /etc/niri
-    # only exists while niri is the active environment, which is the only time
-    # niri reads this.
-    homeManager = _: {
-      xdg.configFile."niri/config.kdl".text = ''
-        include "/etc/niri/config.kdl"
-      '';
-    };
   };
 }
