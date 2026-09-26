@@ -27,11 +27,8 @@ _: {
           lookapp.enable = true;
           niri = {
             enable = true;
-            # Lets the back side button drag windows like Mod+LMB, which niri
-            # hardcodes and can't bind from config.
-            package = pkgs.niri.overrideAttrs (old: {
-              patches = (old.patches or [ ]) ++ [ ./niri-side-button-drag.patch ];
-            });
+            # Patched so the back side button drags windows.
+            package = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.niri;
           };
         };
 

@@ -76,6 +76,12 @@ let
       meta.mainProgram = "ngit";
     };
 
+  # Lets the back side button drag windows like Mod+LMB, which niri hardcodes
+  # and can't bind from config.
+  niri = pkgs.niri.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [ ../../patches/niri-side-button-drag.patch ];
+  });
+
   pnu = pkgs.writeShellApplication {
     name = "pnu";
     runtimeInputs = [ pkgs.nushell ];
@@ -107,6 +113,7 @@ in
         packages = {
           inherit
             ngit
+            niri
             pnu
             soap-cli
             windmill-cli
