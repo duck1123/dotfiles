@@ -57,6 +57,12 @@ let
       used = inputs.self.lib.environments.usedBy host.environments;
     };
     features = builtins.attrNames (lib.filterAttrs (_: isEnabled) host.features);
+    # Name to reach the host by (ssh, `nur --host`).
+    sshHost = host.hostname;
+    # Flake attributes built for the host, or null.
+    homeConfiguration = if host.modules.homeManager != null then host.homeConfigurationName else null;
+    nixosConfiguration =
+      if host.modules.nixos != null && host.nixos.enable then host.hostname else null;
   };
 
   registryModule =

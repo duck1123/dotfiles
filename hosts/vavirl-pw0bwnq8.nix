@@ -124,6 +124,7 @@
     };
 
   homeConfigurationName = "drenfer@VAVIRL-PW0BWNQ8";
+  info.sshHost = "vallen";
 
   modules.nixos =
     { config, inputs, ... }:

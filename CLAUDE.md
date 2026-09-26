@@ -99,9 +99,9 @@ Host modules don't set `host` themselves; anything else importing `modules.<clas
 
 #### Host info (`hosts.json`)
 
-Each host also has an `info` record: a JSON-friendly summary (hostname, name, system, user, nixos/android, environments, enabled `features`). Its fields default to `defaultInfo` in `modules/flake/hosts.nix` (change that to record something for every host), and a host file can override or add fields with `info.<field> = ...;` (never paths or functions). A feature counts as enabled if its `enable`, or any direct sub-option's `enable` (e.g. `kubernetes.server.enable`), is true.
+Each host also has an `info` record: a JSON-friendly summary (hostname, name, system, user, nixos/android, environments, enabled `features`, `sshHost`, and the `homeConfiguration`/`nixosConfiguration` attribute names or null). Its fields default to `defaultInfo` in `modules/flake/hosts.nix` (change that to record something for every host), and a host file can override or add fields with `info.<field> = ...;` (never paths or functions). A feature counts as enabled if its `enable`, or any direct sub-option's `enable` (e.g. `kubernetes.server.enable`), is true.
 
-- `nix eval --json .#hostInfo` — all hosts' info from the working tree
+- `nix eval --json .#hostInfo` — all hosts' info from the working tree (what `scripts/nur.nu` uses)
 - `~/.config/dotfiles/hosts.json` — `{ current, hosts: [info ...] }`, written on every host by `modules.homeManager.host-info` (imported by `homeManager.base`); reflects the last home-manager switch. Meant as a data source for other tools (e.g. Look).
 - `nushell/modules/hosts_module.nu` reads that file: `hosts list`, `hosts get [host]`, `hosts features [host]` (defaulting to the current host).
 
@@ -202,7 +202,7 @@ Current registries:
 
 Create `hosts/<hostname>.nix` (copy an existing one); nothing else needs registering. Set `modules.nixos` + `nixos.enable = true` to get a `nixosConfigurations` entry and `modules.homeManager` (even `{ }`, see `steamdeck`) to get a `homeConfigurations` entry. A host that isn't built by Nix at all (e.g. `pixel8`, an Android phone tracked only for feature flags/syncthing) sets neither.
 
-`scripts/nur.nu` still has its own hardcoded host lists (`nixos-hosts`, `home-hosts`, `host-flake-name`, `host-user`) for tab completion; add the host there too.
+`nur` picks the host up automatically: its host lists and `--host` resolution read `nix eval --json .#hostInfo`. `--host` takes the host's `info.sshHost` (defaults to the hostname; e.g. `vallen` for `vavirl-pw0bwnq8`) or its hostname, and maps it to `info.homeConfiguration` / `info.nixosConfiguration`.
 
 ### Secrets
 

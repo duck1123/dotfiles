@@ -43,6 +43,9 @@
   homeManager =
     { config, pkgs, ... }:
     {
+      # nom: used by scripts/nur.nu for builds
+      home.packages = [ pkgs.nix-output-monitor ];
+
       nix.package = pkgs.nix;
 
       nix.settings = {

@@ -7,7 +7,11 @@ def hosts-file []: nothing -> path {
 }
 
 def hosts-data []: nothing -> record {
-  open (hosts-file)
+  let file = (hosts-file)
+  if not ($file | path exists) {
+    error make {msg: $"($file) not found: it is written by the dotfiles home-manager config \(homeManager.host-info\)"}
+  }
+  open $file
 }
 
 def "nu-complete hosts" []: nothing -> list<string> {
@@ -27,7 +31,7 @@ export def "hosts get" [
   let name = $host | default $data.current
   let matches = $data.hosts | where hostname == $name
   if ($matches | is-empty) {
-    error make { msg: $"unknown host: ($name)" }
+    error make {msg: $"unknown host: ($name)"}
   }
   $matches | first
 }
