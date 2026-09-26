@@ -182,16 +182,20 @@ _: {
         environment = {
           sessionVariables.NIXOS_OZONE_WL = "1";
 
+          # niri's stock config binds Mod+T to alacritty and Mod+D to fuzzel;
+          # keep both around so it stays usable if binds.kdl isn't loaded.
           # niri spawns xwayland-satellite on demand for X11 apps when it's on
           # PATH.
-          systemPackages = [ pkgs.xwayland-satellite ];
+          systemPackages = with pkgs; [
+            alacritty
+            fuzzel
+            xwayland-satellite
+          ];
 
           etc = {
-            # niri reads ~/.config/niri/config.kdl if it exists, else this file, and
-            # only writes its stock config to the user path when neither exists. So
-            # shipping the stock config plus the includes here covers fresh hosts;
-            # an existing user config still wins and needs the same trailing
-            # includes added by hand.
+            # niri reads ~/.config/niri/config.kdl if it exists, else this file.
+            # The homeManager body below points the user path back here, so a
+            # stale user config can't shadow it.
             "niri/config.kdl".source = pkgs.runCommand "niri-config.kdl" { } ''
               cat ${config.programs.niri.package.src}/resources/default-config.kdl > $out
               printf '\ninclude "/etc/niri/look.kdl"\ninclude "/etc/niri/binds.kdl"\n' >> $out
@@ -228,5 +232,15 @@ _: {
 
         services.displayManager.defaultSession = "niri";
       };
+
+    # ~/.config is shared by every specialisation, and niri prefers it over
+    # /etc/niri/config.kdl, so own it and defer to the system config. /etc/niri
+    # only exists while niri is the active environment, which is the only time
+    # niri reads this.
+    homeManager = _: {
+      xdg.configFile."niri/config.kdl".text = ''
+        include "/etc/niri/config.kdl"
+      '';
+    };
   };
 }
