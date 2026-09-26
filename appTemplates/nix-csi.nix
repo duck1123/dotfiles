@@ -7,9 +7,10 @@
 }:
 with lib;
 let
-  nixcsi = import "${self.inputs.nix-csi}/default.nix" {
-    system = pkgs.stdenv.hostPlatform.system;
-  };
+  inherit (pkgs.stdenv.hostPlatform) system;
+  # nixkube's own package set, from the sources its umbrella pins (see the
+  # `nixkube` flake input), so its store paths match nixkube.cachix.org.
+  nixkube = import "${self.inputs.nixkube}/default.nix" { inherit system; };
 in
 {
   name = "nix-csi";
@@ -53,43 +54,49 @@ in
       # paths with "lacks a signature by a trusted key" regardless of trusted-users,
       # since the stdio-spawned remote daemon doesn't resolve the SSH-authenticated
       # user as a trusted uid the way a local socket connection would.
-      cacheSettings = atticSettings // {
+      # Added to the pynixd controller (the cache) on top of atticSettings.
+      cacheSettings = {
         trusted-users = [ "nix" ];
-        trusted-public-keys = atticSettings.trusted-public-keys ++ [
+        trusted-public-keys = [
           "powerspecnix-workstation:QPvTlnwGiEZxUT1nOhVy0OvMoI3UmD3byuzHkVVNLGg="
         ];
       };
-      nixcsiEval = nixcsi.kubenixInstance {
-        module.imports = [
-          # Override curPkgs to avoid builtins.currentSystem (unavailable in pure eval)
-          { _module.args.curPkgs = mkForce nixcsi.pkgs; }
+      # Upstream's kubenixInstance, minus the authorizedKeys it reads from
+      # its own keys/ directory: only our keys get into the cache.
+      nixkubeEval = nixkube.easykubenix {
+        inherit (nixkube) pkgs;
+        modules = [
+          "${self.inputs.nixkube}/kubenix"
+          { _module.args.sources = nixkube.sources; }
           {
-            nix-csi = {
-              inherit (cfg) authorizedKeys;
-
-              builders = {
-                # Gives cache/node/proxy a local-build fallback (via SSH-ng,
-                # discovered dynamically by builders.py) for bootstrap *-init-env
-                # paths that are missing from Attic, instead of hard-failing.
-                deployments.amd64.enable = true;
-                nixConfig.settings = atticSettings;
+            nixkube = {
+              enable = true;
+              # Kept from the nix-csi days, so the ArgoCD app, its pinned
+              # volumes and every reference to the namespace stay put.
+              namespace = "nix-csi";
+              hostSystem = system;
+              # Every node is x86_64; skip building aarch64 environments.
+              systems = {
+                x86_64-linux = true;
+                aarch64-linux = false;
               };
 
-              cache = {
-                # Bootstrap components (cache-init-env, proxy-env, etc.) aren't
-                # published to nix-csi.cachix.org for every commit — our own
-                # cache closes that gap so cold-starts don't depend on upstream CI.
-                nixConfig.settings = cacheSettings;
-                storageClassName = cfg.cache.storageClassName;
-              };
+              # Inherited by the node DaemonSet, the pynixd controller
+              # and its builders. Lists append to upstream's defaults
+              # (nixkube.cachix.org, cache.nixos.org).
+              nixConfig.settings = atticSettings;
 
-              node.nixConfig.settings = atticSettings;
+              pynixd = {
+                inherit (cfg) authorizedKeys;
+                inherit (cfg.cache) storageClassName;
+                controller.nixConfig.settings = cacheSettings;
+              };
             };
           }
         ];
       };
 
-      resources = nixcsiEval.eval.config.kubernetes.generated;
+      resources = nixkubeEval.config.kubernetes.generated;
       pinIp =
         ip: r:
         r
@@ -100,36 +107,10 @@ in
             };
           };
         };
-      # builders.py (nix-csi's own code) discovers builder pods via the k8s API
-      # and addresses them as `ssh-ng://nix@<pod-name>.nix-csi-builders.<ns>.svc...`
-      # -- a DNS name that's only ever populated by the StatefulSet controller
-      # (which sets each pod's `hostname`/`subdomain` to match its governing
-      # headless Service). The `builders.deployments.amd64` option renders a
-      # plain Deployment instead, whose pods get random name suffixes and no
-      # such DNS record, so that address never resolves and every build that
-      # needs an actual (non-substitutable) derivation fails outright. Promoting
-      # it to a StatefulSet (same pattern already used for the `nix-cache` role,
-      # see StatefulSet-nix-cache.yaml) gives it a stable `amd64-0` pod name that
-      # matches what builders.py expects, with no other spec changes needed.
-      toBuilderStatefulSet =
-        r:
-        r
-        // {
-          kind = "StatefulSet";
-          spec = r.spec // {
-            serviceName = "nix-csi-builders";
-          };
-        };
+      # pynixd-lb replaced both nix-cache-lb (.241, port 2222) and
+      # nix-proxy (.240); it keeps the cache's address and port.
       patchedResources = map (
-        r:
-        if r.kind == "Service" && r.metadata.name == "nix-cache-lb" then
-          pinIp "192.168.0.241" r
-        else if r.kind == "Service" && r.metadata.name == "nix-proxy" then
-          pinIp "192.168.0.240" r
-        else if r.kind == "Deployment" && r.metadata.name == "amd64" then
-          toBuilderStatefulSet r
-        else
-          r
+        r: if r.kind == "Service" && r.metadata.name == "pynixd-lb" then pinIp "192.168.0.241" r else r
       ) resources;
       yaml = builtins.unsafeDiscardStringContext (
         builtins.concatStringsSep "\n---\n" (map builtins.toJSON patchedResources)

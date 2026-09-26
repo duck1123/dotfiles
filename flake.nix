@@ -59,17 +59,19 @@
     # from look.cachix.org instead of compiling from source.
     look.url = "github:kunkka19xx/look?dir=apps/linows";
 
-    # Intentionally pinned rather than tracking upstream master -- the vendored
-    # appTemplates/nix-csi.nix (originally from
-    # k3s-fleetops, see modules/kubernetes/docs/nix-csi-and-binary-cache.md) is
-    # written/tested against this exact commit and broke evaluation entirely
-    # when this had drifted forward via a routine `nix flake update`. Don't
-    # update this input without also verifying `nix build
-    # .#nixidyEnvs.x86_64-linux.dev.activationPackage --impure` still evaluates.
-    nix-csi = {
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.treefmt-nix.follows = "treefmt-nix";
-      url = "github:Lillecarl/nix-csi/7ddae07bf04c9540084d649a9404900d94adc2fd";
+    # nixkube (formerly nix-csi), the CSI driver behind the "no Dockerfile"
+    # pattern; consumed by appTemplates/nix-csi.nix.
+    # Not a flake in practice: default.nix takes its sources from the nixidae
+    # umbrella revision named in its own nix/umbrella.rev, which is what keeps
+    # its store paths identical to the ones upstream CI pushes to
+    # nixkube.cachix.org. Pinned by rev because upstream churns heavily; bump
+    # it on purpose and check `nix build
+    # .#nixidyEnvs.x86_64-linux.dev.activationPackage --impure` plus the
+    # rendered dev/nix-csi manifests (see
+    # modules/kubernetes/docs/nix-csi-and-binary-cache.md).
+    nixkube = {
+      flake = false;
+      url = "github:Lillecarl/nixkube/b0e6c41be2102f347402795db2bdc4f0241248c5";
     };
 
     nix-kube-generators.url = "github:farcaller/nix-kube-generators";
@@ -157,13 +159,6 @@
     };
 
     systems.url = "github:nix-systems/default";
-
-    treefmt-nix = {
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-      };
-      url = "github:numtide/treefmt-nix";
-    };
 
     zen-browser = {
       inputs = {

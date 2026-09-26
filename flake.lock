@@ -145,38 +145,6 @@
         "type": "github"
       }
     },
-    "dinix": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1769166639,
-        "narHash": "sha256-Xpqn3FuNYMKvCyJwOmdIY4WjFZd9TVGrjPtHsEZXkxU=",
-        "owner": "lillecarl",
-        "repo": "dinix",
-        "rev": "383d944448f629813a691707b8b45ba78f4d2f6b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "lillecarl",
-        "repo": "dinix",
-        "type": "github"
-      }
-    },
-    "easykubenix": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1771374020,
-        "narHash": "sha256-JTweNo2EimlhVUQcXUJD/2g+ZTumPcAbIp4EKuSERq0=",
-        "owner": "lillecarl",
-        "repo": "easykubenix",
-        "rev": "88a025fc04889f25b702f79030c6220c3ec48f9b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "lillecarl",
-        "repo": "easykubenix",
-        "type": "github"
-      }
-    },
     "firefox-gnome-theme": {
       "flake": false,
       "locked": {
@@ -205,22 +173,6 @@
       "original": {
         "owner": "edolstra",
         "repo": "flake-compat",
-        "type": "github"
-      }
-    },
-    "flake-compatish": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1768889023,
-        "narHash": "sha256-g1gcagOt283Mv51FSAy8YCPWosMjsW+icP4Vrt5/3jY=",
-        "owner": "lillecarl",
-        "repo": "flake-compatish",
-        "rev": "c3accc4dfe4ae0b1311ae61d8d5431c87b5dcd84",
-        "type": "github"
-      },
-      "original": {
-        "owner": "lillecarl",
-        "repo": "flake-compatish",
         "type": "github"
       }
     },
@@ -702,33 +654,6 @@
         "type": "github"
       }
     },
-    "nix-csi": {
-      "inputs": {
-        "dinix": "dinix",
-        "easykubenix": "easykubenix",
-        "flake-compatish": "flake-compatish",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "treefmt-nix": [
-          "treefmt-nix"
-        ]
-      },
-      "locked": {
-        "lastModified": 1772057487,
-        "narHash": "sha256-8E558MZicDnxuCYtVlT5fkOOvnTsjfZ2hLoU3L86ZtQ=",
-        "owner": "Lillecarl",
-        "repo": "nix-csi",
-        "rev": "7ddae07bf04c9540084d649a9404900d94adc2fd",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Lillecarl",
-        "repo": "nix-csi",
-        "rev": "7ddae07bf04c9540084d649a9404900d94adc2fd",
-        "type": "github"
-      }
-    },
     "nix-github-actions": {
       "inputs": {
         "nixpkgs": [
@@ -818,6 +743,23 @@
       "original": {
         "owner": "arnarg",
         "repo": "nixidy",
+        "type": "github"
+      }
+    },
+    "nixkube": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790329841,
+        "narHash": "sha256-e9RNYB5hohrnhXv5TU2eCqlrahHI39UWLfoXEfGDLtE=",
+        "owner": "Lillecarl",
+        "repo": "nixkube",
+        "rev": "b0e6c41be2102f347402795db2bdc4f0241248c5",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Lillecarl",
+        "repo": "nixkube",
+        "rev": "b0e6c41be2102f347402795db2bdc4f0241248c5",
         "type": "github"
       }
     },
@@ -1052,10 +994,10 @@
         "hyprland": "hyprland",
         "import-tree": "import-tree",
         "look": "look",
-        "nix-csi": "nix-csi",
         "nix-kube-generators": "nix-kube-generators",
         "nixhelm": "nixhelm",
         "nixidy": "nixidy",
+        "nixkube": "nixkube",
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_2",
         "nixpkgs-kernel": "nixpkgs-kernel",
@@ -1067,7 +1009,6 @@
         "sops-nix": "sops-nix",
         "stylix": "stylix",
         "systems": "systems",
-        "treefmt-nix": "treefmt-nix",
         "zen-browser": "zen-browser"
       }
     },
@@ -1250,26 +1191,6 @@
       "original": {
         "owner": "tinted-theming",
         "repo": "base16-zed",
-        "type": "github"
-      }
-    },
-    "treefmt-nix": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1786901030,
-        "narHash": "sha256-WSFCsDSE5ffgD2MqzkM2CYjeFiKhRF/dJUN8uedb6YE=",
-        "owner": "numtide",
-        "repo": "treefmt-nix",
-        "rev": "27b3b12a8e6375f28ebe122f07d230ca5459bbfa",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "treefmt-nix",
         "type": "github"
       }
     },
