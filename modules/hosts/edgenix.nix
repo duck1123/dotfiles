@@ -21,7 +21,7 @@ in
 
           features = {
             bluetooth.enable = true;
-            clojure.enable = true;
+            clojure.enable = false;
             common.enable = true;
             docker.enable = true;
             emacs.enable = true;

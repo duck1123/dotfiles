@@ -77,7 +77,7 @@ _: {
           kustomize
           # lens
           # md-tangle
-          minio-client
+          # minio-client
           # mr
           nixd
           nmap
@@ -88,7 +88,7 @@ _: {
           # podman-desktop
           # podman-tui
           # postman
-          runme
+          # runme
           sqlite
           sops
           # sqsh
@@ -98,6 +98,7 @@ _: {
           # tilt
           # vcluster
           # virtualbox
+          vscode
           yq-go # used by scripts/k8s-bootstrap-argocd-repo.sh and post-process-manifests
         ];
       };

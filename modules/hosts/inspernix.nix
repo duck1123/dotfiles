@@ -17,8 +17,10 @@ in
           name = hostname;
 
           environments = {
-            primary = "hyprland";
-            gnome.enable = true;
+            primary = "niri";
+            gnome.enable = false;
+            hyprland.enable = true;
+            # niri.enable = true;
             plasma6.enable = true;
           };
 

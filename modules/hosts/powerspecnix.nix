@@ -17,8 +17,9 @@ in
           inherit hostname identity system;
 
           environments = {
-            primary = "hyprland";
-            niri.enable = true;
+            primary = "niri";
+            hyprland.enable = true;
+            # niri.enable = true;
             plasma6.enable = true;
           };
 
@@ -27,12 +28,12 @@ in
             battery.enable = false;
             bitcoin.enable = false;
             bluetooth.enable = true;
-            clojure.enable = true;
+            clojure.enable = false;
             common.enable = true;
-            chat.enable = true;
+            chat.enable = false;
             dbt.enable = false;
             developer.enable = true;
-            docker.enable = true;
+            docker.enable = false;
             emacs.enable = true;
             email.enable = true;
             flipper.enable = false;
@@ -73,7 +74,7 @@ in
               server.enable = false;
             };
 
-            music.enable = false;
+            music.enable = true;
             network.enable = true;
             nfs.enable = false;
             nix = {
@@ -83,10 +84,10 @@ in
             nostr.enable = true;
             nushell.enable = true;
             obsidian.enable = true;
-            pictures.enable = true;
+            pictures.enable = false;
             python.enable = true;
             radio.enable = false;
-            sddm.enable = true;
+            sddm.enable = false;
             sound.enable = true;
             ssh.enable = true;
             starship.enable = true;
@@ -108,7 +109,7 @@ in
             touch.enable = false;
             vim.enable = false;
             virtualization.enable = false;
-            vr.enable = true;
+            vr.enable = false;
             vpn.enable = true;
             vscode.enable = false;
             waybar.enable = false;
@@ -132,10 +133,8 @@ in
         host = config.hosts.${hostname};
 
         home.packages = with pkgs; [
-          affine
           claude-code
           qbittorrent
-          vscode
         ];
       };
 
