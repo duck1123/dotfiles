@@ -4,6 +4,7 @@ _: {
     let
       inherit (inputs.self.types) generic;
       android-submodule = generic.android-submodule { inherit inputs lib; };
+      environments-submodule = generic.environments-submodule { inherit inputs lib; };
       featureSubmodule = generic.feature-submodule { inherit inputs lib; };
       home-manager-submodule = generic.home-manager-submodule { inherit inputs lib; };
       identitySubmodule = generic.identitySubmodule { inherit inputs lib; };
@@ -16,6 +17,12 @@ _: {
           type = android-submodule;
           default = { };
           description = "Android configuration";
+        };
+
+        environments = mkOption {
+          type = environments-submodule;
+          default = { };
+          description = "Desktop environments: the primary one plus those built as specialisations";
         };
 
         features = mkOption {

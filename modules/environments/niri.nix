@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.environments-niri =
+  environments.niri.nixos =
     {
       config,
       inputs,

@@ -15,6 +15,12 @@ in
           identity = config.identities.duck;
           name = hostname;
 
+          environments = {
+            primary = "plasma6";
+            gnome.enable = true;
+            hyprland.enable = true;
+          };
+
           features = {
             clojure.enable = false;
             common.enable = true;
@@ -166,36 +172,14 @@ in
           networking.useDHCP = lib.mkDefault true;
           nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
         };
-        core = [
+      in
+      {
+        _module.args = { inherit inputs; };
+        imports = [
           core-module
           hardware-configuration
           inputs.self.modules.nixos.base
         ];
-        mkSpecialisation = module: {
-          inheritParentConfig = false;
-          configuration = {
-            imports = core ++ [ module ];
-            _module.args = { inherit inputs; };
-          };
-        };
-        specialisations = with inputs.self.modules.nixos; {
-          budgie = mkSpecialisation environments-budgie;
-          hyprland = mkSpecialisation environments-hyprland;
-          gnome = mkSpecialisation environments-gnome;
-          plasma6 = mkSpecialisation environments-plasma6;
-        };
-      in
-      {
-        _module.args = { inherit inputs; };
-        imports = specialisations.plasma6.configuration.imports;
-        specialisation = {
-          # budgie disabled: nixpkgs' budgie module references pkgs.qogir-theme,
-          # which was removed upstream (depended on gtk-engine-murrine/GTK2)
-          # inherit (specialisations) budgie;
-          inherit (specialisations) gnome;
-          inherit (specialisations) hyprland;
-          # inherit (specialisations) plasma6;
-        };
       };
   };
 }

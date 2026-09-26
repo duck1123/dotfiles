@@ -16,6 +16,12 @@ in
         hosts.${hostname} = {
           inherit hostname identity system;
 
+          environments = {
+            primary = "hyprland";
+            niri.enable = true;
+            plasma6.enable = true;
+          };
+
           features = {
             backups.enable = true;
             battery.enable = false;
@@ -269,38 +275,14 @@ in
 
           swapDevices = [ ];
         };
-        core = [
+      in
+      {
+        _module.args = { inherit inputs; };
+        imports = [
           core-module
           hardware-configuration
           inputs.self.modules.nixos.base
         ];
-        mkSpecialisation = env-module: {
-          inheritParentConfig = false;
-          configuration = {
-            imports = core ++ [ env-module ];
-            _module.args = { inherit inputs; };
-          };
-        };
-        specialisations = with inputs.self.modules.nixos; {
-          budgie = mkSpecialisation environments-budgie;
-          hyprland = mkSpecialisation environments-hyprland;
-          gnome = mkSpecialisation environments-gnome;
-          i3 = mkSpecialisation environments-i3;
-          niri = mkSpecialisation environments-niri;
-          plasma6 = mkSpecialisation environments-plasma6;
-        };
-      in
-      {
-        _module.args = { inherit inputs; };
-        imports = specialisations.hyprland.configuration.imports;
-        specialisation = {
-          # inherit (specialisations) budgie;
-          # inherit (specialisations) gnome;
-          # inherit (specialisations) i3;
-          # inherit (specialisations) hyprland;
-          inherit (specialisations) niri;
-          inherit (specialisations) plasma6;
-        };
       };
   };
 }

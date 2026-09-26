@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.environments-i3 =
+  environments.i3.nixos =
     { pkgs, ... }:
     {
       services.xserver.windowManager.i3 = {

@@ -58,7 +58,7 @@ Key subdirectories:
 - `modules/flake/` — flake outputs: `nixosConfigurations`, `homeConfigurations`, `devShells`, `packages`, and the `lib/+mk-os.nix` helpers
 - `modules/hosts/` — per-host module definitions (one `.nix` per host, e.g. `edgenix.nix`)
 - `modules/features/` — features enabled/disabled per host (bluetooth, hyprland, kubernetes, etc.), each self-registering via `features.<name>` (see Feature System)
-- `modules/environments/` — desktop environment modules (gnome, hyprland, i3, plasma6, budgie)
+- `modules/environments/` — desktop environments (budgie, gnome, hyprland, i3, niri, plasma6), each self-registering via `environments.<name>` (see Environment System)
 - `modules/nixos/` — NixOS-specific modules (boot, users, i18n, sddm, etc.)
 - `modules/options/` — NixOS option declarations (host, hosts, identities, simpleFeature type)
 - `modules/types/` — custom Nix types/submodules for hosts, identities, features
@@ -70,7 +70,7 @@ Key subdirectories:
 Each host file (e.g., `modules/hosts/edgenix.nix`) defines three namespaced modules in `flake.modules`:
 1. `generic.<hostname>` — shared config: features enabled/disabled, identity assignment, syncthing shares
 2. `homeManager.<hostname>` — home-manager extras: extra packages, session paths
-3. `nixos.<hostname>` — NixOS hardware config + specialisations (multiple DE variants via `specialisation`)
+3. `nixos.<hostname>` — NixOS hardware config (specialisations are generated from `hosts.<hostname>.environments`, see Environment System)
 
 `modules/flake/nixosConfigurations.nix` builds hosts using helpers from `lib/+mk-os.nix`:
 - `linux "hostname"` → `nixpkgs.lib.nixosSystem` with `modules.nixos.base` + `modules.nixos.<hostname>`
@@ -101,9 +101,39 @@ Registry knobs beyond the two bodies (a body may also be a list of bodies):
 - `gated = false` — skip the automatic `enable` gate when the feature has no plain `enable` or gates differently per class; the bodies then return their own `mkIf`/`mkMerge` (see `media`, `kubernetes`)
 
 Gotchas:
-- flake-parts types `flake.modules.<class>.<name>` as a `deferredModule`, so `features.<name>` can't be nested there. The registry writes the nested `features` attrset into the *published* flake output through `touchup.attr.modules.finish`, so it is visible as `inputs.self.modules.<class>.features.<name>` but **not** in `config.flake.modules` inside flake-parts modules.
+- flake-parts types `flake.modules.<class>.<name>` as a `deferredModule`, so `features.<name>` can't be nested there. The registry sets `nestedModules.<class>.features` (`modules/flake/nested-modules.nix`), which is written into the *published* flake output through `touchup.attr.modules.finish`, so it is visible as `inputs.self.modules.<class>.features.<name>` but **not** in `config.flake.modules` inside flake-parts modules. `finish` only takes one definition, so any other nested group must go through `nestedModules` too.
 - A body that sets options which only exist in some hosts (e.g. `sops.*`) can't live in a feature that WSL also imports, because `mkIf false` still errors on an undeclared option. That is why `modules/features/nix-attic.nix` stays a standalone `modules.nixos.nix-attic` imported directly by `nixos.base`.
 - Non-feature modules (`state-version`, `boot`, `i18n`, `users`, `sddm`, `environments-*`) are still plain `flake.modules.<class>.<name>` and are listed explicitly in `base.nix`.
+
+### Environment System
+
+Desktop environments work like features. Each is declared once in `modules/environments/<name>.nix` by setting `environments.<name>` in the registry in `modules/flake/environments.nix`:
+
+```nix
+_: {
+  environments.niri = {
+    nixos = { pkgs, ... }: { programs.niri.enable = true; };  # body only, like features
+    # homeManager = ...;                                      # optional
+  };
+}
+```
+
+A host picks its environments in `generic.<hostname>`:
+
+```nix
+hosts.<hostname>.environments = {
+  primary = "hyprland";   # what the host boots into by default (null = none)
+  gnome.enable = true;    # every other enabled environment becomes a specialisation
+  plasma6.enable = true;
+};
+```
+
+How it fits together:
+- `nixos.specialisations` (imported by `nixos.base`) imports every `modules.nixos.environments.<name>` and declares `environments.active`, which defaults to `primary`. Each NixOS body is gated on `environments.active == <name>`.
+- Each enabled non-primary environment becomes `specialisation.<name>` with `inheritParentConfig = true` and only `environments.active` forced to `<name>`, so host files carry no specialisation plumbing. nixpkgs drops nested specialisations itself.
+- home-manager bodies are shared across specialisations, so they're gated on the host using the environment at all (`primary` or `.enable`).
+- A body's `imports` are hoisted out of the gate, since imports can't be conditional (e.g. niri imports the Look NixOS module unconditionally; it only acts when `programs.lookapp.enable` is set).
+- `primary` is reserved and can't be used as an environment name.
 
 ### Hosts
 

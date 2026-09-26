@@ -16,6 +16,12 @@ in
           identity = config.identities.duck;
           name = hostname;
 
+          environments = {
+            primary = "hyprland";
+            gnome.enable = true;
+            plasma6.enable = true;
+          };
+
           features = {
             battery.enable = true;
             bluetooth.enable = true;
@@ -192,38 +198,14 @@ in
           nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
           hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
         };
-        core = [
+      in
+      {
+        _module.args = { inherit inputs; };
+        imports = [
           core-module
           hardware-configuration
           inputs.self.modules.nixos.base
         ];
-        mkSpecialisation = module: {
-          inheritParentConfig = false;
-          configuration = {
-            imports = core ++ [ module ];
-            _module.args = { inherit inputs; };
-          };
-        };
-        specialisations = with inputs.self.modules.nixos; {
-          budgie = mkSpecialisation environments-budgie;
-          hyprland = mkSpecialisation environments-hyprland;
-          gnome = mkSpecialisation environments-gnome;
-          i3 = mkSpecialisation environments-i3;
-          plasma6 = mkSpecialisation environments-plasma6;
-        };
-      in
-      {
-        _module.args = { inherit inputs; };
-        imports = specialisations.hyprland.configuration.imports;
-        specialisation = {
-          # budgie disabled: nixpkgs' budgie module references pkgs.qogir-theme,
-          # which was removed upstream (depended on gtk-engine-murrine/GTK2)
-          # inherit (specialisations) budgie;
-          inherit (specialisations) gnome;
-          # inherit (specialisations) hyprland;
-          # inherit (specialisations) i3;
-          inherit (specialisations) plasma6;
-        };
       };
   };
 }

@@ -135,11 +135,9 @@ in
   config = {
     flake.types.generic.feature-options = lib.mapAttrs (_: feature: feature.featureOption) cfg;
 
-    # flake-parts types flake.modules.<class>.<name> as a deferredModule, so
-    # `features.<name>` can't be nested there. Reshape the published output.
-    touchup.attr.modules.finish =
-      modules:
-      modules
-      // lib.genAttrs classes (class: (modules.${class} or { }) // { features = modulesFor class; });
+    # published as modules.<class>.features.<name> (see nested-modules.nix)
+    nestedModules = lib.genAttrs classes (class: {
+      features = modulesFor class;
+    });
   };
 }

@@ -1,5 +1,5 @@
 _: {
-  flake.modules.nixos.environments-hyprland =
+  environments.hyprland.nixos =
     {
       config,
       inputs,

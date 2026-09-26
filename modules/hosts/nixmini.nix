@@ -14,6 +14,10 @@ in
           identity = config.identities.duck;
           name = hostname;
 
+          environments = {
+            primary = "plasma6";
+          };
+
           features = {
             bluetooth.enable = true;
             clojure.enable = true;
@@ -71,14 +75,7 @@ in
             zsh.enable = true;
           };
 
-          nixos = {
-            enable = true;
-            budgie.enable = false;
-            gnome.enable = false;
-            hyprland.enable = false;
-            i3.enable = false;
-            plasma6.enable = true;
-          };
+          nixos.enable = true;
 
           pubkey = "";
         };
@@ -178,33 +175,14 @@ in
           networking.useDHCP = lib.mkDefault true;
           nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
         };
-        core = [
+      in
+      {
+        _module.args = { inherit inputs; };
+        imports = [
           core-module
           hardware-configuration
           inputs.self.modules.nixos.base
         ];
-        mkSpecialisation = module: {
-          inheritParentConfig = false;
-          configuration = {
-            imports = core ++ [ module ];
-            _module.args = { inherit inputs; };
-          };
-        };
-        specialisations = with inputs.self.modules.nixos; {
-          budgie = mkSpecialisation environments-budgie;
-          hyprland = mkSpecialisation environments-hyprland;
-          gnome = mkSpecialisation environments-gnome;
-          plasma6 = mkSpecialisation environments-plasma6;
-        };
-      in
-      {
-        _module.args = { inherit inputs; };
-        imports = specialisations.plasma6.configuration.imports;
-        specialisation = {
-          # budgie disabled: nixpkgs' budgie module references pkgs.qogir-theme,
-          # which was removed upstream (depended on gtk-engine-murrine/GTK2)
-          # inherit (specialisations) budgie;
-        };
       };
   };
 }
