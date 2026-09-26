@@ -45,16 +45,50 @@ def home-hosts []: nothing -> list<string> {
   host-infos | where homeConfiguration != null | get sshHost
 }
 
-def all-home-installables []: nothing -> list<string> {
+# linkFarm entry ({name, expr}) for a host's home-manager activation package.
+# `expr` is a Nix expression relative to the flake bound as `f` (see build-combined).
+def home-part [host: string]: nothing -> record<name: string, expr: string> {
+  {name: $"(host-info $host | get hostname)-home", expr: $"f.homeConfigurations.(home-attr $host | to json).activationPackage"}
+}
+
+# linkFarm entry ({name, expr}) for a host's NixOS toplevel.
+def os-part [host: string]: nothing -> record<name: string, expr: string> {
+  {name: $"(host-info $host | get hostname)-os", expr: $"f.nixosConfigurations.(os-attr $host | to json).config.system.build.toplevel"}
+}
+
+# linkFarm entries for every host's home-manager activation package.
+def all-home-parts []: nothing -> list<record<name: string, expr: string>> {
   host-infos | where homeConfiguration != null | each {|h|
-    $".#homeConfigurations.($h.homeConfiguration).activationPackage"
+    {name: $"($h.hostname)-home", expr: $"f.homeConfigurations.($h.homeConfiguration | to json).activationPackage"}
   }
 }
 
-def all-os-installables []: nothing -> list<string> {
+# linkFarm entries for every host's NixOS toplevel.
+def all-os-parts []: nothing -> list<record<name: string, expr: string>> {
   host-infos | where nixosConfiguration != null | each {|h|
-    $".#nixosConfigurations.($h.nixosConfiguration).config.system.build.toplevel"
+    {name: $"($h.hostname)-os", expr: $"f.nixosConfigurations.($h.nixosConfiguration | to json).config.system.build.toplevel"}
   }
+}
+
+# Build several flake outputs as one derivation: a linkFarm with a symlink per part,
+# so nom tracks a single build graph instead of one installable at a time.
+def build-combined [
+  ...parts: record<name: string, expr: string>
+  --fallback
+  --no-link
+]: nothing -> nothing {
+  let args = [
+    ...(if $fallback { ["--fallback"] } else { [] })
+    ...(if $no_link { ["--no-link"] } else { [] })
+  ]
+  let entries = ($parts | each {|p| $"{ name = ($p.name | to json); path = ($p.expr); }" } | str join " ")
+  let expr = ([
+    $"let f = builtins.getFlake ($env.PWD | to json);"
+    "pkgs = f.inputs.nixpkgs.legacyPackages.${builtins.currentSystem};"
+    $"in pkgs.linkFarm \"nur-build\" [ ($entries) ]"
+  ] | str join " ")
+
+  ^nom build --impure ...$args --expr $expr
 }
 
 # Valid target names for build/switch (tab completion)
@@ -143,24 +177,37 @@ export def "nur build" [
   let args = (if $fallback { ["--fallback"] } else { [] })
 
   if $all {
-    let installables = [
-      ...(if $targets.os { all-os-installables } else { [] })
-      ...(if $targets.home { all-home-installables } else { [] })
+    let parts = [
+      ...(if $targets.os { all-os-parts } else { [] })
+      ...(if $targets.home { all-home-parts } else { [] })
     ]
 
-    if ($installables | is-not-empty) {
-      ^nom build ...$args --no-link ...$installables
+    if ($parts | is-not-empty) {
+      build-combined ...$parts --fallback=$fallback --no-link
     }
   } else if ($host | is-empty) {
+    # Build everything in one nom graph first, so the nh builds below find it all in the
+    # store and print their package diffs back to back.
+    let current = (sys host | get hostname | str lowercase)
+    let parts = [
+      ...(if $targets.os { [(os-part $current)] } else { [] })
+      ...(if $targets.home { [(home-part $current)] } else { [] })
+    ]
+
+    if ($parts | is-not-empty) {
+      build-combined ...$parts --fallback=$fallback --no-link
+    }
+
     if $targets.home { ^nh home build ...$args . }
     if $targets.os { ^nh os build ...$args . }
   } else {
-    if $targets.home {
-      ^nom build ...$args $".#homeConfigurations.(home-attr $host).activationPackage"
-    }
+    let parts = [
+      ...(if $targets.os { [(os-part $host)] } else { [] })
+      ...(if $targets.home { [(home-part $host)] } else { [] })
+    ]
 
-    if $targets.os {
-      ^nom build ...$args $".#nixosConfigurations.(os-attr $host).config.system.build.toplevel"
+    if ($parts | is-not-empty) {
+      build-combined ...$parts --fallback=$fallback
     }
   }
 
