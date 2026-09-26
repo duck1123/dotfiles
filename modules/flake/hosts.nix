@@ -117,6 +117,19 @@ let
       host = config.hosts.${name};
     };
 
+  # Suffixes the generation's derivation name with the hostname, so builds of
+  # several hosts (`nur build --all`) tell their home-manager-generation apart.
+  # home-manager declares this option without an `apply`, so a second
+  # declaration can add one.
+  nameGeneration =
+    name:
+    { lib, ... }:
+    {
+      options.home.activationPackage = lib.mkOption {
+        apply = pkg: pkg.overrideAttrs { name = "home-manager-generation-${name}"; };
+      };
+    };
+
   pkgsFor = lib.genAttrs config.systems (
     system:
     import inputs.nixpkgs {
@@ -172,6 +185,7 @@ in
             inputs.self.modules.homeManager.base
             inputs.self.modules.homeManager.${name}
             (setHost name)
+            (nameGeneration name)
           ];
         }
       )
