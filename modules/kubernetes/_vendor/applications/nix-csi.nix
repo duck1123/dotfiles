@@ -45,11 +45,14 @@ _: {
           let
             # duck1123.cachix.org is fed by `cachix watch-store` on the
             # workstation, so anything built locally (e.g. attic's own
-            # attic-server-bundle) is fetchable even while Attic is down.
+            # attic-server-bundle) is fetchable even while Attic is down. It
+            # has to be asked *before* Attic (priority 41, same as this cache
+            # by default): a down Attic answers 503, which nix treats as a hard
+            # error rather than moving on to the next substituter.
             atticSettings = {
               substituters = [
                 "https://attic.home.kronkltd.net/nixos"
-                "https://duck1123.cachix.org"
+                "https://duck1123.cachix.org?priority=30"
               ];
               trusted-public-keys = [
                 "nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4="
