@@ -62,7 +62,6 @@ Key subdirectories:
 - `modules/nixos/` — NixOS-specific modules (boot, users, i18n, sddm, etc.)
 - `modules/options/` — NixOS option declarations (host, hosts, identities, simpleFeature type)
 - `modules/types/` — custom Nix types/submodules for hosts, identities, features
-- `modules/identities/` — per-user identity definitions (duck, deck, drenfer)
 - `modules/kubernetes/` — the k3s fleet-ops integration, fully consolidated into this repo (the `k3s-fleetops` flake input is gone; there is no external dependency left). `_vendor/applications/` and `_vendor/generators/`/`_vendor/lib/`/`_vendor/modules/` hold the application library/generators (edit these directly — "_vendor" is a historical name, not a sync boundary); `_env/dev/` has the per-app instance config for the `dev` nixidy environment. See `modules/kubernetes/docs/` for deployment workflow, the two-module-system gotcha, pinned-volume handling, and a troubleshooting playbook.
 
 ### Host Configuration Pattern
@@ -139,6 +138,23 @@ How it fits together:
 - Because home-manager is shared across specialisations, a feature that runs a service should limit it to the environments that asked for it at runtime: `inputs.self.lib.environments.desktopsFor config.host "<feature>"` returns their `desktopNames` (see `wayle`, which uses them as `ConditionEnvironment=|XDG_CURRENT_DESKTOP=...` so it doesn't start under Plasma).
 - `primary` is reserved and can't be used as an environment name.
 - Anything consumed as a module (like `environments-host`) must be published under `flake.modules`, not `flake.types.generic`: that option is typed `anything`, which wraps function values and forces config-dependent definitions too early (infinite recursion).
+
+### Registries (top-level directories)
+
+Some core types live in top-level directories outside `modules/` and are auto-loaded by `modules/flake/registries.nix`: every `<dir>/<name>.nix` becomes a flake-parts definition of `<attr>.<name>`, so adding one means dropping in a file (files starting with `_` are skipped). A file holds only the entry's body, either a plain value or a function of flake-parts module args when it needs to reference other entries:
+
+```nix
+# identities/deck.nix
+{ config, ... }: {
+  inherit (config.identities.duck) email gpgKey name;   # flake-parts config
+  username = "deck";
+}
+```
+
+The registry's option is declared in `modules/flake/<attr>.nix` and evaluated once at the flake level. To add a new registry, add a `<attr> = ../../<dir>;` line to the table in `registries.nix` and declare the option.
+
+Current registries:
+- `identities/` — per-user identities (duck, deck, drenfer). Declared in `modules/flake/identities.nix`, published as `inputs.self.identities`, and exposed read-only to generic/NixOS/home-manager modules as `config.identities` (`modules/options/identities-options.nix`). Hosts pick one with `identity = config.identities.<name>`.
 
 ### Hosts
 

@@ -9,8 +9,9 @@ _: {
     {
       options.identities = mkOption {
         type = types.attrsOf identitySubmodule;
-        description = "Map of identities with their configurations";
-        default = { };
+        description = "Map of identities with their configurations (defined in identities/, read-only here)";
+        default = inputs.self.identities;
+        readOnly = true;
       };
     };
 }
