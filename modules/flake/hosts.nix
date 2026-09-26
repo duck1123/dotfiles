@@ -1,5 +1,11 @@
 # Registry for `hosts.<name>`, loaded from ../../hosts by ./registries.nix.
 #
+# `info` is the host's JSON-friendly summary, published as
+# `inputs.self.hostInfo` and written to ~/.config/dotfiles/hosts.json by
+# `modules.homeManager.host-info` (read by nushell/modules/hosts_module.nu).
+# Its fields default to `defaultInfo` below; a host file can override or add
+# any of them with `info.<field> = ...`.
+#
 # A host file holds the host's data (the `hostSubmodule` options: features,
 # environments, identity, ...) plus its own modules:
 #
@@ -28,8 +34,30 @@ let
   # Options that only exist in the registry, stripped from the published data.
   registryOnly = [
     "homeConfigurationName"
+    "info"
     "modules"
   ];
+
+  # A feature counts as enabled when its `enable` is set, or (for features with
+  # a custom option like kubernetes) any direct sub-option's `enable` is.
+  isEnabled =
+    feature:
+    feature.enable or false
+    || lib.any (v: lib.isAttrs v && (v.enable or false) == true) (builtins.attrValues feature);
+
+  # What gets recorded about each host. Keep it JSON-serialisable: no paths
+  # (they'd be copied to the store) or functions.
+  defaultInfo = host: {
+    inherit (host) hostname name system;
+    user = host.identity.username;
+    nixos = host.nixos.enable;
+    android = host.android.enable;
+    environments = {
+      inherit (host.environments) primary;
+      used = inputs.self.lib.environments.usedBy host.environments;
+    };
+    features = builtins.attrNames (lib.filterAttrs (_: isEnabled) host.features);
+  };
 
   registryModule =
     { name, config, ... }:
@@ -49,6 +77,11 @@ let
           };
         };
 
+        info = mkOption {
+          type = types.attrsOf types.anything;
+          description = "JSON summary of the host (see `defaultInfo`).";
+        };
+
         homeConfigurationName = mkOption {
           type = types.str;
           default = "${config.identity.username}@${config.hostname}";
@@ -59,6 +92,7 @@ let
       config = {
         hostname = lib.mkDefault name;
         name = lib.mkDefault config.hostname;
+        info = lib.mapAttrs (_: lib.mkDefault) (defaultInfo config);
       };
     };
 
@@ -94,9 +128,21 @@ in
 
   config.flake = {
     hosts = lib.mapAttrs (_: host: removeAttrs host registryOnly) cfg;
+    hostInfo = lib.mapAttrs (_: host: host.info) cfg;
 
     modules = {
-      homeManager = lib.mapAttrs (_: host: host.modules.homeManager) (withModule "homeManager");
+      homeManager = lib.mapAttrs (_: host: host.modules.homeManager) (withModule "homeManager") // {
+        # Every host's `info`, for nushell (hosts_module.nu) and other tools.
+        # Imported by homeManager.base.
+        host-info =
+          { config, inputs, ... }:
+          {
+            xdg.configFile."dotfiles/hosts.json".text = builtins.toJSON {
+              current = config.host.hostname;
+              hosts = builtins.attrValues inputs.self.hostInfo;
+            };
+          };
+      };
       nixos = lib.mapAttrs (_: host: host.modules.nixos) (withModule "nixos");
     };
 

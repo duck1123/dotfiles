@@ -129,6 +129,7 @@ use ~/nushell/completions/bb-completions.nu *
 use ~/nushell/completions/devspace-completions.nu *
 use ~/nushell/completions/nak-completions.nu *
 
+use ~/nushell/modules/hosts_module.nu *
 use ~/nushell/modules/hypr_module.nu *
 use ~/nushell/modules/nostr_module.nu *
 use ~/nushell/modules/pj_module.nu *

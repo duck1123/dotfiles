@@ -97,6 +97,14 @@ From that the registry generates:
 
 Host modules don't set `host` themselves; anything else importing `modules.<class>.<hostname>` has to.
 
+#### Host info (`hosts.json`)
+
+Each host also has an `info` record: a JSON-friendly summary (hostname, name, system, user, nixos/android, environments, enabled `features`). Its fields default to `defaultInfo` in `modules/flake/hosts.nix` (change that to record something for every host), and a host file can override or add fields with `info.<field> = ...;` (never paths or functions). A feature counts as enabled if its `enable`, or any direct sub-option's `enable` (e.g. `kubernetes.server.enable`), is true.
+
+- `nix eval --json .#hostInfo` — all hosts' info from the working tree
+- `~/.config/dotfiles/hosts.json` — `{ current, hosts: [info ...] }`, written on every host by `modules.homeManager.host-info` (imported by `homeManager.base`); reflects the last home-manager switch. Meant as a data source for other tools (e.g. Look).
+- `nushell/modules/hosts_module.nu` reads that file: `hosts list`, `hosts get [host]`, `hosts features [host]` (defaulting to the current host).
+
 ### Feature System
 
 Features are toggled with `enable = true/false` under `hosts.<hostname>.features.<name>`.
