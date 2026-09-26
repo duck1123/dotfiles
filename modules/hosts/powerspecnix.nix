@@ -286,6 +286,7 @@ in
           hyprland = mkSpecialisation environments-hyprland;
           gnome = mkSpecialisation environments-gnome;
           i3 = mkSpecialisation environments-i3;
+          niri = mkSpecialisation environments-niri;
           plasma6 = mkSpecialisation environments-plasma6;
         };
       in
@@ -297,6 +298,7 @@ in
           # inherit (specialisations) gnome;
           # inherit (specialisations) i3;
           # inherit (specialisations) hyprland;
+          inherit (specialisations) niri;
           inherit (specialisations) plasma6;
         };
       };
