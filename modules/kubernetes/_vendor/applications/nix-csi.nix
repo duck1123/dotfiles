@@ -43,9 +43,18 @@ _: {
         extraAppConfig =
           cfg:
           let
+            # duck1123.cachix.org is fed by `cachix watch-store` on the
+            # workstation, so anything built locally (e.g. attic's own
+            # attic-server-bundle) is fetchable even while Attic is down.
             atticSettings = {
-              substituters = [ "https://attic.home.kronkltd.net/nixos" ];
-              trusted-public-keys = [ "nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4=" ];
+              substituters = [
+                "https://attic.home.kronkltd.net/nixos"
+                "https://duck1123.cachix.org"
+              ];
+              trusted-public-keys = [
+                "nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4="
+                "duck1123.cachix.org-1:Cj3r3BH7Xuy0zFWy8V/VIB3F7+Gi1m9HB302E9UGV3E="
+              ];
             };
             # Lets a workstation push locally-signed store paths directly via
             # `nix copy --to ssh-ng://nix@...` — otherwise nix-daemon rejects unsigned
