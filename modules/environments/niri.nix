@@ -1,6 +1,11 @@
 _: {
   flake.modules.nixos.environments-niri =
-    { inputs, pkgs, ... }:
+    {
+      config,
+      inputs,
+      pkgs,
+      ...
+    }:
     {
       imports = [ inputs.look.nixosModules.default ];
 
@@ -14,11 +19,20 @@ _: {
           xwayland-satellite
         ];
 
-        # Look in place of fuzzel. niri reads a single config.kdl and has no
-        # IPC for adding binds, so the user config has to pull this in with a
-        # trailing `include optional=true "/etc/niri/look.kdl"`; binds from a
-        # later include override earlier ones, so this wins over the default
-        # Mod+D fuzzel bind without editing it out.
+        # niri reads ~/.config/niri/config.kdl if it exists, else this file, and
+        # only writes its stock config to the user path when neither exists. So
+        # shipping the stock config plus the Look include here covers fresh
+        # hosts; an existing user config still wins and needs the same
+        # trailing include added by hand.
+        etc."niri/config.kdl".source = pkgs.runCommand "niri-config.kdl" { } ''
+          cat ${config.programs.niri.package.src}/resources/default-config.kdl > $out
+          printf '\ninclude "/etc/niri/look.kdl"\n' >> $out
+        '';
+
+        # Look in place of fuzzel. niri has no IPC for adding binds, so this
+        # has to be included from config.kdl; binds from a later include
+        # override earlier ones, so this wins over the default Mod+D fuzzel
+        # bind without editing it out.
         etc."niri/look.kdl".text = ''
           spawn-at-startup "lookapp"
 
