@@ -29,7 +29,6 @@ in
             gaming.enable = true;
             git.enable = true;
             glances.enable = true;
-            hyprland.enable = true;
 
             kubernetes = {
               client.enable = true;

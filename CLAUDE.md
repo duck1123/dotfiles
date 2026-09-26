@@ -112,6 +112,8 @@ Desktop environments work like features. Each is declared once in `modules/envir
 ```nix
 _: {
   environments.niri = {
+    features = [ "wayle" ];      # features turned on for hosts using this environment
+    desktopNames = [ "niri" ];   # XDG_CURRENT_DESKTOP of the session
     nixos = { pkgs, ... }: { programs.niri.enable = true; };  # body only, like features
     # homeManager = ...;                                      # optional
   };
@@ -133,7 +135,10 @@ How it fits together:
 - Each enabled non-primary environment becomes `specialisation.<name>` with `inheritParentConfig = true` and only `environments.active` forced to `<name>`, so host files carry no specialisation plumbing. nixpkgs drops nested specialisations itself.
 - home-manager bodies are shared across specialisations, so they're gated on the host using the environment at all (`primary` or `.enable`).
 - A body's `imports` are hoisted out of the gate, since imports can't be conditional (e.g. niri imports the Look NixOS module unconditionally; it only acts when `programs.lookapp.enable` is set).
+- `features` are set with `mkDefault true` on every host that uses the environment (primary or enabled), via `modules.generic.environments-host` in the host submodule. They remain ordinary features, so several environments can share one (hyprland and niri both pull in `wayle`) and a host can still set one directly or turn it off. Don't enable environment-owned features (`hyprland`, `gnome`, `i3`, `wayle`) by hand in host files.
+- Because home-manager is shared across specialisations, a feature that runs a service should limit it to the environments that asked for it at runtime: `inputs.self.lib.environments.desktopsFor config.host "<feature>"` returns their `desktopNames` (see `wayle`, which uses them as `ConditionEnvironment=|XDG_CURRENT_DESKTOP=...` so it doesn't start under Plasma).
 - `primary` is reserved and can't be used as an environment name.
+- Anything consumed as a module (like `environments-host`) must be published under `flake.modules`, not `flake.types.generic`: that option is typed `anything`, which wraps function values and forces config-dependent definitions too early (infinite recursion).
 
 ### Hosts
 

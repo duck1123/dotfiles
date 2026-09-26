@@ -11,68 +11,71 @@ _: {
       nixos-submodule = generic.nixos-submodule { inherit inputs lib; };
     in
     with lib;
-    types.submodule {
-      options = {
-        android = mkOption {
-          type = android-submodule;
-          default = { };
-          description = "Android configuration";
-        };
+    types.submodule [
+      inputs.self.modules.generic.environments-host
+      {
+        options = {
+          android = mkOption {
+            type = android-submodule;
+            default = { };
+            description = "Android configuration";
+          };
 
-        environments = mkOption {
-          type = environments-submodule;
-          default = { };
-          description = "Desktop environments: the primary one plus those built as specialisations";
-        };
+          environments = mkOption {
+            type = environments-submodule;
+            default = { };
+            description = "Desktop environments: the primary one plus those built as specialisations";
+          };
 
-        features = mkOption {
-          type = featureSubmodule;
-          default = { };
-          description = "Feature flags for the host";
-        };
+          features = mkOption {
+            type = featureSubmodule;
+            default = { };
+            description = "Feature flags for the host";
+          };
 
-        home-manager = mkOption {
-          type = home-manager-submodule;
-          default = { };
-          description = "Home-manager configuration";
-        };
+          home-manager = mkOption {
+            type = home-manager-submodule;
+            default = { };
+            description = "Home-manager configuration";
+          };
 
-        hostname = mkOption {
-          type = types.str;
-          description = "The hostname";
-        };
+          hostname = mkOption {
+            type = types.str;
+            description = "The hostname";
+          };
 
-        id = mkOption {
-          type = types.str;
-          description = "The host id";
-        };
+          id = mkOption {
+            type = types.str;
+            description = "The host id";
+          };
 
-        identity = mkOption {
-          type = identitySubmodule;
-          description = "The identity configuration (name, username, email, gpgKey)";
-        };
+          identity = mkOption {
+            type = identitySubmodule;
+            description = "The identity configuration (name, username, email, gpgKey)";
+          };
 
-        name = mkOption {
-          type = types.str;
-          description = "The host name";
-        };
+          name = mkOption {
+            type = types.str;
+            description = "The host name";
+          };
 
-        nixos = mkOption {
-          type = nixos-submodule;
-          default = { };
-          description = "NixOS environment configuration";
-        };
+          nixos = mkOption {
+            type = nixos-submodule;
+            default = { };
+            description = "NixOS environment configuration";
+          };
 
-        pubkey = mkOption {
-          type = types.str;
-          default = "";
-          description = "The pubkey for this system";
-        };
+          pubkey = mkOption {
+            type = types.str;
+            default = "";
+            description = "The pubkey for this system";
+          };
 
-        system = mkOption {
-          type = types.str;
-          description = "The system architecture";
+          system = mkOption {
+            type = types.str;
+            description = "The system architecture";
+          };
         };
-      };
-    };
+      }
+    ];
 }

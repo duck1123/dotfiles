@@ -44,12 +44,7 @@ let
   # host uses the environment at all.
   conditions = {
     nixos = name: config: config.environments.active == name;
-    homeManager =
-      name: config:
-      let
-        envs = config.host.environments;
-      in
-      envs.primary == name || envs.${name}.enable;
+    homeManager = name: config: builtins.elem name (usedBy config.host.environments);
   };
 
   toModule = class: name: environment: {
@@ -73,6 +68,26 @@ let
           description = "Human description used in the generated host option docs.";
         };
 
+        features = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = ''
+            Features this environment turns on (with `mkDefault`) for any host
+            that uses it. They stay ordinary features: other environments can
+            list them too, and a host can still set them directly.
+          '';
+        };
+
+        desktopNames = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = ''
+            `XDG_CURRENT_DESKTOP` values of the session, so services from
+            `features` can be limited to this environment at runtime (see
+            `lib.environments.desktopsFor`).
+          '';
+        };
+
         homeManager = mkOption {
           type = bodies;
           default = [ ];
@@ -87,6 +102,23 @@ let
       };
     }
   );
+
+  # Environments a host uses: its primary plus every enabled one.
+  usedBy = envs: builtins.filter (name: envs.primary == name || envs.${name}.enable) names;
+
+  # Host module: turn on the features each used environment asks for.
+  hostFeatures =
+    { config, lib, ... }:
+    {
+      config.features = lib.mkMerge (
+        map (
+          name:
+          lib.genAttrs cfg.${name}.features (_: {
+            enable = lib.mkDefault true;
+          })
+        ) (usedBy config.environments)
+      );
+    };
 
   # hosts.<host>.environments: `primary` plus an `<name>.enable` per environment
   hostEnvironmentsSubmodule =
@@ -134,6 +166,21 @@ in
 
   config = {
     flake = {
+      lib.environments = {
+        inherit usedBy;
+
+        # XDG_CURRENT_DESKTOP values of the host's environments that list
+        # `feature`, for gating that feature's services at runtime.
+        desktopsFor =
+          host: feature:
+          lib.concatMap (
+            name: lib.optionals (builtins.elem feature cfg.${name}.features) cfg.${name}.desktopNames
+          ) (usedBy host.environments);
+      };
+
+      # A module, not a type: types.generic is `anything`, which would wrap it.
+      modules.generic.environments-host = hostFeatures;
+
       types.generic.environments-submodule =
         assert lib.assertMsg (!(cfg ? primary)) "`primary` is reserved and can't name an environment";
         hostEnvironmentsSubmodule;
@@ -142,7 +189,7 @@ in
         { config, inputs, ... }:
         let
           envs = config.host.environments;
-          specialised = builtins.filter (name: name != envs.primary && envs.${name}.enable) names;
+          specialised = builtins.filter (name: name != envs.primary) (usedBy envs);
         in
         {
           imports = builtins.attrValues inputs.self.modules.nixos.environments;

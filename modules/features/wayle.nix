@@ -1,8 +1,23 @@
 _: {
   features.wayle = {
     homeManager =
-      { config, lib, ... }:
       {
+        config,
+        inputs,
+        lib,
+        ...
+      }:
+      let
+        # Environments that pull wayle in (see `environments.<name>.features`).
+        # One home-manager generation serves every specialisation, so the
+        # service is limited to their sessions at runtime instead.
+        desktops = inputs.self.lib.environments.desktopsFor config.host "wayle";
+      in
+      {
+        systemd.user.services.wayle.Unit.ConditionEnvironment = lib.mkIf (desktops != [ ]) (
+          lib.mkForce ([ "WAYLAND_DISPLAY" ] ++ map (desktop: "|XDG_CURRENT_DESKTOP=${desktop}") desktops)
+        );
+
         # https://github.com/nix-community/home-manager/blob/master/modules/services/wayle.nix
         services.wayle = {
           enable = true;

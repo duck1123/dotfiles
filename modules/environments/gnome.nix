@@ -1,8 +1,13 @@
 _: {
-  environments.gnome.nixos = _: {
-    services = {
-      desktopManager.gnome.enable = true;
-      displayManager.defaultSession = "gnome";
+  environments.gnome = {
+    features = [ "gnome" ];
+    desktopNames = [ "GNOME" ];
+
+    nixos = _: {
+      services = {
+        desktopManager.gnome.enable = true;
+        displayManager.defaultSession = "gnome";
+      };
     };
   };
 }

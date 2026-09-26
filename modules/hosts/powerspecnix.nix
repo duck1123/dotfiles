@@ -41,9 +41,7 @@ in
             gaming.enable = true;
             git.enable = true;
             glances.enable = true;
-            gnome.enable = true;
             hyprland = {
-              enable = true;
               monitor = [
                 {
                   output = "HDMI-A-1";
@@ -59,7 +57,6 @@ in
                 }
               ];
             };
-            i3.enable = false;
             java.enable = true;
             jujutsu.enable = true;
 
@@ -116,7 +113,6 @@ in
             vscode.enable = false;
             waybar.enable = false;
             waydroid.enable = true;
-            wayle.enable = true;
             windmill.enable = true;
             xserver.enable = true;
             zen-browser.enable = true;
