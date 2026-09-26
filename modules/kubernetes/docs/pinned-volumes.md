@@ -8,19 +8,19 @@ This is specifically for **small, precious, hand-managed volumes** (an app's con
 
 ## A volumeHandle is environment data, not app data
 
-A `volumeHandle` identifies one specific Longhorn volume that exists on *this* cluster. It means nothing anywhere else -- someone standing up a second environment from this same repo would have no such volume, and a literal handle string sitting in `applications/<name>.nix` (which is meant to describe the app in a way that's reusable across environments) would just be wrong for them.
+A `volumeHandle` identifies one specific Longhorn volume that exists on *this* cluster. It means nothing anywhere else -- someone standing up a second environment from this same repo would have no such volume, and a literal handle string sitting in `appTemplates/<name>.nix` (which is meant to describe the app in a way that's reusable across environments) would just be wrong for them.
 
 So `mkArgoApp` splits the two apart:
 
-- **`volumes`** (a parameter to `mkArgoApp`, in `applications/<name>.nix`) declares each volume's *shape* -- size, and any naming overrides -- with no handle. Environment-agnostic.
-- **`cfg.volumeOverrides.<key>`** (a plain option, set per-environment in e.g. `env/dev/<name>.nix`) is `recursiveUpdate`d on top of that key's shape. `volumeHandle` is the field that pins it, but any field can be overridden this way (`size` most commonly, also `accessModes`, `storageClassName`, `volumeAttributes`, `pvcName`) without touching `applications/<name>.nix`.
+- **`volumes`** (a parameter to `mkArgoApp`, in `appTemplates/<name>.nix`) declares each volume's *shape* -- size, and any naming overrides -- with no handle. Environment-agnostic.
+- **`cfg.volumeOverrides.<key>`** (a plain option, set per-environment in e.g. `env/dev/<name>.nix`) is `recursiveUpdate`d on top of that key's shape. `volumeHandle` is the field that pins it, but any field can be overridden this way (`size` most commonly, also `accessModes`, `storageClassName`, `volumeAttributes`, `pvcName`) without touching `appTemplates/<name>.nix`.
 
-A key present in `volumes` but with no `volumeHandle` anywhere (whether via `volumeOverrides` or otherwise) isn't pinned at all -- it's just an ordinary dynamically-provisioned PVC using the app's normal `storageClassName`. That's what a brand-new environment gets automatically, with zero extra config: everything works, it's just not yet guaranteed to survive a disable/re-enable cycle. Once someone captures a real handle for it (see below) and adds one line to that environment's `env/dev/<name>.nix`, the exact same volume becomes pinned on the next `nur switch` -- no change to `applications/<name>.nix` at all.
+A key present in `volumes` but with no `volumeHandle` anywhere (whether via `volumeOverrides` or otherwise) isn't pinned at all -- it's just an ordinary dynamically-provisioned PVC using the app's normal `storageClassName`. That's what a brand-new environment gets automatically, with zero extra config: everything works, it's just not yet guaranteed to survive a disable/re-enable cycle. Once someone captures a real handle for it (see below) and adds one line to that environment's `env/dev/<name>.nix`, the exact same volume becomes pinned on the next `nur switch` -- no change to `appTemplates/<name>.nix` at all.
 
 ## Using it
 
 ```nix
-# applications/myapp.nix
+# appTemplates/myapp.nix
 self.lib.mkArgoApp { inherit config lib self pkgs; } {
   name = "myapp";
 
@@ -59,13 +59,13 @@ self.lib.mkArgoApp { inherit config lib self pkgs; } {
 This does three things automatically:
 - Generates the `PersistentVolumeClaim` (and, once a handle exists, its matching pinned `PersistentVolume`) and merges them into the app's resources -- no need to spread anything into `extraResources` yourself.
 - Exposes `cfg.volumes.appdata.pvcName` (the generated PVC's k8s name) and `cfg.volumes.appdata.volume` (a ready `{ name; persistentVolumeClaim.claimName; }` entry) so `extraResources`/`extraAppConfig` can reference it without hand-typing the naming convention.
-- Supports multiple entries per app -- see `applications/paperless-ngx.nix` (`data`/`media`/`export`/`consume`) or `applications/tdarr.nix` for apps with more than one volume.
+- Supports multiple entries per app -- see `appTemplates/paperless-ngx.nix` (`data`/`media`/`export`/`consume`) or `appTemplates/tdarr.nix` for apps with more than one volume.
 
-An app can freely mix pinned and dynamic/NFS volumes -- the common pattern across `*arr` apps is a small (potentially pinned) `config` volume alongside a large dynamic or NFS-backed `downloads`/`media` volume that's fine to lose. See `applications/sonarr.nix` or `applications/lidarr.nix`.
+An app can freely mix pinned and dynamic/NFS volumes -- the common pattern across `*arr` apps is a small (potentially pinned) `config` volume alongside a large dynamic or NFS-backed `downloads`/`media` volume that's fine to lose. See `appTemplates/sonarr.nix` or `appTemplates/lidarr.nix`.
 
 ### Overriding the generated PVC name
 
-Pass an explicit `pvcName` (and/or `pvName`) inside a volume's arg-set in `volumes` when the default `"${name}-${name}-<key>"` convention doesn't fit -- e.g. a Helm chart with an `existingClaim`-style value that expects a specific literal string. `applications/pihole.nix` needs this: its chart config already says `existingClaim = "pihole"`, so its `volumes.data` sets `pvcName = "pihole";` to match.
+Pass an explicit `pvcName` (and/or `pvName`) inside a volume's arg-set in `volumes` when the default `"${name}-${name}-<key>"` convention doesn't fit -- e.g. a Helm chart with an `existingClaim`-style value that expects a specific literal string. `appTemplates/pihole.nix` needs this: its chart config already says `existingClaim = "pihole"`, so its `volumes.data` sets `pvcName = "pihole";` to match.
 
 ## Capturing a `volumeHandle`
 

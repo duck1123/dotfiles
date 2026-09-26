@@ -9,7 +9,7 @@
     ingress.tls.enable = true;
     # Root "/" doesn't return a monitorable response; the pod's own liveness/
     # readiness probes already settled on /admin for the same reason (see
-    # applications/pihole.nix). Point straight at /admin/login rather than /admin
+    # appTemplates/pihole.nix). Point straight at /admin/login rather than /admin
     # so this doesn't depend on Uptime Kuma following pihole's redirect.
     monitoring.autokuma.url = "https://${config.services.pihole.ingress.domain}/admin/login";
     serviceDnsLoadBalancerIP = "192.168.0.243";

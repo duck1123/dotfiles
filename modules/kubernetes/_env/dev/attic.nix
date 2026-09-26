@@ -19,7 +19,7 @@
       # content-hash-based so collision risk with other garage tenants
       # (e.g. xyops) is effectively nil.
       bucket = "default";
-      # Must match garage's configured s3_region (see applications/garage.nix) --
+      # Must match garage's configured s3_region (see appTemplates/garage.nix) --
       # "us-east-1" because that's what attic-server's presigned-download
       # codepath hardcodes regardless of this value, not because Garage cares.
       region = "us-east-1";

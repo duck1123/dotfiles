@@ -59,6 +59,7 @@ Top-level registry directories (auto-loaded, see Registries):
 - `environments/` — desktop environments (budgie, gnome, hyprland, i3, niri, plasma6), one `<name>.nix` per environment (see Environment System)
 - `identities/` — per-user identities (duck, deck, drenfer)
 - `hosts/` — one `<hostname>.nix` per host (see Host Configuration Pattern)
+- `appTemplates/` — one `<name>.nix` per Kubernetes app: just the spec lambda passed to `mkArgoApp` (see Registries)
 
 Key subdirectories of `modules/`:
 - `modules/flake/` — flake outputs: `nixosConfigurations`, `homeConfigurations`, `devShells`, `packages`, and the `lib/+mk-os.nix` helpers
@@ -66,7 +67,7 @@ Key subdirectories of `modules/`:
 - `modules/options/` — NixOS option declarations (host, hosts, identities, simpleFeature type)
 - `modules/types/` — custom Nix types/submodules for hosts, identities, features
 - `modules/base.nix`, `modules/state-version.nix` — the `homeManager.base`/`nixos.base` entry modules and state versions
-- `modules/kubernetes/` — the k3s fleet-ops integration, fully consolidated into this repo (the `k3s-fleetops` flake input is gone; there is no external dependency left). `_vendor/applications/` and `_vendor/generators/`/`_vendor/lib/`/`_vendor/modules/` hold the application library/generators (edit these directly — "_vendor" is a historical name, not a sync boundary); `_env/dev/` has the per-app instance config for the `dev` nixidy environment. See `modules/kubernetes/docs/` for deployment workflow, the two-module-system gotcha, pinned-volume handling, and a troubleshooting playbook.
+- `modules/kubernetes/` — the k3s fleet-ops integration, fully consolidated into this repo (no external dependency left). `options.nix` declares `flake.lib`/`flake.nixidyApps`; `lib/` holds the `flake.lib.*` helpers (`mkArgoApp`, `mkPinnedVolume`, ...); `pkgs/` the packages some apps use; `applications.nix` turns every `appTemplates` entry into a `flake.nixidyApps` module via `mkArgoApp`; `nixidy-apps/` holds the few apps that don't use `mkArgoApp`. The `_`-prefixed dirs aren't flake-parts modules: `_nixidy/` has the modules for the inner nixidy eval (listed in `nixidy-envs.nix`), `_generators/` the CRD generators, `_lib/` `postProcessManifests`, and `_env/dev/` the per-app instance config for the `dev` nixidy environment. See `modules/kubernetes/docs/` for deployment workflow, the two-module-system gotcha, pinned-volume handling, and a troubleshooting playbook.
 
 ### Host Configuration Pattern
 
@@ -179,11 +180,12 @@ Some core types live in top-level directories outside `modules/` and are auto-lo
 }
 ```
 
-The registry's option is declared in `modules/flake/<attr>.nix` and evaluated once at the flake level. To add a new registry, add a `<attr> = ../../<dir>;` line to the table in `registries.nix` and declare the option.
+The registry's option is declared in `modules/flake/<attr>.nix` and evaluated once at the flake level. To add a new registry, add a `<attr> = ../../<dir>;` line to the table in `registries.nix` (the `raw = true` table if its entries are themselves functions) and declare the option.
 
 Current registries:
 - `features/`, `environments/`, `hosts/` — see Feature System, Environment System and Host Configuration Pattern.
 - `identities/` — per-user identities (duck, deck, drenfer). Declared in `modules/flake/identities.nix`, published as `inputs.self.identities`, and exposed read-only to generic/NixOS/home-manager modules as `config.identities` (`modules/options/identities-options.nix`). Hosts pick one with `identity = config.identities.<name>`.
+- `appTemplates/` — Kubernetes app templates. A **raw** registry: each file is the lambda `{ config, lib, pkgs, self, ... }: { name = ...; chart = ...; ... }` (nixidy module args → `mkArgoApp` spec), kept as-is rather than called with flake-parts args. Declared in `modules/flake/appTemplates.nix`; `modules/kubernetes/applications.nix` wraps each one as `self.lib.mkArgoApp { inherit config lib pkgs self; } (template args)` into `flake.nixidyApps.<name>`. Adding an app means dropping in a file; app-owned assets (dashboards, scripts, site sources) live in `resources/apps/<name>/`.
 
 ### Hosts
 

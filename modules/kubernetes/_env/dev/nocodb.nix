@@ -22,7 +22,7 @@
     # auto-creates one "default" bucket on boot (same bucket attic/xyops use).
     # Endpoint must be garage's ingress domain, not the in-cluster
     # garage.garage ClusterIP -- see the `storage.endpoint` option doc in
-    # applications/nocodb.nix for why (presigned URLs go to the browser).
+    # appTemplates/nocodb.nix for why (presigned URLs go to the browser).
     storage = {
       enable = true;
       backend = "garage";

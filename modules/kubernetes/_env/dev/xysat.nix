@@ -16,7 +16,7 @@ in
       if apiKey == "" then "" else "http://xyops.xyops:5522/api/app/satellite/config?t=${apiKey}";
 
     # Gives jobs the satellite runs access to a small nix-provided toolset at
-    # /nix/var/result/bin (on PATH) via nix-csi -- see applications/xysat.nix.
+    # /nix/var/result/bin (on PATH) via nix-csi -- see appTemplates/xysat.nix.
     # Add/remove packages here freely; empty string disables the mount.
     nixExpr = ''
       let

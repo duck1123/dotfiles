@@ -217,12 +217,12 @@ nur switch --host edgenix home                # home-manager only
 
 ## Kubernetes manifests
 
-The cluster's application definitions, generators, and shared library code live under `modules/kubernetes/_vendor/`; the environment-specific config (which apps are enabled, their domains, storage, secrets wiring) lives in `modules/kubernetes/_env/dev/`. Building that config produces Kubernetes manifests via [nixidy](https://github.com/arnarg/nixidy), which get pushed to a private [argo-manifests](https://github.com/duck1123/argo-manifests) repo; ArgoCD on the cluster syncs from there. See `modules/kubernetes/docs/` for the deployment workflow in more depth, the pinned-volumes convention, and a troubleshooting playbook.
+The cluster's application definitions live in `appTemplates/` (one `mkArgoApp` spec per app), with generators and shared library code under `modules/kubernetes/`; the environment-specific config (which apps are enabled, their domains, storage, secrets wiring) lives in `modules/kubernetes/_env/dev/`. Building that config produces Kubernetes manifests via [nixidy](https://github.com/arnarg/nixidy), which get pushed to a private [argo-manifests](https://github.com/duck1123/argo-manifests) repo; ArgoCD on the cluster syncs from there. See `modules/kubernetes/docs/` for the deployment workflow in more depth, the pinned-volumes convention, and a troubleshooting playbook.
 
 ```
 dotfiles/
-  modules/kubernetes/
-    _vendor/              ← application definitions, generators, shared library code
+  appTemplates/            ← application definitions (one mkArgoApp spec per app)
+  modules/kubernetes/      ← mkArgoApp and other library code, generators, packages
     _env/dev/              ← this environment's config (services, domains, storage)
   secrets/k8s.enc.yaml     ← encrypted cluster secrets (sops/age)
   kubernetes/

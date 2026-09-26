@@ -4,7 +4,7 @@
     # Flip on once `superset.database.password` / `superset.secretKey` / `superset.admin.*`
     # are populated in secrets.enc.yaml (see `nur secrets edit`) and the matching entry
     # exists in env/dev/postgresql.nix's extraDatabases -- see IMAGE-VERSIONS.md /
-    # applications/superset.nix for the exact keys expected.
+    # appTemplates/superset.nix for the exact keys expected.
     enable = true;
 
     databaseTarget = "postgresql";
@@ -29,7 +29,7 @@
 
     # One SQL Lab connection per database on the shared postgres instance (Postgres has
     # no cross-database queries, so one connection can't cover all of them -- see
-    # applications/superset.nix). Sourced from postgresql.nix's extraDatabases so new
+    # appTemplates/superset.nix). Sourced from postgresql.nix's extraDatabases so new
     # app databases automatically get a connection registered on the next `nur switch`.
     reportingConnections = map (db: {
       inherit (db) name username password;

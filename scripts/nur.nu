@@ -567,22 +567,17 @@ export def "nur k8s bootstrap-argocd-repo" [] {
 }
 
 # ─── App management (ported from k3s-fleetops) ──────────────────────────────
-# Application templates are vendored locally under
-# modules/kubernetes/_vendor/applications/ (see modules/kubernetes/default.nix).
+# Apps are appTemplates/<name>.nix (mkArgoApp templates, see
+# modules/kubernetes/applications.nix) plus modules/kubernetes/nixidy-apps/<name>.nix
+# (plain nixidy modules that don't go through mkArgoApp).
 
-# Every app name registered in modules/kubernetes/_vendor/applications/default.nix's imports list
+# Every app name defined by a file in either directory
 def "nu-complete apps" []: nothing -> list<string> {
-  try {
-    open --raw modules/kubernetes/_vendor/applications/default.nix
-    | lines
-    | each { str trim }
-    | where {|line| $line | str starts-with './' }
-    | each {|line| $line | str replace --all --regex '^\./|\.nix$' '' }
-    | uniq
-    | sort
-  } catch { |err|
-    error make {msg: $"Failed to read modules/kubernetes/_vendor/applications/default.nix: ($err.msg)"}
-  }
+  glob "{appTemplates,modules/kubernetes/nixidy-apps}/*.nix"
+  | each { path parse | get stem }
+  | where {|name| not ($name | str starts-with '_') }
+  | uniq
+  | sort
 }
 
 # List every app name accepted by `nur apps restart` (one per line)

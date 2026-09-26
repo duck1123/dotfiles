@@ -6,7 +6,7 @@ _: {
     ingress.tls.enable = true;
 
     # Points at ditto-relay's bundled single-node OpenSearch (see
-    # applications/ditto-relay.nix) -- cross-namespace Service DNS.
+    # appTemplates/ditto-relay.nix) -- cross-namespace Service DNS.
     opensearchHosts = [ "http://ditto-relay-opensearch.ditto-relay:9200" ];
 
     # Without this, ditto-relay's `nostr-events` index has data in it but

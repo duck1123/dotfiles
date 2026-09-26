@@ -8,7 +8,7 @@
 
     # Flip these on by populating metabase.admin.password in secrets.enc.yaml (see
     # `nur secrets edit`) -- until then the register-connections job is skipped
-    # entirely (see applications/metabase.nix).
+    # entirely (see appTemplates/metabase.nix).
     admin = {
       email = (secrets.metabase or { }).admin.email or "admin@metabase.local";
       password = (secrets.metabase or { }).admin.password or "";

@@ -1,6 +1,6 @@
 { config, secrets, ... }:
 {
-  # ../../applications/immich.nix
+  # appTemplates/immich.nix
   services.immich = {
     adminApiKey = secrets.immich.adminApiKey;
 

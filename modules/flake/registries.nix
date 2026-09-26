@@ -4,9 +4,16 @@
 # a value or as a function of flake-parts module args (e.g. `{ config, ... }:`
 # to reference other entries). Files and directories starting with `_` are
 # skipped, like import-tree does.
+#
+# A "raw" registry keeps each file's value as-is, even when it is a function,
+# for registries whose entries are themselves lambdas (e.g. appTemplates,
+# whose bodies are nixidy module args -> mkArgoApp spec).
 { lib, ... }:
 let
   loadRegistry =
+    {
+      raw ? false,
+    }:
     attr: dir:
     let
       isEntry = n: t: t == "regular" && lib.hasSuffix ".nix" n && !lib.hasPrefix "_" n;
@@ -16,7 +23,7 @@ let
         let
           path = dir + "/${file}";
           body = import path;
-          bodyFn = if lib.isFunction body then body else _: body;
+          bodyFn = if lib.isFunction body && !raw then body else _: body;
         in
         {
           _file = path;
@@ -34,10 +41,14 @@ let
     };
 in
 {
-  imports = lib.mapAttrsToList loadRegistry {
-    environments = ../../environments;
-    features = ../../features;
-    hosts = ../../hosts;
-    identities = ../../identities;
-  };
+  imports =
+    lib.mapAttrsToList (loadRegistry { }) {
+      environments = ../../environments;
+      features = ../../features;
+      hosts = ../../hosts;
+      identities = ../../identities;
+    }
+    ++ lib.mapAttrsToList (loadRegistry { raw = true; }) {
+      appTemplates = ../../appTemplates;
+    };
 }

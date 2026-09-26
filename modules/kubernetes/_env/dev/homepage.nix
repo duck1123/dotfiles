@@ -36,7 +36,7 @@
       };
 
       Automation = {
-        # ArgoCD doesn't set `uses-ingress` (see applications/argocd.nix), so it
+        # ArgoCD doesn't set `uses-ingress` (see appTemplates/argocd.nix), so it
         # can't auto-discover a homepage tile -- listed here by its real URL.
         argocd = {
           href = "https://argocd.dev.kronkltd.net/";
@@ -110,10 +110,10 @@
     # service's `homepage.extraSettings.widget.*` (or `widgets`/`extraGroups`
     # here) as `{{HOMEPAGE_VAR_<KEY>}}` -- homepage substitutes the placeholder
     # from the container env at render time, so the ConfigMap/git stay
-    # plaintext-free. See applications/homepage.nix for how this is wired.
+    # plaintext-free. See appTemplates/homepage.nix for how this is wired.
     # Each mkArgoApp service below auto-populates its own
     # `homepage.extraSettings.widget` once its `apiKey` (or, for immich,
-    # `adminApiKey`) is set -- see applications/immich.nix for the pattern.
+    # `adminApiKey`) is set -- see appTemplates/immich.nix for the pattern.
     # This just has to supply the matching env var for each widget's
     # `{{HOMEPAGE_VAR_*}}` placeholder. PLEX_API_KEY backs the static Plex
     # entry above (Plex isn't a mkArgoApp service).

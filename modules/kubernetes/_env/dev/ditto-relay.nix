@@ -12,7 +12,7 @@
     volumeOverrides.opensearch-data.volumeHandle = "pvc-5baee1d1-efe8-464b-ae93-910d4c7c593d";
 
     # No k8s Ingress (reached via the Cloudflare Tunnel, see
-    # applications/ditto-relay.nix and applications/cloudflared.nix), so
+    # appTemplates/ditto-relay.nix and appTemplates/cloudflared.nix), so
     # homepage/monitoring.autokuma have no ingress domain to default their
     # url/href to -- set both explicitly. Grouped with duck1123 under the
     # "Nostr" homepage heading (see env/dev.nix's homepageGroups).

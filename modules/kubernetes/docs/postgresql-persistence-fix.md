@@ -4,7 +4,7 @@
 PostgreSQL was using `emptyDir` volumes instead of PersistentVolumeClaims, causing data loss on pod restarts or node updates.
 
 ## Solution
-1. **Enable persistence in Helm values** - Updated `applications/postgresql/default.nix` to explicitly enable persistence
+1. **Enable persistence in Helm values** - Updated `appTemplates/postgresql.nix` to explicitly enable persistence
 2. **Regenerate manifests** - Run `nur switch` to apply changes
 3. **Migrate existing data** - If data exists, back it up before applying changes
 

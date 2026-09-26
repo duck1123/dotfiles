@@ -60,7 +60,7 @@
     look.url = "github:kunkka19xx/look?dir=apps/linows";
 
     # Intentionally pinned rather than tracking upstream master -- the vendored
-    # modules/kubernetes/_vendor/applications/nix-csi.nix (originally from
+    # appTemplates/nix-csi.nix (originally from
     # k3s-fleetops, see modules/kubernetes/docs/nix-csi-and-binary-cache.md) is
     # written/tested against this exact commit and broke evaluation entirely
     # when this had drifted forward via a routine `nix flake update`. Don't

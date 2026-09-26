@@ -87,7 +87,7 @@ cd "$DOTFILES_ROOT"
 # 5. Post-process manifests (fixups for nixidy hardcoded behaviours -- e.g.
 #    Prometheus admission webhook RBAC/Jobs, MetalLB webhook cert
 #    ignoreDifferences). Vendored from k3s-fleetops, same as the library
-#    code under modules/kubernetes/_vendor/.
+#    code under modules/kubernetes/.
 #
 #    post-process-manifests hardcodes fleetops' own "manifests/dev/..."
 #    paths (its rootPath is "./manifests/dev"; ours is just "dev", no
@@ -100,7 +100,7 @@ cd "$DOTFILES_ROOT"
 echo "Post-processing manifests..."
 POST_PROCESS_BIN="$(
   nix build --no-link --print-out-paths --impure --expr \
-    "let flake = builtins.getFlake (toString ./.); pkgs = flake.inputs.nixpkgs.legacyPackages.${SYSTEM}; in pkgs.callPackage ./modules/kubernetes/_vendor/lib/postProcessManifests.nix { }"
+    "let flake = builtins.getFlake (toString ./.); pkgs = flake.inputs.nixpkgs.legacyPackages.${SYSTEM}; in pkgs.callPackage ./modules/kubernetes/_lib/postProcessManifests.nix { }"
 )"
 POST_PROCESS_WRAPPER="$(mktemp -d)"
 trap 'rm -f "$TMP" "$OUT_PATHS"; rm -rf "$POST_PROCESS_WRAPPER"' EXIT
