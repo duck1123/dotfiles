@@ -49,12 +49,14 @@ _: {
         # fit this shape+override model, so it keeps its own hand-rolled
         # mkPinnedVolume call. Shape only -- no volumeHandle here, that's
         # environment-specific (see env/dev/garage.nix and docs/pinned-volumes.md).
-        volumes = cfg: {
-          meta = {
-            pvcName = "${name}-meta";
-            size = cfg.metaPersistenceSize;
+        volumes =
+          cfg:
+          optionalAttrs (cfg.hostPath == null) {
+            meta = {
+              pvcName = "${name}-meta";
+              size = cfg.metaPersistenceSize;
+            };
           };
-        };
 
         extraOptions = {
           image = mkOption {
@@ -98,8 +100,22 @@ _: {
             default = "default";
           };
 
+          # Longhorn on nasnix (the NAS VM, whose virtual disk saturates when
+          # the NAS is busy) corrupted the metadata DB three times in two
+          # weeks; a plain directory on a node's local SSD avoids both Longhorn
+          # and the NAS. See docs/nix-csi-and-binary-cache.md.
+          hostPath = mkOption {
+            description = mdDoc ''
+              Directory on the `hostAffinity` node holding `meta/` and `data/`
+              (created if missing), used instead of PVCs. Requires
+              `hostAffinity`. null = PVCs (Longhorn, or NFS for data).
+            '';
+            type = types.nullOr types.str;
+            default = null;
+          };
+
           metaPersistenceSize = mkOption {
-            description = mdDoc "Size of the metadata volume (lmdb — keep this off NFS)";
+            description = mdDoc "Size of the metadata volume (keep this off NFS)";
             type = types.str;
             default = "2Gi";
           };
@@ -160,7 +176,14 @@ _: {
 
         extraResources =
           cfg:
+          assert lib.assertMsg (cfg.hostPath == null || cfg.hostAffinity != null)
+            "services.garage.hostPath needs services.garage.hostAffinity, or the pod can land on a node without its data";
           let
+            onHost = cfg.hostPath != null;
+            hostDir = sub: {
+              path = "${cfg.hostPath}/${sub}";
+              type = "DirectoryOrCreate";
+            };
             pinnedData = self.lib.mkPinnedVolume {
               pvcName = "${name}-data";
               volumeHandle = cfg.dataVolumeHandle;
@@ -362,12 +385,28 @@ _: {
                         name = "config";
                         configMap.name = "${name}-config";
                       }
-                      cfg.volumes.meta.volume
-                      {
-                        name = "data";
-                        persistentVolumeClaim.claimName = "${name}-data";
-                      }
-                    ];
+                    ]
+                    ++ (
+                      if onHost then
+                        [
+                          {
+                            name = "meta";
+                            hostPath = hostDir "meta";
+                          }
+                          {
+                            name = "data";
+                            hostPath = hostDir "data";
+                          }
+                        ]
+                      else
+                        [
+                          cfg.volumes.meta.volume
+                          {
+                            name = "data";
+                            persistentVolumeClaim.claimName = "${name}-data";
+                          }
+                        ]
+                    );
                   };
                 };
               };
@@ -434,7 +473,7 @@ _: {
               ];
             };
 
-            persistentVolumeClaims = {
+            persistentVolumeClaims = optionalAttrs (!onHost) {
               "${name}-data" =
                 if cfg.nfs.enable then
                   {
@@ -449,7 +488,9 @@ _: {
                   pinnedData.persistentVolumeClaims."${name}-data";
             };
 
-            persistentVolumes = nfsDataPV // lib.optionalAttrs (!cfg.nfs.enable) pinnedData.persistentVolumes;
+            persistentVolumes = optionalAttrs (!onHost) (
+              nfsDataPV // lib.optionalAttrs (!cfg.nfs.enable) pinnedData.persistentVolumes
+            );
           };
       };
 }

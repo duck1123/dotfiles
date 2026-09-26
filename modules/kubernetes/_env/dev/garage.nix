@@ -3,14 +3,13 @@
   services.garage = {
     enable = true;
 
-    # Pin to the node its RWO Longhorn volumes' replicas actually live on --
-    # without this, a reschedule to a different node forces those volumes
-    # through a detach/reattach cycle, which is what triggered both the
-    # 2026-09-13 garage-meta LMDB corruption incident (see
-    # docs/nix-csi-and-binary-cache.md) and a live FailedAttachVolume storm
-    # on garage-meta found 2026-09-14. Update this if the volumes are ever
-    # deliberately moved to a different node.
-    hostAffinity = "nasnix";
+    # Metadata and data live in a plain directory on nixmini's NVMe. They
+    # used to be single-replica Longhorn volumes on nasnix, the NAS VM, whose
+    # one virtual disk saturates whenever the NAS is busy; the metadata DB was
+    # corrupted three times in two weeks (LMDB 2026-09-13 and 2026-09-20,
+    # sqlite 2026-09-26). See docs/nix-csi-and-binary-cache.md.
+    hostAffinity = "nixmini";
+    hostPath = "/var/lib/garage";
 
     adminToken = (secrets.garage or { }).adminToken or "";
     rpcSecret = (secrets.garage or { }).rpcSecret or "";
@@ -32,15 +31,5 @@
       enable = true;
       url = "http://garage.garage.svc.cluster.local:3903/health";
     };
-
-    # Start out on longhorn (no NFS) to keep the first boot simple — flip on
-    # once garage is validated, pointed at its own NAS export like rustfs's.
-    nfs.enable = false;
-
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster. dataVolumeHandle
-    # only takes effect while nfs.enable is false, as above.
-    volumeOverrides.meta.volumeHandle = "pvc-12507954-e2c5-4fd6-9a00-498f96993445";
-    dataVolumeHandle = "pvc-06689573-2c6c-4acd-961d-95a4801239b2";
   };
 }
