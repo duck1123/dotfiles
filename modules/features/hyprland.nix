@@ -239,7 +239,7 @@ _: {
                   mods = [ mainMod ];
                   key = "a";
                   command = "exec";
-                  arg = "pear-desktop";
+                  arg = "plexamp";
                 }
                 {
                   mods = [ mainMod ];

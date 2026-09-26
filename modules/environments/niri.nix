@@ -48,7 +48,7 @@ _: {
           }
           {
             key = "Mod+A";
-            spawn = [ "pear-desktop" ];
+            spawn = [ "plexamp" ];
           }
           {
             key = "Mod+B";
@@ -89,6 +89,10 @@ _: {
           {
             key = "Mod+U";
             sh = inLastDir "jjui";
+          }
+          {
+            key = "Mod+V";
+            spawn = [ "code" ];
           }
           {
             key = "XF86AudioRaiseVolume";
