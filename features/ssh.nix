@@ -2,7 +2,7 @@
   homeManager =
     { config, lib, ... }:
     let
-      # Same tailnet as modules/kubernetes/_env/dev.nix's tail-domain.
+      # Same tailnet as clusters/dev/options.nix's tail-domain.
       tailnet-domain = "bearded-snake.ts.net";
 
       tailscale-hosts = lib.filterAttrs (

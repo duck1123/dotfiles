@@ -14,7 +14,7 @@ Because `00-master`'s child Applications all inherit `selfHeal: true`, ArgoCD ac
 
 The correct sequence, which actually sticks:
 
-1. Change the desired state in the Nix source — typically `replicas = 0;` under `services.<name>` in `env/dev/<name>.nix`.
+1. Change the desired state in the Nix source — typically `replicas = 0;` under `services.<name>` in `clusters/dev/apps/<name>.nix`.
 2. `nur switch` (or at least `nur switch --fallback` if the local binary cache is being flaky).
 3. `git commit` + `git push`.
 4. Optionally force immediate reconciliation instead of waiting for ArgoCD's poll interval:

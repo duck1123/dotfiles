@@ -16,7 +16,7 @@ in
         devEnv = inputs.nixidy.lib.mkEnvs {
           inherit pkgs;
           charts = inputs.nixhelm.chartsDerivations.${system};
-          envs.dev.modules = [ ./_env/dev.nix ];
+          envs.dev.modules = [ ../../clusters/dev ];
           extraSpecialArgs = { inherit self crdImports; };
           modules = (builtins.attrValues self.nixidyApps) ++ [
             self.modules.generic.ageRecipients

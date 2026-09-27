@@ -10,13 +10,13 @@ The fix uses homepage's own built-in secret-substitution syntax instead of inven
 
 - `services.homepage.widgetSecrets` (an `attrsOf str`) is a sops-encrypted Kubernetes Secret (`homepage-widget-secrets`, via the same `sopsSecrets`/`write-sops-secrets.sh` pipeline every other app's secrets use — see the main CLAUDE.md's Secrets section) whose keys are injected into the homepage container as `HOMEPAGE_VAR_<KEY>` env vars (`appTemplates/homepage.nix`).
 - Anywhere in `settings`/`widgets`/`extraGroups`/`bookmarkGroups`/a service's `homepage.extraSettings`, write the literal string `"{{HOMEPAGE_VAR_<KEY>}}"` instead of a real value.
-- Wire the actual value in `env/dev/homepage.nix`'s `widgetSecrets`, sourced from `secrets.enc.yaml`.
+- Wire the actual value in `clusters/dev/apps/homepage.nix`'s `widgetSecrets`, sourced from `secrets.enc.yaml`.
 
 **Never** route a secret value through `self.lib.toYAML` — it round-trips through the Nix store via `builtins.toFile`/`pkgs.runCommand`, which would leave the plaintext world-readable in `/nix/store` regardless of what ends up in git. `toYAML` is fine (and used) for the non-secret parts of homepage's config; just don't let a `widgetSecrets` value anywhere near it.
 
 ## Auto-populating a service's own widget
 
-Rather than hand-writing each widget in `env/dev/homepage.nix`, the established pattern (see `appTemplates/immich.nix`, `appTemplates/sonarr.nix`, etc.) is: give the app itself an `apiKey` (or, for immich, `adminApiKey`) option that auto-populates its own `homepage.extraSettings.widget` once set:
+Rather than hand-writing each widget in `clusters/dev/apps/homepage.nix`, the established pattern (see `appTemplates/immich.nix`, `appTemplates/sonarr.nix`, etc.) is: give the app itself an `apiKey` (or, for immich, `adminApiKey`) option that auto-populates its own `homepage.extraSettings.widget` once set:
 
 ```nix
 # appTemplates/<name>.nix
@@ -38,13 +38,13 @@ homepage.extraSettings = mkOption {
 
 This needs `cfg = config.services.<name>;` bound in the file's outer `let` (some apps already have a `let` block for a `password-secret` constant — just add `cfg` alongside it) since `extraOptions` is a plain attrset, not a `cfg: ...` function, so it can't otherwise see the app's own resolved config.
 
-Then in `env/dev/<name>.nix`: `apiKey = secrets.<name>.key;`, and in `env/dev/homepage.nix`'s `widgetSecrets`: `<NAME>_API_KEY = config.services.<name>.apiKey;`.
+Then in `clusters/dev/apps/<name>.nix`: `apiKey = secrets.<name>.key;`, and in `clusters/dev/apps/homepage.nix`'s `widgetSecrets`: `<NAME>_API_KEY = config.services.<name>.apiKey;`.
 
 Check [gethomepage's widget docs](https://gethomepage.dev/widgets/services/) for the exact `type`/field names and any `version` field before assuming a widget just needs `type`/`url`/`key` — several widgets don't map 1:1 to their app's own name (Stash's widget `type` is `"stash"`, not `"stashapp"`) and some need an explicit API-version field once the backing app crosses a version threshold (Immich's widget needs `version = 2` for Immich >= v1.118; Komga's needs it for Komga v2+; Glances needs `version = 4`) — the 404s just look like a broken URL/key if you don't know to check this.
 
 ## Out-of-cluster services (not a `mkArgoApp` service)
 
-Some dashboard entries aren't `mkArgoApp` services at all — e.g. Plex (`services.plex` via NixOS, on `edgenix`) and per-node Glances (`features.glances` in dotfiles, one instance per cluster host). These can't auto-discover, so they're added as static entries directly in `env/dev/homepage.nix`'s `extraGroups`, keyed by static LAN IP:
+Some dashboard entries aren't `mkArgoApp` services at all — e.g. Plex (`services.plex` via NixOS, on `edgenix`) and per-node Glances (`features.glances` in dotfiles, one instance per cluster host). These can't auto-discover, so they're added as static entries directly in `clusters/dev/apps/homepage.nix`'s `extraGroups`, keyed by static LAN IP:
 
 ```nix
 extraGroups.Media.plex = {
@@ -61,7 +61,7 @@ Still goes through `widgetSecrets` the same way for the key.
 
 ## Dashboard group registry (`config.homepageGroups`)
 
-`services.<name>.homepage.group` (default `"Apps"`) is validated against `config.homepageGroups` (`modules/homepageGroups.nix`, populated in `env/dev.nix`) via `types.enum` — an unrecognized group name fails the build with a clear "not of type" error rather than silently creating a stray one-off group. Adding a new group means adding it to the `homepageGroups` list in `env/dev.nix` *first*, then referencing it from an app's `homepage.group`.
+`services.<name>.homepage.group` (default `"Apps"`) is validated against `config.homepageGroups` (`modules/homepageGroups.nix`, populated in `clusters/dev/default.nix`) via `types.enum` — an unrecognized group name fails the build with a clear "not of type" error rather than silently creating a stray one-off group. Adding a new group means adding it to the `homepageGroups` list in `clusters/dev/default.nix` *first*, then referencing it from an app's `homepage.group`.
 
 That same list's **order also controls render order** in `services.yaml` (`appTemplates/homepage.nix` sorts groups by registry position, not the alphabetical order Nix attrsets would otherwise iterate in) — earlier entries appear first, which today (no multi-column `layout` configured in `settings.yaml`) is the only lever for "this group should be near the top/left." If per-group column placement is ever needed, `modules/homepageGroups.nix`/`config.homepageGroups` is the natural place to extend (e.g. turning each entry into `{ column = ...; }`) without touching the enum-validation mechanism — see [gethomepage's layout docs](https://gethomepage.dev/configs/settings/#layout) for what real multi-column placement requires (nested groups in `services.yaml` itself, not just ordering).
 

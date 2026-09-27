@@ -9,9 +9,12 @@ let
   secrets = self.lib.loadSecrets { inherit pkgs; };
 in
 {
-  # Recursively imports every module under ./dev (one file per service, plus
-  # ./dev/options.nix for the shared devDefaults.* options).
-  imports = [ (self.inputs.import-tree ./dev) ];
+  # ./options.nix declares the shared devDefaults.* options; ./apps holds one
+  # file per service, imported recursively.
+  imports = [
+    ./options.nix
+    (self.inputs.import-tree ./apps)
+  ];
 
   _module.args = {
     inherit secrets;

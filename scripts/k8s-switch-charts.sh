@@ -91,7 +91,7 @@ cd "$DOTFILES_ROOT"
 #
 #    post-process-manifests hardcodes fleetops' own "manifests/dev/..."
 #    paths (its rootPath is "./manifests/dev"; ours is just "dev", no
-#    "manifests/" wrapper -- see modules/kubernetes/_env/dev.nix). Rather
+#    "manifests/" wrapper -- see clusters/dev/default.nix). Rather
 #    than fork the script or leave a permanent symlink in the checkout,
 #    run it from a throwaway dir with a transient "manifests" symlink
 #    pointing at the real checkout, so its relative paths resolve through
