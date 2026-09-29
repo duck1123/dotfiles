@@ -98,7 +98,7 @@
         # vcluster
         # virtualbox
         vscode
-        yq-go # used by scripts/k8s-bootstrap-argocd-repo.sh and post-process-manifests
+        yq-go # used by scripts/k8s-bootstrap-argocd-repo.sh and k8s-post-process-manifests.nu
       ];
     };
 }

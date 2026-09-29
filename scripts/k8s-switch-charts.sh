@@ -86,25 +86,9 @@ cd "$DOTFILES_ROOT"
 # ---------------------------------------------------------------------------
 # 5. Post-process manifests (fixups for nixidy hardcoded behaviours -- e.g.
 #    Prometheus admission webhook RBAC/Jobs, MetalLB webhook cert
-#    ignoreDifferences). Vendored from k3s-fleetops, same as the library
-#    code under modules/kubernetes/.
-#
-#    post-process-manifests hardcodes fleetops' own "manifests/dev/..."
-#    paths (its rootPath is "./manifests/dev"; ours is just "dev", no
-#    "manifests/" wrapper -- see clusters/dev/default.nix). Rather
-#    than fork the script or leave a permanent symlink in the checkout,
-#    run it from a throwaway dir with a transient "manifests" symlink
-#    pointing at the real checkout, so its relative paths resolve through
-#    to the real files without touching what gets committed.
+#    ignoreDifferences).
 # ---------------------------------------------------------------------------
 echo "Post-processing manifests..."
-POST_PROCESS_BIN="$(
-  nix build --no-link --print-out-paths --impure --expr \
-    "let flake = builtins.getFlake (toString ./.); pkgs = flake.inputs.nixpkgs.legacyPackages.${SYSTEM}; in pkgs.callPackage ./modules/kubernetes/_lib/postProcessManifests.nix { }"
-)"
-POST_PROCESS_WRAPPER="$(mktemp -d)"
-trap 'rm -f "$TMP" "$OUT_PATHS"; rm -rf "$POST_PROCESS_WRAPPER"' EXIT
-ln -s "$MANIFESTS_DIR" "$POST_PROCESS_WRAPPER/manifests"
-(cd "$POST_PROCESS_WRAPPER" && "$POST_PROCESS_BIN/bin/post-process-manifests")
+nu "$SCRIPT_DIR/k8s-post-process-manifests.nu" "$MANIFESTS_DIR/dev"
 
 echo "Done. Run 'bb k8s-push' to commit and push manifests."
