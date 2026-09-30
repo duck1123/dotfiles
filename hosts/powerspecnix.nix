@@ -77,6 +77,7 @@ in
     nostr.enable = true;
     nushell.enable = true;
     obsidian.enable = true;
+    office.enable = true;
     pictures.enable = false;
     python.enable = true;
     radio.enable = false;
