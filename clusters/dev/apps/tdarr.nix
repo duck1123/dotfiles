@@ -1,7 +1,7 @@
 { config, ... }:
 {
   services.tdarr = {
-    enable = true;
+    enable = false;
     image = "ghcr.io/haveagitgat/tdarr:2.86.01";
     healthcheckcpuWorkers = 1;
     healthcheckgpuWorkers = 1;
