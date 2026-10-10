@@ -50,7 +50,7 @@ in
     image = mkOption {
       description = mdDoc "The garage container image";
       type = types.str;
-      default = "dxflrs/garage:v2.3.0";
+      default = "dxflrs/garage:v2.4.1";
     };
 
     # 64 hex chars, e.g. `openssl rand -hex 32`. Only matters for

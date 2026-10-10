@@ -8,7 +8,7 @@ rec {
     image = mkOption {
       description = mdDoc "The docker image";
       type = types.str;
-      default = "ghcr.io/flaresolverr/flaresolverr:v3.5.0";
+      default = "ghcr.io/flaresolverr/flaresolverr:v3.5.2";
     };
 
     service.port = mkOption {
