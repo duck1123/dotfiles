@@ -1,7 +1,7 @@
 { config, secrets, ... }:
 {
   services.windmill = {
-    enable = false;
+    enable = true;
     # hostAffinity = "nixmini";
     image = "ghcr.io/windmill-labs/windmill-full:latest";
 
