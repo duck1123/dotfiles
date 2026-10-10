@@ -59,6 +59,12 @@ in
         trusted-users = [ "nix" ];
         trusted-public-keys = [
           "powerspecnix-workstation:QPvTlnwGiEZxUT1nOhVy0OvMoI3UmD3byuzHkVVNLGg="
+          # The cluster's own signing key (Secret nix-csi/nix-key, generated
+          # once by the init Job). Nodes sign with it before `nix copy`ing to
+          # pynixd, which otherwise refuses every path ("lacks a signature by
+          # a trusted key") and the node gives up after six attempts. Update
+          # this if that Secret is ever regenerated.
+          "nix-cache-1:KoqtCQBvf0eHQevY1y319FFEyr8Ef5ZZU9HA3PRjR/A="
         ];
       };
       # Upstream's kubenixInstance, minus the authorizedKeys it reads from
