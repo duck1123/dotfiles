@@ -2,6 +2,27 @@
 with lib;
 let
   cfg = config.services.trilium;
+
+  # Trilium's "Claude Code" provider doesn't bundle the CLI: it drives
+  # whatever binary TRILIUM_CLAUDE_CODE_PATH (or `claude` on PATH) points at,
+  # and the triliumnext image ships neither. There's no Dockerfile of ours to
+  # add it to, so mount nixpkgs' claude-code via nix-csi -- same pattern as
+  # appTemplates/autokuma.nix. claude-code is unfree, hence allowUnfree.
+  claudeCodeExpr = ''
+    let
+      pkgs = import (builtins.fetchTree {
+        type = "github";
+        owner = "nixos";
+        repo = "nixpkgs";
+        ref = "nixos-unstable";
+      }) { config.allowUnfree = true; };
+    in
+    pkgs.claude-code
+  '';
+
+  # On the data PVC so the `claude /login` credentials survive pod restarts
+  # (HOME itself, /home/node, is part of the image).
+  claudeConfigDir = "/home/node/trilium-data/claude";
 in
 rec {
   name = "trilium";
@@ -51,6 +72,17 @@ rec {
           key = "{{HOMEPAGE_VAR_TRILIUM_API_KEY}}";
         };
       };
+    };
+
+    claudeCode.enable = mkOption {
+      description = mdDoc ''
+        Mount the Claude Code CLI into the container (via nix-csi) so the
+        "Claude Code" AI provider works. Needs a one-time login afterwards:
+        `kubectl -n trilium exec -it deploy/trilium -- su node -c /nix/var/result/bin/claude`,
+        then `/login`.
+      '';
+      type = types.bool;
+      default = false;
     };
 
     dataStorage = mkOption {
@@ -105,6 +137,18 @@ rec {
                     name = "TZ";
                     value = cfg.tz;
                   }
+                ]
+                ++ optionals cfg.claudeCode.enable [
+                  {
+                    # Explicit path rather than PATH: start-docker.sh drops to
+                    # the node user through `su`, which may reset PATH.
+                    name = "TRILIUM_CLAUDE_CODE_PATH";
+                    value = "/nix/var/result/bin/claude";
+                  }
+                  {
+                    name = "CLAUDE_CONFIG_DIR";
+                    value = claudeConfigDir;
+                  }
                 ];
                 ports = [
                   {
@@ -134,11 +178,29 @@ rec {
                     mountPath = "/home/node/trilium-data";
                     name = "data";
                   }
+                ]
+                ++ optionals cfg.claudeCode.enable [
+                  {
+                    mountPath = "/nix";
+                    name = "nix";
+                    subPath = "nix";
+                  }
                 ];
               }
             ];
 
-            volumes = [ cfg.volumes.data.volume ];
+            volumes = [
+              cfg.volumes.data.volume
+            ]
+            ++ optionals cfg.claudeCode.enable [
+              {
+                name = "nix";
+                csi = {
+                  driver = "nix.csi.store";
+                  volumeAttributes.nixExpr = claudeCodeExpr;
+                };
+              }
+            ];
           };
         };
       };
