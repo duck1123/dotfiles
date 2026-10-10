@@ -23,6 +23,8 @@ let
   # On the data PVC so the `claude /login` credentials survive pod restarts
   # (HOME itself, /home/node, is part of the image).
   claudeConfigDir = "/home/node/trilium-data/claude";
+
+  claude-secret = "trilium-claude-code";
 in
 rec {
   name = "trilium";
@@ -77,12 +79,24 @@ rec {
     claudeCode.enable = mkOption {
       description = mdDoc ''
         Mount the Claude Code CLI into the container (via nix-csi) so the
-        "Claude Code" AI provider works. Needs a one-time login afterwards:
+        "Claude Code" AI provider works. Authenticate either by setting
+        `claudeCode.oauthToken`, or with a one-time login afterwards:
         `kubectl -n trilium exec -it deploy/trilium -- su node -c /nix/var/result/bin/claude`,
         then `/login`.
       '';
       type = types.bool;
       default = false;
+    };
+
+    claudeCode.oauthToken = mkOption {
+      description = mdDoc ''
+        Long-lived Claude subscription token from `claude setup-token`
+        (valid about a year), injected as `CLAUDE_CODE_OAUTH_TOKEN` so no
+        login inside the pod is needed. Stored in secrets.enc.yaml as
+        `trilium.claudeToken`.
+      '';
+      type = types.str;
+      default = "";
     };
 
     dataStorage = mkOption {
@@ -97,6 +111,12 @@ rec {
       default = 1;
     };
   };
+
+  sopsSecrets =
+    cfg:
+    optionalAttrs (cfg.claudeCode.enable && cfg.claudeCode.oauthToken != "") {
+      ${claude-secret}.CLAUDE_CODE_OAUTH_TOKEN = cfg.claudeCode.oauthToken;
+    };
 
   extraResources = cfg: {
     deployments.${name} = {
@@ -148,6 +168,15 @@ rec {
                   {
                     name = "CLAUDE_CONFIG_DIR";
                     value = claudeConfigDir;
+                  }
+                ]
+                ++ optionals (cfg.claudeCode.enable && cfg.claudeCode.oauthToken != "") [
+                  {
+                    name = "CLAUDE_CODE_OAUTH_TOKEN";
+                    valueFrom.secretKeyRef = {
+                      name = claude-secret;
+                      key = "CLAUDE_CODE_OAUTH_TOKEN";
+                    };
                   }
                 ];
                 ports = [

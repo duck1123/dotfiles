@@ -3,7 +3,10 @@
   services.trilium = {
     enable = true;
     apiKey = secrets.trilium.key;
-    claudeCode.enable = true;
+    claudeCode = {
+      enable = true;
+      oauthToken = secrets.trilium.claudeToken;
+    };
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
