@@ -25,6 +25,9 @@ rec {
   };
 
   extraAppConfig = cfg: {
+    # The chart's values.schema.json (0.13.0+) `$ref`s the bjw-s common
+    # library's schema over HTTPS, which the Nix build sandbox can't fetch.
+    helm.releases.${name}.extraOpts = [ "--skip-schema-validation" ];
     annotations."argocd.argoproj.io/sync-wave" = "2";
   };
 
@@ -32,15 +35,15 @@ rec {
   chart = lib.helm.downloadHelmChart {
     repo = "oci://ghcr.io/immich-app/immich-charts";
     chart = "immich";
-    version = "0.12.0";
-    chartHash = "sha256-Lfx0JwdG65oTeql/qEBF6OOgqYw9AMU+uEdI0Yi5fuQ=";
+    version = "0.13.4";
+    chartHash = "sha256-Nj9kifEjGhulJ2+9ktv58wAFYiCLuxH9Q04TOyKC4x8=";
   };
 
   extraOptions = {
     image.tag = mkOption {
       description = mdDoc "The docker image tag";
       type = types.str;
-      default = "release";
+      default = "v3.3.1";
     };
 
     adminApiKey = mkOption {
@@ -64,8 +67,8 @@ rec {
     # `services.homepage.widgetSecrets.IMMICH_API_KEY` from
     # `config.services.immich.adminApiKey` in env/dev/homepage.nix.
     # `version = 2` selects homepage's newer Immich API paths
-    # (/api/server/*, required for Immich >= v1.118 -- this repo tracks
-    # the "release" image tag, currently v2.x); the API key must carry
+    # (/api/server/*, required for Immich >= v1.118 -- this repo pins
+    # `image.tag`, currently v3.x); the API key must carry
     # the `server.statistics` permission or homepage's requests 403.
     homepage.extraSettings = mkOption {
       default = lib.optionalAttrs (cfg.adminApiKey != "") {
@@ -175,6 +178,8 @@ rec {
       nodeSelector."kubernetes.io/hostname" = cfg.hostAffinity;
     };
 
+    controllers.main.containers.main.image.tag = cfg.image.tag;
+
     # Environment variables for all Immich components
     controllers.main.containers.main.env = {
       DB_HOSTNAME = cfg.database.host;
@@ -200,36 +205,9 @@ rec {
     };
 
     immich = {
-      image.tag = cfg.image.tag;
-
-      # Persistence configuration
-      persistence = {
-        library.existingClaim = "${name}-${name}-library";
-        upload = {
-          enabled = true;
-          storageClass = cfg.storageClassName;
-          accessMode = "ReadWriteOnce";
-          size = "10Gi";
-        };
-        thumbs = {
-          enabled = true;
-          storageClass = cfg.storageClassName;
-          accessMode = "ReadWriteOnce";
-          size = "50Gi";
-        };
-        ml = {
-          enabled = true;
-          storageClass = cfg.storageClassName;
-          accessMode = "ReadWriteOnce";
-          size = "10Gi";
-        };
-        config = {
-          enabled = true;
-          storageClass = cfg.storageClassName;
-          accessMode = "ReadWriteOnce";
-          size = "1Gi";
-        };
-      };
+      # The chart's values schema (0.13.0+) rejects anything else under
+      # `immich` -- the image tag is set on controllers.main above.
+      persistence.library.existingClaim = "${name}-${name}-library";
     };
 
     server = {

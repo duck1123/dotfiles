@@ -10,7 +10,7 @@
     enable = true;
     apiKey = secrets.prowlarr.key;
     hostAffinity = "edgenix";
-    image = "linuxserver/prowlarr:2.5.2.5491-ls156";
+    image = "linuxserver/prowlarr:2.6.5.5623-ls163";
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
