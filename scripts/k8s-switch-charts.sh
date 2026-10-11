@@ -72,6 +72,19 @@ fi
 # 3. Run activation from within the manifests repo checkout
 #    nixidy writes to rootPath ("dev/") relative to the git root it finds.
 # ---------------------------------------------------------------------------
+# nixidy's activate rsyncs its build output over dev/ with --delete; it doesn't
+# know SopsSecret files exist, so it wipes them all on every run. Snapshot them
+# first so k8s-write-sops-secrets.sh can tell which ones actually changed
+# instead of re-encrypting everything unconditionally.
+SECRETS_SNAPSHOT="$(mktemp -d)"
+trap 'rm -rf "$TMP" "$OUT_PATHS" "$SECRETS_SNAPSHOT"' EXIT
+if [[ -d "$MANIFESTS_DIR/dev" ]]; then
+  (
+    cd "$MANIFESTS_DIR/dev"
+    find . -name 'SopsSecret-*.yaml' -exec cp --parents -t "$SECRETS_SNAPSHOT" {} +
+  )
+fi
+
 echo "Activating manifests in $MANIFESTS_DIR ..."
 cd "$MANIFESTS_DIR"
 "$DRV_PATH/activate"
@@ -81,7 +94,7 @@ cd "$MANIFESTS_DIR"
 # ---------------------------------------------------------------------------
 echo "Writing sops secrets..."
 cd "$DOTFILES_ROOT"
-./scripts/k8s-write-sops-secrets.sh
+SOPS_SECRETS_REFERENCE_DIR="$SECRETS_SNAPSHOT" ./scripts/k8s-write-sops-secrets.sh
 
 # ---------------------------------------------------------------------------
 # 5. Post-process manifests (fixups for nixidy hardcoded behaviours -- e.g.
