@@ -133,12 +133,12 @@ _: {
             values = data.values or data;
           }) combinedSopsSecrets;
 
-      # nasnix (the control-plane node) carries this taint so ordinary workloads
-      # stay off it; see allowControlPlane.
+      # nasnix (the control-plane node) carries this taint (PreferNoSchedule) so
+      # ordinary workloads stay off it; see allowControlPlane. No `effect`, so
+      # it matches whichever effect the taint has.
       controlPlaneToleration = {
         key = "node-role.kubernetes.io/control-plane";
         operator = "Exists";
-        effect = "NoSchedule";
       };
 
       # Let every pod spec the app defines in `resources` schedule onto the
@@ -318,7 +318,7 @@ _: {
         allowControlPlane = mkOption {
           description = mdDoc ''
             Let ${name}'s pods schedule onto the control-plane node (nasnix), which
-            is tainted `node-role.kubernetes.io/control-plane:NoSchedule` to keep
+            is tainted `node-role.kubernetes.io/control-plane:PreferNoSchedule` to keep
             ordinary workloads off it. Covers the workloads the app defines as
             resources; a chart's own workloads need the toleration in `values`.
           '';

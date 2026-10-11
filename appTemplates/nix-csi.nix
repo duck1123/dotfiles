@@ -59,7 +59,6 @@ in
       controlPlaneToleration = {
         key = "node-role.kubernetes.io/control-plane";
         operator = "Exists";
-        effect = "NoSchedule";
       };
       # Added to the pynixd controller (the cache) on top of atticSettings.
       cacheSettings = {

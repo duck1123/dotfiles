@@ -9,7 +9,6 @@
       {
         key = "node-role.kubernetes.io/control-plane";
         operator = "Exists";
-        effect = "NoSchedule";
       }
     ];
     # Subnet routing is handled by nasnix host-level Tailscale (~/dotfiles),

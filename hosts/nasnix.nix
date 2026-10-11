@@ -29,6 +29,12 @@ in
       client.enable = true;
       server.enable = true;
       dualStack.enable = false;
+      # Keep ordinary workloads off this node (it's the NAS VM, with one slow
+      # virtual disk). Soft on purpose: Longhorn's engine-image and
+      # instance-manager pods don't tolerate a hard taint. Apps that may stay
+      # set allowControlPlane. k3s only applies this when the node registers;
+      # on the running cluster it was set with `kubectl taint`.
+      extraK3sFlags = [ "--node-taint=node-role.kubernetes.io/control-plane=true:PreferNoSchedule" ];
     };
 
     network.enable = true;
