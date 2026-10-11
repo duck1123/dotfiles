@@ -99,6 +99,25 @@ rec {
       default = "";
     };
 
+    backendScripting.enable = mkOption {
+      description = mdDoc ''
+        Allow backend script execution (`TRILIUM_SECURITY_BACKEND_SCRIPTING_ENABLED`).
+        Backend scripts have full server access (filesystem, network,
+        `child_process`), so only enable if every user is trusted with that.
+      '';
+      type = types.bool;
+      default = false;
+    };
+
+    sqlConsole.enable = mkOption {
+      description = mdDoc ''
+        Enable the SQL console (`TRILIUM_SECURITY_SQL_CONSOLE_ENABLED`), which
+        allows raw SQL against the Trilium database.
+      '';
+      type = types.bool;
+      default = false;
+    };
+
     dataStorage = mkOption {
       description = mdDoc "Size of the data PVC";
       type = types.str;
@@ -156,6 +175,16 @@ rec {
                   {
                     name = "TZ";
                     value = cfg.tz;
+                  }
+                  # Always set, so the env var (which wins over config.ini on
+                  # the data PVC) is the single source of truth.
+                  {
+                    name = "TRILIUM_SECURITY_BACKEND_SCRIPTING_ENABLED";
+                    value = boolToString cfg.backendScripting.enable;
+                  }
+                  {
+                    name = "TRILIUM_SECURITY_SQL_CONSOLE_ENABLED";
+                    value = boolToString cfg.sqlConsole.enable;
                   }
                 ]
                 ++ optionals cfg.claudeCode.enable [

@@ -7,6 +7,8 @@
       enable = true;
       oauthToken = secrets.trilium.claudeToken;
     };
+    backendScripting.enable = true;
+    sqlConsole.enable = true;
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
