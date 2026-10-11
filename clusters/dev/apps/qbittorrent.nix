@@ -2,6 +2,7 @@
 {
   services.qbittorrent = {
     enable = true;
+    allowControlPlane = true;
     hostAffinity = "nasnix";
 
     homepage.group = "Download";

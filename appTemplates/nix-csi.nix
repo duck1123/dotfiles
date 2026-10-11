@@ -54,6 +54,13 @@ in
       # paths with "lacks a signature by a trusted key" regardless of trusted-users,
       # since the stdio-spawned remote daemon doesn't resolve the SSH-authenticated
       # user as a trusted uid the way a local socket connection would.
+      # nasnix is tainted to keep ordinary workloads off it (see
+      # allowControlPlane in mkArgoApp).
+      controlPlaneToleration = {
+        key = "node-role.kubernetes.io/control-plane";
+        operator = "Exists";
+        effect = "NoSchedule";
+      };
       # Added to the pynixd controller (the cache) on top of atticSettings.
       cacheSettings = {
         trusted-users = [ "nix" ];
@@ -92,6 +99,9 @@ in
               # (nixkube.cachix.org, cache.nixos.org).
               nixConfig.settings = atticSettings;
 
+              # The CSI driver has to be on every node, tainted or not.
+              node.tolerations = [ controlPlaneToleration ];
+
               pynixd = {
                 inherit (cfg) authorizedKeys;
                 inherit (cfg.cache) storageClassName;
@@ -115,8 +125,27 @@ in
         };
       # pynixd-lb replaced both nix-cache-lb (.241, port 2222) and
       # nix-proxy (.240); it keeps the cache's address and port.
+      # nixkube has no tolerations option for the pynixd StatefulSet.
+      tolerateControlPlane =
+        r:
+        r
+        // {
+          spec = r.spec // {
+            template = r.spec.template // {
+              spec = r.spec.template.spec // {
+                tolerations = (r.spec.template.spec.tolerations or [ ]) ++ [ controlPlaneToleration ];
+              };
+            };
+          };
+        };
       patchedResources = map (
-        r: if r.kind == "Service" && r.metadata.name == "pynixd-lb" then pinIp "192.168.0.241" r else r
+        r:
+        if r.kind == "Service" && r.metadata.name == "pynixd-lb" then
+          pinIp "192.168.0.241" r
+        else if cfg.allowControlPlane && r.kind == "StatefulSet" && r.metadata.name == "pynixd" then
+          tolerateControlPlane r
+        else
+          r
       ) resources;
       yaml = builtins.unsafeDiscardStringContext (
         builtins.concatStringsSep "\n---\n" (map builtins.toJSON patchedResources)

@@ -133,6 +133,55 @@ _: {
             values = data.values or data;
           }) combinedSopsSecrets;
 
+      # nasnix (the control-plane node) carries this taint so ordinary workloads
+      # stay off it; see allowControlPlane.
+      controlPlaneToleration = {
+        key = "node-role.kubernetes.io/control-plane";
+        operator = "Exists";
+        effect = "NoSchedule";
+      };
+
+      # Let every pod spec the app defines in `resources` schedule onto the
+      # control-plane node. Helm-rendered workloads aren't covered: those take
+      # tolerations through their chart values.
+      addControlPlaneToleration =
+        resources:
+        let
+          addToPodSpec =
+            spec:
+            spec
+            // {
+              tolerations = (spec.tolerations or [ ]) ++ [ controlPlaneToleration ];
+            };
+          addToTemplate =
+            workload:
+            workload
+            // {
+              spec = (workload.spec or { }) // {
+                template = (workload.spec.template or { }) // {
+                  spec = addToPodSpec (workload.spec.template.spec or { });
+                };
+              };
+            };
+          addToCronJob =
+            cronJob:
+            cronJob
+            // {
+              spec = (cronJob.spec or { }) // {
+                jobTemplate = addToTemplate (cronJob.spec.jobTemplate or { });
+              };
+            };
+          mapKind =
+            kind: f:
+            lib.optionalAttrs (resources ? ${kind}) { ${kind} = lib.mapAttrs (_: f) resources.${kind}; };
+        in
+        resources
+        // mapKind "deployments" addToTemplate
+        // mapKind "statefulSets" addToTemplate
+        // mapKind "daemonSets" addToTemplate
+        // mapKind "jobs" addToTemplate
+        // mapKind "cronJobs" addToCronJob;
+
       # Inject hostAffinity nodeSelector into all deployment and statefulSet pod specs
       addHostAffinityToResources =
         resources: hostAffinity:
@@ -264,6 +313,17 @@ _: {
           default = { };
           description = "Extra Kubernetes resources related to ${name}.";
           type = attrs;
+        };
+
+        allowControlPlane = mkOption {
+          description = mdDoc ''
+            Let ${name}'s pods schedule onto the control-plane node (nasnix), which
+            is tainted `node-role.kubernetes.io/control-plane:NoSchedule` to keep
+            ordinary workloads off it. Covers the workloads the app defines as
+            resources; a chart's own workloads need the toleration in `values`.
+          '';
+          type = types.bool;
+          default = false;
         };
 
         hostAffinity = mkOption {
@@ -623,9 +683,11 @@ _: {
                     (extraResources cfg)
                     cfg.extraResources
                   ];
-                  resources = addHostAffinityToResources (builtins.removeAttrs baseResources [
+                  placedResources = addHostAffinityToResources (builtins.removeAttrs baseResources [
                     "sopsSecrets"
                   ]) cfg.hostAffinity;
+                  resources =
+                    if cfg.allowControlPlane then addControlPlaneToleration placedResources else placedResources;
                 in
                 mkMerge [
                   {

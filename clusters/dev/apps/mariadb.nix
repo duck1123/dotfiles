@@ -1,6 +1,7 @@
 { secrets, ... }:
 {
   services.mariadb = {
+    allowControlPlane = true;
     auth = {
       inherit (secrets.mariadb)
         database
