@@ -2,9 +2,9 @@
 {
   services.radarr = {
     databaseTarget = "postgresql";
-    database.enable = false;
+    database.enable = true;
 
-    enable = true;
+    enable = false;
     apiKey = secrets.radarr.key;
     hostAffinity = "edgenix";
     image = "linuxserver/radarr:6.4.4.10685-ls319";

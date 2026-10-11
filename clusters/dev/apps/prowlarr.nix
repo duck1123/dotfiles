@@ -7,7 +7,7 @@
       name = "prowlarr-main";
     };
 
-    enable = true;
+    enable = false;
     apiKey = secrets.prowlarr.key;
     hostAffinity = "edgenix";
     image = "linuxserver/prowlarr:2.6.5.5623-ls163";

@@ -2,9 +2,9 @@
 {
   services.lidarr = {
     databaseTarget = "postgresql";
-    database.enable = false;
+    database.enable = true;
 
-    enable = true;
+    enable = false;
     apiKey = secrets.lidarr.key;
     hostAffinity = "edgenix";
 
