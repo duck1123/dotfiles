@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  self,
+  ...
+}:
 with lib;
 let
   cfg = config.services.trilium;
@@ -6,19 +11,12 @@ let
   # Trilium's "Claude Code" provider doesn't bundle the CLI: it drives
   # whatever binary TRILIUM_CLAUDE_CODE_PATH (or `claude` on PATH) points at,
   # and the triliumnext image ships neither. There's no Dockerfile of ours to
-  # add it to, so mount nixpkgs' claude-code via nix-csi -- same pattern as
-  # appTemplates/autokuma.nix. claude-code is unfree, hence allowUnfree.
-  claudeCodeExpr = ''
-    let
-      pkgs = import (builtins.fetchTree {
-        type = "github";
-        owner = "nixos";
-        repo = "nixpkgs";
-        ref = "nixos-unstable";
-      }) { config.allowUnfree = true; };
-    in
-    pkgs.claude-code
-  '';
+  # add it to, so mount nixpkgs' claude-code via nix-csi. Built as the
+  # `trilium-claude-code` flake package (modules/kubernetes/pkgs/) and
+  # resolved via the per-system storePath convention, same as
+  # appTemplates/duck1123.nix -- see that package's comment for why this
+  # isn't a nixExpr string.
+  claudeCode = self.packages.x86_64-linux.trilium-claude-code;
 
   # On the data PVC so the `claude /login` credentials survive pod restarts
   # (HOME itself, /home/node, is part of the image).
@@ -255,7 +253,7 @@ rec {
                 name = "nix";
                 csi = {
                   driver = "nix.csi.store";
-                  volumeAttributes.nixExpr = claudeCodeExpr;
+                  volumeAttributes."x86_64-linux" = "${claudeCode}";
                 };
               }
             ];

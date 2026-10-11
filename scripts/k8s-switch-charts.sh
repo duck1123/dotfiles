@@ -104,4 +104,33 @@ SOPS_SECRETS_REFERENCE_DIR="$SECRETS_SNAPSHOT" ./scripts/k8s-write-sops-secrets.
 echo "Post-processing manifests..."
 nu "$SCRIPT_DIR/k8s-post-process-manifests.nu" "$MANIFESTS_DIR/dev"
 
-echo "Done. Run 'bb k8s-push' to commit and push manifests."
+# ---------------------------------------------------------------------------
+# 6. Push every store path the manifests pin (nix-csi's per-system storePath
+#    volumeAttributes) to Attic. nix-csi has no recipe to build these from, so
+#    a path missing from the cache leaves the pod stuck in ContainerCreating.
+#    attic-watch-store usually uploads them already, but only on hosts that
+#    run it and with no guarantee it finishes before the manifests are pushed.
+# ---------------------------------------------------------------------------
+ATTIC_CACHE="${ATTIC_CACHE:-nixos}"
+mapfile -t PINNED_PATHS < <(
+  grep -rhoE '(x86_64|aarch64)-linux: /nix/store/[^[:space:]]+' "$MANIFESTS_DIR/dev" \
+    | awk '{ print $2 }' | sort -u
+)
+LOCAL_PATHS=()
+for path in "${PINNED_PATHS[@]}"; do
+  # Paths this host never built (nixkube's own environments) come from
+  # upstream's cache instead.
+  if [[ -e "$path" ]]; then
+    LOCAL_PATHS+=("$path")
+  fi
+done
+if [[ ${#LOCAL_PATHS[@]} -eq 0 ]]; then
+  :
+elif ! command -v attic >/dev/null 2>&1; then
+  echo "WARNING: attic not found, not pushing pinned store paths to the cache" >&2
+else
+  echo "Pushing ${#LOCAL_PATHS[@]} pinned store path(s) to Attic cache '$ATTIC_CACHE'..."
+  attic push "$ATTIC_CACHE" "${LOCAL_PATHS[@]}"
+fi
+
+echo "Done. Run 'nur k8s push' to commit and push manifests."
