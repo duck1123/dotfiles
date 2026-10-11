@@ -174,7 +174,7 @@ in
               {
                 name = "nix";
                 csi = {
-                  driver = "nix.csi.store";
+                  driver = "nixkube";
                   volumeAttributes."x86_64-linux" = "${dittoRelayBundle}";
                 };
               }

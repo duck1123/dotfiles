@@ -201,7 +201,7 @@ in
             {
               name = "nix";
               csi = {
-                driver = "nix.csi.store";
+                driver = "nixkube";
                 volumeAttributes.nixExpr = nixExpr;
               };
             }

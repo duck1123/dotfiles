@@ -2,7 +2,7 @@
 
 ## nixkube (formerly nix-csi) is pinned by rev
 
-The CSI driver behind the "no Dockerfile" pattern was renamed upstream from `nix-csi` to [nixkube](https://github.com/Lillecarl/nixkube). It is the `nixkube` flake input (`flake = false`), pinned to a specific commit, and consumed by `appTemplates/nix-csi.nix`. The ArgoCD app, the `nix-csi` namespace (`nixkube.namespace`) and the `nix.csi.store` CSI driver name (`nixkube.node.compat`, on by default) are all kept, so apps using the driver didn't change.
+The CSI driver behind the "no Dockerfile" pattern was renamed upstream from `nix-csi` to [nixkube](https://github.com/Lillecarl/nixkube). It is the `nixkube` flake input (`flake = false`), pinned to a specific commit, and consumed by `appTemplates/nix-csi.nix`. The ArgoCD app and the `nix-csi` namespace (`nixkube.namespace`) are kept. App templates use the `nixkube` CSI driver name; the old `nix.csi.store` name is still registered (`nixkube.node.compat`, on by default, deprecated upstream) and takes the same volume attributes, so it can be turned off once no running pod was mounted through it.
 
 How it's consumed, and why:
 
@@ -17,7 +17,7 @@ What changed from the old nix-csi layout (at the previous pin `7ddae07`):
 - Options: `authorizedKeys` → `nixkube.pynixd.authorizedKeys`, `cache.storageClassName` → `nixkube.pynixd.storageClassName`, the per-role `nixConfig`s → shared `nixkube.nixConfig` (node, controller and builders) plus `nixkube.pynixd.controller.nixConfig` for the cache-only extras.
 - The old cache GC loop (`environments/modules/gc.nix`) never deleted anything (its `jq` returned `null`, `--skip-live` isn't a valid flag); fixed upstream in `e0e99491`.
 
-**Bumping it:** change the rev in `flake.nix`, then `nix build .#nixidyEnvs.x86_64-linux.dev.activationPackage --impure` and diff the rendered `dev/nix-csi` manifests. Upstream moves fast (hundreds of commits a month, frequent option reshuffles), so read `doc/options.md` at the new rev rather than assuming option names carry over.
+**Bumping it:** change the rev in `flake.nix`, `nix flake lock`, then `nix build .#nixidyEnvs.x86_64-linux.dev.activationPackage --impure` and diff the rendered `dev/nix-csi` manifests. A bump changes the node and pynixd environments' store paths, and no upstream cache has ours. `appTemplates/nix-csi.nix` realises both during eval and `k8s-switch-charts.sh` pushes every pinned store path to Attic, so a normal `nur switch k8s` covers it; check the push step listed them before the manifests go out, since nodes can't start the driver without them. Upstream moves fast (hundreds of commits a month, frequent option reshuffles), so read `doc/options.md` at the new rev rather than assuming option names carry over.
 
 ## The self-hosted Attic cache exists specifically to feed nix-csi
 

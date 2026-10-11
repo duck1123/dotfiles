@@ -80,6 +80,17 @@ in
         modules = [
           "${self.inputs.nixkube}/kubenix"
           { _module.args.sources = nixkube.sources; }
+          # Surfaces the package set the node and pynixd environments come
+          # from (a module argument, otherwise unreachable from out here).
+          (
+            { csiPkgs, ... }:
+            {
+              options.environmentPackages = mkOption {
+                type = types.raw;
+                default = csiPkgs.${system};
+              };
+            }
+          )
           {
             nixkube = {
               enable = true;
@@ -146,9 +157,21 @@ in
         else
           r
       ) resources;
-      yaml = builtins.unsafeDiscardStringContext (
-        builtins.concatStringsSep "\n---\n" (map builtins.toJSON patchedResources)
-      );
+      # The manifests name the node and pynixd environments by store path
+      # only: upstream strips their string context, and nixidy rejects a
+      # yaml that has any. Nothing would then build them, no cache would
+      # have them, and nodes couldn't start the driver. pathExists realises
+      # them during eval instead, so every switch has them locally for
+      # k8s-switch-charts.sh to push to Attic.
+      environments = with nixkubeEval.config.environmentPackages; [
+        nixkube-node-env
+        nixkube-pynixd-env
+      ];
+      yaml =
+        assert all (env: builtins.pathExists "${env}") environments;
+        builtins.unsafeDiscardStringContext (
+          builtins.concatStringsSep "\n---\n" (map builtins.toJSON patchedResources)
+        );
     in
     {
       # Deploy nix-csi before other apps that use the CSI driver (wave 0).

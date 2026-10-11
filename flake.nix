@@ -71,7 +71,7 @@
     # modules/kubernetes/docs/nix-csi-and-binary-cache.md).
     nixkube = {
       flake = false;
-      url = "github:Lillecarl/nixkube/b0e6c41be2102f347402795db2bdc4f0241248c5";
+      url = "github:Lillecarl/nixkube/3f618b46feb37f01aac048033fc079db764097f1";
     };
 
     nix-kube-generators.url = "github:farcaller/nix-kube-generators";

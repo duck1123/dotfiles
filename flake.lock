@@ -749,17 +749,17 @@
     "nixkube": {
       "flake": false,
       "locked": {
-        "lastModified": 1790329841,
-        "narHash": "sha256-e9RNYB5hohrnhXv5TU2eCqlrahHI39UWLfoXEfGDLtE=",
+        "lastModified": 1790851111,
+        "narHash": "sha256-gt86f7pA1y716tFnMhh/Y1SiI1Whkt4WlUNCRtdvmCI=",
         "owner": "Lillecarl",
         "repo": "nixkube",
-        "rev": "b0e6c41be2102f347402795db2bdc4f0241248c5",
+        "rev": "3f618b46feb37f01aac048033fc079db764097f1",
         "type": "github"
       },
       "original": {
         "owner": "Lillecarl",
         "repo": "nixkube",
-        "rev": "b0e6c41be2102f347402795db2bdc4f0241248c5",
+        "rev": "3f618b46feb37f01aac048033fc079db764097f1",
         "type": "github"
       }
     },
