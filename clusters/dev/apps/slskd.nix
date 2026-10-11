@@ -2,7 +2,7 @@
 {
   services.slskd = {
     apiKey = (secrets.slskd or { }).apiKey or "";
-    enable = true;
+    enable = false;
     # hostAffinity = "edgenix";
 
     homepage.group = "Download";

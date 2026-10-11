@@ -2,7 +2,7 @@
 {
   services.radarr = {
     databaseTarget = "postgresql";
-    database.enable = true;
+    database.enable = false;
 
     enable = true;
     apiKey = secrets.radarr.key;
