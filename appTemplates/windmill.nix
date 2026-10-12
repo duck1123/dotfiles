@@ -62,6 +62,7 @@ let
     "YT-Cache"
     "Videos"
     "Books"
+    "Photos"
     "slskd_downloads"
   ];
   mediaSlug = folder: builtins.replaceStrings [ "_" ] [ "-" ] (lib.toLower folder);
