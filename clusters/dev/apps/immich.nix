@@ -13,6 +13,7 @@
 
     externalLibrary = {
       enable = true;
+      readOnly = false;
       server = config.devDefaults.nasHost;
       path = "${config.devDefaults.nasBase}/Photos";
     };

@@ -149,9 +149,20 @@ rec {
 
     externalLibrary = {
       enable = mkOption {
-        description = mdDoc "Mount an NFS share as an external library (read-only) at /mnt/external-library";
+        description = mdDoc "Mount an NFS share as an external library at /mnt/external-library";
         type = types.bool;
         default = false;
+      };
+
+      # Immich edits external-library assets (date, location, description,
+      # ...) by writing an XMP sidecar next to the original, so a read-only
+      # mount makes those assets uneditable from the UI. Only the container
+      # mount is switched -- the PV/PVC stay ReadOnlyMany, since a PVC's
+      # accessModes are immutable and NFS doesn't enforce them anyway.
+      readOnly = mkOption {
+        description = mdDoc "Mount the external library read-only";
+        type = types.bool;
+        default = true;
       };
 
       server = mkOption {
@@ -224,7 +235,7 @@ rec {
         globalMounts = [
           {
             path = "/mnt/external-library";
-            readOnly = true;
+            inherit (cfg.externalLibrary) readOnly;
           }
         ];
       };
@@ -289,12 +300,14 @@ rec {
             spec = {
               accessModes = [ "ReadWriteMany" ];
               capacity.storage = "1Ti";
+              # hard, unlike the read-mostly external library below: this
+              # volume holds uploaded originals, and a soft mount turns a
+              # NAS hiccup into a failed (possibly partial) write.
               mountOptions = [
                 "nolock"
                 "nfsvers=3"
                 "noexec"
-                "soft"
-                "timeo=30"
+                "hard"
               ];
               nfs = {
                 server = cfg.nfs.server;
