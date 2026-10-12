@@ -19,6 +19,7 @@ in
   features = {
     battery.enable = true;
     bluetooth.enable = true;
+    claude.enable = true;
     clojure.enable = true;
     common.enable = true;
     docker.enable = true;

@@ -24,6 +24,7 @@ in
     clojure.enable = false;
     common.enable = true;
     chat.enable = false;
+    claude.enable = true;
     dbt.enable = false;
     developer.enable = true;
     docker.enable = false;
@@ -121,10 +122,7 @@ in
   modules.homeManager =
     { pkgs, ... }:
     {
-      home.packages = with pkgs; [
-        claude-code
-        qbittorrent
-      ];
+      home.packages = with pkgs; [ qbittorrent ];
     };
 
   modules.nixos =
