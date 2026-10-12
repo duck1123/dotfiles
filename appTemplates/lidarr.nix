@@ -410,6 +410,7 @@ rec {
             capacity.storage = "1Ti";
             mountOptions = [
               "nolock"
+              "nfsvers=3"
               "noexec"
               "soft"
               "timeo=30"
@@ -431,6 +432,7 @@ rec {
             accessModes = [ "ReadWriteMany" ];
             mountOptions = [
               "nolock"
+              "nfsvers=3"
               "noexec"
               "soft"
               "timeo=30"
@@ -452,6 +454,7 @@ rec {
             capacity.storage = "1Ti";
             mountOptions = [
               "nolock"
+              "nfsvers=3"
               "noexec"
               "soft"
               "timeo=30"

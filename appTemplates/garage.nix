@@ -188,6 +188,7 @@ in
           };
           mountOptions = [
             "nolock"
+            "nfsvers=3"
             "noexec"
             "soft"
             "timeo=30"

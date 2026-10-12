@@ -201,6 +201,7 @@ with lib;
             accessModes = [ "ReadWriteMany" ];
             mountOptions = [
               "nolock"
+              "nfsvers=3"
               "noexec"
               "soft"
               "timeo=30"

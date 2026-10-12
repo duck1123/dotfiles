@@ -618,6 +618,7 @@ rec {
           accessModes = [ "ReadWriteMany" ];
           mountOptions = [
             "nolock"
+            "nfsvers=3"
             "noexec"
             "soft"
             "timeo=30"
@@ -642,6 +643,7 @@ rec {
           accessModes = [ "ReadWriteMany" ];
           mountOptions = [
             "nolock"
+            "nfsvers=3"
             "noexec"
             "soft"
             "timeo=30"
@@ -666,6 +668,7 @@ rec {
           accessModes = [ "ReadWriteMany" ];
           mountOptions = [
             "nolock"
+            "nfsvers=3"
             "noexec"
             "soft"
             "timeo=30"
