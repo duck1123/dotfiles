@@ -377,6 +377,43 @@ export def "nur diff-os" [--host: string@nixos-hosts] {
   do-diff-remote-os $host
 }
 
+# VS Code settings that don't match what Nix manages (features/vscode.nix plus the
+# host's features.vscode.settings), local or on --host. `unmanaged` keys exist only
+# in settings.json; `changed` keys were edited in the UI and reset on the next switch.
+export def "nur vscode drift" [--host: string@home-hosts = ""]: nothing -> table {
+  let read = {|rel|
+    if ($host | is-empty) {
+      open --raw ($env.HOME | path join $rel)
+    } else {
+      ^ssh (ssh-target $host) cat $rel
+    } | from json
+  }
+
+  # One row per setting; nested blocks like "[nix]" are split into their keys
+  # (with the block as `section`), matching how activation deep-merges them.
+  let flatten = {|settings|
+    $settings | transpose key value | each {|row|
+      if ($row.value | describe | str starts-with record) {
+        $row.value | transpose key value | insert section $row.key
+      } else {
+        [($row | insert section null)]
+      }
+    } | flatten
+  }
+
+  let current = (do $flatten (do $read ".config/Code/User/settings.json"))
+  let managed = (do $flatten (do $read ".config/dotfiles/vscode-settings.json"))
+
+  $current | each {|row|
+    let match = ($managed | where section == $row.section and key == $row.key)
+    if ($match | is-empty) {
+      {section: $row.section, key: $row.key, status: unmanaged, value: $row.value, nix: null}
+    } else if ($match.0.value != $row.value) {
+      {section: $row.section, key: $row.key, status: changed, value: $row.value, nix: $match.0.value}
+    }
+  } | compact
+}
+
 # Show what would change without applying (local if no --host, otherwise remote dry-run)
 export def "nur dry-run-os" [--host: string@nixos-hosts = ""] {
   if ($host | is-empty) {
