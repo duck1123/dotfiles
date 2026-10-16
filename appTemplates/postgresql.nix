@@ -202,6 +202,11 @@ in
               description = mdDoc "Extensions to enable in this database (e.g. [ \"vector\" ]). Created as the postgres superuser -- most extensions (pgvector included) refuse non-superusers even when they own the database, so this can't be done by the app's own role.";
               default = [ ];
             };
+            readAllTables = mkOption {
+              type = types.bool;
+              description = mdDoc "Grant `username` SELECT on every table in the public schema, now and in the future (default privileges for tables created by postgres). For apps that connect as postgres, so their tables aren't owned by `username` -- otherwise `username`'s reportingConnections (Windmill, Metabase) can't read anything.";
+              default = false;
+            };
           };
         }
       );
@@ -338,6 +343,17 @@ in
                             ${lib.concatMapStringsSep "\n                                  " (
                               ext: "CREATE EXTENSION IF NOT EXISTS \"${ext}\";"
                             ) db.extensions}
+                          EOSQL
+                        ''
+                      ) cfg.extraDatabases}
+                      ${lib.concatMapStringsSep "\n" (
+                        db:
+                        lib.optionalString db.readAllTables ''
+                          echo "Granting ${db.username} read access to all tables in ${db.name}..."
+                          psql -v ON_ERROR_STOP=1 -d '${db.name}' <<-EOSQL
+                            GRANT USAGE ON SCHEMA public TO "${db.username}";
+                            GRANT SELECT ON ALL TABLES IN SCHEMA public TO "${db.username}";
+                            ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT ON TABLES TO "${db.username}";
                           EOSQL
                         ''
                       ) cfg.extraDatabases}

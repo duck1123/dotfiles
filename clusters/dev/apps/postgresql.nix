@@ -33,6 +33,9 @@
           name = "immich";
           username = "immich";
           password = secrets.postgresql.userPassword;
+          # Immich connects as postgres, so its tables aren't owned by
+          # `immich`; this lets f/fleetops/db_immich read them.
+          readAllTables = true;
         }
         {
           name = "gitea";
