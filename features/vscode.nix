@@ -36,6 +36,7 @@
         "screencastMode.fontSize" = 64.0;
         "telemetry.feedback.enabled" = false;
         "telemetry.telemetryLevel" = "off";
+        "trilium.serverUrl" = "https://trilium.home.kronkltd.net";
         vs-kubernetes."vs-kubernetes.crd-code-completion" = "enabled";
       };
 
