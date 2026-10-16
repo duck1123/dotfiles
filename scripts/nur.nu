@@ -294,6 +294,161 @@ export def "nur secrets windows-key" []: nothing -> string {
   sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM
 }
 
+const SECRETS_DEFAULT_FILE = "secrets/k8s.enc.yaml"
+
+def "nu-complete secret-files" []: nothing -> list<string> {
+  ls secrets | where name =~ '\.(yaml|json)$' | get name
+}
+
+# Plaintext path for an `*.enc.*` file (secrets/k8s.enc.yaml -> secrets/k8s.yaml),
+# refusing anything that isn't git-ignored so a decrypt can never be committed.
+def secret-plaintext-path [file: string]: nothing -> string {
+  if not ($file | str contains ".enc.") {
+    error make {msg: $"($file) is encrypted in place (no .enc. in its name); use `nur secrets edit ($file)` instead"}
+  }
+  let plain = ($file | str replace ".enc." ".")
+  if (^git check-ignore -q $plain | complete).exit_code != 0 {
+    error make {msg: $"($plain) is not git-ignored; add it to .gitignore before decrypting to it"}
+  }
+  $plain
+}
+
+def secret-load [file: string]: nothing -> record {
+  ^sops --decrypt --output-type json $file | from json
+}
+
+# Dotted paths of every leaf value, e.g. postgresql.password
+def secret-leaf-paths [data: any, prefix: string = ""]: nothing -> list<string> {
+  match ($data | describe | str replace --regex '<.*' '') {
+    "record" => {
+      $data | transpose key value | each { |kv|
+        secret-leaf-paths $kv.value ([$prefix $kv.key] | where $it != "" | str join ".")
+      } | flatten
+    }
+    "list" | "table" => {
+      $data | enumerate | each { |it|
+        secret-leaf-paths $it.item ([$prefix ($it.index | into string)] | where $it != "" | str join ".")
+      } | flatten
+    }
+    _ => [$prefix]
+  }
+}
+
+def secret-lookup [data: record, path: string, file: string]: nothing -> string {
+  let value = ($path | split row "." | reduce --fold $data { |part, acc|
+    let key = if ($acc | describe | str starts-with "list") or ($acc | describe | str starts-with "table") {
+      $part | into int
+    } else { $part }
+    let next = ($acc | get --optional $key)
+    if $next == null {
+      error make {msg: $"No secret at ($path) in ($file); see `nur secrets keys --file ($file)`"}
+    }
+    $next
+  })
+  if ($value | describe) =~ '^(record|list|table)' {
+    error make {msg: $"($path) in ($file) is not a leaf value; see `nur secrets keys --file ($file)`"}
+  }
+  $value | into string
+}
+
+# Edit an encrypted secrets file in-place (no plaintext file written)
+export def "nur secrets edit" [
+  file: string@"nu-complete secret-files" = $SECRETS_DEFAULT_FILE
+]: nothing -> nothing {
+  ^sops $file
+}
+
+# Decrypt an `*.enc.*` secrets file next to itself (secrets/k8s.enc.yaml -> secrets/k8s.yaml).
+# The plaintext must be git-ignored; never commit it.
+export def "nur secrets decrypt" [
+  file: string@"nu-complete secret-files" = $SECRETS_DEFAULT_FILE
+]: nothing -> nothing {
+  let plain = (secret-plaintext-path $file)
+  ^sops --decrypt $file | save --force $plain
+  print $"Decrypted to ($plain) — do not commit this file"
+}
+
+# Encrypt the plaintext produced by `nur secrets decrypt` back into the `*.enc.*` file
+export def "nur secrets encrypt" [
+  file: string@"nu-complete secret-files" = $SECRETS_DEFAULT_FILE
+]: nothing -> nothing {
+  let plain = (secret-plaintext-path $file)
+  # --filename-override matches creation rules against the real target path --
+  # without it sops matches against secrets/k8s.yaml, which falls through to
+  # the generic secrets/*.yaml rule instead of the dedicated k8s.enc.yaml one
+  # (wrong recipient set: missing the k8s primary key, adding nixmini).
+  ^sops --encrypt --filename-override $file $plain | save --force $file
+  print $"Encrypted ($plain) to ($file)"
+}
+
+# List the key paths in a secrets file, without decrypting anything (sops keeps keys in plaintext)
+export def "nur secrets keys" [
+  --file: string@"nu-complete secret-files" = $SECRETS_DEFAULT_FILE
+  prefix: string = ""   # only show paths starting with this, e.g. "postgresql"
+]: nothing -> list<string> {
+  let data = (open --raw $file | from yaml | reject --optional sops)
+  secret-leaf-paths $data | where { str starts-with $prefix }
+}
+
+# Run a command with secrets injected as environment variables, without printing them.
+# Each leading VAR=path argument maps an env var to a dotted path in the secrets file;
+# everything after is the command. Any secret value in the command's output is replaced
+# with [REDACTED:VAR] unless --no-redact is given (which also streams output/stdin).
+#
+#   nur secrets exec PGPASSWORD=postgresql.password psql -h db -U postgres -c '\l'
+#   nur secrets exec --file secrets/mcp.yaml TOKEN=trilium_token sh -c 'curl -H "Authorization: $TOKEN" ...'
+export def --wrapped "nur secrets exec" [
+  --file: string@"nu-complete secret-files" = $SECRETS_DEFAULT_FILE
+  --no-redact
+  ...rest   # untyped: nur re-parses the CLI as Nushell, so `true`/`false`/`null` arrive as literals
+]: nothing -> nothing {
+  let args = ($rest | each { |a| if $a == null { "null" } else { $a | into string } })
+  let mappings = ($args | take while { $in =~ '^[A-Za-z_][A-Za-z0-9_]*=' })
+  let command = ($args | skip ($mappings | length))
+  if ($mappings | is-empty) or ($command | is-empty) {
+    error make {msg: "usage: nur secrets exec [--file F] VAR=path [VAR=path ...] command [args ...]"}
+  }
+
+  let data = (secret-load $file)
+  let secrets = ($mappings | each { |m|
+    let parts = ($m | split row --number 2 "=")
+    {var: $parts.0, value: (secret-lookup $data $parts.1 $file)}
+  })
+  let env_record = ($secrets | reduce --fold {} { |s, acc| $acc | insert $s.var $s.value })
+
+  if $no_redact {
+    with-env $env_record { run-external ...$command }
+    return
+  }
+
+  let result = (with-env $env_record { run-external ...$command | complete })
+  # Longest values first so a secret containing another is redacted whole
+  let redactions = ($secrets | where { ($in.value | str length) > 0 } | sort-by --reverse { $in.value | str length })
+  let redact = { |text: string|
+    $redactions | reduce --fold $text { |s, acc| $acc | str replace --all $s.value $"[REDACTED:($s.var)]" }
+  }
+  print --no-newline (do $redact $result.stdout)
+  print --no-newline --stderr (do $redact $result.stderr)
+  if $result.exit_code != 0 { exit $result.exit_code }
+}
+
+# Show whether a secret is set, plus its length and a short fingerprint, without printing it
+export def "nur secrets check" [
+  --file: string@"nu-complete secret-files" = $SECRETS_DEFAULT_FILE
+  ...paths: string
+]: nothing -> table {
+  let data = (secret-load $file)
+  $paths | each { |path|
+    let value = (try { secret-lookup $data $path $file } catch { null })
+    {
+      path: $path
+      set: ($value != null and $value != "")
+      length: ($value | default "" | str length)
+      sha256: (if $value == null { null } else { $value | hash sha256 | str substring 0..7 })
+    }
+  }
+}
+
 # Switch home-manager, NixOS, and/or k8s manifests (local if no --host, otherwise remote).
 # Pass os/home/k8s to restrict which targets are switched, e.g. `nur switch home k8s`.
 # Use --boot to set the os target as boot default instead of activating immediately (safe for slow activations).
@@ -574,25 +729,6 @@ export def "nur k8s deploy" [] {
   nur k8s push
 }
 
-# Decrypt kubernetes secrets to secrets/k8s.yaml (plaintext — do not commit)
-export def "nur k8s decrypt" [] {
-  ^sops --decrypt secrets/k8s.enc.yaml | save -f secrets/k8s.yaml
-}
-
-# Encrypt secrets/k8s.yaml back to secrets/k8s.enc.yaml
-export def "nur k8s encrypt" [] {
-  # --filename-override matches creation rules against the real target path --
-  # without it sops matches against secrets/k8s.yaml, which falls through to
-  # the generic secrets/*.yaml rule instead of the dedicated k8s.enc.yaml one
-  # (wrong recipient set: missing the k8s primary key, adding nixmini).
-  ^sops --encrypt --filename-override secrets/k8s.enc.yaml secrets/k8s.yaml | save -f secrets/k8s.enc.yaml
-}
-
-# Edit kubernetes secrets in-place (no plaintext file written)
-export def "nur k8s edit-secrets" [] {
-  ^sops secrets/k8s.enc.yaml
-}
-
 # Generate SSH deploy key pair for argo-manifests
 export def "nur k8s generate-deploy-key" [] {
   ^sh scripts/k8s-generate-deploy-key.sh
@@ -710,7 +846,7 @@ export def "nur kuma-cli config" [] {
     error make {msg: (
       $"Secret ($AUTOKUMA_SECRET) in namespace ($AUTOKUMA_NS) has no USERNAME/PASSWORD yet. "
       + "Set services.autokuma.kuma.username/password from secrets.autokuma.* "
-      + "(nur k8s edit-secrets), then nur switch, before running this."
+      + "(nur secrets edit), then nur switch, before running this."
     )}
   }
 

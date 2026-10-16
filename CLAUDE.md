@@ -210,6 +210,18 @@ Create `hosts/<hostname>.nix` (copy an existing one); nothing else needs registe
 
 Managed via [sops-nix](https://github.com/Mic92/sops-nix). Secret files live in `secrets/`. GPG keys are used for encryption (`nur secrets list-keys`).
 
+`secrets/k8s.enc.yaml` (the default for every task below) holds the Kubernetes app secrets; the other `secrets/*.yaml` files are encrypted in place and decrypted by sops-nix on the hosts. Every task takes another file (`--file` for `keys`/`check`/`exec`, positional for the rest).
+
+```sh
+nur secrets edit [file]          # edit in $EDITOR, no plaintext on disk
+nur secrets decrypt [file]       # *.enc.* -> git-ignored plaintext next to it
+nur secrets encrypt [file]       # plaintext -> *.enc.* with the right creation rule
+nur secrets keys [prefix]        # list key paths, e.g. postgresql.adminPassword (no decryption)
+nur secrets check <path>...      # set? length + sha256 prefix, never the value
+nur secrets exec VAR=path... cmd [args...]   # run cmd with secrets as env vars
+```
+
+**Agents: never put a secret value into the conversation.** Don't run `sops -d`, `nur secrets decrypt`, or read `secrets/k8s.yaml`. Find the path with `nur secrets keys`, check it with `nur secrets check`, and use it via `nur secrets exec`, which replaces any secret value in the command's output with `[REDACTED:VAR]`. Reference the variable inside the command (`sh -c '... "$VAR" ...'`); don't interpolate it on the outer command line. `--no-redact` streams output unfiltered (for interactive use), so agents shouldn't use it.
 ### Nushell
 
 `nushell/` contains Nushell shell configuration (`config.nu`, `env.nu`) and custom modules/completions.

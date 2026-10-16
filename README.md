@@ -240,7 +240,7 @@ nur k8s deploy          # build manifests + push to argo-manifests (most common)
 nur k8s switch-charts   # build nixidy manifests → write to kubernetes/manifests/
 nur k8s push            # commit + push kubernetes/manifests/ to argo-manifests
 
-nur k8s edit-secrets    # edit cluster secrets in-place with sops
+nur secrets edit        # edit cluster secrets in-place with sops
 ```
 
 Cluster operations beyond deploying — restarting an app, ArgoCD sync/refresh, port-forwarding, database backup/restore — are also `nur` tasks; see `CLAUDE.md`'s Key Commands for a starting list, or `nur --help` for the full set.
@@ -297,7 +297,7 @@ nur k8s generate-deploy-key
 #    argo-manifests → Settings → Deploy keys → Add deploy key (read-only)
 
 # 3. Store the printed PRIVATE key in secrets:
-nur k8s edit-secrets
+nur secrets edit
 #    Add under key:
 #    argocd:
 #      sshDeployKey: |
@@ -341,16 +341,16 @@ All cluster secrets live in `secrets/k8s.enc.yaml` (encrypted with sops/age).
 Edit in-place (no plaintext file written to disk):
 
 ```sh
-nur k8s edit-secrets
+nur secrets edit
 # or directly: sops secrets/k8s.enc.yaml
 ```
 
 Decrypt → edit → re-encrypt:
 
 ```sh
-nur k8s decrypt           # → secrets/k8s.yaml  (DO NOT commit)
+nur secrets decrypt       # → secrets/k8s.yaml  (DO NOT commit)
 # edit secrets/k8s.yaml
-nur k8s encrypt           # → secrets/k8s.enc.yaml
+nur secrets encrypt       # → secrets/k8s.enc.yaml
 rm secrets/k8s.yaml
 ```
 
