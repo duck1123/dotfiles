@@ -16,7 +16,7 @@ nur build                        # build current home + OS configs
 nur switch                       # switch both home-manager and NixOS
 nur switch home                  # apply home-manager config only
 nur switch os                    # apply NixOS config only
-nur switch k8s                   # build and push k8s manifests only (no --host)
+nur switch k8s                   # build k8s manifests AND push them to argo-manifests (= deploy; no --host)
 nur switch os --boot             # set NixOS as boot default instead of activating (safe for slow activations)
 
 # Validation and formatting
@@ -170,7 +170,7 @@ How it fits together:
 
 ### Registries (top-level directories)
 
-Some core types live in top-level directories outside `modules/` and are auto-loaded by `modules/flake/registries.nix`: every `<dir>/<name>.nix` becomes a flake-parts definition of `<attr>.<name>`, so adding one means dropping in a file (files starting with `_` are skipped). A file holds only the entry's body, either a plain value or a function of flake-parts module args (`config`, `lib`, `inputs`, ...) when it needs them, e.g. to reference other entries. Note that such a function gets the *flake-parts* args, not NixOS/home-manager ones; those belong to the nested `nixos`/`homeManager` bodies. Relative paths are relative to the registry directory (e.g. `../resources/...`).
+Some core types live in top-level directories outside `modules/` and are auto-loaded by `modules/flake/registries.nix`: every `<dir>/<name>.nix` becomes a flake-parts definition of `<attr>.<name>`, so adding one means dropping in a file (files starting with `_` are skipped). The flake only sees git-tracked files: `git add` a new file (staging is enough) or Nix silently acts as if it doesn't exist (`does not provide attribute ...`, no other error). A file holds only the entry's body, either a plain value or a function of flake-parts module args (`config`, `lib`, `inputs`, ...) when it needs them, e.g. to reference other entries. Note that such a function gets the *flake-parts* args, not NixOS/home-manager ones; those belong to the nested `nixos`/`homeManager` bodies. Relative paths are relative to the registry directory (e.g. `../resources/...`).
 
 ```nix
 # identities/deck.nix

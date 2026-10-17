@@ -109,6 +109,27 @@ Longhorn recreates it automatically (same name). Confirm with `kubectl get volum
 
 **Fix:** `kubectl delete pod -n gluetun <pod>` — the Deployment recreates it, gluetun reconnects (often to a different Mullvad server), and the ICMP check usually passes on the new connection. Recheck any app gated behind it afterward; they typically self-resolve once gluetun goes Ready without needing their own restart.
 
+## Working on a node with `kubectl debug node/...`
+
+- Use `--profile=sysadmin` whenever you need block devices or root-owned host files; the default profile isn't privileged.
+- `kubectl debug -it` here usually can't get a real TTY ("Unable to use a TTY") and falls back to streaming. That stream can drop while the command keeps running server-side, so a long `find -delete` can look finished when it isn't (or vice versa). For anything long, run it non-interactively (`kubectl debug node/<n> --image=busybox -- sh -c '...'`, no `-it`) and poll the debugger pod's `.status.phase` + `kubectl logs` for the real result.
+- Every invocation leaves a `node-debugger-<node>-<random>` pod behind (in whatever namespace the context points at, often `argocd`). Delete them when done.
+- An app pod that's crash-looping (container restarts, pod not recreated) keeps its PVCs attached, and their mounts live at `/var/lib/kubelet/pods/<pod-uid>/volumes/kubernetes.io~csi/<pv-name>/mount` on the host — you can edit volume contents there without scaling anything down.
+- Images built on the nix-csi scratch image (e.g. attic) have no shell. For a database-backed app, `kubectl exec` into `postgresql-0` (namespace `postgresql`, `psql -U postgres -d <db>`) or the mariadb pod instead.
+
+## ArgoCD retries a StatefulSet patch forever (immutable field)
+
+Changing an immutable StatefulSet field (`serviceName`, `volumeClaimTemplates`, selectors) makes ArgoCD retry the same failing patch on every sync. Fix: `kubectl delete statefulset <name> --cascade=orphan` (leaves pods and PVCs alone) so the next sync recreates it, then delete the orphaned old pod so the new StatefulSet starts a correct one.
+
+## MariaDB: full restore gotchas
+
+From the 2026-09-07 bitnami→groundhog2k migration; all of these will happen again on any full restore of this instance:
+
+- **Backups:** the dump pipeline must run under `set -eo pipefail`. With only `set -e`, a failing `mysqldump | gzip` produced a truncated "successful" backup (check that the file ends with a newline / a complete statement).
+- **Duplicate FK names:** booklore's and romm's ORMs name unnamed foreign keys `1`, `2`, ..., which collide across tables on restore. Rewrite every ``CONSTRAINT `N` `` to a unique name in the dump first (cosmetic; doesn't change data or relationships). Not automated.
+- **`healthcheck` user disappears:** `mysqldump --all-databases` includes the `mysql` schema, so restoring it replaces the grant tables with the old server's users. The image's `healthcheck` user (used by the chart's probes) is gone, and the pod crash-loops with `Access denied for user 'healthcheck'@'localhost'` on the *next* restart. The password is still in `/var/lib/mysql/.my-healthcheck.cnf`; recreate it with `CREATE USER IF NOT EXISTS 'healthcheck'@'localhost' IDENTIFIED BY '<that password>'; GRANT USAGE ON *.* TO 'healthcheck'@'localhost';`.
+- **"Table doesn't exist" after a restore:** check the source dump first (`grep -c 'CREATE TABLE `<t>`' dump.sql`) before blaming the restore. romm's DB was already missing `roms_metadata`, the `sibling_roms`/`virtual_collections` **views** and the `virtual_collection_roms_ai`/`_au` **triggers** before the migration (recreated by hand on 2026-09-07). When recreating, take the DDL from the app's migrations at the **deployed release tag** (`gh api repos/<org>/<repo>/contents/<path>?ref=<tag>`), not the default branch; ORM model classes can't tell you whether something is a table or a view. Check views and triggers too, not just the table the error names. `mariadb -e` splits on `;` inside `BEGIN...END`, so wrap trigger DDL in `DELIMITER $$ ... $$ DELIMITER ;`.
+
 ## Self-hosted binary cache / nix-csi build failures
 
 See [nix-csi-and-binary-cache.md](nix-csi-and-binary-cache.md) — covers the pinned `nix-csi` flake input, the self-hosted Attic Nix cache (currently backed by Garage; RustFS was the original backend, now disabled but still referenced by a couple of unmigrated apps), and how failures in either cascade into `nix-csi`/build failures in ways that aren't obvious from the nix-csi side alone.
