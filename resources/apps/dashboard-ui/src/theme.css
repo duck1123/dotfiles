@@ -1,0 +1,56 @@
+/* Design tokens for every dashboard-ui component. Hosts can override any
+   --dui-* variable on an ancestor (a Trilium widget maps them onto Trilium's
+   own theme variables). */
+:root {
+  --dui-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --dui-font-size: 14px;
+  --dui-radius: 6px;
+
+  --dui-bg: #ffffff;
+  --dui-surface: #f5f6f8;
+  --dui-border: #d0d4dc;
+  --dui-border-strong: #9aa1ad;
+  --dui-text: #1d2129;
+  --dui-text-muted: #5f6673;
+  --dui-accent: #2f5fd0;
+  --dui-accent-text: #ffffff;
+  --dui-highlight: #e6edfb;
+  --dui-chip-bg: #e9ecf2;
+  --dui-danger: #b42318;
+  --dui-danger-bg: #fdecea;
+  --dui-shadow: 0 6px 20px rgb(15 20 30 / 0.14);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --dui-bg: #1b1e24;
+    --dui-surface: #23272f;
+    --dui-border: #3a404b;
+    --dui-border-strong: #5b6372;
+    --dui-text: #e6e8ec;
+    --dui-text-muted: #a2a9b6;
+    --dui-accent: #7ea2f5;
+    --dui-accent-text: #10131a;
+    --dui-highlight: #2d3a57;
+    --dui-chip-bg: #313744;
+    --dui-danger: #f2938a;
+    --dui-danger-bg: #3d2322;
+    --dui-shadow: 0 6px 20px rgb(0 0 0 / 0.45);
+  }
+}
+
+:root[data-theme="dark"] {
+  --dui-bg: #1b1e24;
+  --dui-surface: #23272f;
+  --dui-border: #3a404b;
+  --dui-border-strong: #5b6372;
+  --dui-text: #e6e8ec;
+  --dui-text-muted: #a2a9b6;
+  --dui-accent: #7ea2f5;
+  --dui-accent-text: #10131a;
+  --dui-highlight: #2d3a57;
+  --dui-chip-bg: #313744;
+  --dui-danger: #f2938a;
+  --dui-danger-bg: #3d2322;
+  --dui-shadow: 0 6px 20px rgb(0 0 0 / 0.45);
+}

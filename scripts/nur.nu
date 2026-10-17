@@ -1377,3 +1377,46 @@ echo 'Restore completed successfully!'"
 export def "nur apply-git-hooks" []: nothing -> nothing {
   ^git config core.hooksPath .githooks
 }
+
+# ---------------------------------------------------------------------------
+# Dashboard UI components (resources/apps/dashboard-ui/), with Storybook.
+# Deployed by `nur switch k8s` as the `storybook` app; these tasks are for
+# working on it locally.
+# ---------------------------------------------------------------------------
+
+const UI_DIR = "resources/apps/dashboard-ui"
+const UI_NIX = "modules/kubernetes/pkgs/dashboard-ui.nix"
+
+def ui-deps []: nothing -> nothing {
+  if not ($"($UI_DIR)/node_modules" | path exists) {
+    ^npm install --prefix $UI_DIR
+  }
+}
+
+# Run Storybook locally with live reload (http://localhost:6006), for changes
+# that aren't deployed yet
+export def "nur ui dev" []: nothing -> nothing {
+  ui-deps
+  ^npm run --prefix $UI_DIR storybook
+}
+
+# Run the component tests and the typecheck
+export def "nur ui test" []: nothing -> nothing {
+  ui-deps
+  ^npm run --prefix $UI_DIR typecheck
+  ^npm test --prefix $UI_DIR
+}
+
+# Build the static Storybook with Nix, as the cluster gets it (tests included)
+export def "nur ui build" []: nothing -> string {
+  ^nix build .#dashboard-ui-storybook --no-link --print-out-paths | str trim
+}
+
+# Update npmDepsHash in the Nix package after package-lock.json changes
+export def "nur ui hash" []: nothing -> nothing {
+  let hash = (^nix run nixpkgs#prefetch-npm-deps -- $"($UI_DIR)/package-lock.json" | lines | last | str trim)
+  open --raw $UI_NIX
+  | str replace --regex 'npmDepsHash = "[^"]*";' $'npmDepsHash = "($hash)";'
+  | save --force $UI_NIX
+  print $"npmDepsHash = ($hash)"
+}

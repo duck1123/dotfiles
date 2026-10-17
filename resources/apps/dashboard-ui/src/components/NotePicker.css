@@ -1,0 +1,139 @@
+.dui-picker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  font-family: var(--dui-font);
+  font-size: var(--dui-font-size);
+  color: var(--dui-text);
+}
+
+.dui-picker__label {
+  font-weight: 600;
+}
+
+.dui-picker__field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 4px 6px;
+  border: 1px solid var(--dui-border);
+  border-radius: var(--dui-radius);
+  background: var(--dui-bg);
+}
+
+.dui-picker__field:focus-within {
+  border-color: var(--dui-accent);
+  box-shadow: 0 0 0 2px var(--dui-highlight);
+}
+
+.dui-picker__input {
+  flex: 1 1 8em;
+  min-width: 8em;
+  padding: 4px 2px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+.dui-picker__input::placeholder {
+  color: var(--dui-text-muted);
+}
+
+.dui-picker__popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  margin-top: 4px;
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--dui-border);
+  border-radius: var(--dui-radius);
+  background: var(--dui-bg);
+  box-shadow: var(--dui-shadow);
+}
+
+.dui-picker__list {
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+}
+
+.dui-picker__list:empty {
+  display: none;
+}
+
+.dui-picker__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.dui-picker__option[aria-selected="true"] {
+  background: var(--dui-highlight);
+}
+
+.dui-picker__icon {
+  flex: none;
+  width: 1.2em;
+  margin-top: 0.15em;
+  text-align: center;
+  color: var(--dui-text-muted);
+}
+
+.dui-picker__icon--default::before {
+  content: "•";
+}
+
+.dui-picker__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dui-picker__title,
+.dui-picker__path {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dui-picker__path {
+  font-size: 0.85em;
+  color: var(--dui-text-muted);
+}
+
+.dui-picker__message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+  padding: 8px 10px;
+  color: var(--dui-text-muted);
+}
+
+.dui-picker__message--error {
+  background: var(--dui-danger-bg);
+  color: var(--dui-danger);
+}
+
+.dui-picker__retry {
+  flex: none;
+  padding: 2px 10px;
+  border: 1px solid currentColor;
+  border-radius: var(--dui-radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}

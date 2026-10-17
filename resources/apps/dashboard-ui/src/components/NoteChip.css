@@ -1,0 +1,60 @@
+.dui-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  padding: 2px 4px 2px 8px;
+  border-radius: 999px;
+  background: var(--dui-chip-bg);
+  color: var(--dui-text);
+  font-family: var(--dui-font);
+  font-size: var(--dui-font-size);
+  line-height: 1.5;
+}
+
+.dui-chip__icon {
+  flex: none;
+  color: var(--dui-text-muted);
+}
+
+.dui-chip__icon--default::before {
+  content: "•";
+}
+
+.dui-chip__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+}
+
+a.dui-chip__title {
+  text-decoration: none;
+}
+
+a.dui-chip__title:hover,
+a.dui-chip__title:focus-visible {
+  text-decoration: underline;
+}
+
+.dui-chip__remove {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--dui-text-muted);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dui-chip__remove:hover,
+.dui-chip__remove:focus-visible {
+  background: var(--dui-border);
+  color: var(--dui-text);
+}

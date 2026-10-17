@@ -43,6 +43,12 @@ nur postgres backup          # dump all PostgreSQL databases to ./backups/postgr
 nur mariadb list-backups     # list MariaDB backups on the mariadb-backups PVC
 nur kuma-cli config          # write ~/.config/kuma/config.toml from cluster secrets
 nur forward argocd           # port-forward the ArgoCD UI to localhost:8080
+
+# Dashboard UI components (resources/apps/dashboard-ui/, deployed as the `storybook` app)
+nur ui dev                   # Storybook with live reload on localhost:6006 (unpushed changes)
+nur ui test                  # component tests + typecheck
+nur ui build                 # Nix build of the static Storybook (what the cluster serves)
+nur ui hash                  # update npmDepsHash after package-lock.json changes
 ```
 
 ## Architecture
@@ -67,7 +73,7 @@ Key subdirectories of `modules/`:
 - `modules/options/` — NixOS option declarations (host, hosts, identities, simpleFeature type)
 - `modules/types/` — custom Nix types/submodules for hosts, identities, features
 - `modules/base.nix`, `modules/state-version.nix` — the `homeManager.base`/`nixos.base` entry modules and state versions
-- `modules/kubernetes/` — the k3s fleet-ops integration, fully consolidated into this repo (no external dependency left). `options.nix` declares `flake.lib`/`flake.nixidyApps`; `lib/` holds the `flake.lib.*` helpers (`mkArgoApp`, `mkPinnedVolume`, ...); `pkgs/` the packages some apps use; `applications.nix` turns every `appTemplates` entry into a `flake.nixidyApps` module via `mkArgoApp`; `nixidy-apps/` holds the few apps that don't use `mkArgoApp`. The `_`-prefixed dirs aren't flake-parts modules: `_nixidy/` has the modules for the inner nixidy eval (listed in `nixidy-envs.nix`), and `_generators/` the CRD generators. The `dev` nixidy environment itself lives outside `modules/` in `clusters/dev/`: `default.nix` (cluster-wide settings: ingress/database providers, GPU profiles, nixidy target), `options.nix` (`devDefaults.*`) and `apps/<name>.nix` (per-app instance config, auto-imported). See `modules/kubernetes/docs/` for deployment workflow, the two-module-system gotcha, pinned-volume handling, and a troubleshooting playbook.
+- `modules/kubernetes/` — the k3s fleet-ops integration, fully consolidated into this repo (no external dependency left). `options.nix` declares `flake.lib`/`flake.nixidyApps`; `lib/` holds the `flake.lib.*` helpers (`mkArgoApp`, `mkPinnedVolume`, ...); `pkgs/` the packages some apps use; `applications.nix` turns every `appTemplates` entry into a `flake.nixidyApps` module via `mkArgoApp`; `nixidy-apps/` holds the few apps that don't use `mkArgoApp`. The `_`-prefixed dirs aren't flake-parts modules: `_nixidy/` has the modules for the inner nixidy eval (listed in `nixidy-envs.nix`), and `_generators/` the CRD generators. The `dev` nixidy environment itself lives outside `modules/` in `clusters/dev/`: `default.nix` (cluster-wide settings: ingress/database providers, GPU profiles, nixidy target), `options.nix` (`devDefaults.*`) and `apps/<name>.nix` (per-app instance config, auto-imported). See `modules/kubernetes/docs/` (start with `architecture.md`, a map of how the pieces fit together) for deployment workflow, the two-module-system gotcha, pinned-volume handling, serving Nix-built static sites, and a troubleshooting playbook.
 
 ### Host Configuration Pattern
 
