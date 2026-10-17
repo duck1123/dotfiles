@@ -937,6 +937,26 @@ export def "nur argocd refresh" [name?: string]: nothing -> nothing {
   }
 }
 
+# Run `argocd ... --core` against the argocd namespace. Core mode reads argocd-cm
+# from the kubeconfig context's namespace (there's no flag for it; -N is only
+# the app namespace), so run it with a temporary copy of the current context
+# whose namespace is argocd, leaving the real kubeconfig alone.
+def argocd-core [...args: string]: nothing -> nothing {
+  let kubeconfig = (^mktemp -t argocd-kubeconfig.XXXXXX | str trim)
+  let result = (try {
+    ^kubectl config view --minify --flatten | save --force $kubeconfig
+    with-env {KUBECONFIG: $kubeconfig} {
+      ^kubectl config set-context --current --namespace=argocd | ignore
+      ^argocd ...$args --core
+    }
+    null
+  } catch { |err| $err.msg })
+  rm --force $kubeconfig
+  if $result != null {
+    error make {msg: $result}
+  }
+}
+
 # Trigger an actual ArgoCD sync, not just a refresh -- a refresh only recomputes
 # the diff against git, it doesn't apply anything or run PostSync hooks. Uses
 # `argocd`'s --core mode, which talks to the k8s API directly via the local
@@ -953,9 +973,9 @@ export def "nur argocd sync" [name?: string]: nothing -> nothing {
         error make {msg: $"Failed to list ArgoCD applications: ($err.msg)"}
       }
     )
-    ^argocd app sync ...$apps --core
+    argocd-core app sync ...$apps
   } else {
-    ^argocd app sync $name --core
+    argocd-core app sync $name
   }
 }
 
