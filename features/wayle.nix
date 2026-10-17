@@ -4,6 +4,7 @@
       config,
       inputs,
       lib,
+      pkgs,
       ...
     }:
     let
@@ -11,6 +12,63 @@
       # One home-manager generation serves every specialisation, so the
       # service is limited to their sessions at runtime instead.
       desktops = inputs.self.lib.environments.desktopsFor config.host "wayle";
+
+      # Quick capture borrows the Trilium token the claude feature installs
+      # (an ETAPI token works for both), so the button only shows where it's
+      # there.
+      quickCaptureEnabled = (config.host.features.claude or { enable = false; }).enable;
+
+      # Desktop twin of the "Quick Capture" script note in Trilium: prompts for
+      # a thought and appends "HH:MM thought" to today's day note, or to its
+      # "Log" child text note when the day note isn't a text note.
+      quickCapture = pkgs.writeShellApplication {
+        name = "trilium-quick-capture";
+        runtimeInputs = with pkgs; [
+          coreutils
+          curl
+          fuzzel
+          jq
+          libnotify
+        ];
+        text = ''
+          base=https://trilium.home.kronkltd.net/etapi
+          token=$(cat /run/secrets/mcp-trilium-token)
+
+          api() { curl -fsS -H "Authorization: $token" "$@"; }
+          trap 'notify-send -u critical "Quick capture failed" "Could not save to Trilium"' ERR
+
+          text=$(fuzzel --dmenu --prompt-only "Capture: " --placeholder "What's on your mind?" --width 60 </dev/null) || exit 0
+          text=$(printf '%s' "$text" | sed -E 's/^[[:space:]]+|[[:space:]]+$//g')
+          [ -n "$text" ] || exit 0
+
+          # Local clock, so the timestamp matches what the Trilium script writes.
+          time=$(date +%H:%M)
+          day=$(api "$base/calendar/days/$(date +%F)")
+          target=$(jq -r .noteId <<<"$day")
+
+          if [ "$(jq -r .type <<<"$day")" != text ]; then
+            dayId=$target
+            target=
+            for id in $(jq -r '.childNoteIds[]' <<<"$day"); do
+              if api "$base/notes/$id" | jq -e '.title == "Log" and .type == "text"' >/dev/null; then
+                target=$id
+                break
+              fi
+            done
+            if [ -z "$target" ]; then
+              target=$(jq -n --arg p "$dayId" '{parentNoteId: $p, title: "Log", type: "text", content: ""}' \
+                | api -X POST -H 'Content-Type: application/json' --data-binary @- "$base/create-note" \
+                | jq -r .note.noteId)
+            fi
+          fi
+
+          line=$(jq -rn --arg t "$time" --arg x "$text" '"<p><strong>\($t)</strong> \($x | @html)</p>"')
+          { api "$base/notes/$target/content"; printf '%s' "$line"; } \
+            | api -X PUT -H 'Content-Type: text/plain' --data-binary @- "$base/notes/$target/content"
+
+          notify-send "Quick capture" "Captured at $time"
+        '';
+      };
     in
     {
       systemd.user.services.wayle.Unit.ConditionEnvironment = lib.mkIf (desktops != [ ]) (
@@ -50,7 +108,8 @@
                   let
                     batteryEnabled = (config.host.features.battery or { enable = false; }).enable;
                   in
-                  [
+                  (lib.optionals quickCaptureEnabled [ "custom-quick-capture" ])
+                  ++ [
                     "media"
                     "network"
                     "bluetooth"
@@ -68,6 +127,18 @@
 
           modules = {
             bluetooth.label-show = false;
+
+            custom = lib.optionals quickCaptureEnabled [
+              {
+                id = "quick-capture";
+                command = "true";
+                interval-ms = 0; # static button: run once, never poll
+                icon-name = "ld-file-text-symbolic";
+                label-show = false;
+                tooltip-format = "Quick capture to Trilium";
+                left-click = lib.getExe quickCapture;
+              }
+            ];
 
             clock = {
               format = "%b %d %I:%M:%S %p";
