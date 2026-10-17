@@ -1,0 +1,4 @@
+value: "http://trilium.trilium:8080"
+is_secret: false
+description: >-
+  In-cluster Trilium URL for ETAPI calls (append /etapi/...).

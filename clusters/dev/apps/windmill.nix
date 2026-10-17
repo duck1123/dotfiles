@@ -24,6 +24,18 @@
 
     inherit (secrets.windmill) superadminSecret superadminEmail superadminPassword;
 
+    # Valueless definitions live in resources/apps/windmill/wmill/f/fleetops/.
+    secretVariables = [
+      {
+        path = "f/fleetops/youtube_api_key";
+        value = secrets.youtube.apiKey;
+      }
+      {
+        path = "f/fleetops/trilium_etapi_token";
+        value = secrets.trilium.key;
+      }
+    ];
+
     # One Windmill resource per database on the shared postgres instance,
     # registered at f/fleetops/db_<name> -- sourced the same way as
     # superset's/metabase's reportingConnections (env/dev/superset.nix).

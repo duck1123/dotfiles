@@ -1,0 +1,8 @@
+value: ""
+is_secret: true
+description: >-
+  Trilium ETAPI token, from secrets/k8s.enc.yaml `trilium.key` (the same token
+  the homepage widget uses). Used by scripts that read or write Trilium
+  notes. The real value is never stored here; it's seeded by the
+  windmill-sync ArgoCD hook job from clusters/dev/apps/windmill.nix's
+  `secretVariables`.
