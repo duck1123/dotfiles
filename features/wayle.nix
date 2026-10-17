@@ -1,3 +1,6 @@
+let
+  captureTokenPath = "/run/secrets/windmill-capture-token";
+in
 {
   homeManager =
     {
@@ -13,14 +16,12 @@
       # service is limited to their sessions at runtime instead.
       desktops = inputs.self.lib.environments.desktopsFor config.host "wayle";
 
-      # Quick capture borrows the Trilium token the claude feature installs
-      # (an ETAPI token works for both), so the button only shows where it's
-      # there.
+      # The quick-capture button sends its text to the Windmill `capture` script
+      # (f/fleetops/capture), which files it as its own #inbox note under
+      # today's day note. Its token is installed by the nixos body below, only
+      # on hosts with the claude feature, the ones whose host keys decrypt it.
       quickCaptureEnabled = (config.host.features.claude or { enable = false; }).enable;
 
-      # Desktop twin of the "Quick Capture" script note in Trilium: prompts for
-      # a thought and appends "HH:MM thought" to today's day note, or to its
-      # "Log" child text note when the day note isn't a text note.
       quickCapture = pkgs.writeShellApplication {
         name = "trilium-quick-capture";
         runtimeInputs = with pkgs; [
@@ -31,42 +32,18 @@
           libnotify
         ];
         text = ''
-          base=https://trilium.home.kronkltd.net/etapi
-          token=$(cat /run/secrets/mcp-trilium-token)
+          url=https://windmill.home.kronkltd.net/api/w/default/jobs/run_wait_result/p/f/fleetops/capture
+          token=$(cat ${captureTokenPath})
+          trap 'notify-send -u critical "Quick capture failed" "Could not send to Trilium"' ERR
 
-          api() { curl -fsS -H "Authorization: $token" "$@"; }
-          trap 'notify-send -u critical "Quick capture failed" "Could not save to Trilium"' ERR
-
-          text=$(fuzzel --dmenu --prompt-only "Capture: " --placeholder "What's on your mind?" --width 60 </dev/null) || exit 0
+          text=$(fuzzel --dmenu --prompt-only "Capture: " --placeholder "Thought, link, or task: / watch: / shopping:" --width 60 </dev/null) || exit 0
           text=$(printf '%s' "$text" | sed -E 's/^[[:space:]]+|[[:space:]]+$//g')
           [ -n "$text" ] || exit 0
 
-          # Local clock, so the timestamp matches what the Trilium script writes.
-          time=$(date +%H:%M)
-          day=$(api "$base/calendar/days/$(date +%F)")
-          target=$(jq -r .noteId <<<"$day")
+          result=$(jq -n --arg t "$text" '{text: $t}' \
+            | curl -fsS -X POST -H "Authorization: Bearer $token" -H 'Content-Type: application/json' --data-binary @- "$url")
 
-          if [ "$(jq -r .type <<<"$day")" != text ]; then
-            dayId=$target
-            target=
-            for id in $(jq -r '.childNoteIds[]' <<<"$day"); do
-              if api "$base/notes/$id" | jq -e '.title == "Log" and .type == "text"' >/dev/null; then
-                target=$id
-                break
-              fi
-            done
-            if [ -z "$target" ]; then
-              target=$(jq -n --arg p "$dayId" '{parentNoteId: $p, title: "Log", type: "text", content: ""}' \
-                | api -X POST -H 'Content-Type: application/json' --data-binary @- "$base/create-note" \
-                | jq -r .note.noteId)
-            fi
-          fi
-
-          line=$(jq -rn --arg t "$time" --arg x "$text" '"<p><strong>\($t)</strong> \($x | @html)</p>"')
-          { api "$base/notes/$target/content"; printf '%s' "$line"; } \
-            | api -X PUT -H 'Content-Type: text/plain' --data-binary @- "$base/notes/$target/content"
-
-          notify-send "Quick capture" "Captured at $time"
+          notify-send "Captured to inbox" "$(jq -r '"\(.title) (\(.kind))"' <<<"$result")"
         '';
       };
     in
@@ -174,5 +151,23 @@
           };
         };
       };
+    };
+
+  # Token for the quick-capture button: a Windmill token that can only run
+  # f/fleetops/capture (windmill.desktopCaptureToken). The k8s secrets file is
+  # also encrypted for the server host keys, so sops-nix can install it here.
+  nixos =
+    { config, lib, ... }:
+    {
+      sops.secrets.windmill-capture-token =
+        lib.mkIf (config.host.features.claude or { enable = false; }).enable
+          {
+            sopsFile = ./../secrets/k8s.enc.yaml;
+            key = "windmill/desktopCaptureToken";
+            path = captureTokenPath;
+            mode = "0400";
+            owner = config.host.identity.username;
+            group = "users";
+          };
     };
 }
