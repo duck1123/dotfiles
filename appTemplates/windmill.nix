@@ -143,7 +143,7 @@ let
         -H "Content-Type: application/json" -d "$body")
 
       # Windmill answers 409 on older versions, 400 "already exists" on newer ones.
-      if [ "$status" = "409" ] || { [ "$status" = "400" ] && grep -q "already exists" /tmp/resp; }; then
+      if [ "$status" = "409" ] || { [ "$status" = "400" ] && [[ "$(</tmp/resp)" == *"already exists"* ]]; }; then
         echo "Updating existing Windmill variable \"$var_path\""
         curl -sf -X POST "$base_url/api/w/$WORKSPACE/variables/update/$var_path" \
           -H "Authorization: Bearer $SUPERADMIN_SECRET" \
@@ -200,7 +200,7 @@ let
         -H "Authorization: Bearer $SUPERADMIN_SECRET" \
         -H "Content-Type: application/json" -d "$var_body")
 
-      if [ "$var_status" = "409" ] || { [ "$var_status" = "400" ] && grep -q "already exists" /tmp/resp; }; then
+      if [ "$var_status" = "409" ] || { [ "$var_status" = "400" ] && [[ "$(</tmp/resp)" == *"already exists"* ]]; }; then
         curl -sf -X POST "$base_url/api/w/$WORKSPACE/variables/update/$password_var_path" \
           -H "Authorization: Bearer $SUPERADMIN_SECRET" \
           -H "Content-Type: application/json" \
