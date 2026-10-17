@@ -18,7 +18,7 @@ schema:
     watchedAt:
       type: string
       format: date-time
-      description: When it was watched (defaults to now). Sets #created and the day note.
+      description: "When it was watched (defaults to now). Sets #created and the day note."
       default: null
     noteIds:
       type: array
