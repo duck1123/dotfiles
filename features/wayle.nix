@@ -94,6 +94,7 @@
 
                 left = [
                   "dashboard"
+                  "niri-workspaces"
                   "hyprland-workspaces"
                   "window-title"
                 ];
@@ -150,6 +151,20 @@
             media.label-show = false;
             microphone.label-show = false;
             network.label-show = false;
+
+            # Icon-only bell; the popup drops down from the clock.
+            notifications = {
+              border-color = "transparent";
+              icon-color = "bg-overlay";
+              icon-bg-color = "transparent";
+              label-show = false;
+              label-color = "transparent";
+              label-max-length = 1;
+              button-bg-color = "transparent";
+              popup-position = "top-center";
+              popup-margin-x = 0.5;
+              popup-margin-y = 0.5;
+            };
             volume.label-show = false;
 
             weather = {
