@@ -252,7 +252,17 @@ async function dropOldClone(c: Changes) {
   }
 }
 
-async function ingest(url: string, watchedAt?: string) {
+// Load the variables and reset per-run state. main() calls this; scripts that
+// import ingest() (f/fleetops/capture) call it first too.
+export async function setup(dry: boolean) {
+  base = await wmill.getVariable("f/fleetops/trilium_base_url");
+  token = await wmill.getVariable("f/fleetops/trilium_etapi_token");
+  ytKey = await wmill.getVariable("f/fleetops/youtube_api_key");
+  dryRun = dry;
+  channels = null;
+}
+
+export async function ingest(url: string, watchedAt?: string) {
   const id = videoId(url);
   if (!id) throw new Error(`not a YouTube video URL: ${url}`);
   const v = (await videos([id])).get(id);
@@ -324,11 +334,7 @@ export async function main(
   limit: number = 25,
   dry_run: boolean = true,
 ) {
-  base = await wmill.getVariable("f/fleetops/trilium_base_url");
-  token = await wmill.getVariable("f/fleetops/trilium_etapi_token");
-  ytKey = await wmill.getVariable("f/fleetops/youtube_api_key");
-  dryRun = dry_run;
-  channels = null;
+  await setup(dry_run);
 
   if (url) return await ingest(url, watchedAt);
   const results = await backfill(noteIds, limit);

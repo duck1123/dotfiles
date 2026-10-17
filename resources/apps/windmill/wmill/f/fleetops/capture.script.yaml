@@ -1,0 +1,30 @@
+summary: Capture an item into the Trilium inbox
+description: >-
+  Creates a note of its own under the day's calendar note, with #created and
+  #inbox. "task:", "watch:" and "shopping:" prefixes set the kind; otherwise a
+  YouTube video goes through youtube_ingest, another link becomes a link note
+  titled from the page, and plain text becomes a journal note.
+lock: '!inline f/fleetops/capture.script.lock'
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties:
+    text:
+      type: string
+      description: "What to capture: a thought, a link, or both (e.g. a shared page's title and URL)."
+      default: ""
+    url:
+      type: string
+      description: A link, if it's sent separately from the text.
+      default: null
+    createdAt:
+      type: string
+      format: date-time
+      description: When it was captured (defaults to now). Sets the day note.
+      default: null
+    dry_run:
+      type: boolean
+      description: Only report what would be created.
+      default: false
+  required: []
