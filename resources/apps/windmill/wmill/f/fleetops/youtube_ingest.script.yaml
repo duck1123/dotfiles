@@ -1,0 +1,37 @@
+summary: Index YouTube videos in Trilium
+description: >-
+  With `url`: create a video note in that day's calendar note (from the YouTube
+  Video template, with ~channel and the API metadata), creating the channel
+  note if needed. Without `url`: backfill existing video/link notes that have
+  no #youtubeVideoId yet (or just `noteIds`), up to `limit`. dry_run (default
+  true) only reports what would change.
+lock: '!inline f/fleetops/youtube_ingest.script.lock'
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties:
+    url:
+      type: string
+      description: YouTube video URL to ingest. Leave empty to backfill.
+      default: null
+    watchedAt:
+      type: string
+      format: date-time
+      description: When it was watched (defaults to now). Sets #created and the day note.
+      default: null
+    noteIds:
+      type: array
+      items:
+        type: string
+      description: Backfill only these notes.
+      default: null
+    limit:
+      type: integer
+      description: Maximum notes to backfill in one run.
+      default: 25
+    dry_run:
+      type: boolean
+      description: Only report what would change.
+      default: true
+  required: []
