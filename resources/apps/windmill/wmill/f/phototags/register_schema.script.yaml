@@ -1,0 +1,17 @@
+summary: Create or update the legacy tag register's schema
+description: >-
+  Creates the tables of the photo tag register (legacy_assignment,
+  legacy_tag_map) in the phototags database if they don't exist, and reports
+  their row counts. Safe to run again; never drops or rewrites data.
+lock: ''
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties:
+    database:
+      type: object
+      format: resource-postgresql
+      description: The phototags database.
+      default: $res:f/fleetops/db_phototags
+  required: []

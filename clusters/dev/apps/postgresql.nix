@@ -38,6 +38,14 @@
           readAllTables = true;
         }
         {
+          # Register of legacy photo tag assignments (digiKam, sidecar
+          # keywords, Takeout) and their reviewed mapping; schema in
+          # resources/apps/windmill/wmill/f/phototags/register_schema.pg.sql.
+          name = "phototags";
+          username = "phototags";
+          password = secrets.postgresql.userPassword;
+        }
+        {
           name = "gitea";
           username = "postgres";
           password = secrets.postgresql.userPassword;
