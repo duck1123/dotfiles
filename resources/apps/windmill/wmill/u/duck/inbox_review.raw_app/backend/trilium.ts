@@ -10,16 +10,11 @@
 //   review back (~topic relations, #kind, title; done clears #inbox).
 //   Without apply=true it only returns the planned changes.
 //
-// "Topics" means notes under the Topics root, minus #topicScope=exclude (the
-// note and its descendants) and everything below #topicScope=excludeChildren.
-// A clone is in scope if any of its placements is.
-import * as wmill from "windmill-client";
+// "Topics" (and the ETAPI client) come from the shared f/lib/trilium module:
+// notes under the Topics root, minus #topicScope exclusions, per placement.
+import { connect, label, own, relations, TOPICS_ROOT, type EtapiNote, type Trilium } from "/f/lib/trilium.ts";
 
-const TOPICS_ROOT = "969cd62d38c65e2acaae97e48a24165e";
 const PREVIEW_CHARS = 1200;
-
-type Attribute = { attributeId: string; noteId: string; type: "label" | "relation"; name: string; value: string };
-type EtapiNote = { noteId: string; title: string; parentNoteIds: string[]; attributes: Attribute[] };
 
 type NoteSummary = { noteId: string; title: string; icon?: string; path: string[] };
 type InboxItem = {
@@ -33,63 +28,10 @@ type InboxItem = {
   preview?: string;
 };
 
-let base = "";
-let token = "";
-
-async function etapi(method: string, path: string, body?: unknown): Promise<any> {
-  const res = await fetch(`${base}/etapi${path}`, {
-    method,
-    headers: { Authorization: token, ...(body === undefined ? {} : { "Content-Type": "application/json" }) },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`ETAPI ${method} ${path}: ${res.status} ${await res.text()}`);
-  const text = await res.text();
-  return text && res.headers.get("content-type")?.includes("json") ? JSON.parse(text) : text;
-}
-
-const notes = new Map<string, Promise<EtapiNote>>();
-function getNote(noteId: string, fresh = false): Promise<EtapiNote> {
-  if (fresh || !notes.has(noteId)) notes.set(noteId, etapi("GET", `/notes/${noteId}`));
-  return notes.get(noteId)!;
-}
-
-// ETAPI also lists attributes a note inherits (e.g. from its template); only
-// the note's own ones are edited here.
-const own = (note: EtapiNote) => note.attributes.filter((a) => a.noteId === note.noteId);
-const label = (note: EtapiNote, name: string) => own(note).find((a) => a.type === "label" && a.name === name);
-const relations = (note: EtapiNote, name: string) => own(note).filter((a) => a.type === "relation" && a.name === name);
-
-function search(query: string, params: Record<string, string> = {}): Promise<EtapiNote[]> {
-  const qs = new URLSearchParams({ search: query, ...params });
-  return etapi("GET", `/notes?${qs}`).then((r) => r.results);
-}
-
-// Titles from "Topics" down to the note's parent, or null when the note isn't
-// a topic (outside the tree, or excluded by #topicScope).
-const paths = new Map<string, Promise<string[] | null>>();
-function topicPath(noteId: string, visiting: Set<string> = new Set()): Promise<string[] | null> {
-  if (!paths.has(noteId)) {
-    paths.set(
-      noteId,
-      (async () => {
-        if (visiting.has(noteId)) return null;
-        const note = await getNote(noteId);
-        if (label(note, "topicScope")?.value === "exclude") return null;
-        for (const parentId of note.parentNoteIds) {
-          if (parentId === TOPICS_ROOT) return ["Topics"];
-          if (parentId === "root" || parentId === "none") continue;
-          const parent = await getNote(parentId);
-          const rule = label(parent, "topicScope")?.value;
-          if (rule === "exclude" || rule === "excludeChildren") continue;
-          const above = await topicPath(parentId, new Set([...visiting, noteId]));
-          if (above) return [...above, parent.title];
-        }
-        return null;
-      })(),
-    );
-  }
-  return paths.get(noteId)!;
-}
+let etapi: Trilium["etapi"];
+let getNote: Trilium["getNote"];
+let search: Trilium["search"];
+let topicPath: Trilium["topicPath"];
 
 function summary(note: EtapiNote, path: string[]): NoteSummary {
   return { noteId: note.noteId, title: note.title, icon: label(note, "iconClass")?.value, path };
@@ -147,7 +89,6 @@ async function searchTopics(text: string, limit = 20): Promise<NoteSummary[]> {
   const found = (
     await search(`note.title *=* "${clean}"`, { ancestorNoteId: TOPICS_ROOT, fastSearch: "true", limit: "60" })
   ).filter((n) => n.noteId !== TOPICS_ROOT);
-  found.forEach((n) => notes.set(n.noteId, Promise.resolve(n)));
   const withPaths = await Promise.all(found.map(async (n) => ({ n, path: await topicPath(n.noteId) })));
   return withPaths
     .filter((r): r is { n: EtapiNote; path: string[] } => r.path !== null)
@@ -225,8 +166,7 @@ async function saveItem(args: {
 }
 
 export async function main(action: string, args: Record<string, any> = {}) {
-  base = await wmill.getVariable("f/fleetops/trilium_base_url");
-  token = await wmill.getVariable("f/fleetops/trilium_etapi_token");
+  ({ etapi, getNote, search, topicPath } = await connect());
 
   switch (action) {
     case "list_inbox":
