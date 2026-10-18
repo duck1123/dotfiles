@@ -1,0 +1,21 @@
+summary: Back up Immich tags with their assets
+description: >-
+  Writes every Immich tag (id, name, path, parent, colour) and the IDs of the
+  assets carrying it to one JSON file under dir/<day>/, then reads it back to
+  check the counts. Assignments come from Immich's database (read-only), so
+  archived, hidden and locked photos are included. Changes nothing in Immich.
+lock: '!inline f/phototags/backup_tags.script.lock'
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties:
+    dir:
+      type: string
+      description: Backup folder on the NAS, as the workers see it.
+      default: /media/Photos/_backups/phototags
+    dry_run:
+      type: boolean
+      description: Only report the counts and the path it would write.
+      default: false
+  required: []

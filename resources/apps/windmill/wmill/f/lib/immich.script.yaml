@@ -1,0 +1,13 @@
+summary: Shared Immich helpers (and a quick status)
+description: >-
+  Library for other scripts and apps: import { connect, openDb, tagAssets }
+  from "/f/lib/immich.ts". API client with the photo tag key, and a read-only
+  connection to Immich's database for exact tag assignments. Run on its own,
+  it reports the server version, tag count and tag assignments.
+lock: '!inline f/lib/immich.script.lock'
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties: {}
+  required: []
