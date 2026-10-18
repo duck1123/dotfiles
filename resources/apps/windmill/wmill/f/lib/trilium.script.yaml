@@ -1,0 +1,19 @@
+summary: Shared Trilium helpers (and a topic check)
+description: >-
+  Library for other scripts and apps: import { connect } from
+  "/f/lib/trilium.ts". Holds the ETAPI client, note and attribute helpers, the
+  local day stamp, and the Topics scope rule (#topicScope). Run on its own, it
+  reports for each note ID whether it's a topic and its path under Topics.
+lock: '!inline f/lib/trilium.script.lock'
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties:
+    noteIds:
+      type: array
+      items:
+        type: string
+      description: Trilium note IDs to check.
+      default: []
+  required: []
