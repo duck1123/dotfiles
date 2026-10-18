@@ -10,7 +10,7 @@ This repo actually evaluates **two separate NixOS-style module systems**, and it
 outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 ```
 
-Every `.nix` file under `modules/` (recursively) is imported automatically via `import-tree` — this is the "drop a file in, no registration needed" behavior described for `modules/pkgs/<name>-site.nix` in the main CLAUDE.md. This is flake-parts' own top-level module system: `perSystem`, `flake.*`, and any custom top-level options a module chooses to declare (e.g. `options.flake.lib`, `options.flake.nixidyApps` in `modules/kubernetes/options.nix`). The top-level `appTemplates/` directory is a registry loaded by `modules/flake/registries.nix` into `config.appTemplates`, the same way `features/` and `hosts/` are..
+Every `.nix` file under `modules/` (recursively) is imported automatically via `import-tree` — this is the "drop a file in, no registration needed" behavior that also covers packages like `modules/kubernetes/pkgs/duck1123-site.nix` (see [docs/architecture.md](../../../docs/architecture.md)). This is flake-parts' own top-level module system: `perSystem`, `flake.*`, and any custom top-level options a module chooses to declare (e.g. `options.flake.lib`, `options.flake.nixidyApps` in `modules/kubernetes/options.nix`). The top-level `appTemplates/` directory is a registry loaded by `modules/flake/registries.nix` into `config.appTemplates`, the same way `features/` and `hosts/` are.
 
 ## Inner: nixidy's per-environment eval (`modules/kubernetes/nixidy-envs.nix`, explicit list only)
 
@@ -52,7 +52,7 @@ The "Did you mean" suggestions are a tell: they're all names that *are* in the e
 When adding a new shared/cross-app config registry (anything meant to be referenced as `config.<name>` from more than one `appTemplates/*.nix` or `clusters/dev/apps/*.nix` file):
 
 1. Create it as its own file under `modules/kubernetes/_nixidy/` (alongside `ingressProviders.nix`/`nfsTargets.nix`/`databaseProviders.nix`/`homepageGroups.nix`; the `_` keeps import-tree from loading it into the outer system). Not `modules/kubernetes/lib/`, that's for `flake.lib.*` helper functions, a different thing entirely.
-2. `git add` it (see the git-tracking gotcha in the main CLAUDE.md — untracked files are invisible to the flake regardless of which module system).
+2. `git add` it (see the git-tracking gotcha in [docs/architecture.md](../../../docs/architecture.md#registries) — untracked files are invisible to the flake regardless of which module system).
 3. Add it to the `modules` list in `modules/kubernetes/nixidy-envs.nix`.
 4. Only then will `clusters/dev/default.nix` (or any `clusters/dev/apps/*.nix`) be able to set it, and `modules/kubernetes/lib/mkArgoApp.nix` (or any `appTemplates/*.nix`) be able to read it via `config.<name>`.
 

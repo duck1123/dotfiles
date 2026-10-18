@@ -6,9 +6,9 @@ The flake is assembled with [flake-parts](https://github.com/hercules-ci/flake-p
 
 ### What's in here
 
-- **NixOS + home-manager** configs for every machine in the fleet — see [Hosts](#hosts) below for the current list, and `CLAUDE.md` for how the module system is organized.
-- **Kubernetes fleet management**: application definitions, environment config, secrets, and the automation to build and deploy manifests via ArgoCD/nixidy. See [Kubernetes manifests](#kubernetes-manifests). This used to live in a separate repo (`k3s-fleetops`); it's since been folded in here so the whole fleet — machines and cluster alike — is defined in one place.
-- **Secrets management** via [sops-nix](https://github.com/Mic92/sops-nix) with age keys, covering both host-level and cluster secrets.
+- **NixOS + home-manager** configs for every machine in the fleet, built from per-host files that toggle shared features and desktop environments.
+- **Kubernetes fleet management**: application definitions, environment config, secrets, and the automation to build and deploy manifests via ArgoCD/nixidy. This used to live in a separate repo (`k3s-fleetops`); it's since been folded in here so the whole fleet — machines and cluster alike — is defined in one place.
+- **Secrets** encrypted with [sops](https://github.com/getsops/sops) and age keys, covering both host-level (via [sops-nix](https://github.com/Mic92/sops-nix)) and cluster secrets.
 - **Nushell configuration** (`nushell/`) shared across every machine, plus the `nur` task definitions that drive everything above.
 
 ## Hosts
@@ -21,351 +21,49 @@ The flake is assembled with [flake-parts](https://github.com/hercules-ci/flake-p
 | nixmini | NixOS x86_64 | k3s node |
 | powerspecnix | NixOS x86_64 | Primary gaming PC |
 | steamdeck | home-manager only | user: deck |
-| vavirl-pw0bwnq8 | NixOS-WSL | WSL on Ubuntu, user: drenfer |
+| vavirl-pw0bwnq8 | NixOS-WSL + home-manager | user: drenfer; home config `drenfer@VAVIRL-PW0BWNQ8`, `--host vallen` |
 | pixel8 | feature/syncthing config only | Android phone; no NixOS or home-manager build target |
 
----
+`hosts/<hostname>.nix` is the source of truth; `nix eval --json .#hostInfo` prints every host's details.
 
-## Setup
+## Usage
 
-### Clone location
-
-The default and recommended location is `~/dotfiles`. The Nushell config derives all internal paths from `$env.DOTFILES_DIR`, which defaults to `~/dotfiles` but can be overridden by setting it in the environment before launching Nushell.
+Day-to-day work is all `nur` tasks, run from anywhere in the repo:
 
 ```sh
-git clone git@github.com:duck1123/dotfiles.git ~/dotfiles
+nur switch                  # apply home-manager + NixOS on this machine
+nur switch --host edgenix   # build locally, deploy to another host
+nur switch k8s              # build and deploy the cluster manifests
+nur check                   # nix flake check
 ```
 
-### Nix (non-NixOS only)
-
-NixOS machines already have Nix. For non-NixOS hosts (steamdeck), use the [Determinate Nix installer](https://github.com/DeterminateSystems/nix-installer), which handles upgrades cleanly and supports WSL out of the box:
-
-```sh
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install \
-  --extra-conf "trusted-users = root $USER"
-```
-
-The `trusted-users` flag is required to allow this user to specify substituters (binary caches). Without it, cachix/attic caches are silently ignored and every package builds from source.
-
-Flake support is enabled automatically by the Determinate installer. If you ever need to add local Nix settings, edit `/etc/nix/nix.custom.conf` (Determinate's user-editable overlay — `/etc/nix/nix.conf` is managed by the installer and will be overwritten on upgrade).
-
-### WSL — NixOS image setup
-
-`vavirl-pw0bwnq8` runs as a NixOS-WSL distro, replacing the plain Ubuntu WSL base.
-
-**Step 1** — build the tarball builder:
-
-```sh
-nur build --tarball --host vavirl-pw0bwnq8
-```
-
-This produces `result/bin/nixos-wsl-tarball-builder` — a self-contained script.
-
-**Step 2** — run the builder as root to produce the image (writes `nixos.wsl` to the current directory):
-
-```sh
-sudo result/bin/nixos-wsl-tarball-builder
-```
-
-**Step 3** — import it into WSL from inside the Ubuntu WSL shell:
-
-```sh
-# cmd.exe is always available in WSL; tr strips the Windows carriage return
-WIN_HOME=$(cmd.exe /c "echo %USERPROFILE%" 2>/dev/null | tr -d '\r')
-mkdir -p "$(wslpath "$WIN_HOME")/wsl/NixOS"
-wsl.exe --unregister NixOS 2>/dev/null || true   # remove any previous failed import
-wsl.exe --import NixOS "$WIN_HOME\\wsl\\NixOS" "$(wslpath -w "$(pwd)/nixos.wsl")"
-wsl.exe -s NixOS   # set as default distro (optional)
-```
-
-After first boot, apply the home-manager config from inside the NixOS WSL shell:
-
-```sh
-nur switch home
-```
-
-Subsequent NixOS updates deploy via the normal `nur switch os` command.
-
-### Task runner
-
-Tasks are defined in `scripts/nur.nu` and run with [nur](https://github.com/nur-taskrunner/nur), a Nushell-based task runner (similar to `just`, but tasks are plain Nushell `def`s). The `nurfile` at the repo root loads the tasks module via `overlay use scripts/nur.nu`; `nur` discovers it automatically as long as your CWD is the repo root (or a subdirectory of it).
-
-On hosts with the `nushell` home-manager feature enabled, `nur` is already on `PATH`. On a fresh machine, before home-manager has been applied, get a Nushell session with the tasks preloaded instead:
-
-```sh
-nix run .#pnu
-```
-
-then run `nur <task>` inside that shell.
-
-### direnv
-
-`.envrc` is gitignored — copy the example and edit it before allowing:
-
-```sh
-cp .envrc.example .envrc
-# Review and fill in any secrets (e.g. TAILSCALE_API_KEY)
-direnv allow
-```
-
-`use flake` in the file loads the repo's devShell, which provides `nur`, `nh`, `sops`, `age`, `kubectl`, and the other tools listed in `modules/flake/devShells.nix`. Entering the directory activates the environment; leaving it deactivates it.
-
-If direnv is not yet installed, the `direnv` home-manager feature handles that on managed hosts. On a fresh machine before home-manager has run, use `nix run .#pnu` to get a shell with the tools available instead.
-
-### Age key (sops-nix)
-
-All secrets are encrypted with [sops](https://github.com/getsops/sops) using age keys. You need the private key available for decryption.
-
-#### Restore existing key from KeePass
-
-```sh
-export KEEPASS_DB_PATH="${HOME}/keepass/passwords.kdbx"
-export SECRET_PATH="/Kubernetes/Age-key"
-mkdir -p ~/.config/sops/age
-keepassxc-cli show -s -a Password ${KEEPASS_DB_PATH?} ${SECRET_PATH?} > ~/.config/sops/age/keys.txt
-```
-
-#### Or generate a new key
-
-```sh
-mkdir -p ~/.config/sops/age
-age-keygen -o ~/.config/sops/age/keys.txt
-```
-
----
-
-## Commands
-
-### List age secret keys
-
-```sh
-nur secrets list-keys
-```
-
-### Update flake inputs
-
-```sh
-nix flake update
-```
-
-### Format Nix files
-
-```sh
-nur format
-```
-
-### Lint Nix files
-
-```sh
-nur lint
-```
-
----
-
-## NixOS / home-manager
-
-### Apply local configuration
-
-```sh
-nur switch                       # apply both home-manager and NixOS
-nur switch home                  # home-manager only
-nur switch os                    # NixOS only
-nur switch k8s                   # build and push k8s manifests only (no --host)
-nur switch os --boot             # set NixOS as boot default instead of activating (safe for slow activations)
-```
-
-### Remote deployment
-
-All builds happen locally (with `nom` for better progress display), then the result is copied and activated on the remote host.
-
-#### Build only (no activation)
-
-```sh
-nur build --host edgenix
-nur build --host nasnix
-```
-
-#### Show package changes (diff)
-
-```sh
-nur diff-os --host edgenix
-nur diff-os --host nasnix
-```
-
-#### Dry run (preview without applying)
-
-```sh
-nur dry-run-os --host edgenix
-nur dry-run-os --host nasnix
-```
-
-#### Switch (build and activate)
-
-```sh
-nur switch --host edgenix                     # both home-manager and NixOS
-nur switch --host nasnix
-
-nur switch --host edgenix os                  # NixOS only
-nur switch --host edgenix home                # home-manager only
-```
-
-**Prerequisites:**
-- SSH key-based auth configured for the target host (e.g. `edgenix`, `nasnix`)
-- Remote user has sudo access (tasks prompt for the sudo password when switching NixOS)
-
----
-
-## Kubernetes manifests
-
-The cluster's application definitions live in `appTemplates/` (one `mkArgoApp` spec per app), with generators and shared library code under `modules/kubernetes/`; the environment-specific config (which apps are enabled, their domains, storage, secrets wiring) lives in `clusters/dev/`. Building that config produces Kubernetes manifests via [nixidy](https://github.com/arnarg/nixidy), which get pushed to a private [argo-manifests](https://github.com/duck1123/argo-manifests) repo; ArgoCD on the cluster syncs from there. See `modules/kubernetes/docs/` for the deployment workflow in more depth, the pinned-volumes convention, and a troubleshooting playbook.
+## Layout
 
 ```
 dotfiles/
-  appTemplates/            ← application definitions (one mkArgoApp spec per app)
-  modules/kubernetes/      ← mkArgoApp and other library code, generators, packages
-  clusters/dev/            ← the dev nixidy environment: default.nix (cluster-wide
-    apps/                    settings), options.nix (devDefaults), apps/ (per-app config)
-  secrets/k8s.enc.yaml     ← encrypted cluster secrets (sops/age)
+  hosts/                   ← one file per machine: identity, features, environments, host modules
+  features/                ← shared features hosts toggle (one file each)
+  environments/            ← desktop environments (one file each)
+  identities/              ← per-user identities
+  modules/                 ← flake-parts modules (auto-imported): flake outputs, NixOS modules, k8s library
+  appTemplates/            ← Kubernetes app definitions (one mkArgoApp spec per app)
+  clusters/dev/            ← the dev cluster: cluster-wide settings and per-app config
+  resources/apps/          ← app-owned assets (dashboards, scripts, site sources)
+  secrets/                 ← sops-encrypted secrets
   kubernetes/
     infra-manifests/       ← ArgoCD bootstrap manifests (install, 00-master app-of-apps)
-    manifests/              ← checkout of argo-manifests (gitignored here)
+    manifests/             ← checkout of argo-manifests (git-ignored here)
+  nushell/                 ← Nushell config, modules and completions
+  scripts/nur.nu           ← nur task definitions
 ```
 
-### Ongoing workflow
+## Documentation
 
-```sh
-nur k8s deploy          # build manifests + push to argo-manifests (most common)
-
-# or step by step:
-nur k8s switch-charts   # build nixidy manifests → write to kubernetes/manifests/
-nur k8s push            # commit + push kubernetes/manifests/ to argo-manifests
-
-nur secrets edit        # edit cluster secrets in-place with sops
-```
-
-Cluster operations beyond deploying — restarting an app, ArgoCD sync/refresh, port-forwarding, database backup/restore — are also `nur` tasks; see `CLAUDE.md`'s Key Commands for a starting list, or `nur --help` for the full set.
-
-### First-time setup on a new machine
-
-#### 1. Clone the private manifests repo
-
-ArgoCD reads manifests from [argo-manifests](https://github.com/duck1123/argo-manifests). Clone it inside this repo (it is gitignored here):
-
-```sh
-git clone git@github.com:duck1123/argo-manifests.git kubernetes/manifests
-```
-
-#### 2. Verify your age key can decrypt cluster secrets
-
-```sh
-sops --decrypt secrets/k8s.enc.yaml > /dev/null && echo "OK"
-```
-
-#### 3. Build and push manifests
-
-```sh
-nur k8s deploy
-```
-
-### Bootstrap a new cluster
-
-Run these steps when setting up ArgoCD on a fresh cluster for the first time.
-
-#### Install ArgoCD
-
-```sh
-nur install argocd
-```
-
-#### Configure the argo-manifests deploy key
-
-ArgoCD needs an SSH deploy key to pull from the private manifests repo. This credential must be applied directly (ArgoCD cannot sync it from the repo it does not yet have access to).
-
-**If you already have a deploy key stored in secrets:**
-
-```sh
-nur k8s bootstrap-argocd-repo
-```
-
-**If you need to create a new deploy key:**
-
-```sh
-# 1. Generate the key pair
-nur k8s generate-deploy-key
-
-# 2. Add the printed PUBLIC key to GitHub:
-#    argo-manifests → Settings → Deploy keys → Add deploy key (read-only)
-
-# 3. Store the printed PRIVATE key in secrets:
-nur secrets edit
-#    Add under key:
-#    argocd:
-#      sshDeployKey: |
-#        -----BEGIN OPENSSH PRIVATE KEY-----
-#        ...
-#        -----END OPENSSH PRIVATE KEY-----
-
-# 4. Apply the credential to the cluster
-nur k8s bootstrap-argocd-repo
-```
-
-#### Push manifests and apply the master application
-
-```sh
-nur k8s deploy
-
-# Apply the generated ArgoCD Application manifests so ArgoCD starts tracking them
-kubectl apply -f kubernetes/manifests/dev/apps/
-```
-
-Each `Application-*.yaml` is self-managed (automated sync + prune), so once applied ArgoCD will keep syncing all applications from the manifests repo on its own.
-
-#### Get the initial ArgoCD password
-
-```sh
-argocd admin initial-password -n argocd
-```
-
-#### Forward the ArgoCD UI (before ingress is ready)
-
-```sh
-kubectl port-forward svc/argocd-server -n argocd 8080:443
-```
-
-Then open https://localhost:8080/
-
-### Managing secrets
-
-All cluster secrets live in `secrets/k8s.enc.yaml` (encrypted with sops/age).
-
-Edit in-place (no plaintext file written to disk):
-
-```sh
-nur secrets edit
-# or directly: sops secrets/k8s.enc.yaml
-```
-
-Decrypt → edit → re-encrypt:
-
-```sh
-nur secrets decrypt       # → secrets/k8s.yaml  (DO NOT commit)
-# edit secrets/k8s.yaml
-nur secrets encrypt       # → secrets/k8s.enc.yaml
-rm secrets/k8s.yaml
-```
-
----
-
-## Validation
-
-```sh
-nur check              # nix flake check
-nur lint               # lint .nix files with statix
-nur build --all        # build all configurations
-```
-
-### Reboot
-
-```sh
-sudo reboot
-```
+| Page | Covers |
+|---|---|
+| [docs/setup.md](docs/setup.md) | Setting up a new machine, including the NixOS-WSL image |
+| [docs/nur_commands.md](docs/nur_commands.md) | Every `nur` task: build/switch, secrets, k8s deploy, cluster operations |
+| [docs/architecture.md](docs/architecture.md) | How the flake fits together: registries, hosts, features, environments |
+| [docs/secrets.md](docs/secrets.md) | sops/age setup, who can decrypt what, adding recipients |
+| [modules/kubernetes/docs/](modules/kubernetes/docs/) | The cluster: architecture, deployment workflow, [bootstrapping a new cluster](modules/kubernetes/docs/bootstrap.md), pinned volumes, troubleshooting |
+| [CLAUDE.md](CLAUDE.md) | Orientation and rules for AI agents working in this repo |

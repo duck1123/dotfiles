@@ -1,6 +1,6 @@
 # How the Cluster Pieces Fit Together
 
-A map of the k3s setup: what each piece does, and how a change in this repo becomes a running pod. The other pages in this folder go deep on single topics; this one links them together. The main `CLAUDE.md` covers the repo layout and the `nur` commands.
+A map of the k3s setup: what each piece does, and how a change in this repo becomes a running pod. The other pages in this folder go deep on single topics; this one links them together. The repo-wide layout is in [docs/architecture.md](../../../docs/architecture.md) and the `nur` commands in [docs/nur_commands.md](../../../docs/nur_commands.md).
 
 ```mermaid
 flowchart LR

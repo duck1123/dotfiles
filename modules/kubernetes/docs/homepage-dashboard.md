@@ -8,7 +8,7 @@ Homepage's `services.yaml`/`widgets.yaml`/etc. are rendered into a plain `Config
 
 The fix uses homepage's own built-in secret-substitution syntax instead of inventing anything new: homepage resolves `{{HOMEPAGE_VAR_<NAME>}}` placeholders in its config files from container environment variables at render time (see [gethomepage's secrets docs](https://gethomepage.dev/configs/secrets/)). So:
 
-- `services.homepage.widgetSecrets` (an `attrsOf str`) is a sops-encrypted Kubernetes Secret (`homepage-widget-secrets`, via the same `sopsSecrets`/`write-sops-secrets.sh` pipeline every other app's secrets use — see the main CLAUDE.md's Secrets section) whose keys are injected into the homepage container as `HOMEPAGE_VAR_<KEY>` env vars (`appTemplates/homepage.nix`).
+- `services.homepage.widgetSecrets` (an `attrsOf str`) is a sops-encrypted Kubernetes Secret (`homepage-widget-secrets`, via the same `sopsSecrets`/`write-sops-secrets.sh` pipeline every other app's secrets use — see [docs/secrets.md](../../../docs/secrets.md)) whose keys are injected into the homepage container as `HOMEPAGE_VAR_<KEY>` env vars (`appTemplates/homepage.nix`).
 - Anywhere in `settings`/`widgets`/`extraGroups`/`bookmarkGroups`/a service's `homepage.extraSettings`, write the literal string `"{{HOMEPAGE_VAR_<KEY>}}"` instead of a real value.
 - Wire the actual value in `clusters/dev/apps/homepage.nix`'s `widgetSecrets`, sourced from `secrets.enc.yaml`.
 

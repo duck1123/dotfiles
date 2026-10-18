@@ -1,6 +1,6 @@
 # Deployment Workflow Details
 
-The main CLAUDE.md covers the basic GitOps flow. This page covers the gotchas that are easy to get backwards under pressure (e.g. mid-incident).
+[docs/nur_commands.md](../../../docs/nur_commands.md#kubernetes-manifests) lists the deploy and cluster tasks. This page covers the gotchas that are easy to get backwards under pressure (e.g. mid-incident).
 
 ## What actually deploys
 
@@ -36,7 +36,7 @@ This is the same sequence to scale back up afterward. It feels slower than reach
 - `nur argocd refresh <name>` only re-diffs against git. It does **not** start a new operation when the last one ended `Failed` with its retry budget exhausted (e.g. after a pinned-volume replace kept failing) — the app just stays `OutOfSync`/`Failed`. Use `nur argocd sync <name>` for that.
 - `PostSync`/`Sync` hooks (e.g. `postgresql-init-databases`, which creates per-app DB users) only run on a real sync, never on a refresh.
 - A hook Job stuck in progress ("waiting for completion of hook", or `FailedPrecondition: another operation is already in progress`) blocks every later sync. Neither a refresh nor deleting the Job clears it; terminate the operation first (from the dev shell): `argocd app terminate-op <name> --core`. Check `status.operationState.phase`/`message` on the Application to confirm this is what's happening.
-- `--core` mode (used by `nur argocd sync` and the command above) reads ArgoCD's config from the kube context's *current namespace*. If that isn't `argocd` it fails with `configmap "argocd-cm" not found`; switch first with `kubectl config set-context --current --namespace=argocd`.
+- `--core` mode reads ArgoCD's config from the kube context's *current namespace*, and fails with `configmap "argocd-cm" not found` if that isn't `argocd`. `nur argocd sync` handles this itself (it runs `argocd` against a temporary kubeconfig set to the `argocd` namespace), but a hand-run `argocd ... --core` like the `terminate-op` above doesn't: switch first with `kubectl config set-context --current --namespace=argocd`.
 
 ## Secret value changes don't restart pods
 
