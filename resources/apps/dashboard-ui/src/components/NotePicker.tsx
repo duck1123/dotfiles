@@ -24,6 +24,8 @@ export interface NotePickerProps {
   defaultOpen?: boolean;
   /** Start with this text in the field. */
   defaultText?: string;
+  /** Focus the field when the picker appears. */
+  autoFocus?: boolean;
 }
 
 type Status = "idle" | "loading" | "done" | "error";
@@ -40,6 +42,7 @@ export function NotePicker({
   limit = 20,
   defaultOpen = false,
   defaultText = "",
+  autoFocus = false,
 }: NotePickerProps) {
   const id = useId();
   const inputId = `${id}-input`;
@@ -184,6 +187,7 @@ export function NotePicker({
         })}
         <input
           id={inputId}
+          autoFocus={autoFocus}
           className="dui-picker__input"
           type="text"
           role="combobox"

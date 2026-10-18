@@ -95,3 +95,22 @@ test("says so when the queue is empty", async () => {
   setup(createMockInboxSource({ items: [] }));
   expect(await screen.findByText("Nothing left to review.")).toBeInTheDocument();
 });
+
+test("focuses the topic search for each new item, ready for typing", async () => {
+  const { user } = setup();
+  const topicsField = () => screen.getByRole("combobox", { name: "Topics" });
+  await screen.findByDisplayValue(sampleItems[0].title);
+  expect(topicsField()).toHaveFocus();
+
+  await user.keyboard("{Control>}{Enter}{/Control}");
+  await screen.findByDisplayValue(sampleItems[1].title);
+  expect(topicsField()).toHaveFocus();
+
+  // Typing goes straight into the search.
+  await user.keyboard("sourd");
+  expect(await screen.findByRole("option", { name: /Sourdough/ })).toBeInTheDocument();
+
+  await user.click(queueItems()[2]);
+  await screen.findByDisplayValue(sampleItems[3].title);
+  expect(topicsField()).toHaveFocus();
+});

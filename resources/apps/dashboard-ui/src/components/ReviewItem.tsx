@@ -13,12 +13,21 @@ export interface ReviewItemProps {
   kinds?: string[];
   /** Write the changes back. Rejecting shows the error and keeps the edits. */
   onSave: (changes: ReviewChanges) => Promise<void>;
+  /** Focus the topic search when the item appears, ready for typing. */
+  autoFocusTopics?: boolean;
 }
 
 // Render with `key={item.noteId}` so switching items starts a fresh form.
 
 /** The editor for one queue item: title, kind and topics, then save or mark reviewed. */
-export function ReviewItem({ item, source, topicScope, kinds = defaultKinds, onSave }: ReviewItemProps) {
+export function ReviewItem({
+  item,
+  source,
+  topicScope,
+  kinds = defaultKinds,
+  onSave,
+  autoFocusTopics = false,
+}: ReviewItemProps) {
   const id = useId();
   const [title, setTitle] = useState(item.title);
   const [kind, setKind] = useState(item.kind ?? "");
@@ -116,7 +125,14 @@ export function ReviewItem({ item, source, topicScope, kinds = defaultKinds, onS
         </span>
       </div>
 
-      <NotePicker label="Topics" source={source} scope={topicScope} value={topicIds} onChange={setTopicIds} />
+      <NotePicker
+        label="Topics"
+        source={source}
+        scope={topicScope}
+        value={topicIds}
+        onChange={setTopicIds}
+        autoFocus={autoFocusTopics}
+      />
 
       {tags.length > 0 && (
         <div className="dui-review__row">

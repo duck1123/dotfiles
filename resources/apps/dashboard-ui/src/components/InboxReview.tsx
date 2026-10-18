@@ -98,6 +98,9 @@ export function InboxReview({ inbox, notes, topicScope, kinds }: InboxReviewProp
             topicScope={topicScope}
             kinds={kinds}
             onSave={save}
+            // Each item mounts a fresh editor (key), so after "Mark reviewed"
+            // or a click in the queue the topic search is focused, ready for typing.
+            autoFocusTopics
           />
         ) : (
           status === "ready" && <p className="dui-inbox__empty">Pick an item to review.</p>
