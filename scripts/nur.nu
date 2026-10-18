@@ -597,6 +597,51 @@ export def "nur claude drift" [--host: string@home-hosts = ""]: nothing -> table
   }
 }
 
+# Remove throwaway Claude Code permission rules from ~/.claude/settings.json, local or
+# on --host: Bash rules without a wildcard (they approve one exact command line), and
+# rules naming a /nix/store hash, /tmp or a scratchpad path. Lists them unless --apply;
+# --apply first copies the file to settings.json.bak-<timestamp>. Shared rules from
+# features/claude.nix are never removed (activation would add them back anyway).
+export def "nur claude prune" [--host: string@home-hosts = "", --apply]: nothing -> any {
+  let rel = ".claude/settings.json"
+  let read = {|path|
+    if ($host | is-empty) {
+      open --raw ($env.HOME | path join $path)
+    } else {
+      ^ssh (ssh-target $host) cat $path
+    } | from json
+  }
+
+  let settings = (do $read $rel)
+  let managed = (do $read ".config/dotfiles/claude-settings.json" | get permissions.allow)
+  let junk = {|rule|
+    ($rule not-in $managed) and (
+      ($rule starts-with "Bash(" and not ($rule | str contains "*"))
+      or ($rule =~ '/nix/store/[0-9a-z]{32}-' or $rule =~ '//?tmp/[^*]' or ($rule | str contains "scratchpad"))
+    )
+  }
+  let allow = ($settings | get -o permissions.allow | default [])
+  let removed = ($allow | where {|r| do $junk $r })
+
+  if not $apply {
+    return ($removed | each {|rule|
+      {rule: ($rule | str replace -ar '(?i)(\w*(password|token|secret|key)\w*=)(\S+)' '${1}[REDACTED]')}
+    })
+  }
+
+  let kept = ($allow | where {|r| not (do $junk $r) })
+  let json = ($settings | upsert permissions.allow $kept | to json --indent 2)
+  let backup = $"($rel).bak-(date now | format date '%Y%m%d-%H%M%S')"
+  if ($host | is-empty) {
+    cd $env.HOME
+    cp $rel $backup
+    $json | save --force $rel
+  } else {
+    $json | ^ssh (ssh-target $host) $"cp ($rel) ($backup) && cat > ($rel)"
+  }
+  print $"Removed ($removed | length) of ($allow | length) rules; backup at ~/($backup)"
+}
+
 # Show what would change without applying (local if no --host, otherwise remote dry-run)
 export def "nur dry-run-os" [--host: string@nixos-hosts = ""] {
   if ($host | is-empty) {

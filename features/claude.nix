@@ -57,6 +57,9 @@ let
       "git blame"
       "git ls-files"
       "git rev-parse"
+      "git fetch"
+      "git stash"
+      "git mv"
       "git add"
       "git commit"
       "gh pr view"
@@ -74,8 +77,12 @@ let
       "nix log"
       "nix search"
       "nix derivation show"
+      "nix fmt"
       "nixfmt"
       "statix"
+      "tar tzf"
+      "jar tf"
+      "openssl x509"
       # repo tasks that don't deploy or decrypt
       "nur check"
       "nur lint"
@@ -99,6 +106,8 @@ let
       "kubectl api-resources"
       "kubectl version"
       "kubectl auth can-i"
+      "kubectl wait"
+      "kubectl kustomize"
       "argocd app list"
       "argocd app get"
       "argocd app diff"
@@ -144,6 +153,7 @@ let
     ++ [
       "WebSearch"
       "Read(//nix/store/**)"
+      "Read(//tmp/**)"
     ]
     ++ map (domain: "WebFetch(domain:${domain})") [
       "github.com"
