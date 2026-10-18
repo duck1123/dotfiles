@@ -24,7 +24,7 @@
 
     inherit (secrets.windmill) superadminSecret superadminEmail superadminPassword;
 
-    # Valueless definitions live in resources/apps/windmill/wmill/f/fleetops/.
+    # Valueless definitions live next to each path under resources/apps/windmill/wmill/f/.
     secretVariables = [
       {
         path = "f/fleetops/youtube_api_key";
@@ -33,6 +33,10 @@
       {
         path = "f/fleetops/trilium_etapi_token";
         value = secrets.trilium.key;
+      }
+      {
+        path = "f/phototags/immich_api_key";
+        value = secrets.immich.phototagsApiKey;
       }
     ];
 

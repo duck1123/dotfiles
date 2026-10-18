@@ -1,0 +1,4 @@
+value: "http://immich-server.immich:2283"
+is_secret: false
+description: >-
+  In-cluster Immich URL for API calls (append /api/...).
