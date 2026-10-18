@@ -33,9 +33,15 @@ _: {
         # needs, and resources/apps/windmill/wmill (this repo's declarative
         # resources/scripts/flows/variables tree) at share/windmill-wmill --
         # same self-referential-flake bundling as appTemplates/duck1123.nix's
-        # site+python3 and appTemplates/nostrarchives.nix's compiled binary. Since
-        # nix-csi fetches this flake fresh from GitHub, the synced content
-        # always reflects the last-*pushed* commit, not local uncommitted edits.
+        # site+python3 and appTemplates/nostrarchives.nix's compiled binary. The
+        # bundle is built locally when `nur switch k8s` evaluates the manifests
+        # and pinned by store path, so it carries the git-tracked working tree
+        # (`git add` is enough; no push to the remote needed).
+        #
+        # Only f/ and wmill.yaml go in. u/ holds drafts pushed by hand
+        # (e.g. u/duck/inbox_review, a raw app that needs node_modules to
+        # bundle); `wmill sync push` re-pushed it despite `includes: f/**`,
+        # replacing its working bundle with a broken one on every sync.
         windmill-sync-bundle = pkgs.symlinkJoin {
           name = "windmill-sync-bundle";
           paths = [
@@ -45,8 +51,8 @@ _: {
             pkgs.jq
             pkgs.coreutils
             (pkgs.runCommand "windmill-wmill-config" { } ''
-              mkdir -p $out/share
-              cp -r ${../../../resources/apps/windmill/wmill} $out/share/windmill-wmill
+              mkdir -p $out/share/windmill-wmill
+              cp -r ${../../../resources/apps/windmill/wmill}/{f,wmill.yaml} $out/share/windmill-wmill/
             '')
           ];
         };
