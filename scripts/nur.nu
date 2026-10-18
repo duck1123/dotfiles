@@ -284,11 +284,6 @@ export def "nur install cert-manager" []: nothing -> nothing {
   }
 }
 
-# List GPG secret keys
-export def "nur secrets list-keys" []: nothing -> string {
-  gpg --list-secret-keys --keyid-format=long
-}
-
 # Read windows key from firmware
 export def "nur secrets windows-key" []: nothing -> string {
   sudo grep -Eao '(-?[A-Z0-9]{5}){5}' /sys/firmware/acpi/tables/MSDM
@@ -735,12 +730,6 @@ def do-switch-remote-home [host: string] {
   } else {
     print --stderr "ERROR: Failed to build activation package or invalid path"
   }
-}
-
-# Install ArgoCD into the current cluster
-export def "nur install argocd" [] {
-  ^kubectl create namespace argocd
-  ^kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 }
 
 # Show listening ports

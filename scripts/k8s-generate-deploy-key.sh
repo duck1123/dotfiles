@@ -5,14 +5,14 @@
 #   1. Add the PUBLIC key to GitHub → argo-manifests repo → Settings → Deploy keys
 #      (read-only access is sufficient)
 #   2. Add the PRIVATE key to secrets/k8s.enc.yaml under argocd.sshDeployKey
-#      Run: bb k8s-edit-secrets
+#      Run: nur secrets edit
 #      Add:
 #        argocd:
 #          sshDeployKey: |
 #            -----BEGIN OPENSSH PRIVATE KEY-----
 #            ...
 #            -----END OPENSSH PRIVATE KEY-----
-#   3. Run: bb k8s-bootstrap-argocd-repo
+#   3. Run: nur k8s bootstrap-argocd-repo
 #      (after ArgoCD is installed in the cluster)
 set -euo pipefail
 

@@ -93,7 +93,6 @@
         # sqsh
         soap-cli
         ssh-to-age
-        ssh-to-pgp
         # tilt
         # vcluster
         # virtualbox

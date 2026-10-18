@@ -43,7 +43,7 @@ fi
 
 if [[ ! -d "$MANIFESTS_DIR" ]]; then
   echo "k8s-write-sops-secrets: $MANIFESTS_DIR not found, skipping" >&2
-  echo "Run bb k8s-switch-charts first to generate manifests." >&2
+  echo "Run nur k8s switch-charts first to generate manifests." >&2
   exit 0
 fi
 

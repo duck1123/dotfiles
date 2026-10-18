@@ -2,7 +2,7 @@
 # Commit and push generated manifests to the private manifests repo.
 #
 # Expects kubernetes/manifests/ to be a checkout of the private manifests repo.
-# Run bb k8s-switch-charts first to generate/update the manifests.
+# Run nur k8s switch-charts first to generate/update the manifests.
 #
 # Usage:
 #   ./scripts/k8s-push-manifests.sh

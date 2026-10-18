@@ -7,9 +7,9 @@
 #
 # Prerequisites:
 #   - kubectl configured and pointing at your cluster
-#   - argocd namespace exists (run bb install-argocd first if needed)
+#   - argocd namespace exists (run nur argocd install first if needed)
 #   - secrets/k8s.enc.yaml contains argocd.sshDeployKey (the private half of your deploy key)
-#     See: bb k8s-generate-deploy-key to create the key pair
+#     See: nur k8s generate-deploy-key to create the key pair
 #
 # Usage:
 #   ./scripts/k8s-bootstrap-argocd-repo.sh
@@ -33,10 +33,10 @@ if [[ -z "$SSH_PRIVATE_KEY" || "$SSH_PRIVATE_KEY" == "null" ]]; then
   echo "ERROR: argocd.sshDeployKey not found in secrets/k8s.enc.yaml" >&2
   echo "" >&2
   echo "Generate a deploy key first:" >&2
-  echo "  bb k8s-generate-deploy-key" >&2
+  echo "  nur k8s generate-deploy-key" >&2
   echo "" >&2
   echo "Then add the private key to secrets/k8s.enc.yaml:" >&2
-  echo "  bb k8s-edit-secrets" >&2
+  echo "  nur secrets edit" >&2
   echo "" >&2
   echo "Add under key: argocd:" >&2
   echo "    sshDeployKey: |" >&2
