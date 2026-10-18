@@ -35,13 +35,24 @@ in
               {
                 inherit name;
                 image = "ghcr.io/lillecarl/nix-csi/scratch:1.0.1";
+                # Plain `python3 -m http.server` answers If-Modified-Since with
+                # 304 by comparing against the store's 1970 mtimes, so browsers
+                # kept serving stale builds forever. Ignore it and make them
+                # revalidate every time.
                 command = [
                   "python3"
-                  "-m"
-                  "http.server"
-                  (toString port)
-                  "--directory"
-                  "/nix/var/result/share/storybook"
+                  "-c"
+                  ''
+                    import functools, http.server as h
+                    class Handler(h.SimpleHTTPRequestHandler):
+                        def send_head(self):
+                            del self.headers["If-Modified-Since"]
+                            return super().send_head()
+                        def end_headers(self):
+                            self.send_header("Cache-Control", "no-cache")
+                            super().end_headers()
+                    h.ThreadingHTTPServer(("", ${toString port}), functools.partial(Handler, directory="/nix/var/result/share/storybook")).serve_forever()
+                  ''
                 ];
                 ports = [
                   {
