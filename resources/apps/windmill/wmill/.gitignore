@@ -1,0 +1,3 @@
+# wmill CLI hash cache for `wmill generate-metadata`, recreated whenever it is
+# missing. Not used here: .script.yaml schemas and locks are written by hand.
+wmill-lock.yaml
