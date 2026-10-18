@@ -1,4 +1,10 @@
+export { InboxReview, type InboxReviewProps } from "./components/InboxReview";
 export { NoteChip, type NoteChipProps } from "./components/NoteChip";
 export { NotePicker, type NotePickerProps } from "./components/NotePicker";
+export { ReviewItem, type ReviewItemProps } from "./components/ReviewItem";
+export { ReviewQueue, type ReviewQueueProps } from "./components/ReviewQueue";
+export { createMockInboxSource, type MockInboxOptions } from "./inbox/mockInboxSource";
+export { sampleItems } from "./inbox/sampleItems";
+export { defaultKinds, type InboxItem, type InboxSource, type ReviewChanges } from "./inbox/types";
 export { createMockSource, sampleNotes, type MockSourceOptions } from "./notes/mockSource";
 export type { NoteScope, NoteSource, NoteSummary, SearchOptions } from "./notes/types";

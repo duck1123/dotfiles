@@ -1463,3 +1463,41 @@ export def "nur ui hash" []: nothing -> nothing {
   | save --force $UI_NIX
   print $"npmDepsHash = ($hash)"
 }
+
+# ---------------------------------------------------------------------------
+# Inbox review: a Windmill full-code app built from dashboard-ui. It's a draft
+# under u/duck/, which the windmill-sync hook leaves alone (it owns only f/),
+# so it's deployed with `nur inbox push`, not `nur switch k8s`.
+# ---------------------------------------------------------------------------
+
+const INBOX_APP_DIR = "resources/apps/windmill/wmill/u/duck/inbox_review.raw_app"
+const INBOX_APP_PATH = "u/duck/inbox_review"
+
+def wmill-bin []: nothing -> string {
+  let out = (^nix build .#wmill-cli --no-link --print-out-paths | str trim)
+  $"($out)/bin/wmill"
+}
+
+# Reinstall the app's dependencies, picking up dashboard-ui changes (it's
+# installed as a copy, see the app's .npmrc)
+def inbox-deps []: nothing -> nothing {
+  rm -rf $"($INBOX_APP_DIR)/node_modules/dashboard-ui"
+  ^npm install --prefix $INBOX_APP_DIR --no-audit --no-fund
+}
+
+# Run the inbox review app locally with live reload; backend calls run on the
+# real Windmill workers
+export def "nur inbox dev" []: nothing -> nothing {
+  let wmill = (wmill-bin)
+  inbox-deps
+  cd $INBOX_APP_DIR
+  ^$wmill app dev . --port 4567
+}
+
+# Bundle and deploy the inbox review app to Windmill (u/duck/inbox_review)
+export def "nur inbox push" []: nothing -> nothing {
+  let wmill = (wmill-bin)
+  inbox-deps
+  cd $INBOX_APP_DIR
+  ^$wmill app push . $INBOX_APP_PATH
+}

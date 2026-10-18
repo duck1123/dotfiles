@@ -1,0 +1,9 @@
+body {
+  margin: 0;
+  background: var(--dui-bg);
+  color: var(--dui-text);
+}
+
+.app {
+  padding: 16px;
+}

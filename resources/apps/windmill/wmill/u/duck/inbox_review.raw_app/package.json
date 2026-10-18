@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "dependencies": {
+    "dashboard-ui": "file:../../../../../dashboard-ui",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "windmill-client": "^1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0"
+  }
+}

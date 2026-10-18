@@ -1,0 +1,39 @@
+.dui-inbox {
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  font-family: var(--dui-font);
+  font-size: var(--dui-font-size);
+  color: var(--dui-text);
+}
+
+.dui-inbox__queue {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.dui-inbox__detail {
+  min-width: 0;
+  max-width: 760px;
+}
+
+.dui-inbox__progress,
+.dui-inbox__empty {
+  margin: 8px 0 0;
+  color: var(--dui-text-muted);
+}
+
+@media (max-width: 720px) {
+  .dui-inbox {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dui-inbox__queue {
+    position: static;
+    max-height: 40vh;
+  }
+}

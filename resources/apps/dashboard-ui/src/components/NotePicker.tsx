@@ -97,6 +97,11 @@ export function NotePicker({
     const timer = setTimeout(() => {
       source.search(needle, { query: scopeQuery, noun }, { limit, signal: controller.signal }).then(
         (found) => {
+          // A source that ignores the signal (a Windmill job can't be
+          // cancelled) still resolves; drop results for text that's changed.
+          if (controller.signal.aborted) {
+            return;
+          }
           setResults(found);
           setActive(0);
           setStatus("done");
@@ -143,7 +148,8 @@ export function NotePicker({
         setActive((i) => Math.max(i - 1, 0));
         break;
       case "Enter":
-        if (open && visible[active]) {
+        // Ctrl/Cmd+Enter belongs to the surrounding form.
+        if (!event.ctrlKey && !event.metaKey && open && visible[active]) {
           event.preventDefault();
           pick(visible[active]);
         }

@@ -94,6 +94,7 @@ The runtime package's `bin/` is on `PATH`, and its root is at `/nix/var/result`.
 - The tree reaches the hook inside `windmill-sync-bundle`, a store path built at switch time like any other. The job mounts it by store path (`appTemplates/windmill.nix`), so it should reflect the local git-tracked tree. A comment in `windmill-sync.nix` and a note elsewhere say the bundle comes from the last *pushed* commit. **Unverified which is right**: confirm on the next `f/` change by deploying without pushing the dotfiles commit, then fix whichever is wrong.
 - Secret values are seeded by the hook from sops, never through git (`skipSecrets: true`).
 - Full-code (raw) apps: the `wmill` CLI bundles them locally with esbuild and runs `npm install` first if `node_modules` is missing. The hook pod has no npm, so a raw app under `f/` needs its `node_modules` built by Nix into the sync bundle.
+- **Drafts in git:** `resources/apps/windmill/wmill/u/duck/` holds apps that are tracked here but outside the hook's `f/**`, deployed by hand with `wmill app push`. The inbox review app lives there (`u/duck/inbox_review.raw_app`, `nur inbox dev` / `nur inbox push`). It installs `resources/apps/dashboard-ui` as a copy (`install-links=true` in its `.npmrc`): a symlinked copy would resolve `react` from dashboard-ui's own `node_modules` and load React twice. Promoting it to `f/` means moving the folder and solving the `node_modules` point above.
 
 ## Which page for what
 

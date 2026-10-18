@@ -1,0 +1,133 @@
+.dui-review {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  font-family: var(--dui-font);
+  font-size: var(--dui-font-size);
+  color: var(--dui-text);
+}
+
+.dui-review__row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dui-review__row--inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.dui-review__label {
+  font-weight: 600;
+}
+
+.dui-review__input,
+.dui-review__select {
+  padding: 6px 8px;
+  border: 1px solid var(--dui-border);
+  border-radius: var(--dui-radius);
+  background: var(--dui-bg);
+  color: inherit;
+  font: inherit;
+}
+
+.dui-review__input {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.dui-review__input:focus,
+.dui-review__select:focus {
+  outline: none;
+  border-color: var(--dui-accent);
+  box-shadow: 0 0 0 2px var(--dui-highlight);
+}
+
+.dui-review__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-left: auto;
+}
+
+.dui-review__links a {
+  color: var(--dui-accent);
+}
+
+.dui-review__muted {
+  color: var(--dui-text-muted);
+}
+
+.dui-review__chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.dui-review__link-button {
+  padding: 2px 6px;
+  border: none;
+  background: transparent;
+  color: var(--dui-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dui-review__preview {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--dui-border-strong);
+  border-radius: 0 var(--dui-radius) var(--dui-radius) 0;
+  background: var(--dui-surface);
+  color: var(--dui-text-muted);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.dui-review__error {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--dui-radius);
+  background: var(--dui-danger-bg);
+  color: var(--dui-danger);
+}
+
+.dui-review__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.dui-review__button {
+  padding: 6px 14px;
+  border: 1px solid var(--dui-border-strong);
+  border-radius: var(--dui-radius);
+  background: var(--dui-bg);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dui-review__button--primary {
+  border-color: var(--dui-accent);
+  background: var(--dui-accent);
+  color: var(--dui-accent-text);
+  font-weight: 600;
+}
+
+.dui-review__button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.dui-review__hint {
+  font-size: 0.85em;
+  color: var(--dui-text-muted);
+}

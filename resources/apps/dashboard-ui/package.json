@@ -8,6 +8,12 @@
     ".": "./src/index.ts",
     "./theme.css": "./src/theme.css"
   },
+  "files": [
+    "src",
+    "!src/**/*.stories.tsx",
+    "!src/**/*.test.tsx",
+    "!src/test-setup.ts"
+  ],
   "scripts": {
     "storybook": "storybook dev --port 6006 --no-open",
     "build-storybook": "storybook build --output-dir storybook-static --disable-telemetry",

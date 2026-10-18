@@ -83,6 +83,31 @@ test("shows a search error and retries", async () => {
   await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(2));
 });
 
+test("ignores a slow search that finishes after newer text", async () => {
+  const user = userEvent.setup();
+  const base = createMockSource();
+  const pending: Array<() => void> = [];
+  // Resolves only when told to, and never looks at the abort signal.
+  const source: NoteSource = {
+    ...base,
+    search: (text, scope) =>
+      new Promise((resolve) => pending.push(() => base.search(text, scope).then(resolve))),
+  };
+  render(<Harness source={source} />);
+
+  const input = screen.getByRole("combobox");
+  await user.type(input, "r");
+  await waitFor(() => expect(pending).toHaveLength(1));
+  await user.type(input, "ust");
+  await waitFor(() => expect(pending.length).toBeGreaterThan(1));
+
+  pending[pending.length - 1]();
+  await waitFor(() => expect(screen.getAllByRole("option")).toHaveLength(2));
+  pending[0]();
+  await new Promise((r) => setTimeout(r, 20));
+  expect(screen.getAllByRole("option")).toHaveLength(2);
+});
+
 test("single mode replaces the picked note", async () => {
   const user = userEvent.setup();
   render(<Harness source={createMockSource()} initial={["mockTomato01"]} multi={false} />);

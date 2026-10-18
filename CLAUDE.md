@@ -50,6 +50,10 @@ nur ui dev                   # Storybook with live reload on localhost:6006 (unp
 nur ui test                  # component tests + typecheck
 nur ui build                 # Nix build of the static Storybook (what the cluster serves)
 nur ui hash                  # update npmDepsHash after package-lock.json changes
+
+# Inbox review app (Windmill full-code app at u/duck/inbox_review, built from dashboard-ui)
+nur inbox dev                # local dev server on localhost:4567; backend calls run on real Windmill
+nur inbox push               # bundle and deploy it (not part of `nur switch k8s`)
 ```
 
 ## Architecture

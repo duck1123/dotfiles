@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
+import { fn } from "storybook/test";
 import { createMockSource, sampleNotes } from "../notes/mockSource";
 import type { NoteScope } from "../notes/types";
 import { NotePicker, type NotePickerProps } from "./NotePicker";
@@ -7,12 +8,20 @@ import { NotePicker, type NotePickerProps } from "./NotePicker";
 const topics: NoteScope = { query: "note.ancestors.noteId = mockTopics", noun: "topic" };
 const source = createMockSource({ latencyMs: 250 });
 
-// Keeps the picked IDs in state, so the stories behave like a real form.
+// Keeps the picked IDs in state, so the stories behave like a real form, and
+// still reports each change to the Actions panel.
 function Stateful(props: NotePickerProps) {
   const [value, setValue] = useState(props.value);
   return (
     <div style={{ maxWidth: 480, minHeight: 360 }}>
-      <NotePicker {...props} value={value} onChange={setValue} />
+      <NotePicker
+        {...props}
+        value={value}
+        onChange={(ids) => {
+          setValue(ids);
+          props.onChange(ids);
+        }}
+      />
     </div>
   );
 }
@@ -25,8 +34,12 @@ const meta = {
     source,
     scope: topics,
     value: [],
-    onChange: () => {},
+    onChange: fn(),
     label: "Topics",
+  },
+  argTypes: {
+    source: { control: false },
+    scope: { control: false },
   },
 } satisfies Meta<typeof NotePicker>;
 
