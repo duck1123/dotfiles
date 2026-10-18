@@ -1573,10 +1573,33 @@ export def "nur inbox dev" [
   ^$wmill app dev . --port $port --no-open
 }
 
+# A copy of a raw app ready to push: backend files that import shared Windmill
+# modules ("/f/lib/...") get those modules bundled in. Windmill redeploys
+# anything importing a script whenever that script is redeployed (every
+# windmill sync), and a server-side redeploy of a raw app keeps no frontend
+# bundle, which breaks the app. Bundled, the pushed app imports nothing from
+# f/, while the source in git still shares the module.
+def raw-app-stage [app_dir: string]: nothing -> string {
+  let wmill_root = ("resources/apps/windmill/wmill" | path expand)
+  let stage = (^mktemp -d | str trim)
+  let src = ($app_dir | path expand)
+  ls -a $src | where name !~ '/node_modules$' | each {|f| cp -r $f.name $stage }
+  ^ln -s ($src | path join node_modules) ($stage | path join node_modules)
+  ls ($stage | path join backend) | where name =~ '\.ts$' | each {|f|
+    let code = (open --raw $f.name)
+    if ($code | str contains '"/f/') {
+      $code | str replace --all '"/f/' $'"($wmill_root)/f/' | save --force $f.name
+      ^nix shell nixpkgs#esbuild -c esbuild $f.name --bundle --format=esm --platform=node --target=esnext --external:windmill-client --external:bun --outfile=($f.name) --allow-overwrite --log-level=warning
+    }
+  }
+  $stage
+}
+
 # Bundle and deploy the inbox review app to Windmill (u/duck/inbox_review)
 export def "nur inbox push" []: nothing -> nothing {
   let wmill = (wmill-bin)
   inbox-deps
-  cd $INBOX_APP_DIR
-  ^$wmill app push . $INBOX_APP_PATH
+  let stage = (raw-app-stage $INBOX_APP_DIR)
+  do { cd $stage; ^$wmill app push . $INBOX_APP_PATH }
+  rm -rf $stage
 }
