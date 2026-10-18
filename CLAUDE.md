@@ -16,7 +16,8 @@ nur build                        # build current home + OS configs
 nur switch                       # switch both home-manager and NixOS
 nur switch home                  # apply home-manager config only
 nur switch os                    # apply NixOS config only
-nur switch k8s                   # build k8s manifests AND push them to argo-manifests (= deploy; no --host)
+nur switch k8s                   # build k8s manifests, review them in magit, confirm, then push to argo-manifests (= deploy; no --host)
+nur switch k8s --no-review       # same without review/confirmation (needed when there is no terminal, e.g. agents)
 nur switch os --boot             # set NixOS as boot default instead of activating (safe for slow activations)
 
 # Validation and formatting

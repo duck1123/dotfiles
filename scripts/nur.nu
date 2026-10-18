@@ -454,6 +454,7 @@ export def "nur secrets check" [
 # Use --boot to set the os target as boot default instead of activating immediately (safe for slow activations).
 export def "nur switch" [
   --boot
+  --no-review  # k8s: push manifests without reviewing them in magit first
   --host: string@home-hosts = ""
   ...only: string@only-targets
 ]: nothing -> nothing {
@@ -512,7 +513,7 @@ export def "nur switch" [
   }
 
   if $targets.k8s {
-    nur k8s deploy
+    if $no_review { nur k8s deploy --no-review } else { nur k8s deploy }
   }
 }
 
@@ -720,12 +721,54 @@ export def "nur k8s push" [] {
   ^sh scripts/k8s-push-manifests.sh
 }
 
-# Build manifests and push to private repo (sync + switch-charts + push).
+# Whether kubernetes/manifests has anything to push: uncommitted changes, or
+# commits not yet on its upstream (e.g. committed by hand during review).
+def k8s-manifests-pending []: nothing -> bool {
+  let dir = "kubernetes/manifests"
+  let dirty = (^git -C $dir status --porcelain | str trim | is-not-empty)
+  let ahead = (^git -C $dir rev-list --count "@{u}..HEAD" | str trim | into int) > 0
+  $dirty or $ahead
+}
+
+# Open magit on kubernetes/manifests, like the Mod+E binding, and block until
+# the frame is closed (a graphical frame, or a tty frame without a display).
+def k8s-review-manifests []: nothing -> nothing {
+  let dir = ("kubernetes/manifests" | path expand)
+  let expr = $"\(magit-status \"($dir)\"\)"
+  let frame = if ($env.WAYLAND_DISPLAY? | is-not-empty) or ($env.DISPLAY? | is-not-empty) { "-c" } else { "-t" }
+  print "Review the manifest changes in magit; close the frame (C-x 5 0) when done."
+  ^emacsclient $frame -a "" --eval $expr
+}
+
+# Build manifests and push to private repo (sync + switch-charts + review + push).
 # Syncing first keeps the local checkout from being stale relative to origin,
 # so `git push` in `nur k8s push` doesn't get rejected as non-fast-forward.
-export def "nur k8s deploy" [] {
+# Unless --no-review, the changes are opened in magit first and pushing needs
+# confirmation; aborting leaves them uncommitted in kubernetes/manifests
+# (push them later with `nur k8s push`).
+export def "nur k8s deploy" [
+  --no-review  # Commit and push without reviewing or confirming
+] {
   nur k8s manifests sync
   nur k8s switch-charts
+
+  if not $no_review {
+    if not (k8s-manifests-pending) {
+      print "No manifest changes to push."
+      return
+    }
+    if not (is-terminal --stdin) {
+      error make {msg: "reviewing manifests needs a terminal; pass --no-review to push without it"}
+    }
+    k8s-review-manifests
+    let push = "Commit and push"
+    let choice = ([$push "Abort (keep changes in kubernetes/manifests)"] | input list "Push these manifest changes?")
+    if $choice != $push {
+      print "Not pushed. Run 'nur k8s push' to push later."
+      return
+    }
+  }
+
   nur k8s push
 }
 

@@ -23,16 +23,19 @@ cd "$MANIFESTS_DIR"
 
 git add .
 
-if git diff --cached --quiet; then
+if ! git diff --cached --quiet; then
+  echo "Changes staged:"
+  git --no-pager diff --cached --stat
+
+  COMMIT_MSG="${COMMIT_MSG:-Update manifests $(date -u +%Y-%m-%dT%H:%M:%SZ)}"
+  git commit -m "$COMMIT_MSG"
+elif [[ "$(git rev-list --count '@{u}..HEAD')" -eq 0 ]]; then
+  # Nothing staged and nothing committed ahead of upstream (commits made by
+  # hand, e.g. in magit during `nur k8s deploy`'s review, still get pushed).
   echo "No manifest changes to push."
   exit 0
 fi
 
-echo "Changes staged:"
-git --no-pager diff --cached --stat
-
-COMMIT_MSG="${COMMIT_MSG:-Update manifests $(date -u +%Y-%m-%dT%H:%M:%SZ)}"
-git commit -m "$COMMIT_MSG"
 git push
 
 echo "Manifests pushed successfully."
