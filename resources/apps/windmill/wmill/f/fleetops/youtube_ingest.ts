@@ -12,16 +12,16 @@
 //
 // dryRun (default true) only reports what would change.
 import * as wmill from "windmill-client";
+import { connect, localStamp, type Attribute, type EtapiNote, type Trilium } from "/f/lib/trilium.ts";
 
 const VIDEO_TEMPLATE = "TR59IiYZa5V2";
 const CHANNEL_TEMPLATE = "MEwPXJNfzb5F";
 const CHANNEL_PARENT = "ded6b81aed13ee81b3008e65fc49b3a4"; // Youtuber
 const OLD_VIDEOS_PARENT = "9bf7c7fbb1e2170e792ddff6b221a9f2"; // Youtube Videos
-const TIME_ZONE = "America/New_York";
 const DESCRIPTION_HEADING = "<h3>YouTube description</h3>";
 
-type Attr = { attributeId: string; noteId: string; type: string; name: string; value: string };
-type Note = { noteId: string; title: string; attributes: Attr[]; parentBranchIds: string[] };
+type Note = Pick<EtapiNote, "noteId" | "title" | "attributes" | "parentBranchIds">;
+type Attr = Attribute;
 type Video = {
   id: string;
   title: string;
@@ -33,29 +33,12 @@ type Video = {
   thumbnail: string | null;
 };
 
-let base = "";
-let token = "";
+let trilium: Trilium;
+let etapi: Trilium["etapi"];
 let ytKey = "";
 let dryRun = true;
 
-async function etapi(method: string, path: string, body?: unknown, raw = false): Promise<any> {
-  const res = await fetch(`${base}/etapi${path}`, {
-    method,
-    headers: {
-      Authorization: token,
-      ...(body === undefined ? {} : { "Content-Type": raw ? "text/plain" : "application/json" }),
-    },
-    body: body === undefined ? undefined : raw ? (body as string) : JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`ETAPI ${method} ${path}: ${res.status} ${await res.text()}`);
-  const text = await res.text();
-  return text && res.headers.get("content-type")?.includes("json") ? JSON.parse(text) : text;
-}
-
-async function search(query: string, limit = 100000): Promise<Note[]> {
-  const qs = new URLSearchParams({ search: query, limit: String(limit) });
-  return (await etapi("GET", `/notes?${qs}`)).results;
-}
+const search = (query: string, limit = 100000): Promise<Note[]> => trilium.search(query, { limit: String(limit) });
 
 async function youtube(endpoint: string, ids: string[], part: string): Promise<any[]> {
   const items: any[] = [];
@@ -116,17 +99,6 @@ const escape = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").rep
 function descriptionHtml(text: string): string {
   const paras = text.split("\n").filter((l) => l.trim()).map((l) => `<p>${escape(l)}</p>`);
   return paras.length ? DESCRIPTION_HEADING + paras.join("") : "";
-}
-
-function localStamp(date: Date): { day: string; created: string } {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-CA", {
-      timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", hourCycle: "h23",
-    }).formatToParts(date).map((p) => [p.type, p.value]),
-  );
-  const day = `${parts.year}-${parts.month}-${parts.day}`;
-  return { day, created: `${day} ${parts.hour}:${parts.minute}` };
 }
 
 // Planned/applied changes for one note, reported back to the caller.
@@ -255,8 +227,8 @@ async function dropOldClone(c: Changes) {
 // Load the variables and reset per-run state. main() calls this; scripts that
 // import ingest() (f/fleetops/capture) call it first too.
 export async function setup(dry: boolean) {
-  base = await wmill.getVariable("f/fleetops/trilium_base_url");
-  token = await wmill.getVariable("f/fleetops/trilium_etapi_token");
+  trilium = await connect();
+  etapi = trilium.etapi;
   ytKey = await wmill.getVariable("f/fleetops/youtube_api_key");
   dryRun = dry;
   channels = null;

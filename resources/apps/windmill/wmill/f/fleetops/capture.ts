@@ -7,7 +7,7 @@
 //   (#kind=video, channel, metadata); any other link is #kind=link, titled from
 //   the page; plain text is #kind=journal, titled from its first line.
 // - Text sent along with a link is kept in the note's content.
-import * as wmill from "windmill-client";
+import { connect, localStamp, type Trilium } from "/f/lib/trilium.ts";
 // Imported rather than run as a child job: a parent waiting on a child job
 // deadlocks when the worker has no free slot for the child.
 import { ingest as ingestYoutube, setup as setupYoutube } from "./youtube_ingest.ts";
@@ -15,25 +15,9 @@ import { ingest as ingestYoutube, setup as setupYoutube } from "./youtube_ingest
 const PREFIXES: Record<string, string> = { task: "task", watch: "watchlist", shopping: "shopping" };
 // Sites whose page title is only the site's name; the URL is a better title.
 const GENERIC_TITLES = new Set(["reddit", "youtube", "x", "twitter", "facebook", "instagram"]);
-const TIME_ZONE = "America/New_York";
 const URL_RE = /https?:\/\/[^\s"<>]+/;
 
-let base = "";
-let token = "";
-
-async function etapi(method: string, path: string, body?: unknown, raw = false): Promise<any> {
-  const res = await fetch(`${base}/etapi${path}`, {
-    method,
-    headers: {
-      Authorization: token,
-      ...(body === undefined ? {} : { "Content-Type": raw ? "text/plain" : "application/json" }),
-    },
-    body: body === undefined ? undefined : raw ? (body as string) : JSON.stringify(body),
-  });
-  if (!res.ok) throw new Error(`ETAPI ${method} ${path}: ${res.status} ${await res.text()}`);
-  const text = await res.text();
-  return text && res.headers.get("content-type")?.includes("json") ? JSON.parse(text) : text;
-}
+let etapi: Trilium["etapi"];
 
 async function label(noteId: string, name: string, value: string) {
   await etapi("POST", "/attributes", { noteId, type: "label", name, value });
@@ -48,17 +32,6 @@ function decodeEntities(s: string): string {
   const named: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
   return s.replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (m, e: string) =>
     e[0] === "#" ? String.fromCodePoint(parseInt(e.slice(e[1] === "x" ? 2 : 1), e[1] === "x" ? 16 : 10)) : named[e.toLowerCase()] ?? m);
-}
-
-function localStamp(date: Date): { day: string; created: string } {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-CA", {
-      timeZone: TIME_ZONE, year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", hourCycle: "h23",
-    }).formatToParts(date).map((p) => [p.type, p.value]),
-  );
-  const day = `${parts.year}-${parts.month}-${parts.day}`;
-  return { day, created: `${day} ${parts.hour}:${parts.minute}` };
 }
 
 function isYoutubeVideo(url: string): boolean {
@@ -113,8 +86,7 @@ function firstLine(text: string, max = 100): string {
 }
 
 export async function main(text: string = "", url?: string, createdAt?: string, dry_run: boolean = false) {
-  base = await wmill.getVariable("f/fleetops/trilium_base_url");
-  token = await wmill.getVariable("f/fleetops/trilium_etapi_token");
+  ({ etapi } = await connect());
 
   let rest = text.trim();
   const prefix = rest.match(/^(task|watch|shopping):\s*/i);
