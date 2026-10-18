@@ -10,8 +10,8 @@
 //   review back (~topic relations, #kind, title; done clears #inbox).
 //   Without apply=true it only returns the planned changes.
 //
-// "Topics" means notes under the Topics root, minus #photoTags=exclude (the
-// note and its descendants) and everything below #photoTags=excludeChildren.
+// "Topics" means notes under the Topics root, minus #topicScope=exclude (the
+// note and its descendants) and everything below #topicScope=excludeChildren.
 // A clone is in scope if any of its placements is.
 import * as wmill from "windmill-client";
 
@@ -65,7 +65,7 @@ function search(query: string, params: Record<string, string> = {}): Promise<Eta
 }
 
 // Titles from "Topics" down to the note's parent, or null when the note isn't
-// a topic (outside the tree, or excluded by #photoTags).
+// a topic (outside the tree, or excluded by #topicScope).
 const paths = new Map<string, Promise<string[] | null>>();
 function topicPath(noteId: string, visiting: Set<string> = new Set()): Promise<string[] | null> {
   if (!paths.has(noteId)) {
@@ -74,12 +74,12 @@ function topicPath(noteId: string, visiting: Set<string> = new Set()): Promise<s
       (async () => {
         if (visiting.has(noteId)) return null;
         const note = await getNote(noteId);
-        if (label(note, "photoTags")?.value === "exclude") return null;
+        if (label(note, "topicScope")?.value === "exclude") return null;
         for (const parentId of note.parentNoteIds) {
           if (parentId === TOPICS_ROOT) return ["Topics"];
           if (parentId === "root" || parentId === "none") continue;
           const parent = await getNote(parentId);
-          const rule = label(parent, "photoTags")?.value;
+          const rule = label(parent, "topicScope")?.value;
           if (rule === "exclude" || rule === "excludeChildren") continue;
           const above = await topicPath(parentId, new Set([...visiting, noteId]));
           if (above) return [...above, parent.title];
