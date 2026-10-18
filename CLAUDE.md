@@ -24,6 +24,7 @@ nur switch os --boot             # set NixOS as boot default instead of activati
 nur check           # run nix flake check
 nur format          # format all .nix files with nixfmt
 nur lint            # lint all .nix files with statix
+nur claude drift [--host h]  # Claude Code allow rules a host has beyond the shared list in features/claude.nix
 
 # Remote deployment (builds locally, copies + activates remotely)
 nur switch --host edgenix    # deploy to edgenix
