@@ -4,7 +4,7 @@
     databaseTarget = "postgresql";
     database.enable = true;
 
-    enable = false;
+    enable = true;
     apiKey = secrets.lidarr.key;
     hostAffinity = "edgenix";
 

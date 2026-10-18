@@ -1,7 +1,7 @@
 { config, secrets, ... }:
 {
   services.soularr = {
-    enable = false;
+    enable = true;
     # hostAffinity = "edgenix";
 
     lidarr = {
