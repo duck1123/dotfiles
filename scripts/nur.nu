@@ -570,6 +570,33 @@ export def "nur vscode drift" [--host: string@home-hosts = ""]: nothing -> table
   } | compact
 }
 
+# Claude Code permission rules in ~/.claude/settings.json that features/claude.nix
+# doesn't manage, local or on --host: candidates to promote to the shared list (or to
+# the host's features.claude.allow), or one-off approvals to delete. `pattern` rules
+# end in a wildcard; the rest approve one exact command. Values of *PASSWORD=, *TOKEN=,
+# *SECRET= and *KEY= assignments are masked, since approved commands can contain them.
+export def "nur claude drift" [--host: string@home-hosts = ""]: nothing -> table {
+  let read = {|rel|
+    if ($host | is-empty) {
+      open --raw ($env.HOME | path join $rel)
+    } else {
+      ^ssh (ssh-target $host) cat $rel
+    } | from json
+  }
+
+  let current = (do $read ".claude/settings.json" | get -o permissions.allow | default [])
+  let managed = (do $read ".config/dotfiles/claude-settings.json" | get permissions.allow)
+
+  $current
+  | where $it not-in $managed
+  | each {|rule|
+    {
+      rule: ($rule | str replace -ar '(?i)(\w*(password|token|secret|key)\w*=)(\S+)' '${1}[REDACTED]')
+      pattern: ($rule =~ '\*\)$')
+    }
+  }
+}
+
 # Show what would change without applying (local if no --host, otherwise remote dry-run)
 export def "nur dry-run-os" [--host: string@nixos-hosts = ""] {
   if ($host | is-empty) {
