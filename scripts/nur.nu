@@ -1486,12 +1486,19 @@ def inbox-deps []: nothing -> nothing {
 }
 
 # Run the inbox review app locally with live reload; backend calls run on the
-# real Windmill workers
-export def "nur inbox dev" []: nothing -> nothing {
+# real Windmill workers. The browser is opened with xdg-open: wmill's own
+# opener only recognizes Chrome, Brave, Firefox and Edge, so it fails on Zen.
+export def "nur inbox dev" [
+  --no-open  # Don't open a browser
+]: nothing -> nothing {
   let wmill = (wmill-bin)
+  let port = 4567
   inbox-deps
+  if not $no_open {
+    job spawn { sleep 3sec; ^xdg-open $"http://localhost:($port)" } | ignore
+  }
   cd $INBOX_APP_DIR
-  ^$wmill app dev . --port 4567
+  ^$wmill app dev . --port $port --no-open
 }
 
 # Bundle and deploy the inbox review app to Windmill (u/duck/inbox_review)
