@@ -34,6 +34,10 @@ nur lint                      # statix
 - **Feature and environment files hold bodies only.** A `features/<name>.nix` `homeManager`/`nixos` body has no `config =` or `mkIf enable` wrapper; the registry adds the gate. Don't enable environment-owned features (`hyprland`, `gnome`, `i3`, `wayle`) by hand in host files.
 - When adding or changing a `nur` task, update [docs/nur_commands.md](docs/nur_commands.md) to match. `scripts/nur.nu` is local to this repo; it isn't deployed to hosts.
 
+## Tickets
+
+Follow-up work and open decisions for this repo are Trilium tickets. The convention is the `rules.trilium-tickets` entry in [features/claude.nix](features/claude.nix), deployed to `~/.claude/rules/` on every host with the claude feature; edit it there, not in `~/.claude`. This repo's project note is Agentic Notes → **Dotfiles** (`LKirRVxHLtwu`): link tickets to it with `~related`. Its saved search **Dotfiles Tickets** lists the open ones, so check it when starting work in an area.
+
 ## Hosts
 
 Hosts are `hosts/<hostname>.nix`; the [README](README.md#hosts) has the table and `nix eval --json .#hostInfo` has the details. Non-obvious ones:

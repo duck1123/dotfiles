@@ -222,6 +222,26 @@ in
           type = "http";
           headersHelper = "${headersHelper name}";
         }) remoteServers;
+
+        # Written to ~/.claude/rules/<name>.md and loaded in every session.
+        rules.trilium-tickets = ''
+          # Tickets (Trilium)
+
+          Duck tracks follow-up work, open decisions and next steps for every project as tickets in Trilium (`https://trilium.home.kronkltd.net`, via the Trilium MCP tools). Don't leave them only in chat or agent memory.
+
+          - **Where:** every ticket is a direct child of the top-level **Tickets** note (`WkaTsNgJJGQz`, a board). New children get the **Ticket** template (`K2T9FJKrOnUm`) automatically, which supplies `#ticket` and the field definitions.
+          - **Fields:** set each one on the ticket itself:
+            - `#status`: `To Do` / `In Progress` / `Waiting` / `Done`.
+            - `#assignee`: `duck` or `claude`. Whose move it is.
+            - `#reporter`: `duck` or `claude`. Who filed it.
+            - `#category`: `decision` (an open question for Duck), `task`, `bug` or `idea` (parked until needed).
+            - `~related`: points at the project or topic note(s). For an agentic project, that's its note under Agentic Notes (`YxR4EdcnsqcO`).
+          - **Body:** the goal, what's known so far, and a "Done when" line. Don't add a filed date; the note's created date is the record.
+          - **Searching:** always add `#!template` (the template itself carries `#ticket`). Test for open tickets with `not(#status = Done)`, never `#status != Done`. Example: `#ticket #!template ~related.noteId = <project> not(#status = Done)`.
+          - **Saved searches:** in Searches (`7lgPyt10Typ6`): *Open Tickets*, *My Tickets*, *Open Decisions*. A project can have its own saved search in its note.
+          - **Upkeep:** check the project's open tickets when starting work in an area. When work finishes a ticket or makes it stale, update its `#status` and text.
+          - **Don't** put `#archived` or a default `#status` on the Ticket template. Instances inherit both, which hides tickets or gives them two statuses.
+        '';
       };
 
       # No programs.claude-code.settings: that makes settings.json a read-only
