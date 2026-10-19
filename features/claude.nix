@@ -241,6 +241,14 @@ in
           - **Saved searches:** in Searches (`7lgPyt10Typ6`): *Open Tickets*, *My Tickets*, *Open Decisions*. A project can have its own saved search in its note.
           - **Upkeep:** check the project's open tickets when starting work in an area. When work finishes a ticket or makes it stale, update its `#status` and text.
           - **Don't** put `#archived` or a default `#status` on the Ticket template. Instances inherit both, which hides tickets or gives them two statuses.
+
+          ## Projects
+
+          Each agentic project is a direct child of Agentic Notes (`YxR4EdcnsqcO`) and gets the **Project** template (`obJZaZYpTeJ2`) automatically. The **Projects** board under Agentic Notes groups them by status.
+
+          - **Status is the `#projectStatus` label, not prose:** `Active`, `Blocked` (waiting on Duck or something else), `Parked` (nothing in progress), `Ongoing` (an area with no end), `Done` (goal met; leftover tickets may stay open). Update it whenever it stops being true, e.g. when the last task is done or a decision ticket starts blocking the work.
+          - **New project:** set `#projectStatus` and `#started` (date) on it, clone it into its start day's Calendar note (ETAPI `calendar/days/<date>`), and add a `<Project> Tickets` saved search child (the open-tickets query above).
+          - Next steps and open questions are tickets, not paragraphs in the project note; the note holds at most one dated line on where it stands.
         '';
       };
 
