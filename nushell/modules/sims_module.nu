@@ -457,3 +457,42 @@ export def "sims save delete-backup" [
   for b in $found { rm -r ($root | path join $b.id) }
   $found | update deleted true
 }
+
+# Mods (simsnix). The catalog and profiles are evaluated by the framework in
+# dotfiles' modules/sims4/_simsnix with `nix eval --impure`; the catalog is read
+# in place from dataDir, so nothing from it is copied to /nix/store.
+
+# Evaluate a profile into the manifest `sims switch` will install
+export def "sims manifest" [
+  profile?: string # profile to evaluate (default: "default")
+]: nothing -> record {
+  let cfg = sims-config
+  let data = $cfg.dataDir | path expand
+  if not ($data | path exists) {
+    error make {msg: $"($data) not found: clone the private repo there, or set the sims4 feature's dataDir"}
+  }
+  let sources_file = $data | path join sources.json
+  if ($sources_file | path exists) and (open $sources_file | is-not-empty) {
+    error make {msg: $"($sources_file) lists sources, which aren't supported yet"}
+  }
+  let args = {
+    framework: $cfg.framework
+    nixpkgsLib: $cfg.nixpkgsLib
+    sources: [$data]
+    profile: ($profile | default default)
+  }
+  let expr = '
+    let a = builtins.fromJSON (builtins.getEnv "SIMSNIX_ARGS"); in
+    import (/. + a.framework + "/eval.nix") {
+      lib = import (/. + a.nixpkgsLib);
+      sources = map (s: /. + s) a.sources;
+      inherit (a) profile;
+    }'
+  let r = with-env {SIMSNIX_ARGS: ($args | to json -r)} { ^nix eval --impure --json --expr $expr | complete }
+  if $r.exit_code != 0 {
+    # the framework's own errors read better without nix's trace
+    let own = $r.stderr | lines | skip until {|l| $l =~ 'error: simsnix: ' } | str trim | str replace -r '^error: ' ''
+    error make {msg: (if ($own | is-empty) { $r.stderr } else { $own | str join "\n" })}
+  }
+  $r.stdout | from json
+}

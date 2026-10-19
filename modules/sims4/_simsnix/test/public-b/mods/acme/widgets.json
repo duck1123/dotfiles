@@ -1,0 +1,18 @@
+{
+  "downloadPage": "https://example.com/b/widgets",
+  "versions": {
+    "2.0": {
+      "added": "2026-02-01",
+      "files": [
+        {
+          "name": "widgets-2.0.zip",
+          "sha256": "b200",
+          "members": [
+            { "path": "Widgets/widgets.ts4script", "sha256": "b201" },
+            { "path": "Widgets/widgets.package", "sha256": "b202" }
+          ]
+        }
+      ]
+    }
+  }
+}

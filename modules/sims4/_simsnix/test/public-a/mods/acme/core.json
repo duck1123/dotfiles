@@ -1,0 +1,7 @@
+{
+  "title": "Acme Core",
+  "tags": ["library"],
+  "versions": {
+    "3.1": { "files": [ { "name": "acme_core.ts4script", "sha256": "c310" } ] }
+  }
+}

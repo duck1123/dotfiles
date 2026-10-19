@@ -1,0 +1,23 @@
+{
+  "title": "Widgets",
+  "downloadPage": "https://example.com/a/widgets",
+  "tags": ["script"],
+  "stateFiles": ["*.cfg"],
+  "versions": {
+    "1.0": {
+      "added": "2026-01-01",
+      "files": [
+        {
+          "name": "widgets-1.0.zip",
+          "sha256": "a100",
+          "members": [
+            { "path": "Widgets/widgets.ts4script", "sha256": "a101" },
+            { "path": "Widgets/widgets.package", "sha256": "a102" },
+            { "path": "Widgets/readme.txt", "sha256": "a103" }
+          ]
+        }
+      ]
+    }
+  },
+  "stripComponents": 1
+}
