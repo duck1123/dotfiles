@@ -83,6 +83,26 @@ in
     python.enable = true;
     radio.enable = false;
     sddm.enable = false;
+
+    sims4 = {
+      enable = true;
+      defaultInstance = "frozen";
+
+      instances = {
+        # Frozen 1.121 copy with its own Wine prefix, launched from Lutris
+        frozen = {
+          documents = "~/Games/direct/the-sims-4-1.121.372/drive_c/users/steamuser/Documents/Electronic Arts/The Sims 4";
+          gameDir = "~/Games/direct/the-sims-4-1.121.372/drive_c/Program Files/EA Games/The Sims 4";
+        };
+
+        # Steam install, left to update
+        steam = {
+          documents = "~/.local/share/Steam/steamapps/compatdata/1222670/pfx/drive_c/users/steamuser/Documents/Electronic Arts/The Sims 4";
+          gameDir = "~/.local/share/Steam/steamapps/common/The Sims 4";
+        };
+      };
+    };
+
     sound.enable = true;
     ssh.enable = true;
     starship.enable = true;
