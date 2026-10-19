@@ -4,8 +4,8 @@ let
   # theme = "catppuccin-frappe";
   # theme = "catppuccin-latte";
   # theme = "evenok-dark";
-  # theme = "humanoid-dark";
-  theme = "oxocarbon-dark";
+  theme = "humanoid-dark";
+  # theme = "oxocarbon-dark";
   # theme = "still-alive";
   image = ../resources/wallpaper/nix-wallpaper-mosaic-blue.png;
 in
