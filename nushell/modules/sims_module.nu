@@ -40,6 +40,14 @@ def "nu-complete sims backups" []: nothing -> list<string> {
   sims save list | get id
 }
 
+# Slots of the instance named by -i/--instance on the command line (else the default)
+def "nu-complete sims slots" [context: string]: nothing -> list<string> {
+  let words = $context | split row ' '
+  let at = $words | enumerate | where item in [-i --instance] | get -o 0.index
+  let name = if $at == null { null } else { $words | get -o ($at + 1) }
+  sims save slots --instance $name | get slot
+}
+
 # Resolve an instance name (default from config) to its record
 def instance [name?: string]: nothing -> record {
   let cfg = sims-config
@@ -129,6 +137,14 @@ def saves-files [saves: path]: nothing -> table {
       let s = path-slot $rel
       if $s == null { {path: $rel, kind: global, slot: null} } else { {path: $rel, kind: modslot, slot: $s} }
     }
+  }
+}
+
+# Remove files (rows from saves-files) and the folders that leaves empty
+def remove-saves [saves: path, files: table] {
+  for f in $files { rm ($saves | path join $f.path) }
+  for d in (glob --no-file $"($saves)/**/*" | sort-by {|d| $d | str length } --reverse) {
+    if (ls -a $d | is-empty) { rm $d }
   }
 }
 
@@ -380,12 +396,64 @@ export def "sims save wipe" [
   assert-game-closed
   if ($files | is-empty) { return ($plan | update applied true) }
   let b = sims save backup --instance $i.name --all --label $label
-  for f in $remove { rm ($i.saves | path join $f.path) }
-  # Drop folders the removal emptied, deepest first
-  for d in (glob --no-file $"($i.saves)/**/*" | sort-by {|d| $d | str length } --reverse) {
-    if (ls -a $d | is-empty) { rm $d }
-  }
+  remove-saves $i.saves $remove
   let thumbs = $i.documents | path join localthumbcache.package
   if ($thumbs | path exists) { rm $thumbs }
   $plan | update backup $b.id | update applied true
+}
+
+# Back up a save slot, then delete it and its mod data. Dry run unless --apply.
+export def "sims save delete" [
+  slot: string@"nu-complete sims slots"                 # slot id from `sims save slots`
+  --instance (-i): string@"nu-complete sims instances" # instance (default from config)
+  --apply                                               # actually do it
+]: nothing -> record {
+  let i = instance $instance
+  let hex = slot-hex $slot
+  let id = $hex | into int --radix 16
+  let remove = saves-files $i.saves | where slot == $id
+  if ($remove | where kind == save | is-empty) {
+    error make {msg: $"no slot ($hex) in instance ($i.name)"}
+  }
+  let plan = {
+    instance: $i.name
+    slot: $hex
+    saveFiles: ($remove | where kind == save | length)
+    modFiles: ($remove | where kind == modslot | length)
+    backup: null
+    applied: false
+  }
+  if not $apply {
+    print 'dry run: add --apply to back up and delete'
+    return $plan
+  }
+  assert-game-closed
+  let b = sims save backup $hex --instance $i.name --label pre-delete
+  remove-saves $i.saves $remove
+  $plan | update backup $b.id | update applied true
+}
+
+# Delete backups by id. Dry run unless --apply.
+export def "sims save delete-backup" [
+  ...ids: string@"nu-complete sims backups" # backup ids from `sims save list`
+  --apply                                    # actually do it
+]: nothing -> table {
+  if ($ids | is-empty) { error make {msg: "give at least one backup id"} }
+  let root = backup-root
+  for id in $ids {
+    if ($id =~ '[/\\]' or $id in ['.' '..'] or not ($root | path join $id meta.json | path exists)) {
+      error make {msg: $"no backup ($id)"}
+    }
+  }
+  let found = $ids | each {|id|
+    let dir = $root | path join $id
+    # Includes Mods files hardlinked into other backups, so deleting may free less
+    {id: $id, size: (du $dir | get physical.0), deleted: false}
+  }
+  if not $apply {
+    print 'dry run: add --apply to delete'
+    return $found
+  }
+  for b in $found { rm -r ($root | path join $b.id) }
+  $found | update deleted true
 }
