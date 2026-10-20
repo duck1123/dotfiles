@@ -159,6 +159,9 @@ To scale or pause an app, change `replicas` in `clusters/dev/apps/<name>.nix` an
 | `nur postgres restore <file> [--database db] [--recreate]` | Restore a local `.sql`, `.sql.gz` or `.custom` file. The target database is inferred from a `<db>_<YYYYMMDD>_<HHMMSS>` filename unless `--database` is given; `--recreate` drops it first. A bare filename that doesn't exist locally restores that dump from the PVC via a Job. |
 | `nur mariadb list-backups` | List the dumps on the `mariadb-backups` PVC. |
 | `nur mariadb restore [--backup-file f]` | Restore a dump from the PVC via a Job (prompts with the list if no file is given). **Replaces all existing databases.** |
+| `nur sqlite list <ns>` | SQLite databases (found by file header) on the namespace's Longhorn PVCs, with sizes. NFS PVCs are skipped. `excluded` marks the ones `backup` skips by default. |
+| `nur sqlite backup <ns> [--pvc p] [--exclude re] [--output-dir dir]` | Consistent online copy of each database (`sqlite3 .backup`, then `integrity_check`), gzipped to `./backups/sqlite/<ns>/<timestamp>/<pvc>/<path>.gz`. Safe while the app runs: a throwaway `sqlite-helper-*` pod mounts the PVCs on the app's node. `--exclude` defaults to paths under a `backup/` or `backups/` dir; `""` keeps everything. |
+| `nur sqlite restore <dir-or-file>` | Restore a whole backup run directory or one `.gz` from it, inferring namespace, PVC and path from the layout. Refuses while any pod mounts the PVC: set the app's replicas to 0 and deploy first (not `kubectl scale`). Backs the current databases up to `<timestamp>-pre-restore/` first, keeps file owner and mode, and deletes stale `-wal`/`-shm`. |
 
 ### Other cluster helpers
 

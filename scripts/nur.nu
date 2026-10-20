@@ -1474,6 +1474,295 @@ echo 'Restore completed successfully!'"
   print $"Monitor: kubectl logs -n ($namespace) -f job/($job_name)"
 }
 
+# ─── SQLite (app databases on Longhorn PVCs) ────────────────────────────────
+
+const SQLITE_BACKUP_DIR = "./backups/sqlite"
+const SQLITE_IMAGE = "alpine:3.21"
+# Apps keep their own copies under backups/ (e.g. slskd's pre-migration ones)
+const SQLITE_EXCLUDE = '/backups?/'
+
+# Longhorn-backed PVCs in a namespace. NFS volumes are skipped: SQLite isn't
+# safe on them, and walking a media share for databases would take forever.
+def sqlite-claims [ns: string]: nothing -> list<string> {
+  let pvs = (
+    try {
+      ^kubectl get pv -o json | from json | get items
+    } catch { |err|
+      error make {msg: $"Failed to list PersistentVolumes: ($err.msg)"}
+    }
+  )
+  let longhorn = (
+    $pvs
+    | where { |pv| ($pv.spec.csi?.driver? | default "") == "driver.longhorn.io" }
+    | each { |pv| $pv.metadata.name }
+  )
+  let pvcs = (
+    try {
+      ^kubectl get pvc -n $ns -o json | from json | get items
+    } catch { |err|
+      error make {msg: $"Failed to list PVCs in ($ns): ($err.msg)"}
+    }
+  )
+  $pvcs
+  | where { |c| ($c.spec.volumeName? | default "") in $longhorn }
+  | each { |c| $c.metadata.name }
+}
+
+# Running or pending pods (other than our helpers) that mount any of `claims`
+def sqlite-users [ns: string, claims: list<string>]: nothing -> list<record> {
+  let pods = (
+    try {
+      ^kubectl get pods -n $ns -o json | from json | get items
+    } catch { |err|
+      error make {msg: $"Failed to list pods in ($ns): ($err.msg)"}
+    }
+  )
+  $pods
+  | where { |p| not ($p.metadata.name | str starts-with "sqlite-helper-") }
+  | where { |p| $p.status.phase in ["Running", "Pending"] }
+  | where { |p|
+    $p.spec.volumes? | default [] | any { |v| ($v.persistentVolumeClaim?.claimName? | default "") in $claims }
+  }
+  | each { |p| {name: $p.metadata.name, node: ($p.spec.nodeName? | default "")} }
+}
+
+# Start a pod with sqlite3 that mounts each claim at /pvc/<claim>
+def sqlite-helper-up [ns: string, claims: list<string>]: nothing -> string {
+  let name = $"sqlite-helper-(date now | format date '%s')"
+  # A Longhorn RWO volume attaches to one node at a time, so join the app on
+  # its node while it's running
+  let node = (sqlite-users $ns $claims | where node != "" | get node? | default [] | first 1)
+  let vols = ($claims | enumerate)
+  let pod_spec = {
+    apiVersion: "v1"
+    kind: "Pod"
+    metadata: {name: $name, namespace: $ns}
+    spec: ({
+      restartPolicy: "Never"
+      terminationGracePeriodSeconds: 1
+      containers: [{
+        name: "sqlite"
+        image: $SQLITE_IMAGE
+        command: ["sh", "-c", "apk add --no-cache -q sqlite && touch /tmp/ready && sleep 3600"]
+        readinessProbe: {exec: {command: ["test", "-f", "/tmp/ready"]}, periodSeconds: 2}
+        volumeMounts: ($vols | each { |v| {name: $"v($v.index)", mountPath: $"/pvc/($v.item)"} })
+      }]
+      volumes: ($vols | each { |v| {name: $"v($v.index)", persistentVolumeClaim: {claimName: $v.item}} })
+    } | merge (if ($node | is-empty) { {} } else { {nodeName: ($node | first)} }))
+  }
+  try {
+    $pod_spec | to yaml | ^kubectl apply -f - | ignore
+    ^kubectl -n $ns wait --for=condition=Ready $"pod/($name)" --timeout=180s | ignore
+  } catch { |err|
+    sqlite-helper-down $ns $name
+    error make {msg: $"Helper pod ($name) didn't become ready: ($err.msg)"}
+  }
+  $name
+}
+
+def sqlite-helper-down [ns: string, pod: string]: nothing -> nothing {
+  try {
+    ^kubectl -n $ns delete pod $pod --ignore-not-found=true --wait=false | ignore
+  } catch { |err|
+    print $"Warning: failed to delete helper pod ($ns)/($pod): ($err.msg)"
+  }
+}
+
+# SQLite files under /pvc in the helper pod, found by their header (so .db,
+# .sqlite, .sqlite3 and extensionless files all count; -wal/-shm don't)
+def sqlite-find [ns: string, pod: string]: nothing -> table {
+  let script = 'find /pvc -maxdepth 6 -type f -size +0 2>/dev/null | while IFS= read -r f; do
+  [ "$(head -c 15 "$f" 2>/dev/null)" = "SQLite format 3" ] && printf "%s\t%s\n" "$(stat -c %s "$f")" "$f"
+done; true'
+  let out = (
+    try {
+      ^kubectl exec -n $ns $pod -- sh -c $script
+    } catch { |err|
+      error make {msg: $"Failed to search for databases: ($err.msg)"}
+    }
+  )
+  $out
+  | lines
+  | where { |it| $it | is-not-empty }
+  | parse "{size}\t{path}"
+  | each { |r|
+    let rel = ($r.path | str replace '/pvc/' '')
+    let claim = ($rel | split row '/' | first)
+    {claim: $claim, path: ($rel | str replace $"($claim)/" ''), size: ($r.size | into filesize)}
+  }
+}
+
+# Back up every database on `claims` to <out_dir>/<claim>/<path>.gz
+def sqlite-backup-run [
+  ns: string
+  claims: list<string>
+  exclude: string
+  out_dir: string
+]: nothing -> table {
+  let pod = (sqlite-helper-up $ns $claims)
+  # .backup uses SQLite's online backup API, so the copy is consistent even
+  # while the app is writing. Any -wal/-shm the CLI creates is handed back to
+  # the database's owner so a non-root app can still open it.
+  let script = 'set -e
+f="$1"
+sqlite3 -cmd ".timeout 30000" "$f" ".backup /tmp/out.db"
+o=$(stat -c %u:%g "$f")
+for x in "$f-wal" "$f-shm"; do [ -e "$x" ] && chown "$o" "$x"; done
+r=$(sqlite3 /tmp/out.db "PRAGMA integrity_check;")
+[ "$r" = ok ] || { echo "integrity_check: $r" >&2; exit 1; }
+gzip -c /tmp/out.db
+rm -f /tmp/out.db'
+  let result = (
+    try {
+      let dbs = (
+        sqlite-find $ns $pod
+        | where { |d| $exclude == "" or not ($"/($d.path)" =~ $exclude) }
+      )
+      if ($dbs | is-empty) {
+        print $"No SQLite databases found on: ($claims | str join ', ')"
+      }
+      $dbs | each { |d|
+        let dest = ([$out_dir $d.claim $"($d.path).gz"] | path join)
+        mkdir ($dest | path dirname)
+        print $"Backing up: ($d.claim)/($d.path) \(($d.size)\)"
+        ^kubectl exec -n $ns $pod -- sh -c $script sh $"/pvc/($d.claim)/($d.path)" | save --raw --force $dest
+        # A failed exec leaves an empty or truncated file, which gzip -t rejects
+        try {
+          ^gzip -t $dest
+        } catch {
+          rm -f $dest
+          error make {msg: $"Backup of ($d.claim)/($d.path) failed \(see the error above\)"}
+        }
+        print $"  ✓ ($dest)"
+        {claim: $d.claim, path: $d.path, size: $d.size, file: $dest, compressed: (ls $dest | get size | first)}
+      }
+    } catch { |err|
+      sqlite-helper-down $ns $pod
+      error make {msg: $"SQLite backup failed: ($err.msg)"}
+    }
+  )
+  sqlite-helper-down $ns $pod
+  $result
+}
+
+# List the SQLite databases on an app's Longhorn PVCs
+export def "nur sqlite list" [
+  namespace: string   # The app's namespace (usually its name)
+]: nothing -> table {
+  let claims = (sqlite-claims $namespace)
+  if ($claims | is-empty) {
+    error make {msg: $"No Longhorn PVCs in namespace ($namespace)"}
+  }
+  let pod = (sqlite-helper-up $namespace $claims)
+  let dbs = (
+    try {
+      sqlite-find $namespace $pod
+    } catch { |err|
+      sqlite-helper-down $namespace $pod
+      error make {msg: $err.msg}
+    }
+  )
+  sqlite-helper-down $namespace $pod
+  $dbs | insert excluded { |d| $"/($d.path)" =~ $SQLITE_EXCLUDE }
+}
+
+# Back up an app's SQLite databases (consistent online copies, gzipped)
+export def "nur sqlite backup" [
+  namespace: string                   # The app's namespace (usually its name)
+  --pvc: string = ""                  # Only this PVC (default: all Longhorn PVCs in the namespace)
+  --exclude: string = $SQLITE_EXCLUDE # Skip database paths matching this regex ("" keeps all)
+  --output-dir: string = $SQLITE_BACKUP_DIR
+]: nothing -> table {
+  let claims = if ($pvc | is-empty) { sqlite-claims $namespace } else { [$pvc] }
+  if ($claims | is-empty) {
+    error make {msg: $"No Longhorn PVCs in namespace ($namespace)"}
+  }
+  let timestamp = (date now | format date '%Y%m%d_%H%M%S')
+  let out_dir = ([$output_dir $namespace $timestamp] | path join)
+  print $"=== SQLite Backup: ($namespace) ==="
+  print $"PVCs: ($claims | str join ', ') | Output: ($out_dir)"
+  print ""
+  sqlite-backup-run $namespace $claims $exclude $out_dir
+}
+
+# Restore SQLite databases from a `nur sqlite backup` run. The app must be
+# scaled to 0 first; its current databases are backed up before overwriting.
+export def "nur sqlite restore" [
+  path: string   # A run directory (backups/sqlite/<ns>/<timestamp>) or one .gz file inside it
+]: nothing -> table {
+  if not ($path | path exists) {
+    error make {msg: $"Not found: ($path)"}
+  }
+  let files = if ($path | path type) == "dir" {
+    glob ($path | path expand | path join "**" "*.gz")
+  } else {
+    [($path | path expand)]
+  }
+  if ($files | is-empty) {
+    error make {msg: $"No .gz backups under ($path)"}
+  }
+  let targets = (
+    $files | each { |f|
+      let m = ($f | parse --regex '/(?P<ns>[^/]+)/(?P<ts>\d{8}_\d{6}[^/]*)/(?P<claim>[^/]+)/(?P<rel>.+)\.gz$')
+      if ($m | is-empty) {
+        error make {msg: $"($f) isn't laid out as <ns>/<YYYYMMDD_HHMMSS>[-pre-restore]/<pvc>/<path>.gz"}
+      }
+      $m | first | insert file $f
+    }
+  )
+  let namespaces = ($targets | get ns | uniq)
+  if ($namespaces | length) != 1 {
+    error make {msg: $"Backups span several namespaces: ($namespaces | str join ', ')"}
+  }
+  let ns = ($namespaces | first)
+  let claims = ($targets | get claim | uniq)
+
+  let users = (sqlite-users $ns $claims)
+  if ($users | is-not-empty) {
+    error make {msg: $"($users | get name | str join ', ') still mount ($claims | str join ', '). Scale the app to 0 first: set its replicas to 0 in clusters/dev/apps/ and deploy \(not `kubectl scale`, which ArgoCD reverts\), then re-run."}
+  }
+
+  print $"=== SQLite Restore: ($ns) ==="
+  print "Backing up the current databases first..."
+  let safety_dir = ([$SQLITE_BACKUP_DIR $ns $"(date now | format date '%Y%m%d_%H%M%S')-pre-restore"] | path join)
+  sqlite-backup-run $ns $claims "" $safety_dir | ignore
+  print ""
+
+  let pod = (sqlite-helper-up $ns $claims)
+  # Check the copy before touching the live file, keep its owner and mode,
+  # and drop any stale -wal/-shm, which would otherwise be replayed onto it
+  let script = 'set -e
+t="$1"
+gunzip -c > /tmp/in.db
+r=$(sqlite3 /tmp/in.db "PRAGMA integrity_check;")
+[ "$r" = ok ] || { echo "integrity_check: $r" >&2; exit 1; }
+if [ -e "$t" ]; then o=$(stat -c %u:%g "$t"); m=$(stat -c %a "$t")
+else mkdir -p "$(dirname "$t")"; o=$(stat -c %u:%g "$(dirname "$t")"); m=644; fi
+cp /tmp/in.db "$t.restore-tmp"
+chown "$o" "$t.restore-tmp"; chmod "$m" "$t.restore-tmp"
+rm -f "$t-wal" "$t-shm" "$t-journal"
+mv "$t.restore-tmp" "$t"
+rm -f /tmp/in.db'
+  let result = (
+    try {
+      $targets | each { |t|
+        print $"Restoring: ($t.claim)/($t.rel)"
+        open --raw $t.file | ^kubectl exec -i -n $ns $pod -- sh -c $script sh $"/pvc/($t.claim)/($t.rel)"
+        print "  ✓"
+        {claim: $t.claim, path: $t.rel, from: $t.file}
+      }
+    } catch { |err|
+      sqlite-helper-down $ns $pod
+      error make {msg: $"SQLite restore failed: ($err.msg). Pre-restore copies are in ($safety_dir)"}
+    }
+  )
+  sqlite-helper-down $ns $pod
+  print ""
+  print $"=== Restore Complete. Pre-restore copies: ($safety_dir) ==="
+  print "Scale the app back up (replicas in clusters/dev/apps/, then deploy)."
+  $result
+}
+
 # Register git hooks for this repo (no .githooks/ committed yet -- fleetops'
 # own pre-commit hook auto-ran a full k8s switch+push on every commit, which
 # doesn't fit dotfiles' separate manifests-repo workflow; add hooks here

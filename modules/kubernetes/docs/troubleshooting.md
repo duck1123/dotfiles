@@ -35,6 +35,16 @@ This has happened at least twice (`stashapp-config`, then `tdarr-tdarr-config`, 
 
 If this recurs a third time, it's worth investigating `/dev/sdb`/iSCSI on `nixmini` directly rather than treating each occurrence as isolated.
 
+## SQLite `disk I/O error` (error 10) on startup: check for a full volume first
+
+**Symptom:** A SQLite-backed app crash-loops with `SQLite Error 10: 'disk I/O error'` while it opens its database. Longhorn reports the volume `healthy` and dmesg shows no I/O errors for its device. (dmesg can show errors for *other* Longhorn devices; match the major:minor of `/dev/longhorn/<pv>` before blaming them.)
+
+**Cause:** The filesystem is full. SQLite can't grow `-shm`/`-wal` and reports it as an I/O error, not `SQLITE_FULL`. On slskd (2026-10-20) a `:latest` image bump ran a migration that first copied `search.db` (17G of search history with no retention set) into `data/backups/` on the same 40G volume. The copy filled the disk, and each restart left another 0-byte `*.pre-migration-backup.*.db`. The same thing had already happened on 2026-09-01.
+
+**Diagnose:** while the pod crash-loops its PVC stays mounted, so use `kubectl debug node/<node> --profile=sysadmin --image=busybox` and `df`/`du` the mount under `/var/lib/kubelet/pods/<pod-uid>/volumes/kubernetes.io~csi/<pv-name>/mount` (see *Working on a node* below; for pinned volumes the directory is named after the PV, e.g. `slskd-slskd-config-pv`).
+
+**Fix:** free space (partial migration backups, history databases) or grow the volume via the template's `volumes.<name>.size`. Then cap whatever grew. For slskd that's `retention.search` in `/app/slskd.yml` on the PVC, which can't be set through an environment variable. Take `nur sqlite backup <ns>` before deleting any database.
+
 ## Longhorn: node stuck `DiskPressure`/unschedulable despite real free disk space
 
 **Symptom:** A Longhorn node/disk shows `Schedulable: False` (disk condition message cites `ScheduledTotal greater than ProvisionedLimit`) even though `df`/actual usage doesn't support it, and the k8s node itself is `Ready`.
