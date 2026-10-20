@@ -135,16 +135,23 @@ in
       default = false;
     };
 
+    reportingGroups = mkOption {
+      description = mdDoc ''
+        config.databaseGroups whose postgres databases become Superset database connections
+        (the default for reportingConnections). "admin" is every database on
+        a provider.
+      '';
+      type = types.listOf types.str;
+      default = [ "admin" ];
+    };
+
     reportingConnections = mkOption {
       description = mdDoc ''
         Postgres databases to register as SQL Lab connections, one entry per
         database (Postgres has no cross-database queries, so a single connection
         can't cover multiple databases on the same instance). Registered
-        declaratively by the superset-register-connections job -- see
-        env/dev/superset.nix, which populates this from
-        config.services.postgresql.extraDatabases so it stays in sync with that
-        list automatically. Each entry should use that database's own
-        least-privilege role rather than the Postgres admin role.
+        declaratively by the superset-register-connections job. Defaults to
+        the databases in reportingGroups, each with its own role.
       '';
       type = types.listOf (
         types.submodule {
@@ -172,7 +179,12 @@ in
           };
         }
       );
-      default = [ ];
+      # Postgres only for now: the registration jobs only speak postgres.
+      default = map (db: removeAttrs db [ "kind" ]) (
+        filter (db: db.kind == "postgresql") (
+          config.databaseConnectionsFor config.services.${name}.reportingGroups
+        )
+      );
     };
   };
 

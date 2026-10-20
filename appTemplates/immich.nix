@@ -14,6 +14,14 @@ rec {
   name = "immich";
   uses-ingress = true;
   uses-database = true;
+  # Immich connects as postgres, so its tables aren't owned by the `immich`
+  # role; readAllTables lets reporting connections (which use `immich`) read them.
+  databases = cfg: [
+    {
+      username = "immich";
+      readAllTables = true;
+    }
+  ];
   requires-redis = true;
 
   sopsSecrets = cfg: {

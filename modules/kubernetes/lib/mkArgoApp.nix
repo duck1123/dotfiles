@@ -50,6 +50,12 @@ _: {
       uses-nfs ? false,
       # Does this app have a centralized external database (services.<name>.database.*)
       uses-database ? false,
+      # The databases this app owns, as a function of cfg returning a list of
+      # partial config.databases entries. Each one defaults to the app's own
+      # cfg.database.{name,username,password}, so the default list is just
+      # the main database. Registered whenever databaseTarget is set (enabled
+      # or not), so the provider creates it and reporting tools can see it.
+      databases ? (cfg: [ { } ]),
       # Does this app talk to redis (services.<name>.redis.*)
       uses-redis ? false,
       # Can this app not run without redis? Then a disabled redis.enable
@@ -665,137 +671,174 @@ _: {
         ))
       ];
 
-      config = mkIf cfg.enable (
-        mkMerge (
-          [
-            (mkIf (cfg.hostAffinity != null) (
-              let
-                profile = config.nodeGpuProfiles.${cfg.hostAffinity} or { };
-              in
-              {
-                services.${name} = {
-                  libvaDriverName = mkDefault (profile.libvaDriverName or "");
-                  vaapiRenderDevice = mkDefault (profile.vaapiRenderDevice or "");
-                  renderGroupGID = mkDefault (profile.renderGroupGID or 303);
-                };
-              }
-            ))
-          ]
-          ++ lib.optional uses-ingress (
-            mkIf (cfg.ingressProvider != null) (
-              let
-                profile = config.ingressProviders.${cfg.ingressProvider} or { };
-              in
-              {
-                services.${name}.ingress = {
-                  ingressClassName = mkDefault (profile.ingressClassName or "traefik");
-                  clusterIssuer = mkDefault (profile.clusterIssuer or "letsEncrypt-prod");
-                  domain = mkDefault "${name}.${profile.domain or "local"}";
-                };
-              }
-            )
-          )
-          ++ lib.optional uses-nfs (
-            mkIf (cfg.nfsTarget != null) (
-              let
-                t = config.nfsTargets.${cfg.nfsTarget} or { };
-              in
-              {
-                services.${name}.nfs = {
-                  server = mkDefault (t.server or "");
-                  path = mkDefault (
-                    if cfg.nfsSubPath != "" then "${t.basePath or ""}/${cfg.nfsSubPath}" else t.basePath or ""
-                  );
-                };
-              }
-            )
-          )
-          ++ lib.optional uses-database (
-            mkIf (cfg.databaseTarget != null) (
-              let
-                t = config.databaseProviders.${cfg.databaseTarget} or { };
-              in
-              {
-                services.${name}.database = {
-                  host = mkDefault (t.host or "");
-                  port = mkDefault (t.port or 0);
-                  username = mkDefault ((t.usernameFor or (n: n)) name);
-                  password = mkDefault ((t.passwordFor or (_: "")) name);
-                };
-              }
-            )
-          )
-          ++ lib.optional uses-redis' (
-            mkIf (cfg.redisTarget != null) (
-              let
-                t = config.redisProviders.${cfg.redisTarget} or { };
-              in
-              {
-                services.${name}.redis = {
-                  enable = mkDefault true;
-                  host = mkDefault (t.host or "");
-                  port = mkDefault (t.port or 6379);
-                  password = mkDefault ((t.passwordFor or (_: "")) name);
-                };
-              }
-            )
-          )
-          ++ [
-            (mkIf (combinedSopsSecrets != { }) {
-              services.${name} = {
-                sopsSecretsManifest = lib.mapAttrsToList (sn: data: {
-                  inherit (cfg) namespace;
-                  app = name;
-                  secretName = sn;
-                  keys = lib.attrNames (data.values or data);
-                }) combinedSopsSecrets;
-                sopsSecretsSpec = secretSpecsList;
-              };
-            })
+      config = mkMerge (
+        # Not gated on cfg.enable: a disabled app's database stays registered
+        # (and keeps existing) for as long as it has a databaseTarget. A plain
+        # optional, not mkIf: apps without uses-database have no
+        # services.<name>.database to define, even conditionally.
+        lib.optional uses-database (
+          mkIf (cfg.databaseTarget != null) (
+            let
+              target = cfg.databaseTarget;
+              t = config.databaseProviders.${target};
+            in
             {
-              # This is the application config for nixidy
-              applications.${name} =
-                let
-                  # sopsSecrets are intentionally excluded: encryption happens outside Nix via
-                  # scripts/write-sops-secrets.sh so plaintext values never enter the Nix store.
-                  baseResources = lib.foldl' lib.recursiveUpdate { } [
-                    volumeResources
-                    (extraResources cfg)
-                    cfg.extraResources
-                  ];
-                  placedResources = addHostAffinityToResources (builtins.removeAttrs baseResources [
-                    "sopsSecrets"
-                  ]) cfg.hostAffinity;
-                  # Here rather than as a services.${name}.redis definition: that
-                  # would make redis.enable depend on itself.
-                  resources =
-                    lib.throwIf (requires-redis && !cfg.redis.enable)
-                      "${name} requires redis: set services.${name}.redisTarget (or redis.enable and redis.host)."
-                      (if cfg.allowControlPlane then addControlPlaneToleration placedResources else placedResources);
-                in
-                mkMerge [
-                  {
-                    inherit (cfg) namespace;
-                    createNamespace = true;
-                    finalizer = "foreground";
+              services.${name}.database = {
+                host = mkDefault t.host;
+                port = mkDefault t.port;
+                username = mkDefault (t.usernameFor name);
+                password = mkDefault (t.passwordFor name);
+              };
 
-                    # TODO: Should I be using some sort of overlay here?
-                    inherit resources;
-                    syncPolicy.finalSyncOpts = [ "CreateNamespace=true" ];
-                  }
-                  (mkIf (cfg.chart != null) {
-                    helm.releases.${name} = {
-                      inherit values;
-                      inherit (cfg) chart;
-                    };
-                  })
-                  (extraAppConfig cfg)
-                  cfg.extraAppConfig
-                ];
+              databases = lib.listToAttrs (
+                map (
+                  spec:
+                  let
+                    db = {
+                      inherit (cfg.database) name username;
+                      # A role other than the app's own gets the provider's
+                      # default password for that role.
+                      password =
+                        if (spec.username or cfg.database.username) == cfg.database.username then
+                          cfg.database.password
+                        else
+                          t.passwordFor spec.username;
+                    }
+                    // spec;
+                  in
+                  lib.nameValuePair "${target}/${db.name}" (
+                    db
+                    // {
+                      provider = target;
+                      inherit (t) kind;
+                      inherit (cfg.database) host port;
+                      owner = name;
+                    }
+                  )
+                ) (databases cfg)
+              );
             }
-            (extraConfig cfg)
-          ]
+          )
         )
+        ++ [
+          (mkIf cfg.enable (
+            mkMerge (
+              [
+                (mkIf (cfg.hostAffinity != null) (
+                  let
+                    profile = config.nodeGpuProfiles.${cfg.hostAffinity} or { };
+                  in
+                  {
+                    services.${name} = {
+                      libvaDriverName = mkDefault (profile.libvaDriverName or "");
+                      vaapiRenderDevice = mkDefault (profile.vaapiRenderDevice or "");
+                      renderGroupGID = mkDefault (profile.renderGroupGID or 303);
+                    };
+                  }
+                ))
+              ]
+              ++ lib.optional uses-ingress (
+                mkIf (cfg.ingressProvider != null) (
+                  let
+                    profile = config.ingressProviders.${cfg.ingressProvider} or { };
+                  in
+                  {
+                    services.${name}.ingress = {
+                      ingressClassName = mkDefault (profile.ingressClassName or "traefik");
+                      clusterIssuer = mkDefault (profile.clusterIssuer or "letsEncrypt-prod");
+                      domain = mkDefault "${name}.${profile.domain or "local"}";
+                    };
+                  }
+                )
+              )
+              ++ lib.optional uses-nfs (
+                mkIf (cfg.nfsTarget != null) (
+                  let
+                    t = config.nfsTargets.${cfg.nfsTarget} or { };
+                  in
+                  {
+                    services.${name}.nfs = {
+                      server = mkDefault (t.server or "");
+                      path = mkDefault (
+                        if cfg.nfsSubPath != "" then "${t.basePath or ""}/${cfg.nfsSubPath}" else t.basePath or ""
+                      );
+                    };
+                  }
+                )
+              )
+              ++ lib.optional uses-redis' (
+                mkIf (cfg.redisTarget != null) (
+                  let
+                    t = config.redisProviders.${cfg.redisTarget} or { };
+                  in
+                  {
+                    services.${name}.redis = {
+                      enable = mkDefault true;
+                      host = mkDefault (t.host or "");
+                      port = mkDefault (t.port or 6379);
+                      password = mkDefault ((t.passwordFor or (_: "")) name);
+                    };
+                  }
+                )
+              )
+              ++ [
+                (mkIf (combinedSopsSecrets != { }) {
+                  services.${name} = {
+                    sopsSecretsManifest = lib.mapAttrsToList (sn: data: {
+                      inherit (cfg) namespace;
+                      app = name;
+                      secretName = sn;
+                      keys = lib.attrNames (data.values or data);
+                    }) combinedSopsSecrets;
+                    sopsSecretsSpec = secretSpecsList;
+                  };
+                })
+                {
+                  # This is the application config for nixidy
+                  applications.${name} =
+                    let
+                      # sopsSecrets are intentionally excluded: encryption happens outside Nix via
+                      # scripts/write-sops-secrets.sh so plaintext values never enter the Nix store.
+                      baseResources = lib.foldl' lib.recursiveUpdate { } [
+                        volumeResources
+                        (extraResources cfg)
+                        cfg.extraResources
+                      ];
+                      placedResources = addHostAffinityToResources (builtins.removeAttrs baseResources [
+                        "sopsSecrets"
+                      ]) cfg.hostAffinity;
+                      # Here rather than as a services.${name}.redis definition: that
+                      # would make redis.enable depend on itself.
+                      resources =
+                        lib.throwIf (requires-redis && !cfg.redis.enable)
+                          "${name} requires redis: set services.${name}.redisTarget (or redis.enable and redis.host)."
+                          (if cfg.allowControlPlane then addControlPlaneToleration placedResources else placedResources);
+                    in
+                    mkMerge [
+                      {
+                        inherit (cfg) namespace;
+                        createNamespace = true;
+                        finalizer = "foreground";
+
+                        # TODO: Should I be using some sort of overlay here?
+                        inherit resources;
+                        syncPolicy.finalSyncOpts = [ "CreateNamespace=true" ];
+                      }
+                      (mkIf (cfg.chart != null) {
+                        helm.releases.${name} = {
+                          inherit values;
+                          inherit (cfg) chart;
+                        };
+                      })
+                      (extraAppConfig cfg)
+                      cfg.extraAppConfig
+                    ];
+                }
+                (extraConfig cfg)
+              ]
+            )
+          ))
+        ]
       );
     };
 

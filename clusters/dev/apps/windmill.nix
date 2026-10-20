@@ -1,4 +1,4 @@
-{ config, secrets, ... }:
+{ secrets, ... }:
 {
   services.windmill = {
     enable = true;
@@ -39,13 +39,5 @@
         value = secrets.immich.phototagsApiKey;
       }
     ];
-
-    # One Windmill resource per database on the shared postgres instance,
-    # registered at f/fleetops/db_<name> -- sourced the same way as
-    # superset's/metabase's reportingConnections (env/dev/superset.nix).
-    reportingConnections = map (db: {
-      inherit (db) name username password;
-      inherit (config.databaseProviders.postgresql) host port;
-    }) config.services.postgresql.extraDatabases;
   };
 }

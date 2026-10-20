@@ -12,6 +12,11 @@ rec {
   name = "whisparr";
   uses-ingress = true;
   uses-database = true;
+  # Main and log databases, both owned by the app's role.
+  databases = cfg: [
+    { }
+    { name = self.lib.arrLogDbName { inherit lib; } cfg.database.name; }
+  ];
 
   # Shape only -- no volumeHandle here, that's environment-specific (see
   # env/dev/whisparr.nix and docs/pinned-volumes.md).
@@ -199,11 +204,7 @@ rec {
                     }
                     {
                       name = "WHISPARR__POSTGRES__LOGDB";
-                      value =
-                        if lib.hasSuffix "-main" cfg.database.name then
-                          lib.removeSuffix "-main" cfg.database.name + "-log"
-                        else
-                          "${cfg.database.name}-log";
+                      value = self.lib.arrLogDbName { inherit lib; } cfg.database.name;
                     }
                     {
                       name = "WHISPARR__POSTGRES__USER";

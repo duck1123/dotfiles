@@ -11,6 +11,17 @@ rec {
   uses-ingress = true;
   uses-nfs = true;
   uses-database = true;
+  # BookOrbit 2.x needs these for its migrations/search, and its own role
+  # can't CREATE EXTENSION, so the provider creates them as the superuser.
+  databases = cfg: [
+    {
+      extensions = [
+        "vector"
+        "uuid-ossp"
+        "pg_trgm"
+      ];
+    }
+  ];
 
   # Shape only -- no volumeHandle here, that's environment-specific (see
   # env/dev/bookorbit.nix and docs/pinned-volumes.md).

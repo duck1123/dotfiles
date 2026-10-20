@@ -18,24 +18,6 @@ in
 
   _module.args = {
     inherit secrets;
-
-    # Generates main + log databases for a list of *arr app configs
-    arrDatabases =
-      apps:
-      builtins.concatLists (
-        map (app: [
-          {
-            name = if app.name == "prowlarr" then "${app.name}-main" else app.name;
-            username = app.name;
-            password = secrets.postgresql.userPassword;
-          }
-          {
-            name = if app.name == "prowlarr" then "${app.name}-log" else "${app.name}-log";
-            username = app.name;
-            password = secrets.postgresql.userPassword;
-          }
-        ]) apps
-      );
   };
 
   # FIXME: naughty config
@@ -95,12 +77,18 @@ in
 
   databaseProviders = {
     postgresql = {
+      kind = "postgresql";
+      app = "postgresql";
+      superuser = "postgres";
       host = "postgresql.postgresql";
       port = 5432;
       usernameFor = appName: appName;
       passwordFor = _appName: secrets.postgresql.userPassword;
     };
     mariadb = {
+      kind = "mariadb";
+      app = "mariadb";
+      superuser = "root";
       host = "mariadb.mariadb";
       port = 3306;
       usernameFor = appName: appName;

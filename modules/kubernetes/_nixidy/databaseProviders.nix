@@ -13,6 +13,31 @@
     type = lib.types.attrsOf (
       lib.types.submodule {
         options = {
+          kind = lib.mkOption {
+            description = "Database engine.";
+            type = lib.types.enum [
+              "postgresql"
+              "mariadb"
+            ];
+          };
+          app = lib.mkOption {
+            description = ''
+              The app (services.<app>) that creates databases registered on
+              this provider, or null if nothing in the cluster does (e.g. a
+              server running directly on a node).
+            '';
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+          };
+          superuser = lib.mkOption {
+            description = ''
+              The provider's admin role. A database whose role is this one
+              still gets created, but the role itself is never created,
+              re-passworded or made the owner.
+            '';
+            type = lib.types.nullOr lib.types.str;
+            default = null;
+          };
           host = lib.mkOption {
             description = "Database host (cluster DNS).";
             type = lib.types.str;

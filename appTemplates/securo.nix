@@ -213,6 +213,9 @@ rec {
   inherit name;
   uses-ingress = true;
   uses-database = true;
+  # The agent knowledge base uses pgvector, which the provider has to create
+  # as the superuser (even the database owner can't CREATE EXTENSION it).
+  databases = cfg: [ { extensions = [ "vector" ]; } ];
   requires-redis = true;
 
   volumes = cfg: {

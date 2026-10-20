@@ -233,6 +233,17 @@ rec {
   inherit name;
   uses-ingress = true;
   uses-database = true;
+  # Besides its own: the register of legacy photo tag assignments (digiKam,
+  # sidecar keywords, Takeout) and their reviewed mapping, used by the
+  # f/phototags scripts. Schema in
+  # resources/apps/windmill/wmill/f/phototags/register_schema.pg.sql.
+  databases = cfg: [
+    { }
+    {
+      name = "phototags";
+      username = "phototags";
+    }
+  ];
   # nfsSubPath left at its "" default, so cfg.nfs.path resolves to the
   # whole nfsTarget basePath (all of nasnix:/mnt/media) rather than one
   # category subfolder -- windmill workers get the same media library
@@ -367,6 +378,16 @@ rec {
       default = [ ];
     };
 
+    reportingGroups = mkOption {
+      description = mdDoc ''
+        config.databaseGroups whose postgres databases become Windmill `postgresql` resources
+        (the default for reportingConnections). "admin" is every database on
+        a provider.
+      '';
+      type = types.listOf types.str;
+      default = [ "admin" ];
+    };
+
     reportingConnections = mkOption {
       description = mdDoc ''
         Postgres databases to register as Windmill `postgresql` resources, one
@@ -375,12 +396,9 @@ rec {
         Registered declaratively by the windmill-sync job, which calls
         Windmill's REST API (POST /resources/create?update_if_exists=true)
         since these are real per-app databases, unlike the static example
-        checked in at wmill/f/fleetops/example_postgres.resource.yaml -- see
-        env/dev/windmill.nix, which populates this from
-        config.services.postgresql.extraDatabases so it stays in sync with
-        that list automatically. Each entry should use that database's own
-        least-privilege role rather than the Postgres admin role. Registered
-        at path f/fleetops/db_<name>.
+        checked in at wmill/f/fleetops/example_postgres.resource.yaml.
+        Defaults to the databases in reportingGroups, each with its own role.
+        Registered at path f/fleetops/db_<name>.
       '';
       type = types.listOf (
         types.submodule {
@@ -408,7 +426,12 @@ rec {
           };
         }
       );
-      default = [ ];
+      # Postgres only for now: the registration jobs only speak postgres.
+      default = map (db: removeAttrs db [ "kind" ]) (
+        filter (db: db.kind == "postgresql") (
+          config.databaseConnectionsFor config.services.${name}.reportingGroups
+        )
+      );
     };
   };
 

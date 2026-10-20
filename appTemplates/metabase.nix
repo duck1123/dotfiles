@@ -138,13 +138,23 @@ in
       };
     };
 
+    reportingGroups = mkOption {
+      description = mdDoc ''
+        config.databaseGroups whose postgres databases become Metabase data source connections
+        (the default for reportingConnections). "admin" is every database on
+        a provider.
+      '';
+      type = types.listOf types.str;
+      default = [ "admin" ];
+    };
+
     reportingConnections = mkOption {
       description = mdDoc ''
         Postgres databases to register as Metabase data source connections, one
         entry per database. Registered declaratively by the
         metabase-register-connections job, which calls Metabase's REST API
         (POST/PUT /api/database) since there's no declarative config path for
-        this -- see env/dev/metabase.nix.
+        this. Defaults to the databases in reportingGroups.
       '';
       type = types.listOf (
         types.submodule {
@@ -172,7 +182,12 @@ in
           };
         }
       );
-      default = [ ];
+      # Postgres only for now: the registration jobs only speak postgres.
+      default = map (db: removeAttrs db [ "kind" ]) (
+        filter (db: db.kind == "postgresql") (
+          config.databaseConnectionsFor config.services.${name}.reportingGroups
+        )
+      );
     };
   };
 

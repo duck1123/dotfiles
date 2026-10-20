@@ -26,6 +26,7 @@ in
             ./_nixidy/homepageGroups.nix
             ./_nixidy/ingressProviders.nix
             ./_nixidy/databaseProviders.nix
+            ./_nixidy/databases.nix
             ./_nixidy/redisProviders.nix
             ./_nixidy/nfsTargets.nix
           ];

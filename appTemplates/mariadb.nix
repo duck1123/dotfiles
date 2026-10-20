@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ config, lib, ... }:
 with lib;
 let
   password-secret = "mariadb-password";
@@ -6,6 +6,16 @@ let
   # Deterministic per-database env var name the init .sh scripts read
   # their password from -- e.g. "booklore" -> "EXTRADB_BOOKLORE_PASSWORD".
   extraDbEnvVar = dbName: "EXTRADB_${lib.toUpper dbName}_PASSWORD";
+
+  # Databases registered (config.databases) on any provider this app serves.
+  # Ones whose role is the provider's superuser get no user/grant of their own.
+  provisioned = filter (
+    db:
+    db.provider != null
+    && db.provision
+    && (config.databaseProviders.${db.provider}.app or null) == "mariadb"
+    && db.username != config.databaseProviders.${db.provider}.superuser
+  ) (attrValues config.databases);
 in
 rec {
   name = "mariadb";
@@ -41,7 +51,7 @@ rec {
         database = cfg.auth.database;
       };
     }
-    // lib.optionalAttrs (cfg.extraDatabases != [ ]) {
+    // lib.optionalAttrs (provisioned != [ ]) {
       # One key per extra database, e.g. "booklore-password" -- kept out
       # of the customScripts ConfigMap (which is plaintext, committed to
       # git) and injected into the mariadb container as env vars instead
@@ -50,7 +60,7 @@ rec {
         map (db: {
           name = "${db.name}-password";
           value = db.password;
-        }) cfg.extraDatabases
+        }) provisioned
       );
     };
 
@@ -90,29 +100,6 @@ rec {
         type = types.str;
         default = "mydb";
       };
-    };
-
-    extraDatabases = mkOption {
-      description = mdDoc "Additional databases to create (list of {name, username, password})";
-      type = types.listOf (
-        types.submodule {
-          options = {
-            name = mkOption {
-              type = types.str;
-              description = mdDoc "Database name";
-            };
-            username = mkOption {
-              type = types.str;
-              description = mdDoc "Database username";
-            };
-            password = mkOption {
-              type = types.str;
-              description = mdDoc "Database password";
-            };
-          };
-        }
-      );
-      default = [ ];
     };
 
     backup = {
@@ -163,7 +150,7 @@ rec {
 
     # One password env var per extra database, sourced from the
     # extra-db-secret SopsSecret above -- never the plaintext value
-    # itself (that only exists in cfg.extraDatabases at Nix-eval time
+    # itself (that only exists in config.databases at Nix-eval time
     # and in the sops-encrypted ciphertext committed to git).
     env = map (db: {
       name = extraDbEnvVar db.name;
@@ -171,7 +158,7 @@ rec {
         name = extra-db-secret;
         key = "${db.name}-password";
       };
-    }) cfg.extraDatabases;
+    }) provisioned;
 
     # Extra databases beyond the main one. A plain .sql file can't do
     # variable substitution, so this is a .sh script instead -- the
@@ -194,7 +181,7 @@ rec {
             FLUSH PRIVILEGES;
           EOSQL
         '';
-      }) cfg.extraDatabases
+      }) provisioned
     );
 
     nodeSelector."kubernetes.io/hostname" = cfg.hostAffinity;

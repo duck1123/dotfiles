@@ -1,4 +1,4 @@
-{ secrets, config, ... }:
+{ secrets, ... }:
 {
   services.superset = {
     admin = {
@@ -16,10 +16,5 @@
     ingressProvider = "traefik-lan";
     redisTarget = "redis";
     secretKey = (secrets.superset or { }).secretKey or "";
-
-    reportingConnections = map (db: {
-      inherit (db) name username password;
-      inherit (config.databaseProviders.postgresql) host port;
-    }) config.services.postgresql.extraDatabases;
   };
 }

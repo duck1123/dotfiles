@@ -15,18 +15,8 @@
     hostAffinity = "edgenix";
     storageClassName = "longhorn";
 
-    extraDatabases = [
-      {
-        name = "booklore";
-        username = "booklore";
-        password = secrets.booklore.database.password;
-      }
-      {
-        name = "romm";
-        username = "mariadb";
-        password = secrets.mariadb.password;
-      }
-    ];
+    # Databases come from the apps that use them (uses-database +
+    # databaseTarget = "mariadb"); see config.databases.
 
     # `data` is now the fresh volume from the bitnami->groundhog2k chart
     # migration (dump/restore cutover, see IMAGE-VERSIONS.md) -- confirmed

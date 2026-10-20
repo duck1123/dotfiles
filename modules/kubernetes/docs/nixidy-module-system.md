@@ -14,7 +14,7 @@ Every `.nix` file under `modules/` (recursively) is imported automatically via `
 
 ## Inner: nixidy's per-environment eval (`modules/kubernetes/nixidy-envs.nix`, explicit list only)
 
-Separately, `modules/kubernetes/nixidy-envs.nix` calls `inputs.nixidy.lib.mkEnvs`, which runs its **own, independent** `evalModules` per environment (currently just `dev`). This is where `services.<name>`, `config.ingressProviders`, `config.nfsTargets`, `config.databaseProviders`, `config.redisProviders`, `config.homepageGroups`, `config.devDefaults`, and everything else that `appTemplates/*.nix` and `clusters/dev/**/*.nix` reference actually lives. Its module list is **hand-maintained, not auto-imported**:
+Separately, `modules/kubernetes/nixidy-envs.nix` calls `inputs.nixidy.lib.mkEnvs`, which runs its **own, independent** `evalModules` per environment (currently just `dev`). This is where `services.<name>`, `config.ingressProviders`, `config.nfsTargets`, `config.databaseProviders`, `config.databases`, `config.redisProviders`, `config.homepageGroups`, `config.devDefaults`, and everything else that `appTemplates/*.nix` and `clusters/dev/**/*.nix` reference actually lives. Its module list is **hand-maintained, not auto-imported**:
 
 ```nix
 devEnv = inputs.nixidy.lib.mkEnvs {
@@ -27,6 +27,7 @@ devEnv = inputs.nixidy.lib.mkEnvs {
     ./_nixidy/homepageGroups.nix
     ./_nixidy/ingressProviders.nix
     ./_nixidy/databaseProviders.nix
+    ./_nixidy/databases.nix
     ./_nixidy/redisProviders.nix
     ./_nixidy/nfsTargets.nix
   ];

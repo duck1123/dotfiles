@@ -1,8 +1,22 @@
-{ lib, ... }:
+{ config, lib, ... }:
 with lib;
 let
   name = "postgresql";
   password-secret = "${name}-password";
+  extra-db-secret = "${name}-extradb-passwords";
+
+  # Databases registered (config.databases) on any provider this app serves.
+  provisioned = filter (
+    db:
+    db.provider != null && db.provision && (config.databaseProviders.${db.provider}.app or null) == name
+  ) (attrValues config.databases);
+  # A database whose role is the provider's superuser is created, but the
+  # role itself is left alone (no CREATE/ALTER USER, no ownership change).
+  ownsRole = db: db.username != config.databaseProviders.${db.provider}.superuser;
+  withRole = filter ownsRole provisioned;
+  # e.g. "paperless-ngx" -> "EXTRADB_PAPERLESS_NGX_PASSWORD"
+  extraDbEnvVar =
+    dbName: "EXTRADB_${toUpper (replaceStrings [ "-" "." ] [ "_" "_" ] dbName)}_PASSWORD";
 in
 {
   inherit name;
@@ -28,16 +42,28 @@ in
       };
     };
 
-  sopsSecrets = cfg: {
-    ${password-secret} = with cfg.auth; {
-      inherit
-        adminPassword
-        adminUsername
-        replicationPassword
-        userPassword
-        ;
+  sopsSecrets =
+    cfg:
+    {
+      ${password-secret} = with cfg.auth; {
+        inherit
+          adminPassword
+          adminUsername
+          replicationPassword
+          userPassword
+          ;
+      };
+    }
+    // optionalAttrs (withRole != [ ]) {
+      # One key per database, read by the init-databases job as env vars so
+      # no password ends up in the (plaintext) Job manifest.
+      ${extra-db-secret} = listToAttrs (
+        map (db: {
+          name = "${db.name}-password";
+          value = db.password;
+        }) withRole
+      );
     };
-  };
 
   # https://artifacthub.io/packages/helm/bitnami/redis
   chart = lib.helm.downloadHelmChart {
@@ -179,39 +205,6 @@ in
         default = "50Gi";
       };
     };
-
-    extraDatabases = mkOption {
-      description = mdDoc "Additional databases to create (list of {name, username, password})";
-      type = types.listOf (
-        types.submodule {
-          options = {
-            name = mkOption {
-              type = types.str;
-              description = mdDoc "Database name";
-            };
-            username = mkOption {
-              type = types.str;
-              description = mdDoc "Database username";
-            };
-            password = mkOption {
-              type = types.str;
-              description = mdDoc "Database password";
-            };
-            extensions = mkOption {
-              type = types.listOf types.str;
-              description = mdDoc "Extensions to enable in this database (e.g. [ \"vector\" ]). Created as the postgres superuser -- most extensions (pgvector included) refuse non-superusers even when they own the database, so this can't be done by the app's own role.";
-              default = [ ];
-            };
-            readAllTables = mkOption {
-              type = types.bool;
-              description = mdDoc "Grant `username` SELECT on every table in the public schema, now and in the future (default privileges for tables created by postgres). For apps that connect as postgres, so their tables aren't owned by `username` -- otherwise `username`'s reportingConnections (Windmill, Metabase) can't read anything.";
-              default = false;
-            };
-          };
-        }
-      );
-      default = [ ];
-    };
   };
 
   defaultValues =
@@ -260,8 +253,9 @@ in
     };
 
   extraResources = cfg: {
-    # Create a Job to initialize extra databases after PostgreSQL is ready
-    jobs = lib.optionalAttrs (cfg.extraDatabases != [ ]) {
+    # Creates every database registered on this provider (config.databases;
+    # apps register theirs via uses-database + databaseTarget).
+    jobs = lib.optionalAttrs (provisioned != [ ]) {
       "${name}-init-databases" = {
         metadata = {
           inherit (cfg) namespace;
@@ -302,39 +296,35 @@ in
                         };
                       };
                     }
-                  ];
+                  ]
+                  ++ map (db: {
+                    name = extraDbEnvVar db.name;
+                    valueFrom.secretKeyRef = {
+                      name = extra-db-secret;
+                      key = "${db.name}-password";
+                    };
+                  }) withRole;
                   command = [
                     "sh"
                     "-c"
                     ''
                       set -e
                       ${lib.concatMapStringsSep "\n" (db: ''
-                        echo "Creating database ${db.name} and user ${db.username}..."
-                        psql -v ON_ERROR_STOP=1 <<-EOSQL
-                          -- Create database if it doesn't exist
-                          SELECT format('CREATE DATABASE %I', '${db.name}') WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${db.name}')\gexec
-
-                          -- Create user if it doesn't exist, then always update password
-                          DO \$\$
-                          BEGIN
-                            IF NOT EXISTS (SELECT FROM pg_user WHERE usename = '${db.username}') THEN
-                              EXECUTE format('CREATE USER %I WITH PASSWORD %L', '${db.username}', '${db.password}');
-                            ELSE
-                              EXECUTE format('ALTER USER %I WITH PASSWORD %L', '${db.username}', '${db.password}');
-                            END IF;
-                          END
-                          \$\$;
-
-                          -- Grant privileges (quote database name)
-                          DO \$\$
-                          BEGIN
-                            EXECUTE format('GRANT ALL PRIVILEGES ON DATABASE %I TO %I', '${db.name}', '${db.username}');
-                            EXECUTE format('ALTER DATABASE %I OWNER TO %I', '${db.name}', '${db.username}');
-                          END
-                          \$\$;
+                        echo "Creating database ${db.name}..."
+                        psql -v ON_ERROR_STOP=1 -v db='${db.name}' <<'EOSQL'
+                        SELECT format('CREATE DATABASE %I', :'db') WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = :'db')\gexec
                         EOSQL
-                        echo "Database ${db.name} created successfully"
-                      '') cfg.extraDatabases}
+                        ${lib.optionalString (ownsRole db) ''
+                          echo "Setting up role ${db.username} as owner of ${db.name}..."
+                          psql -v ON_ERROR_STOP=1 -v db='${db.name}' -v role='${db.username}' -v pw="''$${extraDbEnvVar db.name}" <<'EOSQL'
+                          SELECT format('CREATE USER %I', :'role') WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = :'role')\gexec
+                          SELECT format('ALTER USER %I WITH PASSWORD %L', :'role', :'pw')\gexec
+                          SELECT format('GRANT ALL PRIVILEGES ON DATABASE %I TO %I', :'db', :'role')\gexec
+                          SELECT format('ALTER DATABASE %I OWNER TO %I', :'db', :'role')\gexec
+                          EOSQL
+                        ''}
+                        echo "Database ${db.name} ready"
+                      '') provisioned}
                       ${lib.concatMapStringsSep "\n" (
                         db:
                         lib.optionalString (db.extensions != [ ]) ''
@@ -345,7 +335,7 @@ in
                             ) db.extensions}
                           EOSQL
                         ''
-                      ) cfg.extraDatabases}
+                      ) provisioned}
                       ${lib.concatMapStringsSep "\n" (
                         db:
                         lib.optionalString db.readAllTables ''
@@ -356,7 +346,7 @@ in
                             ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT ON TABLES TO "${db.username}";
                           EOSQL
                         ''
-                      ) cfg.extraDatabases}
+                      ) provisioned}
                     ''
                   ];
                 }
