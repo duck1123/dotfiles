@@ -14,6 +14,7 @@ rec {
   name = "immich";
   uses-ingress = true;
   uses-database = true;
+  requires-redis = true;
 
   sopsSecrets = cfg: {
     ${password-secret} = {
@@ -88,24 +89,6 @@ rec {
     };
 
     redis = {
-      host = mkOption {
-        description = mdDoc "The Redis host";
-        type = types.str;
-        default = "redis";
-      };
-
-      port = mkOption {
-        description = mdDoc "The Redis port";
-        type = types.int;
-        default = 6379;
-      };
-
-      password = mkOption {
-        description = mdDoc "The Redis password";
-        type = types.str;
-        default = "CHANGEME";
-      };
-
       dbIndex = mkOption {
         description = mdDoc "The Redis database index";
         type = types.int;

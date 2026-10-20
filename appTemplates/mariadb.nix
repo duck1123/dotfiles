@@ -248,7 +248,7 @@ rec {
 
                           # Create backup
                           mariadb-dump \
-                            -h mariadb.mariadb \
+                            -h ${name}.${cfg.namespace} \
                             -u root \
                             -p"$MARIADB_ROOT_PASSWORD" \
                             --all-databases \
@@ -338,7 +338,7 @@ rec {
 
             echo "Restoring database..."
             gunzip -c "$BACKUP_FILE" | mariadb \
-              -h mariadb.mariadb \
+              -h ${name}.${cfg.namespace} \
               -u root \
               -p"$MARIADB_ROOT_PASSWORD"
 

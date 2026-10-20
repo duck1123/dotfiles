@@ -33,6 +33,7 @@ in
 rec {
   name = "tube-archivist";
   uses-ingress = true;
+  requires-redis = true;
 
   sopsSecrets =
     cfg:
@@ -108,26 +109,6 @@ rec {
       description = mdDoc "Elasticsearch URL (ES_URL) used by Tube Archivist";
       type = types.str;
       default = "http://tube-archivist-es:9200";
-    };
-
-    redis = {
-      host = mkOption {
-        description = mdDoc "Redis host for REDIS_CON connection string";
-        type = types.str;
-        default = "redis.redis";
-      };
-
-      port = mkOption {
-        description = mdDoc "Redis port for REDIS_CON connection string";
-        type = types.int;
-        default = 6379;
-      };
-
-      password = mkOption {
-        description = mdDoc "Redis password. If set, REDIS_CON is stored in a secret (redis://:password@host:port).";
-        type = types.str;
-        default = "";
-      };
     };
 
     auth = {

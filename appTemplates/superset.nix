@@ -10,6 +10,7 @@ in
   inherit name;
   uses-ingress = true;
   uses-database = true;
+  uses-redis = true;
 
   # https://artifacthub.io/packages/helm/apache-superset/superset
   chart = lib.helm.downloadHelmChart {
@@ -36,6 +37,9 @@ in
         DB_USER = cfg.database.username;
         DB_PASS = cfg.database.password;
         DB_NAME = cfg.database.name;
+        SECRET_KEY = cfg.secretKey;
+      }
+      // optionalAttrs cfg.redis.enable {
         REDIS_HOST = cfg.redis.host;
         REDIS_PORT = toString cfg.redis.port;
         REDIS_USER = "";
@@ -43,7 +47,6 @@ in
         REDIS_DB = toString cfg.redis.cacheDbIndex;
         REDIS_CELERY_DB = toString cfg.redis.celeryDbIndex;
         REDIS_PROTO = "redis";
-        SECRET_KEY = cfg.secretKey;
       };
     }
     // optionalAttrs (cfg.admin.password != "") {
@@ -77,21 +80,6 @@ in
     };
 
     redis = {
-      host = mkOption {
-        description = mdDoc "Redis host (shared cluster instance)";
-        type = types.str;
-        default = "redis.redis";
-      };
-      port = mkOption {
-        description = mdDoc "Redis port";
-        type = types.int;
-        default = 6379;
-      };
-      password = mkOption {
-        description = mdDoc "Redis password";
-        type = types.str;
-        default = "";
-      };
       # Dedicated db indices (not 0/2, already used by other apps sharing this Redis --
       # see incident-tube-archivist-celery-pickle-crashloop in memory for why colliding
       # Celery apps on the same db is dangerous) so Superset's own Celery broker/results
@@ -199,8 +187,15 @@ in
     postgresql.enabled = false;
     redis.enabled = false;
 
+    # cache.enabled = false is the chart's own "no redis" switch: it drops the
+    # redis cache, Celery config and async-query backends. host/port matter
+    # even though REDIS_HOST/REDIS_PORT come from the env secret: the
+    # GLOBAL_ASYNC_QUERIES_* backends are written into superset_config.py
+    # at template time and otherwise fall back to the disabled subchart's
+    # "<release>-redis-headless".
     cache = {
-      enabled = true;
+      enabled = cfg.redis.enable;
+      inherit (cfg.redis) host port;
       cacheDb = cfg.redis.cacheDbIndex;
       celeryDb = cfg.redis.celeryDbIndex;
     };
@@ -237,7 +232,9 @@ in
     # this cluster's password-protected Redis. `config.resultsBackend`, when a string,
     # is inserted verbatim as the RHS of `RESULTS_BACKEND = ...` (see the chart's
     # `superset.config` helper), so this rebuilds the same RedisCache from env instead.
-    config.resultsBackend = ''RedisCache(host=env("REDIS_HOST"), port=int(env("REDIS_PORT", "6379")), password=env("REDIS_PASSWORD", ""), db=int(env("REDIS_DB", "1")), key_prefix="superset_results")'';
+    config = optionalAttrs cfg.redis.enable {
+      resultsBackend = ''RedisCache(host=env("REDIS_HOST"), port=int(env("REDIS_PORT", "6379")), password=env("REDIS_PASSWORD", ""), db=int(env("REDIS_DB", "1")), key_prefix="superset_results")'';
+    };
 
     # The built-in init job would otherwise bake init.adminUser.password as a literal
     # `superset fab create-admin --password ...` CLI arg into its (plaintext, chart
@@ -246,7 +243,10 @@ in
     # password from a secretKeyRef so it never appears in a rendered manifest.
     init.createAdmin = false;
 
-    supersetCeleryBeat.enabled = cfg.celeryBeat.enable;
+    # Celery's broker is redis, so the worker and beat only run with it. The
+    # chart always renders the worker Deployment; scaling it to 0 is the off switch.
+    supersetWorker.replicas.replicaCount = if cfg.redis.enable then 1 else 0;
+    supersetCeleryBeat.enabled = cfg.redis.enable && cfg.celeryBeat.enable;
 
     ingress = with cfg.ingress; {
       enabled = true;

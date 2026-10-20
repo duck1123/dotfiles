@@ -108,6 +108,12 @@ in
     };
   };
 
+  redisProviders.redis = {
+    host = "redis.redis";
+    port = 6379;
+    passwordFor = _appName: secrets.redis.password;
+  };
+
   nixidy = {
     defaults.syncPolicy.autoSync = {
       enable = true;

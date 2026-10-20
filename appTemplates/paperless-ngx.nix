@@ -15,6 +15,7 @@ rec {
   inherit name;
   uses-ingress = true;
   uses-database = true;
+  requires-redis = true;
 
   # `pvcName` overrides since these predate the "${name}-${name}-<key>"
   # convention. Shape only -- no volumeHandle here, that's
@@ -83,24 +84,6 @@ rec {
     };
 
     redis = {
-      host = mkOption {
-        description = mdDoc "The Redis host";
-        type = types.str;
-        default = "redis.redis";
-      };
-
-      port = mkOption {
-        description = mdDoc "The Redis port";
-        type = types.int;
-        default = 6379;
-      };
-
-      password = mkOption {
-        description = mdDoc "The Redis password";
-        type = types.str;
-        default = "";
-      };
-
       dbIndex = mkOption {
         description = mdDoc "The Redis database index";
         type = types.int;

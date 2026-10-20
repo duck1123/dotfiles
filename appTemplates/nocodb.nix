@@ -6,11 +6,15 @@ let
   db-secret = "nocodb-database";
   redis-secret = "nocodb-redis-url";
   storage-work-volume = "nocodb-env-work";
+  # Redis with a password goes through the init container + secret; without
+  # one, NC_REDIS_URL is set directly.
+  redisSecret = cfg: cfg.redis.enable && cfg.redis.password != "";
 in
 rec {
   inherit name;
   uses-ingress = true;
   uses-database = true;
+  uses-redis = true;
 
   # `pvcName = "${name}-data"` (not the usual "${name}-${name}-<key>"
   # convention). Shape only -- no volumeHandle here, that's
@@ -30,7 +34,7 @@ rec {
     // optionalAttrs (cfg.database.password != "") {
       ${db-secret}.password = cfg.database.password;
     }
-    // optionalAttrs (cfg.redis.password != "") {
+    // optionalAttrs (redisSecret cfg) {
       ${redis-secret}.password = cfg.redis.password;
     }
     // optionalAttrs (cfg.storage.enable && cfg.storage.accessKey != "") {
@@ -57,24 +61,6 @@ rec {
       description = mdDoc "JWT secret for auth tokens (generate: openssl rand -hex 32)";
       type = types.str;
       default = "";
-    };
-
-    redis = {
-      host = mkOption {
-        description = mdDoc "Redis host (cluster service)";
-        type = types.str;
-        default = "redis.redis";
-      };
-      port = mkOption {
-        description = mdDoc "Redis port";
-        type = types.int;
-        default = 6379;
-      };
-      password = mkOption {
-        description = mdDoc "Redis password";
-        type = types.str;
-        default = "";
-      };
     };
 
     storage = {
@@ -186,7 +172,7 @@ rec {
             automountServiceAccountToken = true;
             serviceAccountName = "default";
 
-            initContainers = optional (cfg.database.password != "" || cfg.redis.password != "") {
+            initContainers = optional (cfg.database.password != "" || redisSecret cfg) {
               name = "build-connection-urls";
               image = "python:3-alpine";
               imagePullPolicy = "IfNotPresent";
@@ -200,10 +186,10 @@ rec {
                   if os.path.exists("/secrets-db/password"):
                       with open("/secrets-db/password") as f:
                           pwd = f.read()
-                      user = os.environ.get("PGUSER", "nocodb")
-                      host = os.environ.get("PGHOST", "postgresql.postgresql")
-                      port = os.environ.get("PGPORT", "5432")
-                      db = os.environ.get("PGDATABASE", "nocodb")
+                      user = os.environ["PGUSER"]
+                      host = os.environ["PGHOST"]
+                      port = os.environ["PGPORT"]
+                      db = os.environ["PGDATABASE"]
                       enc = urllib.parse.quote(pwd, safe="")
                       nc_db = f"pg://{host}:{port}?u={user}&p={enc}&d={db}"
                       with open("/work/NC_DB", "w") as f:
@@ -212,8 +198,8 @@ rec {
                   if os.path.exists("/secrets-redis/password"):
                       with open("/secrets-redis/password") as f:
                           pwd = f.read()
-                      host = os.environ.get("REDIS_HOST", "redis.redis")
-                      port = os.environ.get("REDIS_PORT", "6379")
+                      host = os.environ["REDIS_HOST"]
+                      port = os.environ["REDIS_PORT"]
                       enc = urllib.parse.quote(pwd, safe="")
                       url = f"redis://:{enc}@{host}:{port}/0"
                       with open("/work/NC_REDIS_URL", "w") as f:
@@ -237,6 +223,8 @@ rec {
                   name = "PGDATABASE";
                   value = cfg.database.name;
                 }
+              ]
+              ++ optionals (redisSecret cfg) [
                 {
                   name = "REDIS_HOST";
                   value = cfg.redis.host;
@@ -256,7 +244,7 @@ rec {
                 mountPath = "/secrets-db";
                 name = "db-secret";
               }
-              ++ optional (cfg.redis.password != "") {
+              ++ optional (redisSecret cfg) {
                 mountPath = "/secrets-redis";
                 name = "redis-secret";
               };
@@ -299,7 +287,7 @@ rec {
                   }
                   # NC_DB and NC_REDIS_URL: from init container when passwords in secrets
                   # Redis without password: direct env
-                  ++ optional (cfg.redis.password == "" && cfg.redis.host != "") {
+                  ++ optional (cfg.redis.enable && cfg.redis.password == "") {
                     name = "NC_REDIS_URL";
                     value = "redis://${cfg.redis.host}:${toString cfg.redis.port}/0";
                   }
@@ -344,7 +332,7 @@ rec {
                       name = "data";
                     }
                   ]
-                  ++ optional (cfg.database.password != "" || cfg.redis.password != "") {
+                  ++ optional (cfg.database.password != "" || redisSecret cfg) {
                     mountPath = "/work";
                     name = storage-work-volume;
                   };
@@ -378,7 +366,7 @@ rec {
                     failureThreshold = 5;
                   };
                 }
-                // optionalAttrs (cfg.database.password != "" || cfg.redis.password != "") {
+                // optionalAttrs (cfg.database.password != "" || redisSecret cfg) {
                   command = [
                     "/bin/sh"
                     "-c"
@@ -395,7 +383,7 @@ rec {
             volumes = [
               cfg.volumes.data.volume
             ]
-            ++ optional (cfg.database.password != "" || cfg.redis.password != "") {
+            ++ optional (cfg.database.password != "" || redisSecret cfg) {
               name = storage-work-volume;
               emptyDir = { };
             }
@@ -403,7 +391,7 @@ rec {
               name = "db-secret";
               secret.secretName = db-secret;
             }
-            ++ optional (cfg.redis.password != "") {
+            ++ optional (redisSecret cfg) {
               name = "redis-secret";
               secret.secretName = redis-secret;
             };

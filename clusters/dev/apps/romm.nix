@@ -11,6 +11,10 @@
     authSecretKey = secrets.romm.authSecretKey;
 
     databaseTarget = "mariadb";
+
+    # Off: RomM runs its own valkey in the pod. With the shared redis it uses
+    # redis.dbIndex (7) so its RQ queues don't collide with other apps.
+    # redisTarget = "redis";
     database = {
       password = secrets.mariadb.password;
       username = "mariadb";

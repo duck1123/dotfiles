@@ -1,15 +1,11 @@
-{ config, secrets, ... }:
+{ config, ... }:
 {
   services.nostrarchives = {
     enable = false;
 
     databaseTarget = "postgresql";
 
-    redis = {
-      host = "redis.redis";
-      port = 6379;
-      password = secrets.redis.password;
-    };
+    redisTarget = "redis";
 
     ingressProvider = "traefik-lan";
 

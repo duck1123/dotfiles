@@ -14,6 +14,7 @@ with lib;
   };
 
   uses-ingress = true;
+  uses-database = true;
 
   extraOptions = {
     ingress = {
@@ -32,44 +33,14 @@ with lib;
       };
     };
 
-    # External database Keycloak stores its realm/user data in. Fill
-    # these in via env/dev/keycloak.nix (following the pattern in
-    # env/dev/postgresql.nix / env/dev/mariadb.nix) before enabling.
+    # External database Keycloak stores its realm/user data in. The
+    # connection comes from databaseTarget (uses-database); only the vendor
+    # is keycloak-specific.
     database = {
       vendor = mkOption {
         description = mdDoc "Database vendor: dev-file, dev-mem, mariadb, mssql, mysql, oracle or postgres";
         type = types.str;
         default = "postgres";
-      };
-
-      host = mkOption {
-        description = mdDoc "Database host";
-        type = types.str;
-        default = "";
-      };
-
-      port = mkOption {
-        description = mdDoc "Database port";
-        type = types.port;
-        default = 5432;
-      };
-
-      name = mkOption {
-        description = mdDoc "Database name";
-        type = types.str;
-        default = "keycloak";
-      };
-
-      username = mkOption {
-        description = mdDoc "Database username";
-        type = types.str;
-        default = "keycloak";
-      };
-
-      password = mkOption {
-        description = mdDoc "Database password";
-        type = types.str;
-        default = "CHANGEME";
       };
     };
   };

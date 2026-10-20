@@ -26,6 +26,7 @@ in
 rec {
   inherit name;
   uses-ingress = true;
+  requires-redis = true;
 
   # Shape only -- no volumeHandle here, that's environment-specific (see
   # env/dev/gramps-web.nix and docs/pinned-volumes.md).
@@ -62,24 +63,6 @@ rec {
     };
 
     redis = {
-      host = mkOption {
-        description = mdDoc "The Redis host (Celery broker/result backend + API rate-limit storage)";
-        type = types.str;
-        default = "redis.redis";
-      };
-
-      port = mkOption {
-        description = mdDoc "The Redis port";
-        type = types.int;
-        default = 6379;
-      };
-
-      password = mkOption {
-        description = mdDoc "The Redis password";
-        type = types.str;
-        default = "";
-      };
-
       # Dedicated db indices (not 0/2/3/4, already used by paperless-ngx/immich,
       # securo, and superset respectively -- see incident-tube-archivist-celery-pickle-crashloop
       # in memory for why colliding Celery apps on the same db is dangerous: a

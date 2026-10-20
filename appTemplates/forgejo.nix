@@ -10,14 +10,7 @@ with lib;
 
   sopsSecrets = cfg: {
     forgejo-admin-password = { inherit (cfg.admin) password username; };
-    postgresql-password = with cfg.postgresql; {
-      inherit
-        adminPassword
-        adminUsername
-        replicationPassword
-        userPassword
-        ;
-    };
+    forgejo-database-password = { inherit (cfg.database) password; };
   };
 
   # `pvcName = "gitea-shared-storage"` to match the chart's own default
@@ -35,8 +28,15 @@ with lib;
   chart = charts.forgejo-helm.forgejo;
 
   uses-ingress = true;
+  uses-database = true;
 
   extraOptions = {
+    database.name = mkOption {
+      description = mdDoc "Database name.";
+      type = types.str;
+      default = "gitea";
+    };
+
     admin = {
       password = mkOption {
         description = mdDoc "The admin password";
@@ -50,32 +50,6 @@ with lib;
         default = "admin";
       };
     };
-
-    postgresql = {
-      adminPassword = mkOption {
-        description = mdDoc "The admin password";
-        type = types.str;
-        default = "CHANGEME";
-      };
-
-      adminUsername = mkOption {
-        description = mdDoc "The admin username";
-        type = types.str;
-        default = "postgres";
-      };
-
-      replicationPassword = mkOption {
-        description = mdDoc "The replication password";
-        type = types.str;
-        default = "CHANGEME";
-      };
-
-      userPassword = mkOption {
-        description = mdDoc "The user password";
-        type = types.str;
-        default = "CHANGEME";
-      };
-    };
   };
 
   defaultValues = cfg: {
@@ -84,19 +58,20 @@ with lib;
         {
           name = "FORGEJO__DATABASE__PASSWD";
           valueFrom.secretKeyRef = {
-            key = "adminPassword";
-            name = "postgresql-password";
+            key = "password";
+            name = "forgejo-database-password";
           };
         }
       ];
 
       admin.existingSecret = "forgejo-admin-password";
 
+      # PASSWD comes from the secret via additionalConfigFromEnvs above.
       config.database = {
         DB_TYPE = "postgres";
-        HOST = "postgresql.postgresql:5432";
-        USER = "postgres";
-        NAME = "gitea";
+        HOST = "${cfg.database.host}:${toString cfg.database.port}";
+        USER = cfg.database.username;
+        NAME = cfg.database.name;
         SCHEMA = "public";
       };
 

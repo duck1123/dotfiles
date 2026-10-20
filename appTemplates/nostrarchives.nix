@@ -35,6 +35,7 @@ in
   inherit name;
   uses-ingress = true;
   uses-database = true;
+  uses-redis = true;
 
   extraOptions = {
     service.port = mkOption {
@@ -48,24 +49,6 @@ in
       type = types.str;
       default = "";
     };
-
-    redis = {
-      host = mkOption {
-        description = mdDoc "Redis service host";
-        type = types.str;
-        default = "redis.redis";
-      };
-      port = mkOption {
-        description = mdDoc "Redis port";
-        type = types.int;
-        default = 6379;
-      };
-      password = mkOption {
-        description = mdDoc "Redis password (empty = no auth)";
-        type = types.str;
-        default = "";
-      };
-    };
   };
 
   sopsSecrets =
@@ -73,7 +56,7 @@ in
     optionalAttrs (cfg.database.password != "") {
       ${db-secret}.DATABASE_URL = databaseUrl cfg;
     }
-    // optionalAttrs (cfg.redis.password != "") {
+    // optionalAttrs (cfg.redis.enable && cfg.redis.password != "") {
       ${redis-secret}.REDIS_URL = redisUrl cfg;
     };
 
@@ -111,14 +94,22 @@ in
           };
         }
       ]
-      ++ optionals (cfg.redis.password != "") [
-        {
-          name = "REDIS_URL";
-          valueFrom.secretKeyRef = {
-            name = redis-secret;
-            key = "REDIS_URL";
-          };
-        }
+      ++ optionals cfg.redis.enable [
+        (
+          if cfg.redis.password != "" then
+            {
+              name = "REDIS_URL";
+              valueFrom.secretKeyRef = {
+                name = redis-secret;
+                key = "REDIS_URL";
+              };
+            }
+          else
+            {
+              name = "REDIS_URL";
+              value = redisUrl cfg;
+            }
+        )
       ];
     in
     {

@@ -45,7 +45,7 @@ flowchart LR
 | Piece | Where it's defined | What it does |
 | --- | --- | --- |
 | App templates | `appTemplates/<name>.nix` | What an app is: chart or hand-written resources, options, volumes. Wrapped by `mkArgoApp` (`modules/kubernetes/lib/mkArgoApp.nix`) into a nixidy module. |
-| Cluster config | `clusters/dev/default.nix`, `clusters/dev/apps/<name>.nix` | This cluster's choices: which apps are on, ingress providers, NFS and database targets, per-app settings. |
+| Cluster config | `clusters/dev/default.nix`, `clusters/dev/apps/<name>.nix` | This cluster's choices: which apps are on, ingress providers, NFS, database and redis targets, per-app settings. Apps declare `uses-database`/`uses-redis` and pick a provider with `databaseTarget`/`redisTarget`; nothing else should name a database or redis host. `redis.enable = false` turns an app's redis connection off. Apps that can't run without redis set `requires-redis`, and for those it fails the build instead. |
 | nixidy | `modules/kubernetes/nixidy-envs.nix` | The second module system that renders all of the above into Kubernetes YAML ([nixidy-module-system.md](nixidy-module-system.md)). |
 | argo-manifests | `git@github.com:duck1123/argo-manifests.git`, checked out at `kubernetes/manifests/` | The rendered YAML. The only thing ArgoCD reads. |
 | ArgoCD | `appTemplates/argocd.nix`, app-of-apps `00-master` | Syncs every app from argo-manifests, with auto-sync, prune and `selfHeal` on. Manual `kubectl` changes get reverted ([deployment-workflow.md](deployment-workflow.md)). |

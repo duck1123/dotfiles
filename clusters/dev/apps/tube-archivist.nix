@@ -25,11 +25,7 @@
       path = "${config.devDefaults.nasBase}";
     };
 
-    redis = {
-      host = "redis.redis";
-      port = 6379;
-      password = secrets.redis.password;
-    };
+    redisTarget = "redis";
     storageClassName = "longhorn";
     replicas = 1;
   };

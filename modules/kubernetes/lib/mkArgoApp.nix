@@ -50,6 +50,11 @@ _: {
       uses-nfs ? false,
       # Does this app have a centralized external database (services.<name>.database.*)
       uses-database ? false,
+      # Does this app talk to redis (services.<name>.redis.*)
+      uses-redis ? false,
+      # Can this app not run without redis? Then a disabled redis.enable
+      # fails the build instead of rendering a broken app. Implies uses-redis.
+      requires-redis ? false,
     }:
     with lib;
     let
@@ -63,6 +68,7 @@ _: {
         unspecified
         ;
       cfg = config.services.${name};
+      uses-redis' = uses-redis || requires-redis;
       values = attrsets.recursiveUpdate (defaultValues cfg) cfg.values;
 
       # See docs/pinned-volumes.md. `volumes cfg` (environment-agnostic, from
@@ -294,6 +300,36 @@ _: {
           default = "";
         };
       };
+      # Connection only. Database indices are app-specific, so each app adds
+      # its own through extraOptions.redis.
+      redis-options = {
+        enable = mkOption {
+          description = mdDoc ''
+            Connect ${name} to redis. On by default when redisTarget is set.
+            When off, the other redis options are kept but unused.
+          '';
+          type = types.bool;
+          default = false;
+        };
+
+        host = mkOption {
+          description = mdDoc "Redis host.";
+          type = str;
+          default = "";
+        };
+
+        port = mkOption {
+          description = mdDoc "Redis port.";
+          type = types.port;
+          default = 6379;
+        };
+
+        password = mkOption {
+          description = mdDoc "Redis password (empty = no auth).";
+          type = str;
+          default = "";
+        };
+      };
       basic-options = {
         chart = mkOption {
           type = nullOr path;
@@ -352,6 +388,12 @@ _: {
 
         databaseTarget = mkOption {
           description = mdDoc "Name of a config.databaseProviders entry supplying default database.{host,port,username,password} for ${name}.";
+          type = nullOr str;
+          default = null;
+        };
+
+        redisTarget = mkOption {
+          description = mdDoc "Name of a config.redisProviders entry supplying default redis.{host,port,password} for ${name}.";
           type = nullOr str;
           default = null;
         };
@@ -592,12 +634,35 @@ _: {
             }
           );
         };
+      }
+      // lib.optionalAttrs uses-redis' {
+        redis = mkOption {
+          default = { };
+          description = "Redis Options";
+          type = submodule (
+            let
+              extra-redis = extraOptions.redis or { };
+              options = recursiveUpdate redis-options extra-redis;
+            in
+            {
+              inherit options;
+            }
+          );
+        };
       };
     in
     {
+      # extraOptions.{ingress,nfs,database,redis} extend the shared submodules
+      # above, so they're left out here instead of being merged into the
+      # submodule's mkOption attrset.
       options.services.${name} = lib.foldl' lib.recursiveUpdate { } [
         basic-options
-        extraOptions
+        (removeAttrs extraOptions (
+          lib.optional uses-ingress "ingress"
+          ++ lib.optional uses-nfs "nfs"
+          ++ lib.optional uses-database "database"
+          ++ lib.optional uses-redis' "redis"
+        ))
       ];
 
       config = mkIf cfg.enable (
@@ -660,6 +725,21 @@ _: {
               }
             )
           )
+          ++ lib.optional uses-redis' (
+            mkIf (cfg.redisTarget != null) (
+              let
+                t = config.redisProviders.${cfg.redisTarget} or { };
+              in
+              {
+                services.${name}.redis = {
+                  enable = mkDefault true;
+                  host = mkDefault (t.host or "");
+                  port = mkDefault (t.port or 6379);
+                  password = mkDefault ((t.passwordFor or (_: "")) name);
+                };
+              }
+            )
+          )
           ++ [
             (mkIf (combinedSopsSecrets != { }) {
               services.${name} = {
@@ -686,8 +766,12 @@ _: {
                   placedResources = addHostAffinityToResources (builtins.removeAttrs baseResources [
                     "sopsSecrets"
                   ]) cfg.hostAffinity;
+                  # Here rather than as a services.${name}.redis definition: that
+                  # would make redis.enable depend on itself.
                   resources =
-                    if cfg.allowControlPlane then addControlPlaneToleration placedResources else placedResources;
+                    lib.throwIf (requires-redis && !cfg.redis.enable)
+                      "${name} requires redis: set services.${name}.redisTarget (or redis.enable and redis.host)."
+                      (if cfg.allowControlPlane then addControlPlaneToleration placedResources else placedResources);
                 in
                 mkMerge [
                   {

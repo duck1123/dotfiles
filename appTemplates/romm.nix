@@ -4,11 +4,13 @@ let
   password-secret = "romm-database-password";
   admin-secret = "romm-admin-password";
   metadata-secret = "romm-metadata-secrets";
+  redis-secret = "romm-redis-password";
 in
 rec {
   name = "romm";
   uses-ingress = true;
   uses-database = true;
+  uses-redis = true;
 
   # Shape only -- no volumeHandle here, that's environment-specific (see
   # env/dev/romm.nix and docs/pinned-volumes.md).
@@ -52,7 +54,10 @@ rec {
               screenscrapeUser = cfg.metadata.screenscraper.username;
               screenscrapePassword = cfg.metadata.screenscraper.password;
             };
-        };
+        }
+    // lib.optionalAttrs (cfg.redis.enable && cfg.redis.password != "") {
+      ${redis-secret}.password = cfg.redis.password;
+    };
 
   extraOptions = {
     image = mkOption {
@@ -64,6 +69,16 @@ rec {
       '';
       type = types.str;
       default = "ghcr.io/rommapp/romm:5.2.0";
+    };
+
+    redis = {
+      # RomM's RQ queues ("rq:queue:default" etc.) and cache keys have no
+      # per-app prefix, so a shared instance needs a db of its own.
+      dbIndex = mkOption {
+        description = mdDoc "Redis database index for RomM's task queues and cache";
+        type = types.int;
+        default = 7;
+      };
     };
 
     admin = {
@@ -339,17 +354,31 @@ rec {
                     name = "GUNICORN_HOST";
                     value = "127.0.0.1";
                   }
-                  # Valkey/Redis configuration - romm uses internal valkey by default
-                  # If you want to use external Redis, uncomment and configure:
-                  # {
-                  #   name = "REDIS_HOST";
-                  #   value = "redis.redis";
-                  # }
-                  # {
-                  #   name = "REDIS_PORT";
-                  #   value = "6379";
-                  # }
                 ]
+                # Without REDIS_HOST, RomM starts its own valkey inside the pod.
+                ++ lib.optionals cfg.redis.enable (
+                  [
+                    {
+                      name = "REDIS_HOST";
+                      value = cfg.redis.host;
+                    }
+                    {
+                      name = "REDIS_PORT";
+                      value = toString cfg.redis.port;
+                    }
+                    {
+                      name = "REDIS_DB";
+                      value = toString cfg.redis.dbIndex;
+                    }
+                  ]
+                  ++ lib.optional (cfg.redis.password != "") {
+                    name = "REDIS_PASSWORD";
+                    valueFrom.secretKeyRef = {
+                      name = redis-secret;
+                      key = "password";
+                    };
+                  }
+                )
                 ++ lib.optionals cfg.metadata.igdb.enable [
                   {
                     name = "IGDB_CLIENT_ID";

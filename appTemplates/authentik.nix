@@ -8,8 +8,8 @@ in
   name = "authentik";
 
   sopsSecrets = cfg: {
-    ${postgresql-secret} = with cfg.postgresql; {
-      inherit password postgres-password replicationPassword;
+    ${postgresql-secret} = {
+      inherit (cfg.database) password;
     };
     ${secret-secret} = {
       "authentik-secret-key" = cfg.secret-key;
@@ -25,46 +25,9 @@ in
   };
 
   uses-ingress = true;
+  uses-database = true;
 
   extraOptions = {
-    postgresql = {
-      host = mkOption {
-        description = mdDoc "The postgreql host";
-        type = types.str;
-        default = "authentik-postgresql";
-      };
-
-      name = mkOption {
-        description = mdDoc "The postgreql database name";
-        type = types.str;
-        default = "authentik";
-      };
-
-      password = mkOption {
-        description = mdDoc "The admin password";
-        type = types.str;
-        default = "CHANGEME";
-      };
-
-      postgres-password = mkOption {
-        description = mdDoc "The user password";
-        type = types.str;
-        default = "CHANGEME";
-      };
-
-      replicationPassword = mkOption {
-        description = mdDoc "The replication password";
-        type = types.str;
-        default = "CHANGEME";
-      };
-
-      user = mkOption {
-        description = mdDoc "The database user";
-        type = types.str;
-        default = "postgresql";
-      };
-    };
-
     secret-key = mkOption {
       description = mdDoc "The secret key";
       type = types.str;
@@ -76,18 +39,23 @@ in
     cfg: with cfg; {
       authentik = {
         error_reporting.enabled = true;
+        # No password here: the chart writes these values into a plain
+        # Secret. It comes from global.env below instead.
         postgresql = {
-          inherit (cfg.postgresql)
-            host
-            name
-            password
-            user
-            ;
+          inherit (cfg.database) host name port;
+          user = cfg.database.username;
         };
         secret_key = "this is a secret";
       };
 
       global.env = [
+        {
+          name = "AUTHENTIK_POSTGRESQL__PASSWORD";
+          valueFrom.secretKeyRef = {
+            name = postgresql-secret;
+            key = "password";
+          };
+        }
         {
           name = "AUTHENTIK_SECRET_KEY";
           valueFrom.secretKeyRef = {
@@ -97,13 +65,8 @@ in
         }
       ];
 
-      postgresql = with cfg.postgresql; {
-        inherit host;
-        auth.existingSecret = postgresql-secret;
-        enabled = false;
-      };
-
-      redis.enabled = true;
+      # The bundled Bitnami postgres stays off; databaseTarget picks the server.
+      postgresql.enabled = false;
 
       server.ingress = with ingress; {
         enabled = true;

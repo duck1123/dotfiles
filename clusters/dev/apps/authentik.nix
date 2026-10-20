@@ -1,4 +1,4 @@
-{ config, secrets, ... }:
+{ secrets, ... }:
 {
   services.authentik = {
     inherit (secrets.authentik) secret-key;
@@ -6,13 +6,7 @@
 
     ingressProvider = "traefik-dev";
 
-    postgresql = {
-      inherit (secrets.authentik.postgresql)
-        password
-        postgres-password
-        replicationPassword
-        ;
-      host = "postgreql.postgreql";
-    };
+    databaseTarget = "postgresql";
+    database.password = secrets.authentik.postgresql.password;
   };
 }

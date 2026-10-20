@@ -12,11 +12,7 @@
     databaseTarget = "postgresql";
     database.password = (secrets.nocodb.postgresql or { }).password or secrets.postgresql.userPassword;
 
-    redis = {
-      host = "redis.redis";
-      port = 6379;
-      password = secrets.redis.password;
-    };
+    redisTarget = "redis";
 
     # Shared garage bucket/credentials (see env/dev/garage.nix) -- garage only
     # auto-creates one "default" bucket on boot (same bucket attic/xyops use).

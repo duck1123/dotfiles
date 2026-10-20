@@ -25,10 +25,9 @@
     homepage.group = "Media";
     nfs.enable = false;
 
+    redisTarget = "redis";
     redis = {
       inherit (secrets.immich.redis) password;
-      host = "redis.redis";
-      port = 6379;
       dbIndex = 0;
     };
 

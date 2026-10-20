@@ -15,11 +15,8 @@
 
     secretKey = secrets.securo.secretKey;
 
+    redisTarget = "redis";
     redis = {
-      host = "redis.redis";
-      port = 6379;
-      password = secrets.redis.password;
-
       # db 0 (the default for every app on the shared redis instance) is a
       # free-for-all: immich (BullMQ), nocodb, and any Celery-based app all
       # write there, and Celery's default result-backend keys

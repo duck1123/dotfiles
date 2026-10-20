@@ -14,7 +14,7 @@
     homepage.group = "Analytics";
     ingress.tls.enable = true;
     ingressProvider = "traefik-lan";
-    redis.password = secrets.redis.password;
+    redisTarget = "redis";
     secretKey = (secrets.superset or { }).secretKey or "";
 
     reportingConnections = map (db: {

@@ -12,6 +12,7 @@ rec {
   inherit name;
   uses-ingress = true;
   uses-database = true;
+  requires-redis = true;
 
   sopsSecrets =
     cfg:
@@ -41,24 +42,6 @@ rec {
       description = mdDoc "AFFiNE Docker image (ghcr.io/toeverything/affine)";
       type = types.str;
       default = "ghcr.io/toeverything/affine:stable";
-    };
-
-    redis = {
-      host = mkOption {
-        description = mdDoc "Redis host (cluster service DNS)";
-        type = types.str;
-        default = "redis.redis";
-      };
-      port = mkOption {
-        description = mdDoc "Redis port";
-        type = types.int;
-        default = 6379;
-      };
-      password = mkOption {
-        description = mdDoc "Redis password";
-        type = types.str;
-        default = "";
-      };
     };
 
     serverExternalUrl = mkOption {

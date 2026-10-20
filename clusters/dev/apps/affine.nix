@@ -1,4 +1,4 @@
-{ config, secrets, ... }:
+{ config, ... }:
 {
   services.affine = {
     enable = false;
@@ -6,11 +6,7 @@
 
     databaseTarget = "postgresql";
 
-    redis = {
-      host = "redis.redis";
-      port = 6379;
-      password = secrets.redis.password;
-    };
+    redisTarget = "redis";
 
     serverExternalUrl = "https://affine.${config.devDefaults.homeDomain}";
 
