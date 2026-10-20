@@ -1185,9 +1185,9 @@ export def "nur postgres list-backups" []: nothing -> nothing {
         name: "lister"
         image: "pgvector/pgvector:pg17"
         command: ["/bin/bash", "-c", "ls -lht /backups/*.sql.gz 2>/dev/null || echo 'No backups found'; df -h /backups"]
-        volumeMounts: [{name: "backups", mountPath: "/backups"}]
+        volumeMounts: [{name: "backups", mountPath: "/backups", subPath: "postgresql"}]
       }]
-      volumes: [{name: "backups", persistentVolumeClaim: {claimName: "postgresql-backups"}}]
+      volumes: [{name: "backups", persistentVolumeClaim: {claimName: "postgresql-backups-nas"}}]
     }
   }
   try {
@@ -1288,9 +1288,9 @@ echo 'Restore completed successfully.'"
                 name: "PGPASSWORD"
                 valueFrom: {secretKeyRef: {name: $PG_SECRET, key: "adminPassword"}}
               }]
-              volumeMounts: [{name: "backups", mountPath: "/backups"}]
+              volumeMounts: [{name: "backups", mountPath: "/backups", subPath: "postgresql"}]
             }]
-            volumes: [{name: "backups", persistentVolumeClaim: {claimName: "postgresql-backups"}}]
+            volumes: [{name: "backups", persistentVolumeClaim: {claimName: "postgresql-backups-nas"}}]
           }
         }
       }
@@ -1394,7 +1394,7 @@ echo 'Restore completed successfully.'"
 
 # ─── MariaDB (ported from k3s-fleetops) ─────────────────────────────────────
 
-# List available MariaDB backups on the mariadb-backups PVC
+# List available MariaDB backups on the NAS (DatabaseBackups/mariadb)
 export def "nur mariadb list-backups" []: nothing -> nothing {
   let namespace = "mariadb"
   let pod_name = "mariadb-backup-lister"
@@ -1406,11 +1406,11 @@ export def "nur mariadb list-backups" []: nothing -> nothing {
       restartPolicy: "Never"
       containers: [{
         name: "lister"
-        image: "bitnami/mariadb:latest"
+        image: "docker.io/mariadb:11.8.9"
         command: ["/bin/bash", "-c", "ls -lh /backups/*.sql.gz 2>/dev/null || echo 'No backups found'"]
-        volumeMounts: [{name: "backups", mountPath: "/backups"}]
+        volumeMounts: [{name: "backups", mountPath: "/backups", subPath: "mariadb"}]
       }]
-      volumes: [{name: "backups", persistentVolumeClaim: {claimName: "mariadb-backups"}}]
+      volumes: [{name: "backups", persistentVolumeClaim: {claimName: "mariadb-backups-nas"}}]
     }
   }
   try {
@@ -1437,7 +1437,7 @@ export def "nur mariadb restore" [--backup-file: string = ""] {
   let restore_cmd = $"set -e
 echo 'Starting restore from: ($backup_filename)'
 echo 'WARNING: This will replace all existing databases!'
-gunzip -c /backups/($backup_filename) | mysql -h mariadb.mariadb -u root -p\"$MARIADB_ROOT_PASSWORD\"
+gunzip -c /backups/($backup_filename) | mariadb -h mariadb.mariadb -u root -p\"$MARIADB_ROOT_PASSWORD\"
 echo 'Restore completed successfully!'"
 
   let job_spec = {
@@ -1451,15 +1451,15 @@ echo 'Restore completed successfully!'"
           restartPolicy: "Never"
           containers: [{
             name: "restore"
-            image: "bitnami/mariadb:latest"
+            image: "docker.io/mariadb:11.8.9"
             command: ["/bin/bash", "-c", $restore_cmd]
             env: [{
               name: "MARIADB_ROOT_PASSWORD"
-              valueFrom: {secretKeyRef: {name: "mariadb-password", key: "mariadb-root-password"}}
+              valueFrom: {secretKeyRef: {name: "mariadb-password", key: "root-password"}}
             }]
-            volumeMounts: [{name: "backups", mountPath: "/backups"}]
+            volumeMounts: [{name: "backups", mountPath: "/backups", subPath: "mariadb"}]
           }]
-          volumes: [{name: "backups", persistentVolumeClaim: {claimName: "mariadb-backups"}}]
+          volumes: [{name: "backups", persistentVolumeClaim: {claimName: "mariadb-backups-nas"}}]
         }
       }
     }

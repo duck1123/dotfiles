@@ -155,9 +155,9 @@ To scale or pause an app, change `replicas` in `clusters/dev/apps/<name>.nix` an
 |---|---|
 | `nur postgres list` | Databases and their sizes. |
 | `nur postgres backup [--database db] [--output-dir dir]` | `pg_dump` every database (or one) to `./backups/postgresql/` as both `<db>_<timestamp>.sql.gz` and `.custom`. |
-| `nur postgres list-backups` | List the dumps on the `postgresql-backups` PVC (via a throwaway pod). |
+| `nur postgres list-backups` | List the nightly dumps in the NAS's `DatabaseBackups/postgresql` (via a throwaway pod). |
 | `nur postgres restore <file> [--database db] [--recreate]` | Restore a local `.sql`, `.sql.gz` or `.custom` file. The target database is inferred from a `<db>_<YYYYMMDD>_<HHMMSS>` filename unless `--database` is given; `--recreate` drops it first. A bare filename that doesn't exist locally restores that dump from the PVC via a Job. |
-| `nur mariadb list-backups` | List the dumps on the `mariadb-backups` PVC. |
+| `nur mariadb list-backups` | List the nightly dumps in the NAS's `DatabaseBackups/mariadb`. |
 | `nur mariadb restore [--backup-file f]` | Restore a dump from the PVC via a Job (prompts with the list if no file is given). **Replaces all existing databases.** |
 | `nur sqlite list <ns>` | SQLite databases (found by file header) on the namespace's Longhorn PVCs, with sizes. NFS PVCs are skipped. `excluded` marks the ones `backup` skips by default. |
 | `nur sqlite backup <ns> [--pvc p] [--exclude re] [--output-dir dir]` | Consistent online copy of each database (`sqlite3 .backup`, then `integrity_check`), gzipped to `./backups/sqlite/<ns>/<timestamp>/<pvc>/<path>.gz`. Safe while the app runs: a throwaway `sqlite-helper-*` pod mounts the PVCs on the app's node. `--exclude` defaults to paths under a `backup/` or `backups/` dir; `""` keeps everything. |

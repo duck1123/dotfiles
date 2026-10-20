@@ -19,8 +19,8 @@ let
   # with no build step (bun runs the sources directly), packaged here as
   # the `ditto-relay-bundle` flake output (modules/pkgs/ditto-relay.nix).
   # Resolved locally at `nur switch` time and handed to nix-csi via its
-  # per-system storePath convention, same as appTemplates/nostrarchives.nix
-  # and appTemplates/duck1123.nix -- meaning a bump of the pinned
+  # per-system storePath convention, same as appTemplates/duck1123.nix --
+  # meaning a bump of the pinned
   # `rev` in modules/pkgs/ditto-relay.nix needs pushing to Attic before
   # nix-csi picks it up.
   dittoRelayBundle = self.packages.x86_64-linux.ditto-relay-bundle;

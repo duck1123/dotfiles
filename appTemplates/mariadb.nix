@@ -3,6 +3,7 @@ with lib;
 let
   password-secret = "mariadb-password";
   extra-db-secret = "mariadb-extradb-passwords";
+  backups-nas = "mariadb-backups-nas";
   # Deterministic per-database env var name the init .sh scripts read
   # their password from -- e.g. "booklore" -> "EXTRADB_BOOKLORE_PASSWORD".
   extraDbEnvVar = dbName: "EXTRADB_${lib.toUpper dbName}_PASSWORD";
@@ -19,6 +20,8 @@ let
 in
 rec {
   name = "mariadb";
+  # NFS is only the backup target (see persistentVolumes below).
+  uses-nfs = true;
 
   # `pvcName` overrides since these are flat names, not the usual
   # "${name}-${name}-<key>" convention -- data's matches the chart's
@@ -268,17 +271,21 @@ rec {
                         }
                       ];
                       volumeMounts = [
-                        {
-                          name = "backup-storage";
-                          mountPath = "/backups";
-                        }
+                        (
+                          {
+                            name = "backup-storage";
+                            mountPath = "/backups";
+                          }
+                          // optionalAttrs cfg.nfs.enable { subPath = name; }
+                        )
                       ];
                     }
                   ];
                   volumes = [
                     {
                       name = "backup-storage";
-                      persistentVolumeClaim.claimName = cfg.volumes.backups.pvcName;
+                      persistentVolumeClaim.claimName =
+                        if cfg.nfs.enable then backups-nas else cfg.volumes.backups.pvcName;
                     }
                   ];
                 };
@@ -286,6 +293,38 @@ rec {
             };
           };
         };
+      };
+    };
+
+    # With nfs.enable, backups go to <nfs.path>/mariadb on the NAS instead
+    # of the Longhorn backups PVC.
+    persistentVolumes = optionalAttrs (cfg.backup.enable && cfg.nfs.enable) {
+      ${backups-nas} = {
+        apiVersion = "v1";
+        kind = "PersistentVolume";
+        metadata.name = backups-nas;
+        spec = {
+          accessModes = [ "ReadWriteMany" ];
+          capacity.storage = "1Ti";
+          # hard, not soft: a timed-out write must not leave a short dump.
+          mountOptions = [
+            "nolock"
+            "nfsvers=3"
+            "noexec"
+            "hard"
+          ];
+          nfs = { inherit (cfg.nfs) server path; };
+          persistentVolumeReclaimPolicy = "Retain";
+        };
+      };
+    };
+
+    persistentVolumeClaims = optionalAttrs (cfg.backup.enable && cfg.nfs.enable) {
+      ${backups-nas}.spec = {
+        accessModes = [ "ReadWriteMany" ];
+        resources.requests.storage = "1Gi";
+        storageClassName = "";
+        volumeName = backups-nas;
       };
     };
 

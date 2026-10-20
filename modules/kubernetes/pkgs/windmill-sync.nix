@@ -33,7 +33,7 @@ _: {
         # needs, and resources/apps/windmill/wmill (this repo's declarative
         # resources/scripts/flows/variables tree) at share/windmill-wmill --
         # same self-referential-flake bundling as appTemplates/duck1123.nix's
-        # site+python3 and appTemplates/nostrarchives.nix's compiled binary. The
+        # site+python3. The
         # bundle is built locally when `nur switch k8s` evaluates the manifests
         # and pinned by store path, so it carries the git-tracked working tree
         # (`git add` is enough; no push to the remote needed).

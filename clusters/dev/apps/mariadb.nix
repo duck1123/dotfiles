@@ -15,6 +15,10 @@
     hostAffinity = "edgenix";
     storageClassName = "longhorn";
 
+    # Nightly backups go to the NAS's DatabaseBackups share, in mariadb/.
+    nfs.enable = true;
+    nfsSubPath = "DatabaseBackups";
+
     # Databases come from the apps that use them (uses-database +
     # databaseTarget = "mariadb"); see config.databases.
 

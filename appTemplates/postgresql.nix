@@ -4,6 +4,7 @@ let
   name = "postgresql";
   password-secret = "${name}-password";
   extra-db-secret = "${name}-extradb-passwords";
+  backups-nas = "${name}-backups-nas";
 
   # Databases registered (config.databases) on any provider this app serves.
   provisioned = filter (
@@ -33,6 +34,8 @@ let
 in
 {
   inherit name;
+  # NFS is only the backup target (see persistentVolumes below).
+  uses-nfs = true;
 
   # `pvcName` overrides since these predate the "${name}-${name}-<key>"
   # convention (data's is flat, matching persistentVolumeClaimName
@@ -503,17 +506,21 @@ in
                         }
                       ];
                       volumeMounts = [
-                        {
-                          mountPath = "/backups";
-                          name = "backup-storage";
-                        }
+                        (
+                          {
+                            mountPath = "/backups";
+                            name = "backup-storage";
+                          }
+                          // optionalAttrs cfg.nfs.enable { subPath = name; }
+                        )
                       ];
                     }
                   ];
                   volumes = [
                     {
                       name = "backup-storage";
-                      persistentVolumeClaim.claimName = cfg.volumes.backups.pvcName;
+                      persistentVolumeClaim.claimName =
+                        if cfg.nfs.enable then backups-nas else cfg.volumes.backups.pvcName;
                     }
                   ];
                 };
@@ -521,6 +528,38 @@ in
             };
           };
         };
+      };
+    };
+
+    # With nfs.enable, backups go to <nfs.path>/postgresql on the NAS
+    # instead of the Longhorn backups PVC.
+    persistentVolumes = optionalAttrs (cfg.backup.enable && cfg.nfs.enable) {
+      ${backups-nas} = {
+        apiVersion = "v1";
+        kind = "PersistentVolume";
+        metadata.name = backups-nas;
+        spec = {
+          accessModes = [ "ReadWriteMany" ];
+          capacity.storage = "1Ti";
+          # hard, not soft: a timed-out write must not leave a short dump.
+          mountOptions = [
+            "nolock"
+            "nfsvers=3"
+            "noexec"
+            "hard"
+          ];
+          nfs = { inherit (cfg.nfs) server path; };
+          persistentVolumeReclaimPolicy = "Retain";
+        };
+      };
+    };
+
+    persistentVolumeClaims = optionalAttrs (cfg.backup.enable && cfg.nfs.enable) {
+      ${backups-nas}.spec = {
+        accessModes = [ "ReadWriteMany" ];
+        resources.requests.storage = "1Gi";
+        storageClassName = "";
+        volumeName = backups-nas;
       };
     };
 
