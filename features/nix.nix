@@ -13,7 +13,15 @@
     {
       atticPush = simpleFeature {
         inherit inputs lib;
-      } "automatic push-on-build to the Attic cache and duck1123.cachix.org";
+      } "automatic push-on-build to the Attic cache";
+
+      # Off everywhere: Attic is the LAN cache, and pushing every build to the
+      # public duck1123.cachix.org too was only a workaround for Attic being
+      # unreliable. Push single paths by hand when needed
+      # (`cachix push duck1123 <path>`).
+      cachixPush = simpleFeature {
+        inherit inputs lib;
+      } "automatic push-on-build to duck1123.cachix.org (needs atticPush)";
 
       substituters = mkOption {
         type = types.listOf types.str;

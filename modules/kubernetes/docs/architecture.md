@@ -63,7 +63,7 @@ flowchart LR
    1. pulls `kubernetes/manifests/`;
    2. decrypts `secrets/k8s.enc.yaml` to a temp file (`DECRYPTED_SECRET_FILE`) and builds the nixidy environment. Every flake package an app references by store path (for example `storybook-runtime`, `windmill-sync-bundle`, `duck1123-runtime`) is built **locally** at this point, from the working tree;
    3. writes the YAML into `kubernetes/manifests/dev/`, adds `SopsSecret` manifests (`scripts/k8s-write-sops-secrets.sh`) and post-processes a few charts;
-   4. **pushes every store path the manifests pin to Attic** (step 6 of `scripts/k8s-switch-charts.sh`). attic-watch-store on the workstations usually has them already; this step makes sure;
+   4. **pushes every store path the manifests pin to Attic** (step 6 of `scripts/k8s-switch-charts.sh`). attic-watch-store on the workstations usually has them already; this step makes sure. Step 7 then lists those closures in `dev/attic/ConfigMap-attic-keepalive.yaml` for Attic's keep-alive job (see [nix-csi-and-binary-cache.md](nix-csi-and-binary-cache.md#garbage-collection));
    5. commits and pushes argo-manifests. **That push is the deploy.**
 3. **ArgoCD** sees the new commit (or `nur argocd refresh <app>` to skip the wait) and applies it.
 4. **Pods start.** A pod with a nixkube volume gets its store path from Attic (or upstream caches) and sees it at `/nix/var/result`. Secrets come from the operator. The ingress gets a certificate from cert-manager.

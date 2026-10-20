@@ -236,6 +236,7 @@ in
             - `#reporter`: `duck` or `claude`. Who filed it.
             - `#category`: `decision` (an open question for Duck), `task`, `bug` or `idea` (parked until needed).
             - `~related`: points at the project or topic note(s). For an agentic project, that's its note under Agentic Notes (`YxR4EdcnsqcO`).
+            - `#ticketId`: the ticket's own noteId, shown as the promoted **ID** field so Duck can copy it. The *Stamp ticket IDs* script (`tCtvIVsSU7kt`) fills it in; set it yourself on a ticket you create in case the script hasn't run. When Duck names a ticket by ID, it's this value. In a pasted Trilium URL, `ntxId=` is a tab ID, not a note.
           - **Body:** the goal, what's known so far, and a "Done when" line. Don't add a filed date; the note's created date is the record.
           - **Searching:** always add `#!template` (the template itself carries `#ticket`). Test for open tickets with `not(#status = Done)`, never `#status != Done`. Example: `#ticket #!template ~related.noteId = <project> not(#status = Done)`.
           - **Saved searches:** in Searches (`7lgPyt10Typ6`): *Open Tickets*, *My Tickets*, *Open Decisions*. A project can have its own saved search in its note.

@@ -16,9 +16,10 @@ _: {
       cachix = {
         cache = "duck1123";
       };
+      inherit (config.host.features) nix;
     in
     {
-      config = lib.mkIf (config.host.features.nix.enable && config.host.features.nix.atticPush.enable) {
+      config = lib.mkIf (nix.enable && nix.atticPush.enable) {
         sops.secrets = {
           attic-push-token = {
             sopsFile = ./../../secrets/attic-token.yaml;
@@ -29,7 +30,8 @@ _: {
             group = "users";
             restartUnits = [ "attic-watch-store.service" ];
           };
-
+        }
+        // lib.optionalAttrs nix.cachixPush.enable {
           cachix-push-token = {
             sopsFile = ./../../secrets/cachix-token.yaml;
             key = "cachix_push_token";
@@ -41,6 +43,7 @@ _: {
           };
         };
 
+        # Kept installed without cachixPush, for manual `cachix push`.
         environment.systemPackages = [ pkgs.cachix ];
 
         systemd.services.attic-watch-store = {
@@ -66,7 +69,7 @@ _: {
           };
         };
 
-        systemd.services.cachix-watch-store = {
+        systemd.services.cachix-watch-store = lib.mkIf nix.cachixPush.enable {
           description = "Auto-push newly built store paths to the ${cachix.cache} Cachix cache";
           after = [
             "network-online.target"

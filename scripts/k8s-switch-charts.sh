@@ -133,4 +133,28 @@ else
   attic push "$ATTIC_CACHE" "${LOCAL_PATHS[@]}"
 fi
 
+# ---------------------------------------------------------------------------
+# 7. List the pinned closures for attic's keep-alive CronJob (see
+#    appTemplates/attic.nix), so Attic's GC never collects a path the cluster
+#    still pins just because nothing re-downloaded it. Leaves out paths signed
+#    by cache.nixos.org, which `attic push` skips too (the cache's upstream
+#    key), so any miss the job reports is a real one.
+# ---------------------------------------------------------------------------
+KEEPALIVE_FILE="$MANIFESTS_DIR/dev/attic/ConfigMap-attic-keepalive.yaml"
+if [[ -d "$(dirname "$KEEPALIVE_FILE")" ]]; then
+  KEEPALIVE_HASHES=()
+  if [[ ${#LOCAL_PATHS[@]} -gt 0 ]]; then
+    mapfile -t KEEPALIVE_HASHES < <(
+      nix path-info --recursive --sigs "${LOCAL_PATHS[@]}" \
+        | grep -v 'cache\.nixos\.org-1:' \
+        | awk '{ print $1 }' | sed -E 's|^/nix/store/([a-z0-9]{32})-.*|\1|' | sort -u
+    )
+  fi
+  echo "Listing ${#KEEPALIVE_HASHES[@]} pinned closure path(s) for Attic's keep-alive job..."
+  {
+    printf 'apiVersion: v1\nkind: ConfigMap\nmetadata:\n  name: attic-keepalive\n  namespace: attic\ndata:\n  hashes: |\n'
+    printf '    %s\n' "${KEEPALIVE_HASHES[@]}"
+  } > "$KEEPALIVE_FILE"
+fi
+
 echo "Done. Run 'nur k8s push' to commit and push manifests."

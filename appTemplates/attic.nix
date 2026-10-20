@@ -36,6 +36,49 @@ let
   # storePath convention, same as appTemplates/duck1123.nix.
   atticServerBundle = self.packages.x86_64-linux.attic-server-bundle;
 
+  # Attic only bumps an object's last-access time when its NAR is downloaded
+  # (not on a narinfo lookup, and not when `attic push` finds it already
+  # there), and it tracks each store path on its own. So a pinned app that
+  # nothing re-pulls for a whole retention period would be collected, along
+  # with its dependencies. This job HEADs the NAR of every path in the pinned
+  # closures, which counts as an access. The list (ConfigMap
+  # `${keepalive-configmap}`) is written by scripts/k8s-switch-charts.sh, not
+  # by nixidy, since only the rendered manifests know every pinned path.
+  keepalive-configmap = "${name}-keepalive";
+  keepaliveTools = pkgs.symlinkJoin {
+    name = "attic-keepalive-tools";
+    paths = [
+      pkgs.bash
+      pkgs.coreutils
+      pkgs.curl
+    ];
+  };
+  keepaliveScript = cfg: ''
+    set -u
+    list=/keepalive/hashes
+    if [ ! -s "$list" ]; then
+      echo "no pinned paths listed in $list; nothing to do"
+      exit 0
+    fi
+    base="http://${name}.${cfg.namespace}:${toString cfg.service.port}/${cfg.garbageCollection.cache}"
+    total=0
+    missing=0
+    while read -r hash; do
+      [ -n "$hash" ] || continue
+      total=$((total + 1))
+      code=$(curl -s -o /dev/null -I -w '%{http_code}' "$base/nar/$hash.nar")
+      case "$code" in
+        2* | 3*) ;;
+        *)
+          echo "not in cache: $hash (HTTP $code)"
+          missing=$((missing + 1))
+          ;;
+      esac
+    done < "$list"
+    echo "touched $((total - missing)) of $total pinned paths"
+    [ "$missing" -eq 0 ]
+  '';
+
   serverConfig = cfg: ''
     listen = "[::]:${toString cfg.service.port}"
     allowed-hosts = ["${cfg.ingress.domain}", "localhost:${toString cfg.service.port}", "${name}.${name}:${toString cfg.service.port}"]
@@ -62,6 +105,12 @@ let
 
     [compression]
     type = "zstd"
+
+    # Applies to every cache without its own retention period (set with
+    # `attic cache configure --retention-period`).
+    [garbage-collection]
+    interval = "${cfg.garbageCollection.interval}"
+    default-retention-period = "${cfg.garbageCollection.retentionPeriod}"
   '';
 in
 {
@@ -74,6 +123,29 @@ in
       description = mdDoc "atticd API listen port";
       type = types.int;
       default = 8080;
+    };
+
+    garbageCollection = {
+      interval = mkOption {
+        description = mdDoc "How often atticd runs garbage collection (humantime, e.g. \"12 hours\")";
+        type = types.str;
+        default = "12 hours";
+      };
+      retentionPeriod = mkOption {
+        description = mdDoc "Delete store paths nobody has downloaded for this long (humantime; \"0s\" disables time-based GC)";
+        type = types.str;
+        default = "30 days";
+      };
+      cache = mkOption {
+        description = mdDoc "Cache whose pinned paths the keep-alive job touches";
+        type = types.str;
+        default = "nixos";
+      };
+      keepaliveSchedule = mkOption {
+        description = mdDoc "Cron schedule of the job that marks pinned paths as accessed. Must run well inside retentionPeriod.";
+        type = types.str;
+        default = "17 3 * * *";
+      };
     };
 
     tokenHs256SecretBase64 = mkOption {
@@ -263,6 +335,57 @@ in
               secretName = "${name}-tls";
             }
           ];
+        };
+      };
+
+      cronJobs."${name}-keepalive".spec = {
+        schedule = cfg.garbageCollection.keepaliveSchedule;
+        concurrencyPolicy = "Forbid";
+        successfulJobsHistoryLimit = 1;
+        failedJobsHistoryLimit = 3;
+        jobTemplate.spec = {
+          backoffLimit = 1;
+          template.spec = {
+            restartPolicy = "Never";
+            containers = [
+              {
+                name = "keepalive";
+                image = "ghcr.io/lillecarl/nix-csi/scratch:1.0.1";
+                command = [
+                  "bash"
+                  "-c"
+                  (keepaliveScript cfg)
+                ];
+                volumeMounts = [
+                  {
+                    name = "nix";
+                    mountPath = "/nix";
+                    subPath = "nix";
+                  }
+                  {
+                    name = "keepalive";
+                    mountPath = "/keepalive";
+                  }
+                ];
+              }
+            ];
+            volumes = [
+              {
+                name = "nix";
+                csi = {
+                  driver = "nixkube";
+                  volumeAttributes."x86_64-linux" = "${keepaliveTools}";
+                };
+              }
+              {
+                name = "keepalive";
+                configMap = {
+                  name = keepalive-configmap;
+                  optional = true;
+                };
+              }
+            ];
+          };
         };
       };
 

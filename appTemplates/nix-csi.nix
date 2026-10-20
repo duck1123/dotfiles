@@ -33,12 +33,13 @@ in
   extraAppConfig =
     cfg:
     let
-      # duck1123.cachix.org is fed by `cachix watch-store` on the
-      # workstation, so anything built locally (e.g. attic's own
-      # attic-server-bundle) is fetchable even while Attic is down. It
-      # has to be asked *before* Attic (priority 41, same as this cache
-      # by default): a down Attic answers 503, which nix treats as a hard
-      # error rather than moving on to the next substituter.
+      # duck1123.cachix.org is no longer fed automatically
+      # (features.nix.cachixPush is off), so it only has older builds and
+      # whatever was pushed by hand, e.g. attic's own attic-server-bundle
+      # with `cachix push duck1123 <path>`, so Attic can come back up while
+      # Attic is down. It has to be asked *before* Attic (priority 41, same
+      # as this cache by default): a down Attic answers 503, which nix
+      # treats as a hard error rather than moving on to the next substituter.
       atticSettings = {
         substituters = [
           "https://attic.home.kronkltd.net/nixos"
