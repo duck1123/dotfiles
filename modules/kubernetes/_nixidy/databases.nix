@@ -84,6 +84,14 @@ in
               type = types.bool;
               default = false;
             };
+            backup = mkOption {
+              description = ''
+                Include this database in its provider's nightly backup. Turn it
+                off for large data that can be fetched or rebuilt again.
+              '';
+              type = types.bool;
+              default = true;
+            };
             groups = mkOption {
               description = ''
                 Groups this database belongs to, for consumers that take

@@ -1184,7 +1184,7 @@ export def "nur postgres list-backups" []: nothing -> nothing {
       containers: [{
         name: "lister"
         image: "pgvector/pgvector:pg17"
-        command: ["/bin/bash", "-c", "ls -lht /backups/postgresql-backup-*.sql.gz 2>/dev/null || echo 'No backups found'"]
+        command: ["/bin/bash", "-c", "ls -lht /backups/*.sql.gz 2>/dev/null || echo 'No backups found'; df -h /backups"]
         volumeMounts: [{name: "backups", mountPath: "/backups"}]
       }]
       volumes: [{name: "backups", persistentVolumeClaim: {claimName: "postgresql-backups"}}]

@@ -14,6 +14,19 @@ let
   # role itself is left alone (no CREATE/ALTER USER, no ownership change).
   ownsRole = db: db.username != config.databaseProviders.${db.provider}.superuser;
   withRole = filter ownsRole provisioned;
+  # Left out of the nightly backup: backup.exclude, plus registered databases
+  # on this provider with backup = false (provisioned or not).
+  backupSkip =
+    cfg:
+    unique (
+      cfg.backup.exclude
+      ++ map (db: db.name) (
+        filter (
+          db:
+          !db.backup && db.provider != null && (config.databaseProviders.${db.provider}.app or null) == name
+        ) (attrValues config.databases)
+      )
+    );
   # e.g. "paperless-ngx" -> "EXTRADB_PAPERLESS_NGX_PASSWORD"
   extraDbEnvVar =
     dbName: "EXTRADB_${toUpper (replaceStrings [ "-" "." ] [ "_" "_" ] dbName)}_PASSWORD";
@@ -199,6 +212,25 @@ in
         default = 30;
       };
 
+      keep = mkOption {
+        description = mdDoc ''
+          Most backup runs to keep, whatever their age. The PVC needs room for
+          one more run than this while a backup is being written.
+        '';
+        type = types.ints.positive;
+        default = 7;
+      };
+
+      exclude = mkOption {
+        description = mdDoc ''
+          Databases to leave out of the backup, on top of registered ones with
+          `backup = false` (see config.databases). For databases nothing
+          registers.
+        '';
+        type = types.listOf types.str;
+        default = [ ];
+      };
+
       storageSize = mkOption {
         description = mdDoc "Storage size for backup PVC";
         type = types.str;
@@ -370,45 +402,93 @@ in
         };
         spec = {
           schedule = cfg.backup.schedule;
+          concurrencyPolicy = "Forbid";
           successfulJobsHistoryLimit = 3;
           failedJobsHistoryLimit = 3;
           jobTemplate = {
             spec = {
+              backoffLimit = 1;
               template = {
                 spec = {
-                  restartPolicy = "OnFailure";
+                  # Never, so a failed run's pod (and its logs) stays around
+                  # under failedJobsHistoryLimit.
+                  restartPolicy = "Never";
                   containers = [
                     {
                       name = "backup";
                       inherit (cfg) image;
                       command = [
-                        "sh"
+                        "/bin/bash"
                         "-c"
                         ''
-                          set -e
+                          # No set -e: one database failing shouldn't stop the
+                          # others. pipefail makes a pg_dump failure fail its
+                          # `| gzip`.
+                          set -uo pipefail
                           BACKUP_DIR="/backups"
                           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-                          BACKUP_FILE="$BACKUP_DIR/postgresql-backup-$TIMESTAMP.sql.gz"
+                          KEEP=${toString cfg.backup.keep}
+                          SKIP=" ${concatStringsSep " " (backupSkip cfg)} "
+                          export PGHOST=${name}.${cfg.namespace} PGUSER=postgres
+                          failed=0
+
+                          # Files left by an interrupted run, empty dumps,
+                          # anything past retentionDays, then all but the
+                          # newest KEEP runs. A run is every file sharing one
+                          # timestamp; the old single-file
+                          # postgresql-backup-<ts>.sql.gz dumps count as runs.
+                          prune() {
+                            find "$BACKUP_DIR" -maxdepth 1 -type f \( -name '*.partial' -o -name '*.sql.gz' -size 0 \) -delete
+                            find "$BACKUP_DIR" -maxdepth 1 -type f -name '*.sql.gz' -mtime +${toString cfg.backup.retentionDays} -delete
+                            ls -1 "$BACKUP_DIR" \
+                              | sed -n 's/.*[_-]\([0-9]\{8\}_[0-9]\{6\}\)\.sql\.gz$/\1/p' \
+                              | sort -u | head -n -"$KEEP" \
+                              | while read -r ts; do
+                                  echo "Removing run $ts"
+                                  rm -f "$BACKUP_DIR"/*[_-]"$ts".sql.gz
+                                done
+                          }
+
+                          # dump <name> <command...>: <name>_<ts>.sql.gz, the
+                          # filename `nur postgres restore` expects. Written
+                          # to .partial first so a failed dump never looks
+                          # like a backup.
+                          dump() {
+                            local out="$BACKUP_DIR/$1_$TIMESTAMP.sql.gz"
+                            shift
+                            if "$@" | gzip > "$out.partial" && mv "$out.partial" "$out"; then
+                              echo "  ok   $(du -h "$out" | cut -f1)  $out"
+                            else
+                              echo "  FAIL $out"
+                              rm -f "$out.partial"
+                              failed=1
+                            fi
+                          }
+                          trap 'rm -f "$BACKUP_DIR"/*.partial' EXIT
 
                           echo "Starting backup at $(date)"
+                          # Before dumping, so a full disk can't block its
+                          # own cleanup.
+                          prune
+                          df -h "$BACKUP_DIR"
 
-                          # Create backup of all databases
-                          pg_dumpall \
-                            -h ${name}.${cfg.namespace} \
-                            -U postgres \
-                            -c \
-                            | gzip > "$BACKUP_FILE"
+                          dbs=$(psql -d postgres -Atc "SELECT datname FROM pg_database WHERE NOT datistemplate ORDER BY 1") \
+                            || { echo "Can't list databases"; exit 1; }
 
-                          echo "Backup completed: $BACKUP_FILE"
-                          echo "Backup size: $(du -h "$BACKUP_FILE" | cut -f1)"
+                          dump globals pg_dumpall --globals-only
+                          for db in $dbs; do
+                            case "$SKIP" in
+                              *" $db "*) echo "  skip $db" ;;
+                              *) dump "$db" pg_dump --clean --if-exists --create "$db" ;;
+                            esac
+                          done
 
-                          # Clean up old backups (keep last ${toString cfg.backup.retentionDays} days)
-                          find "$BACKUP_DIR" -name "postgresql-backup-*.sql.gz" -type f -mtime +${toString cfg.backup.retentionDays} -delete
-
-                          echo "Cleanup completed. Remaining backups:"
-                          ls -lh "$BACKUP_DIR"/*.sql.gz 2>/dev/null || echo "No backups found"
-
-                          echo "Backup job completed at $(date)"
+                          prune
+                          echo "Remaining backups:"
+                          ls -lh "$BACKUP_DIR"
+                          df -h "$BACKUP_DIR"
+                          echo "Backup job finished at $(date) (failed=$failed)"
+                          exit "$failed"
                         ''
                       ];
                       env = [
