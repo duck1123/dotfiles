@@ -16,13 +16,19 @@
     };
 
   nixos =
-    { config, lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.host.features.tailscale;
       setFlags = [
         "--accept-dns=false"
         "--accept-routes=true"
-      ] ++ lib.optional (cfg.advertiseRoutes != [ ]) (
+      ]
+      ++ lib.optional (cfg.advertiseRoutes != [ ]) (
         "--advertise-routes=" + lib.concatStringsSep "," cfg.advertiseRoutes
       );
     in
