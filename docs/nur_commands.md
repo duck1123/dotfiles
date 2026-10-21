@@ -172,6 +172,17 @@ Copies detached Longhorn volumes (apps that are off but whose data you want to k
 | `nur longhorn cold-archive <ns>/<pvc> \| <ns> \| <volume> [--as <ns>/<pvc>]` | For each matching detached volume: snapshot plus Longhorn backup (`cold-<id>`), a read-only file copy checked against a sha256 manifest, then a restore of the block backup into a scratch volume checked against the same manifest, owners and modes. Labels the Backup `cold-verified=true`. Scratch PVs/PVCs/pods go in the `volume-export` namespace and are removed afterwards. A bare `<ns>` takes all its detached volumes. Two volumes sharing a PVC name get `-<id>` added to their export folder. `--as` names the export for a volume given by name whose PVC Longhorn no longer records. |
 | `nur longhorn cold-list` | Detached volumes with their app's `enable` state in `clusters/dev/apps`, and their cold backup's state and whether the restore check passed. |
 
+### NAS archive (RECOVERY_BACKUP drive)
+
+Copies folders from the NAS's `/volume1` onto the RECOVERY_BACKUP USB drive attached to it, at the same path (`TV/Looney Tunes` → `<drive>/TV/Looney Tunes`). Jobs run on the NAS over SSH as the systemd unit `nas-archive-<path>`, so they survive this machine sleeping. `scripts/nas-archive.sh` is reinstalled to `/usr/local/bin/nas-archive` on every run. Each folder's sha256 manifest stays on the drive as `.archive.sha256`. Every outcome is appended to `ARCHIVE.log` at the drive's root.
+
+| Command | What it does |
+|---|---|
+| `nur nas archive <share/folder> [--dry-run] [--skip-arr] [--bwlimit 60M]` | Copy (resumable rsync, capped at `--bwlimit`), hash the source, then check the drive copy against it with the page cache dropped. **Doesn't delete the source**: a verified run prints the `rm` command. Re-running resumes. For a `TV/<show>` or `Movies/<movie>` folder it first sets `Monitored = false` in Sonarr's or Radarr's database, and refuses while that app is running (unmonitor in its UI, then pass `--skip-arr`). |
+| `nur nas archive-verify <share/folder>` | Re-check a folder on the drive against its manifest (bit-rot check for the offline copy). |
+| `nur nas archive-adopt <share/folder>` | For a folder moved some other way (e.g. UGOS File Manager): fix the root-owned `000` directories UGOS leaves, then write its manifest. Refuses if the source still exists or UGOS temp files are present. |
+| `nur nas archive-status` | Running and finished jobs, the last journal lines of running ones, drive free space, and the end of `ARCHIVE.log`. |
+
 ### Other cluster helpers
 
 | Command | What it does |

@@ -2175,6 +2175,133 @@ rm -f /tmp/in.db'
   $result
 }
 
+# ─── NAS archive (RECOVERY_BACKUP USB drive) ────────────────────────────────
+# Moves folders off the NAS's /volume1 onto the USB drive attached to it.
+# The work happens on the NAS (scripts/nas-archive.sh, installed on every
+# run) as a systemd unit, so it survives this machine sleeping.
+
+const NAS_HOST = "192.168.0.124"
+const NAS_ARCHIVE_SCRIPT = "scripts/nas-archive.sh"
+const NAS_ARCHIVE_BIN = "/usr/local/bin/nas-archive"
+# Share -> the *arr app whose database tracks folders in it, and where that
+# share is mounted in the app's pod.
+const NAS_ARR = {
+  TV: {app: "sonarr", table: "Series", root: "/tv"}
+  Movies: {app: "radarr", table: "Movies", root: "/movies"}
+}
+
+def sh-quote [s: string]: nothing -> string {
+  $"'($s | str replace --all "'" "'\\''")'"
+}
+
+def nas-ssh [cmd: string] {
+  ^ssh -o BatchMode=yes $NAS_HOST $cmd
+}
+
+# Copy this repo's scripts/nas-archive.sh to the NAS (UGOS isn't managed here)
+def nas-archive-install []: nothing -> nothing {
+  try {
+    open --raw $NAS_ARCHIVE_SCRIPT | nas-ssh $"sudo tee ($NAS_ARCHIVE_BIN) >/dev/null && sudo chmod 755 ($NAS_ARCHIVE_BIN)"
+  } catch { |err|
+    error make {msg: $"Failed to install ($NAS_ARCHIVE_BIN) on the NAS: ($err.msg)"}
+  }
+}
+
+# Install the script and run it as the transient unit nas-archive-<path>
+# (one at a time per path)
+def nas-archive-start [rel: string, flags: list<string>]: nothing -> nothing {
+  nas-archive-install
+  let q = (sh-quote $rel)
+  let args = ($flags | append ["--" $q] | str join " ")
+  let cmd = $"set -e
+unit=\"nas-archive-$\(systemd-escape -- ($q))\"
+if systemctl is-active --quiet \"$unit\"; then echo \"$unit is already running\" >&2; exit 1; fi
+sudo systemctl reset-failed \"$unit\" 2>/dev/null || true
+sudo systemd-run --quiet --unit=\"$unit\" -p Nice=10 -p IOSchedulingClass=best-effort -p IOSchedulingPriority=7 ($NAS_ARCHIVE_BIN) ($args)
+echo \"Started $unit\""
+  try {
+    nas-ssh $cmd
+  } catch { |err|
+    error make {msg: $"Failed to start the archive job: ($err.msg)"}
+  }
+  print "Follow it with: nur nas archive-status"
+}
+
+# Unmonitor the series/movie a TV/<show> or Movies/<movie> folder belongs
+# to, so it isn't downloaded again. Writes the app's database, so only while
+# the app is stopped.
+def arr-unmonitor [rel: string]: nothing -> nothing {
+  let parts = ($rel | str trim --char "/" | split row "/")
+  let arr = ($NAS_ARR | get --optional ($parts | first))
+  if $arr == null { return }
+  if ($parts | length) != 2 {
+    print $"Note: ($rel) isn't a whole ($arr.app) folder; not changing what ($arr.app) monitors."
+    return
+  }
+  let running = (^kubectl get pods -n $arr.app --no-headers --ignore-not-found | str trim)
+  if ($running | is-not-empty) {
+    error make {msg: $"($arr.app) is running. Unmonitor ($parts | last) in its UI first, then re-run with --skip-arr."}
+  }
+  let path = $"($arr.root)/($parts | last)"
+  let sql = $"UPDATE \"($arr.table)\" SET \"Monitored\" = false WHERE \"Path\" = :'p' RETURNING \"Path\";"
+  let updated = (
+    try {
+      $sql | ^kubectl exec -i -n $PG_NS (pg-pod) -- env $"PGPASSWORD=(pg-password)" psql -h localhost -U $PG_USER -p $PG_PORT -d $arr.app -v ON_ERROR_STOP=1 -v $"p=($path)" -At -f -
+      | lines | where $it == $path
+    } catch { |err|
+      error make {msg: $"Failed to unmonitor ($path) in ($arr.app): ($err.msg)"}
+    }
+  )
+  if ($updated | is-empty) {
+    print $"($arr.app) doesn't track ($path); nothing to unmonitor."
+  } else {
+    print $"Unmonitored ($path) in ($arr.app)."
+  }
+}
+
+# Copy /volume1/<share>/<folder> to the USB drive and sha256-verify it (deleting the source is up to you)
+export def "nur nas archive" [
+  path: string        # Under /volume1, e.g. "TV/Looney Tunes"
+  --dry-run           # Show what would be copied; change nothing
+  --skip-arr          # Don't touch Sonarr/Radarr
+  --bwlimit: string = "60M" # Copy speed cap (rsync --bwlimit; 0 = none). Heavy I/O crashes this NAS.
+]: nothing -> nothing {
+  if $dry_run {
+    nas-archive-install
+    nas-ssh $"sudo ($NAS_ARCHIVE_BIN) --dry-run -- (sh-quote $path)"
+    return
+  }
+  if not $skip_arr {
+    arr-unmonitor $path
+  }
+  nas-archive-start $path [$"--bwlimit=(sh-quote $bwlimit)"]
+}
+
+# Re-check an archived folder on the drive against its .archive.sha256
+export def "nur nas archive-verify" [
+  path: string        # Same path as given to `nur nas archive`
+]: nothing -> nothing {
+  nas-archive-start $path ["--verify"]
+}
+
+# Write a .archive.sha256 (and fix UGOS's 000 directory modes) for a folder moved onto the drive some other way
+export def "nur nas archive-adopt" [
+  path: string        # Its path on the drive, e.g. "TV/MythBusters"
+]: nothing -> nothing {
+  nas-archive-start $path ["--adopt"]
+}
+
+# Show archive jobs on the NAS, the drive's free space and the end of ARCHIVE.log
+export def "nur nas archive-status" []: nothing -> nothing {
+  nas-ssh "drive=$(findmnt -rn -S LABEL=RECOVERY_BACKUP -o TARGET)
+systemctl list-units --all --no-legend --plain 'nas-archive-*' | awk '{print $1, $3, $4}'
+for u in $(systemctl list-units --state=active --no-legend --plain 'nas-archive-*' | awk '{print $1}'); do
+  echo \"== $u\"; sudo journalctl -u \"$u\" --no-pager -n 3 -o cat | tr '\\r' '\\n' | tail -n 3
+done
+echo '== drive'; df -h \"$drive\" | tail -n 1
+echo '== ARCHIVE.log'; tail -n 15 \"$drive/ARCHIVE.log\" 2>/dev/null || echo '(empty)'"
+}
+
 # Register git hooks for this repo (no .githooks/ committed yet -- fleetops'
 # own pre-commit hook auto-ran a full k8s switch+push on every commit, which
 # doesn't fit dotfiles' separate manifests-repo workflow; add hooks here
