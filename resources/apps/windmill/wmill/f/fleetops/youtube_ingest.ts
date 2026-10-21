@@ -16,7 +16,7 @@ import { connect, localStamp, type Attribute, type EtapiNote, type Trilium } fro
 
 const VIDEO_TEMPLATE = "TR59IiYZa5V2";
 const CHANNEL_TEMPLATE = "MEwPXJNfzb5F";
-const CHANNEL_PARENT = "ded6b81aed13ee81b3008e65fc49b3a4"; // Youtuber
+const CHANNEL_PARENT = "ded6b81aed13ee81b3008e65fc49b3a4"; // YouTube Channels
 const OLD_VIDEOS_PARENT = "9bf7c7fbb1e2170e792ddff6b221a9f2"; // Youtube Videos
 const DESCRIPTION_HEADING = "<h3>YouTube description</h3>";
 
