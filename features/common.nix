@@ -9,45 +9,25 @@
         homeDirectory = "/home/${username}";
 
         packages = with pkgs; [
-          # aider-chat-full
           appimage-run
           argocd
           baobab
           bat
           brotab
           byobu
-          # chromium
-          # cheese
-          # cloudflare-cli
-          # cloudflared
-          # code-cursor
           curl
           gnupg
-          # gpa
-          # gnome.dconf-editor
-          # gnome-photos
-          # gnome-tweaks
-          # gnupg
-          # google-chrome
-          # graphviz
-          # gum
-          # fastfetch
           hstr
           htop
           keepassxc
           lens
           libnotify
-          # mosh
           nerdfetch
           nh
           nix-tree
           nixd
           nixfmt
-          # pear-desktop
-          # radicle-node
           ripgrep
-          # slack
-          # simplex-chat-desktop
           smartmontools
           unzip
           xsel
