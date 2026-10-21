@@ -10,9 +10,11 @@ let
 in
 {
   # ./options.nix declares the shared devDefaults.* options; ./apps holds one
-  # file per service, imported recursively.
+  # file per service, imported recursively. ./volume-pins.nix sets every
+  # app's pinned Longhorn volumes from volume-pins.json.
   imports = [
     ./options.nix
+    ./volume-pins.nix
     (self.inputs.import-tree ./apps)
   ];
 

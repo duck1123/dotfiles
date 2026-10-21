@@ -35,6 +35,21 @@ rec {
   uses-ingress = true;
   requires-redis = true;
 
+  # Shape only -- no volumeHandle here (see clusters/dev/volume-pins.json and
+  # docs/pinned-volumes.md). es-data keeps its old flat PVC name.
+  volumes =
+    cfg:
+    {
+      config.size = "5Gi";
+    }
+    // lib.optionalAttrs cfg.elasticsearch.enable {
+      es-data = {
+        size = "50Gi";
+        pvcName = "${name}-es-data";
+        inherit (cfg.elasticsearch) storageClassName;
+      };
+    };
+
   sopsSecrets =
     cfg:
     (lib.optionalAttrs (cfg.auth.username != "" && cfg.auth.password != "") {
@@ -445,12 +460,8 @@ rec {
       tls = [ { hosts = [ domain ]; } ];
     };
 
+    # config and es-data are in `volumes` above, so they can be pinned.
     persistentVolumeClaims = {
-      "${name}-${name}-config".spec = {
-        inherit (cfg) storageClassName;
-        accessModes = [ "ReadWriteOnce" ];
-        resources.requests.storage = "5Gi";
-      };
       "${name}-${name}-youtube".spec =
         if cfg.nfs.enable then
           {
@@ -479,13 +490,6 @@ rec {
             accessModes = [ "ReadWriteOnce" ];
             resources.requests.storage = "50Gi";
           };
-    }
-    // lib.optionalAttrs cfg.elasticsearch.enable {
-      "${name}-es-data".spec = {
-        storageClassName = cfg.elasticsearch.storageClassName;
-        accessModes = [ "ReadWriteOnce" ];
-        resources.requests.storage = "50Gi";
-      };
     };
 
     services = {

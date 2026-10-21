@@ -37,8 +37,5 @@
       password = (secrets.slskd or { }).password or "";
     };
 
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides.config.volumeHandle = "pvc-3daa90da-e4b2-4dd2-8cfe-9a1f98764991";
   };
 }

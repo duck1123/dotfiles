@@ -37,12 +37,5 @@
       assetsPath = "${config.devDefaults.nasBase}/Roms/assets";
       resourcesPath = "${config.devDefaults.nasBase}/Roms/resources";
     };
-
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides = {
-      data.volumeHandle = "pvc-c41afd8b-9c13-4cff-b8a3-5f9023fb7681";
-      config.volumeHandle = "pvc-79977181-2377-4be5-8218-a19774c66c15";
-    };
   };
 }

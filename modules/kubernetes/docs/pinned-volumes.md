@@ -15,7 +15,7 @@ So `mkArgoApp` splits the two apart:
 - **`volumes`** (a parameter to `mkArgoApp`, in `appTemplates/<name>.nix`) declares each volume's *shape* -- size, and any naming overrides -- with no handle. Environment-agnostic.
 - **`cfg.volumeOverrides.<key>`** (a plain option, set per-environment in e.g. `clusters/dev/apps/<name>.nix`) is `recursiveUpdate`d on top of that key's shape. `volumeHandle` is the field that pins it, but any field can be overridden this way (`size` most commonly, also `accessModes`, `storageClassName`, `volumeAttributes`, `pvcName`) without touching `appTemplates/<name>.nix`.
 
-A key present in `volumes` but with no `volumeHandle` anywhere (whether via `volumeOverrides` or otherwise) isn't pinned at all -- it's just an ordinary dynamically-provisioned PVC using the app's normal `storageClassName`. That's what a brand-new environment gets automatically, with zero extra config: everything works, it's just not yet guaranteed to survive a disable/re-enable cycle. Once someone captures a real handle for it (see below) and adds one line to that environment's `clusters/dev/apps/<name>.nix`, the exact same volume becomes pinned on the next `nur switch` -- no change to `appTemplates/<name>.nix` at all.
+A key present in `volumes` but with no `volumeHandle` anywhere (whether via `volumeOverrides` or otherwise) isn't pinned at all -- it's just an ordinary dynamically-provisioned PVC using the app's normal `storageClassName`. That's what a brand-new environment gets automatically, with zero extra config: everything works, it's just not yet guaranteed to survive a disable/re-enable cycle. Once someone captures a real handle for it (see below) and adds it to that environment's `clusters/dev/volume-pins.json`, the exact same volume becomes pinned on the next `nur switch` -- no change to `appTemplates/<name>.nix` at all.
 
 ## Using it
 
@@ -45,16 +45,16 @@ self.lib.mkArgoApp { inherit config lib self pkgs; } {
 };
 ```
 
-```nix
-# clusters/dev/apps/myapp.nix -- this environment's own data
+```json
+// clusters/dev/volume-pins.json -- this environment's own data
 {
-  services.myapp = {
-    enable = true;
-    # Captured via `kubectl get pv ... -o jsonpath='{.spec.csi.volumeHandle}'`
-    volumeOverrides.appdata.volumeHandle = "pvc-<uuid>";
-  };
+  "myapp": {
+    "appdata": "pvc-<uuid>"
+  }
 }
 ```
+
+`clusters/dev/volume-pins.nix` turns each `<app>.<key>` entry into `services.<app>.volumeOverrides.<key>.volumeHandle`. The pins live in JSON, not in the app files, so nur tasks can read and edit them. Other `volumeOverrides` fields (`size`, `storageClassName`, ...) are still set in `clusters/dev/apps/<name>.nix`. Setting a `volumeHandle` there as well is a conflicting definition and fails the build.
 
 This does three things automatically:
 - Generates the `PersistentVolumeClaim` (and, once a handle exists, its matching pinned `PersistentVolume`) and merges them into the app's resources -- no need to spread anything into `extraResources` yourself.
@@ -69,7 +69,7 @@ Pass an explicit `pvcName` (and/or `pvName`) inside a volume's arg-set in `volum
 
 ## Capturing a `volumeHandle`
 
-Nothing in this repo's Nix evaluation has live cluster access, so a handle has to be captured by hand from `kubectl` before it can go in `volumeOverrides.<key>.volumeHandle`. Two cases:
+Nothing in this repo's Nix evaluation has live cluster access, so a handle has to be captured by hand from `kubectl` before it can go in `volume-pins.json`. Two cases:
 
 **An app that's already running on a dynamically-provisioned PVC**, and you want to pin it before its next disable/re-enable cycle:
 
@@ -81,9 +81,9 @@ kubectl get pvc <pvc-name> -n <namespace> -o jsonpath='{.spec.volumeName}'
 kubectl get pv <pv-name-from-above> -o jsonpath='{.spec.csi.volumeHandle}'
 ```
 
-**A brand-new app with no PVC yet**: just declare it in `volumes` and deploy -- with no matching `volumeOverrides.<key>.volumeHandle`, it comes up as an ordinary dynamic PVC automatically. Once it's healthy, run the two commands above against the PVC it created, then add the resulting handle to that environment's `clusters/dev/apps/<name>.nix`. You can't pin a volume that doesn't exist yet -- there has to be a bootstrapping deploy first, and until you do the capture-and-add step it just stays an unpinned dynamic volume indefinitely, which is a perfectly fine place to leave anything that doesn't need the guarantee.
+**A brand-new app with no PVC yet**: just declare it in `volumes` and deploy -- with no matching `volumeOverrides.<key>.volumeHandle`, it comes up as an ordinary dynamic PVC automatically. Once it's healthy, run the two commands above against the PVC it created, then add the resulting handle to that environment's `clusters/dev/volume-pins.json`. You can't pin a volume that doesn't exist yet -- there has to be a bootstrapping deploy first, and until you do the capture-and-add step it just stays an unpinned dynamic volume indefinitely, which is a perfectly fine place to leave anything that doesn't need the guarantee.
 
-Paste the resulting `pvc-<uuid>` string in as a literal in the environment file -- one string, one specific cluster.
+Add the resulting `pvc-<uuid>` string to `clusters/dev/volume-pins.json` under `<app>.<key>` -- one string, one specific cluster.
 
 ## Gotchas
 

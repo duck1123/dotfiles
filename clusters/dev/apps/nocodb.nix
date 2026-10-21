@@ -31,8 +31,5 @@
 
     publicUrl = "https://nocodb.${config.devDefaults.homeDomain}";
 
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides.data.volumeHandle = "pvc-31a2f2bc-8818-4500-ab0a-88f2db40d7b7";
   };
 }

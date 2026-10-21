@@ -28,12 +28,5 @@
     enableNvidiaGPU = false;
     transcodecpuWorkers = 0;
     transcodegpuWorkers = 0;
-
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides = {
-      config.volumeHandle = "pvc-b11637b3-e2c3-4f93-82a3-2a19c53d0aff";
-      temp.volumeHandle = "pvc-157c8a73-0af2-4625-b441-2183651d25b5";
-    };
   };
 }

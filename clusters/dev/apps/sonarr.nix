@@ -19,8 +19,5 @@
     replicas = 1;
     vpn.enable = false;
 
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides.config.volumeHandle = "pvc-bda437d3-382b-4c6b-bbd1-3982593d07fb";
   };
 }

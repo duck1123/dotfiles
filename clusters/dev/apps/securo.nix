@@ -37,11 +37,5 @@
     homepage.group = "Organization";
 
     storageClassName = "longhorn";
-
-    volumeOverrides = {
-      attachments.volumeHandle = "pvc-26f98910-ffc8-42d0-a147-9662c23cd2ae";
-      agent-knowledge.volumeHandle = "pvc-f37b9cbf-5ffc-4e38-bffe-c8dabbceda5a";
-      embedding-models.volumeHandle = "pvc-94cacd5e-4f3a-4100-a179-fad968db8019";
-    };
   };
 }

@@ -35,7 +35,8 @@
 
     # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
     # -- see docs/pinned-volumes.md. Specific to this cluster. Only takes
-    # effect while nfs.enable is false, as above.
+    # effect while nfs.enable is false, as above. (Not in volume-pins.json:
+    # it's immich's own option, not a volumeOverrides key.)
     libraryVolumeHandle = "pvc-d794cdee-ffa7-4885-a2be-b741de8dd416";
   };
 }

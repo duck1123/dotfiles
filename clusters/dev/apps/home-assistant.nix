@@ -13,8 +13,5 @@
     monitoring.autokuma.enable = true;
     storageClassName = "longhorn";
 
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides.config.volumeHandle = "pvc-fbf41b36-718b-4942-bbe1-adf65e5bc7d1";
   };
 }

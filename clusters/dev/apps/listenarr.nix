@@ -28,8 +28,5 @@
       sharedGluetunService = "gluetun.gluetun";
     };
 
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides.config.volumeHandle = "pvc-39d3b055-b19f-4454-b84a-0609fdae6109";
   };
 }

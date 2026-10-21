@@ -19,8 +19,5 @@
       "address=/.home.kronkltd.net/192.168.0.242"
     ];
 
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides.data.volumeHandle = "pvc-131cfa45-b850-44ac-a9b1-81fadbc4bdd2";
   };
 }

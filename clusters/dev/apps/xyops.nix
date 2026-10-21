@@ -18,8 +18,5 @@
     ingressProvider = "traefik-lan";
     homepage.group = "Automation";
 
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides.data.volumeHandle = "pvc-8c803a5c-b039-4ed1-bcec-6726d2f8276b";
   };
 }

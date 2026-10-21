@@ -6,11 +6,6 @@
     relayUrl = "wss://relay.duck1123.com/";
     nsec = secrets.ditto-relay.nsec;
 
-    # Captured via `kubectl get pvc ditto-relay-ditto-relay-opensearch-data -n
-    # ditto-relay -o jsonpath='{.spec.volumeName}'` then `kubectl get pv
-    # <that> -o jsonpath='{.spec.csi.volumeHandle}'` -- see docs/pinned-volumes.md.
-    volumeOverrides.opensearch-data.volumeHandle = "pvc-5baee1d1-efe8-464b-ae93-910d4c7c593d";
-
     # No k8s Ingress (reached via the Cloudflare Tunnel, see
     # appTemplates/ditto-relay.nix and appTemplates/cloudflared.nix), so
     # homepage/monitoring.autokuma have no ingress domain to default their

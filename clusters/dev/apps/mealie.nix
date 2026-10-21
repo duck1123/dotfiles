@@ -16,8 +16,5 @@
 
     storageClassName = "longhorn";
 
-    # Captured via `kubectl get pv <name> -o jsonpath='{.spec.csi.volumeHandle}'`
-    # -- see docs/pinned-volumes.md. Specific to this cluster.
-    volumeOverrides.data.volumeHandle = "pvc-4e3d0692-5c4d-4a65-9f62-3c0f43326ede";
   };
 }
