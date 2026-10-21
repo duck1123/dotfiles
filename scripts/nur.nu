@@ -1641,6 +1641,9 @@ def cold-run-pod [name: string, claim: string, script: string, pod_env: record]:
     if $phase == "Pending" and ((date now) - $started) > 10min {
       error make {msg: $"($name) still Pending after 10 minutes:\n(cold-pod-events $name)"}
     }
+    if ($phase | is-empty) and ((date now) - $started) > 1min {
+      error make {msg: $"($name) disappeared:\n(cold-pod-events $name)"}
+    }
     $phase in ["Succeeded" "Failed"]
   }
   let logs = ((^kubectl -n $COLD_NS logs $name | complete) | $"($in.stdout)($in.stderr)" | str trim)
@@ -1830,6 +1833,11 @@ export def "nur longhorn cold-archive" [
   if ($matches | is-empty) {
     error make {msg: $"No Longhorn volume matches ($target)"}
   }
+  # A namespace an earlier run is still deleting would take this run's
+  # PVCs and pods with it.
+  wait-for $"namespace ($COLD_NS) to finish deleting" 10min {
+    (kget namespace $COLD_NS "{.status.phase}") != "Terminating"
+  }
   ^kubectl create namespace $COLD_NS --dry-run=client -o yaml | ^kubectl apply -f - | ignore
   cold-nas-claim
   for v in $matches {
@@ -1840,7 +1848,7 @@ export def "nur longhorn cold-archive" [
     let out_rel = if $dups > 1 { $"($base)-($v.name | str substring 4..11)" } else { $base }
     cold-archive-one $v $out_rel
   }
-  ^kubectl delete namespace $COLD_NS --ignore-not-found | ignore
+  ^kubectl delete namespace $COLD_NS --ignore-not-found --wait=true | ignore
   ^kubectl delete pv $COLD_NAS_PV --ignore-not-found | ignore
 }
 
