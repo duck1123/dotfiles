@@ -823,7 +823,8 @@ export def "nur k8s deploy" [
     }
     k8s-review-manifests
     let push = "Commit and push"
-    let choice = ([$push "Abort (keep changes in kubernetes/manifests)"] | input list "Push these manifest changes?")
+    # Abort first, so a bare Enter doesn't deploy
+    let choice = (["Abort (keep changes in kubernetes/manifests)" $push] | input list "Push these manifest changes?")
     if $choice != $push {
       print "Not pushed. Run 'nur k8s push' to push later."
       return

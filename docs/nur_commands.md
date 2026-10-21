@@ -108,7 +108,7 @@ App definitions live in `appTemplates/` and `clusters/dev/`. nixidy renders them
 
 | Command | What it does |
 |---|---|
-| `nur k8s deploy [--no-review]` | `manifests sync` + `switch-charts`, then (unless `--no-review`) opens the changes in magit and asks before running `push`. **Deploys.** `nur switch k8s` calls this. |
+| `nur k8s deploy [--no-review]` | `manifests sync` + `switch-charts`, then (unless `--no-review`) opens the changes in magit and asks before running `push` (the prompt starts on Abort, so a bare Enter doesn't deploy). **Deploys.** `nur switch k8s` calls this. |
 | `nur k8s switch-charts [--fallback]` | Render manifests into `kubernetes/manifests/dev/` (plus sops secrets, post-processing, and pushing pinned store paths to Attic). Local only; inspect with `git -C kubernetes/manifests diff`. |
 | `nur k8s push` | Commit and push whatever changed in `kubernetes/manifests/`. **This is the deploy step.** |
 | `nur k8s manifests init` | One-time: clone `argo-manifests` into `kubernetes/manifests/`. |
