@@ -1475,6 +1475,310 @@ echo 'Restore completed successfully!'"
   print $"Monitor: kubectl logs -n ($namespace) -f job/($job_name)"
 }
 
+# ─── Longhorn cold archive (detached volumes -> the NAS) ────────────────────
+# Copies a detached Longhorn volume to the NAS's ClusterBackups share twice:
+# a Longhorn block backup (backupstore/, the cluster's backup target) and a
+# browsable file export (exports/<ns>/<pvc>/: data/, MANIFEST.sha256, INFO).
+# Then it restores the block backup into a scratch volume and checks it
+# against the manifest, and labels the Backup cold-verified=true. It never
+# deletes the source volume. Scratch PVs/PVCs/pods live in COLD_NS.
+
+const LH_NS = "longhorn-system"
+const COLD_NS = "volume-export"
+const COLD_IMAGE = "debian:bookworm-slim"
+const CLUSTER_BACKUPS = {server: "192.168.0.124", path: "/volume1/ClusterBackups"}
+
+# Copy /src to $OUT/data (via data.tmp, so a failed run never leaves a
+# half-copy as data/), checksum the source, and check the copy against it.
+const COLD_EXPORT_SCRIPT = r#'set -euo pipefail
+mkdir -p "$OUT"
+rm -rf "$OUT/data.tmp"
+mkdir "$OUT/data.tmp"
+cp -a /src/. "$OUT/data.tmp/"
+(cd /src && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > "$OUT/MANIFEST.sha256"
+if [ -s "$OUT/MANIFEST.sha256" ]; then
+  (cd "$OUT/data.tmp" && sha256sum --check --quiet --strict ../MANIFEST.sha256)
+fi
+rm -rf "$OUT/data"
+mv "$OUT/data.tmp" "$OUT/data"
+printf 'volume=%s\npvc=%s\nexported=%s\nblock-backup=%s\n' "$VOL" "$PVC" "$(date -Is)" "$BACKUP" > "$OUT/INFO"
+echo "exported $(wc -l < "$OUT/MANIFEST.sha256") files, $(du -sh "$OUT/data" | cut -f1)"'#
+
+# Check the volume restored from the block backup against the export's
+# manifest, file count, owners and modes.
+const COLD_VERIFY_SCRIPT = r#'set -euo pipefail
+cd /src
+if [ -s "$OUT/MANIFEST.sha256" ]; then
+  sha256sum --check --quiet --strict "$OUT/MANIFEST.sha256"
+fi
+n=$(find . -type f | wc -l)
+m=$(wc -l < "$OUT/MANIFEST.sha256")
+[ "$n" -eq "$m" ] || { echo "file count differs: restored $n, manifest $m"; exit 1; }
+diff <(find . -printf '%p %U:%G %m\n' | sort) <(cd "$OUT/data" && find . -printf '%p %U:%G %m\n' | sort)
+echo "verified-restore=$(date -Is)" >> "$OUT/INFO"
+echo "restored $n files match the manifest, owners and modes"'#
+
+# Longhorn's kubernetesStatus only remembers the last PVC that bound a
+# volume, and cold-archive's scratch PVCs overwrite it. The cold-* Backup's
+# `pvc` label keeps the original <ns>/<pvc>, so prefer that when present.
+def lh-volumes []: nothing -> table {
+  let pvc_of = (
+    ^kubectl -n $LH_NS get backups.longhorn.io -o json | from json | get items
+    | where { |b| ($b.metadata.name | str starts-with "cold-") and ($b.spec.labels? | default {} | get --optional pvc) != null }
+    | each { |b| {volume: ($b.metadata.labels | get --optional backup-volume | default ""), pvc: $b.spec.labels.pvc} }
+  )
+  ^kubectl -n $LH_NS get volumes.longhorn.io -o json | from json | get items | each { |v|
+    let k = ($v.status.kubernetesStatus? | default {})
+    let labelled = ($pvc_of | where volume == $v.metadata.name | get --optional 0.pvc)
+    let ns_pvc = if $labelled != null {
+      $labelled | split row "/"
+    } else if ($k.namespace? | default "" | is-empty) or ($k.namespace? == $COLD_NS) {
+      ["" ""]
+    } else {
+      [$k.namespace $k.pvcName]
+    }
+    {
+      name: $v.metadata.name
+      namespace: ($ns_pvc | first)
+      pvc: ($ns_pvc | last)
+      pv: ($k.pvName? | default "")
+      state: ($v.status.state? | default "")
+      size: ($v.spec.size | into int)
+      actual: ($v.status.actualSize? | default 0 | into int)
+    }
+  }
+}
+
+# A jsonpath field of a resource, or "" if it doesn't exist
+def kget [kind: string, name: string, path: string, --namespace (-n): string = ""]: nothing -> string {
+  let ns = if ($namespace | is-empty) { [] } else { ["-n" $namespace] }
+  let r = (^kubectl ...$ns get $kind $name -o $"jsonpath=($path)" | complete)
+  if $r.exit_code == 0 { $r.stdout | str trim } else { "" }
+}
+
+def kapply [docs: list<record>]: nothing -> nothing {
+  $docs | each { to yaml } | str join "\n---\n" | ^kubectl apply -f - | ignore
+}
+
+def wait-for [what: string, timeout: duration, check: closure]: nothing -> nothing {
+  let deadline = ((date now) + $timeout)
+  loop {
+    if (do $check) { return }
+    if (date now) > $deadline {
+      error make {msg: $"Timed out waiting for ($what)"}
+    }
+    sleep 5sec
+  }
+}
+
+# A static PV + PVC in COLD_NS for an existing Longhorn volume (Retain, so
+# deleting them never touches the volume)
+def cold-claim [pv: string, claim: string, volume: string, size: int, fs: string]: nothing -> list<record> {
+  let storage = ($size | into string)
+  [
+    {
+      apiVersion: "v1"
+      kind: "PersistentVolume"
+      metadata: {name: $pv}
+      spec: {
+        capacity: {storage: $storage}
+        accessModes: ["ReadWriteOnce"]
+        persistentVolumeReclaimPolicy: "Retain"
+        storageClassName: ""
+        claimRef: {namespace: $COLD_NS, name: $claim}
+        csi: {driver: "driver.longhorn.io", fsType: $fs, volumeHandle: $volume}
+      }
+    }
+    {
+      apiVersion: "v1"
+      kind: "PersistentVolumeClaim"
+      metadata: {name: $claim, namespace: $COLD_NS}
+      spec: {
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: ""
+        volumeName: $pv
+        resources: {requests: {storage: $storage}}
+      }
+    }
+  ]
+}
+
+# Run a script in a pod with the claim read-only at /src and ClusterBackups
+# at /nas; fail if it fails
+def cold-run-pod [name: string, claim: string, script: string, pod_env: record]: nothing -> nothing {
+  kapply [{
+    apiVersion: "v1"
+    kind: "Pod"
+    metadata: {name: $name, namespace: $COLD_NS}
+    spec: {
+      restartPolicy: "Never"
+      containers: [{
+        name: "main"
+        image: $COLD_IMAGE
+        command: ["bash" "-c" $script]
+        env: ($pod_env | transpose name value)
+        volumeMounts: [
+          {name: "src", mountPath: "/src", readOnly: true}
+          {name: "nas", mountPath: "/nas"}
+        ]
+      }]
+      volumes: [
+        {name: "src", persistentVolumeClaim: {claimName: $claim, readOnly: true}}
+        {name: "nas", nfs: $CLUSTER_BACKUPS}
+      ]
+    }
+  }]
+  wait-for $"pod ($name)" 2hr {
+    (kget pod $name "{.status.phase}" -n $COLD_NS) in ["Succeeded" "Failed"]
+  }
+  let logs = ((^kubectl -n $COLD_NS logs $name | complete).stdout | str trim)
+  $logs | lines | last 3 | each { |l| print $"  ($l)" } | ignore
+  if (kget pod $name "{.status.phase}" -n $COLD_NS) != "Succeeded" {
+    error make {msg: $"($name) failed:\n($logs)"}
+  }
+}
+
+def cold-cleanup [short: string, volume: string]: nothing -> nothing {
+  ^kubectl -n $COLD_NS delete pod $"export-($short)" $"verify-($short)" --ignore-not-found --wait=true | ignore
+  ^kubectl -n $COLD_NS delete pvc $"src-($short)" $"restore-($short)" --ignore-not-found --wait=true | ignore
+  ^kubectl delete pv $"export-($volume)" $"restore-($short)" --ignore-not-found --wait=true | ignore
+  ^kubectl -n $LH_NS delete volumes.longhorn.io $"restore-($short)" --ignore-not-found | ignore
+}
+
+def cold-archive-one [v: record, out_rel: string]: nothing -> nothing {
+  if $v.state != "detached" {
+    error make {msg: $"($v.name) is ($v.state); only detached volumes are archived"}
+  }
+  if ($v.namespace | is-empty) {
+    error make {msg: $"($v.name) has no known namespace/PVC to name its export after"}
+  }
+  let short = ($v.name | str substring 4..11)
+  let tag = $"cold-($short)"
+  let out = $"/nas/($out_rel)"
+  let fs = if ($v.pv | is-empty) { "" } else { kget pv $v.pv "{.spec.csi.fsType}" }
+  let fs = if ($fs | is-empty) { "ext4" } else { $fs }
+  print $"=== ($v.namespace)/($v.pvc) \(($v.name)\) -> ClusterBackups/($out_rel)"
+
+  print "  block backup"
+  if (kget snapshots.longhorn.io $tag "{.metadata.name}" -n $LH_NS | is-empty) {
+    kapply [{
+      apiVersion: "longhorn.io/v1beta2"
+      kind: "Snapshot"
+      metadata: {name: $tag, namespace: $LH_NS}
+      spec: {volume: $v.name, createSnapshot: true, labels: {purpose: "cold-archive"}}
+    }]
+  }
+  wait-for $"snapshot ($tag)" 30min {
+    (kget snapshots.longhorn.io $tag "{.status.readyToUse}" -n $LH_NS) == "true"
+  }
+  if (kget backups.longhorn.io $tag "{.metadata.name}" -n $LH_NS | is-empty) {
+    kapply [{
+      apiVersion: "longhorn.io/v1beta2"
+      kind: "Backup"
+      metadata: {name: $tag, namespace: $LH_NS, labels: {backup-volume: $v.name}}
+      spec: {snapshotName: $tag, labels: {purpose: "cold-archive", pvc: $"($v.namespace)/($v.pvc)"}}
+    }]
+  }
+  wait-for $"backup ($tag)" 2hr {
+    let state = (kget backups.longhorn.io $tag "{.status.state}" -n $LH_NS)
+    if $state == "Error" {
+      error make {msg: $"Backup ($tag) failed: (kget backups.longhorn.io $tag '{.status.error}' -n $LH_NS)"}
+    }
+    $state == "Completed"
+  }
+  let url = (kget backups.longhorn.io $tag "{.status.url}" -n $LH_NS)
+
+  let pod_env = {OUT: $out, VOL: $v.name, PVC: $"($v.namespace)/($v.pvc)", BACKUP: $tag}
+  try {
+    print "  file export"
+    kapply (cold-claim $"export-($v.name)" $"src-($short)" $v.name $v.size $fs)
+    cold-run-pod $"export-($short)" $"src-($short)" $COLD_EXPORT_SCRIPT $pod_env
+    # The source is detached again before the restore check starts
+    ^kubectl -n $COLD_NS delete pod $"export-($short)" --wait=true | ignore
+
+    print "  restore check"
+    kapply [{
+      apiVersion: "longhorn.io/v1beta2"
+      kind: "Volume"
+      metadata: {name: $"restore-($short)", namespace: $LH_NS}
+      spec: {size: ($v.size | into string), numberOfReplicas: 1, frontend: "blockdev", dataEngine: "v1", accessMode: "rwo", fromBackup: $url}
+    }]
+    wait-for $"restore of ($tag)" 2hr {
+      (kget volumes.longhorn.io $"restore-($short)" "{.status.restoreRequired}/{.status.state}" -n $LH_NS) == "false/detached"
+    }
+    kapply (cold-claim $"restore-($short)" $"restore-($short)" $"restore-($short)" $v.size $fs)
+    cold-run-pod $"verify-($short)" $"restore-($short)" $COLD_VERIFY_SCRIPT $pod_env
+  } catch { |err|
+    cold-cleanup $short $v.name
+    error make {msg: $"($v.namespace)/($v.pvc): ($err.msg)"}
+  }
+  cold-cleanup $short $v.name
+  ^kubectl -n $LH_NS label backups.longhorn.io $tag cold-verified=true --overwrite | ignore
+  print "  OK (source volume kept)"
+}
+
+# Archive detached Longhorn volumes to the NAS (block backup + file export, verified by a restore)
+export def "nur longhorn cold-archive" [
+  target: string   # <namespace>/<pvc>, <namespace> (all its detached volumes) or a volume name
+]: nothing -> nothing {
+  let all = (lh-volumes)
+  let matches = if ($target | str starts-with "pvc-") {
+    $all | where name == $target
+  } else if ($target | str contains "/") {
+    let p = ($target | split row "/")
+    $all | where namespace == ($p | first) and pvc == ($p | last)
+  } else {
+    $all | where namespace == $target and state == "detached"
+  }
+  if ($matches | is-empty) {
+    error make {msg: $"No Longhorn volume matches ($target)"}
+  }
+  ^kubectl create namespace $COLD_NS --dry-run=client -o yaml | ^kubectl apply -f - | ignore
+  for v in $matches {
+    # Two volumes can share a namespace/pvc (an app re-created its PVC):
+    # tell their exports apart by the volume's short id.
+    let dups = ($all | where namespace == $v.namespace and pvc == $v.pvc | length)
+    let base = $"exports/($v.namespace)/($v.pvc)"
+    let out_rel = if $dups > 1 { $"($base)-($v.name | str substring 4..11)" } else { $base }
+    cold-archive-one $v $out_rel
+  }
+  ^kubectl delete namespace $COLD_NS --ignore-not-found | ignore
+}
+
+# Detached Longhorn volumes, their app's state in clusters/dev/apps, and how far their cold archive got
+export def "nur longhorn cold-list" []: nothing -> table {
+  let backups = (
+    ^kubectl -n $LH_NS get backups.longhorn.io -o json | from json | get items
+    | where { |b| $b.metadata.name | str starts-with "cold-" }
+    | each { |b|
+      {
+        volume: ($b.metadata.labels | get --optional backup-volume | default "")
+        backup: ($b.status.state? | default "")
+        verified: (($b.metadata.labels | get --optional cold-verified | default "") == "true")
+      }
+    }
+  )
+  lh-volumes | where state == "detached" | each { |v|
+    let f = $"clusters/dev/apps/($v.namespace).nix"
+    let app = if ($v.namespace | is-empty) {
+      "-"
+    } else if not ($f | path exists) {
+      "gone"
+    } else {
+      open $f | parse --regex '(?m)^    enable = (?P<e>true|false);' | get --optional 0.e | default "?"
+    }
+    let b = ($backups | where volume == $v.name | get --optional 0 | default {backup: "", verified: false})
+    {
+      pvc: $"($v.namespace)/($v.pvc)"
+      volume: $v.name
+      actual: ($v.actual | into filesize)
+      app_enabled: $app
+      backup: $b.backup
+      verified: $b.verified
+    }
+  } | sort-by app_enabled pvc
+}
+
 # ─── SQLite (app databases on Longhorn PVCs) ────────────────────────────────
 
 const SQLITE_BACKUP_DIR = "./backups/sqlite"

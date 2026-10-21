@@ -163,6 +163,15 @@ To scale or pause an app, change `replicas` in `clusters/dev/apps/<name>.nix` an
 | `nur sqlite backup <ns> [--pvc p] [--exclude re] [--output-dir dir]` | Consistent online copy of each database (`sqlite3 .backup`, then `integrity_check`), gzipped to `./backups/sqlite/<ns>/<timestamp>/<pvc>/<path>.gz`. Safe while the app runs: a throwaway `sqlite-helper-*` pod mounts the PVCs on the app's node. `--exclude` defaults to paths under a `backup/` or `backups/` dir; `""` keeps everything. |
 | `nur sqlite restore <dir-or-file>` | Restore a whole backup run directory or one `.gz` from it, inferring namespace, PVC and path from the layout. Refuses while any pod mounts the PVC: set the app's replicas to 0 and deploy first (not `kubectl scale`). Backs the current databases up to `<timestamp>-pre-restore/` first, keeps file owner and mode, and deletes stale `-wal`/`-shm`. |
 
+### Longhorn cold archive
+
+Copies detached Longhorn volumes (apps that are off but whose data you want to keep) to the NAS's `ClusterBackups` share in two forms. A **block backup** goes to `backupstore/`, the cluster's Longhorn backup target, for an exact restore: restore it into a new volume and re-enable the app. A **file export** goes to `exports/<ns>/<pvc>/`, with `data/`, `MANIFEST.sha256` and `INFO`, for browsing or copying files out. Neither task ever deletes the source volume.
+
+| Command | What it does |
+|---|---|
+| `nur longhorn cold-archive <ns>/<pvc> \| <ns> \| <volume>` | For each matching detached volume: snapshot plus Longhorn backup (`cold-<id>`), a read-only file copy checked against a sha256 manifest, then a restore of the block backup into a scratch volume checked against the same manifest, owners and modes. Labels the Backup `cold-verified=true`. Scratch PVs/PVCs/pods go in the `volume-export` namespace and are removed afterwards. A bare `<ns>` takes all its detached volumes. Two volumes sharing a PVC name get `-<id>` added to their export folder. |
+| `nur longhorn cold-list` | Detached volumes with their app's `enable` state in `clusters/dev/apps`, and their cold backup's state and whether the restore check passed. |
+
 ### Other cluster helpers
 
 | Command | What it does |
