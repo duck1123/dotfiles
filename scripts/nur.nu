@@ -1490,12 +1490,16 @@ const CLUSTER_BACKUPS = {server: "192.168.0.124", path: "/volume1/ClusterBackups
 
 # Copy /src to $OUT/data (via data.tmp, so a failed run never leaves a
 # half-copy as data/), checksum the source, and check the copy against it.
+# The NAS's shares apply their own ACLs (directories come out 0777), so the
+# copy can't keep modes: METADATA records the source's paths, owners, modes
+# and types instead, and the block backup keeps them exactly.
 const COLD_EXPORT_SCRIPT = r#'set -euo pipefail
 mkdir -p "$OUT"
 rm -rf "$OUT/data.tmp"
 mkdir "$OUT/data.tmp"
 cp -a /src/. "$OUT/data.tmp/"
 (cd /src && find . -type f -print0 | sort -z | xargs -0 -r sha256sum) > "$OUT/MANIFEST.sha256"
+(cd /src && find . -printf '%p %U:%G %m %y\n' | sort) > "$OUT/METADATA"
 if [ -s "$OUT/MANIFEST.sha256" ]; then
   (cd "$OUT/data.tmp" && sha256sum --check --quiet --strict ../MANIFEST.sha256)
 fi
@@ -1505,7 +1509,8 @@ printf 'volume=%s\npvc=%s\nexported=%s\nblock-backup=%s\n' "$VOL" "$PVC" "$(date
 echo "exported $(wc -l < "$OUT/MANIFEST.sha256") files, $(du -sh "$OUT/data" | cut -f1)"'#
 
 # Check the volume restored from the block backup against the export's
-# manifest, file count, owners and modes.
+# manifest and file count, and against the source's owners and modes as
+# recorded in METADATA.
 const COLD_VERIFY_SCRIPT = r#'set -euo pipefail
 cd /src
 if [ -s "$OUT/MANIFEST.sha256" ]; then
@@ -1514,7 +1519,7 @@ fi
 n=$(find . -type f | wc -l)
 m=$(wc -l < "$OUT/MANIFEST.sha256")
 [ "$n" -eq "$m" ] || { echo "file count differs: restored $n, manifest $m"; exit 1; }
-diff <(find . -printf '%p %U:%G %m\n' | sort) <(cd "$OUT/data" && find . -printf '%p %U:%G %m\n' | sort)
+diff <(find . -printf '%p %U:%G %m %y\n' | sort) "$OUT/METADATA"
 echo "verified-restore=$(date -Is)" >> "$OUT/INFO"
 echo "restored $n files match the manifest, owners and modes"'#
 
@@ -1628,14 +1633,26 @@ def cold-run-pod [name: string, claim: string, script: string, pod_env: record]:
       ]
     }
   }]
+  let started = (date now)
   wait-for $"pod ($name)" 2hr {
-    (kget pod $name "{.status.phase}" -n $COLD_NS) in ["Succeeded" "Failed"]
+    let phase = (kget pod $name "{.status.phase}" -n $COLD_NS)
+    # A pod that never starts (the volume won't attach or mount) shows up
+    # here as Pending; don't sit out the whole timeout on it.
+    if $phase == "Pending" and ((date now) - $started) > 10min {
+      error make {msg: $"($name) still Pending after 10 minutes:\n(cold-pod-events $name)"}
+    }
+    $phase in ["Succeeded" "Failed"]
   }
-  let logs = ((^kubectl -n $COLD_NS logs $name | complete).stdout | str trim)
+  let logs = ((^kubectl -n $COLD_NS logs $name | complete) | $"($in.stdout)($in.stderr)" | str trim)
   $logs | lines | last 3 | each { |l| print $"  ($l)" } | ignore
   if (kget pod $name "{.status.phase}" -n $COLD_NS) != "Succeeded" {
-    error make {msg: $"($name) failed:\n($logs)"}
+    let term = (kget pod $name "{.status.containerStatuses[0].state.terminated.reason} exit={.status.containerStatuses[0].state.terminated.exitCode} {.status.containerStatuses[0].state.terminated.message}" -n $COLD_NS)
+    error make {msg: $"($name) failed \(($term)\):\n($logs)\n(cold-pod-events $name)"}
   }
+}
+
+def cold-pod-events [name: string]: nothing -> string {
+  (^kubectl -n $COLD_NS get events --field-selector $"involvedObject.name=($name)" -o custom-columns=REASON:.reason,MESSAGE:.message --no-headers | complete).stdout | lines | last 5 | str join "\n"
 }
 
 def cold-cleanup [short: string, volume: string]: nothing -> nothing {
@@ -1643,6 +1660,48 @@ def cold-cleanup [short: string, volume: string]: nothing -> nothing {
   ^kubectl -n $COLD_NS delete pvc $"src-($short)" $"restore-($short)" --ignore-not-found --wait=true | ignore
   ^kubectl delete pv $"export-($volume)" $"restore-($short)" --ignore-not-found --wait=true | ignore
   ^kubectl -n $LH_NS delete volumes.longhorn.io $"restore-($short)" --ignore-not-found | ignore
+}
+
+# A ready snapshot named cold-<short> (reused on reruns), or cold-<short>-r2,
+# -r3 when that name is taken. A snapshot an interrupted run left half-made
+# sits on the replica marked removed, and Longhorn only purges it while the
+# volume is attached, so a new snapshot under its name is linked to the dead
+# one and never becomes ready. Returns the name used.
+def cold-snapshot [volume: string, short: string]: nothing -> any {
+  for tag in [$"cold-($short)" $"cold-($short)-r2" $"cold-($short)-r3"] {
+    if (kget snapshots.longhorn.io $tag "{.status.readyToUse}" -n $LH_NS) == "true" {
+      return $tag
+    }
+    if (kget snapshots.longhorn.io $tag "{.status.markRemoved}" -n $LH_NS) == "true" {
+      continue
+    }
+    if (kget snapshots.longhorn.io $tag "{.metadata.name}" -n $LH_NS | is-empty) {
+      kapply [{
+        apiVersion: "longhorn.io/v1beta2"
+        kind: "Snapshot"
+        metadata: {name: $tag, namespace: $LH_NS}
+        spec: {volume: $volume, createSnapshot: true, labels: {purpose: "cold-archive"}}
+      }]
+    }
+    let deadline = ((date now) + 30min)
+    mut state = ""
+    while $state == "" {
+      if (kget snapshots.longhorn.io $tag "{.status.readyToUse}" -n $LH_NS) == "true" {
+        $state = "ready"
+      } else if (kget snapshots.longhorn.io $tag "{.status.markRemoved}" -n $LH_NS) == "true" {
+        $state = "taken"
+      } else if (date now) > $deadline {
+        error make {msg: $"Timed out waiting for snapshot ($tag)"}
+      } else {
+        sleep 5sec
+      }
+    }
+    if $state == "ready" {
+      return $tag
+    }
+    print $"  ($tag) is taken by a removed snapshot; trying the next name"
+  }
+  error make {msg: $"No usable snapshot name for ($volume) \(cold-($short) through -r3 are all taken\)"}
 }
 
 def cold-archive-one [v: record, out_rel: string]: nothing -> nothing {
@@ -1653,23 +1712,16 @@ def cold-archive-one [v: record, out_rel: string]: nothing -> nothing {
     error make {msg: $"($v.name) has no known namespace/PVC to name its export after"}
   }
   let short = ($v.name | str substring 4..11)
-  let tag = $"cold-($short)"
   let out = $"/nas/($out_rel)"
   let fs = if ($v.pv | is-empty) { "" } else { kget pv $v.pv "{.spec.csi.fsType}" }
   let fs = if ($fs | is-empty) { "ext4" } else { $fs }
   print $"=== ($v.namespace)/($v.pvc) \(($v.name)\) -> ClusterBackups/($out_rel)"
 
   print "  block backup"
-  if (kget snapshots.longhorn.io $tag "{.metadata.name}" -n $LH_NS | is-empty) {
-    kapply [{
-      apiVersion: "longhorn.io/v1beta2"
-      kind: "Snapshot"
-      metadata: {name: $tag, namespace: $LH_NS}
-      spec: {volume: $v.name, createSnapshot: true, labels: {purpose: "cold-archive"}}
-    }]
-  }
-  wait-for $"snapshot ($tag)" 30min {
-    (kget snapshots.longhorn.io $tag "{.status.readyToUse}" -n $LH_NS) == "true"
+  let tag = (cold-snapshot $v.name $short)
+  # An Error backup never retries; start it over.
+  if (kget backups.longhorn.io $tag "{.status.state}" -n $LH_NS) == "Error" {
+    ^kubectl -n $LH_NS delete backups.longhorn.io $tag --wait=true | ignore
   }
   if (kget backups.longhorn.io $tag "{.metadata.name}" -n $LH_NS | is-empty) {
     kapply [{
