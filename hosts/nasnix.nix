@@ -7,11 +7,7 @@ in
   id = "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
   identity = config.identities.duck;
 
-  environments = {
-    primary = "plasma6";
-    gnome.enable = true;
-    hyprland.enable = true;
-  };
+  environments.primary = "headless";
 
   features = {
     clojure.enable = false;

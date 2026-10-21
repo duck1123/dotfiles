@@ -14,7 +14,7 @@ Top-level registry directories, auto-loaded (see [Registries](#registries)):
 
 - `hosts/`: one `<hostname>.nix` per host (see [Hosts](#hosts))
 - `features/`: one `<name>.nix` per feature that hosts toggle (see [Features](#features))
-- `environments/`: one `<name>.nix` per desktop environment (budgie, gnome, hyprland, i3, niri, plasma6) (see [Environments](#environments))
+- `environments/`: one `<name>.nix` per desktop environment (budgie, gnome, hyprland, i3, niri, plasma6, plus the text-only `headless`) (see [Environments](#environments))
 - `identities/`: per-user identities (duck, deck, drenfer)
 - `appTemplates/`: one `<name>.nix` per Kubernetes app, holding the spec lambda passed to `mkArgoApp`
 
@@ -160,4 +160,5 @@ How it fits together:
 - An environment's `features` are set with `mkDefault true` on every host that uses it (primary or enabled), via `modules.generic.environments-host` in the host submodule. They stay ordinary features, so several environments can share one (hyprland and niri both pull in `wayle`), and a host can still set one directly or turn it off. Don't enable environment-owned features (`hyprland`, `gnome`, `i3`, `wayle`) by hand in host files.
 - Because home-manager is shared across specialisations, a feature that runs a service should limit it at runtime to the environments that asked for it. `inputs.self.lib.environments.desktopsFor config.host "<feature>"` returns their `desktopNames`. See `wayle`, which uses them as `ConditionEnvironment=|XDG_CURRENT_DESKTOP=...` so it doesn't start under Plasma.
 - `primary` is reserved and can't be used as an environment name.
+- `headless` is the text-only environment, for servers like the k3s nodes. It doesn't remove GUI features from the host. While it's active it forces their services off (xserver, sddm, PipeWire, Bluetooth, XDG portals) and boots to `multi-user.target`. So `primary = "headless"; plasma6.enable = true;` boots to a console and keeps Plasma as a boot-menu entry, or switch to it live with `sudo /run/current-system/specialisation/plasma6/bin/switch-to-configuration switch`.
 - Anything consumed as a module (like `environments-host`) must be published under `flake.modules`, not `flake.types.generic`. That option is typed `anything`, which wraps function values and forces config-dependent definitions too early (infinite recursion).

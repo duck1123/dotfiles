@@ -5,7 +5,8 @@
   identity = config.identities.duck;
 
   environments = {
-    primary = "plasma6";
+    primary = "headless";
+    plasma6.enable = true;
   };
 
   features = {
