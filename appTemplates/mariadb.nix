@@ -5,7 +5,7 @@ let
   extra-db-secret = "mariadb-extradb-passwords";
   backups-nas = "mariadb-backups-nas";
   # Deterministic per-database env var name the init .sh scripts read
-  # their password from -- e.g. "booklore" -> "EXTRADB_BOOKLORE_PASSWORD".
+  # their password from -- e.g. "romm" -> "EXTRADB_ROMM_PASSWORD".
   extraDbEnvVar = dbName: "EXTRADB_${lib.toUpper dbName}_PASSWORD";
 
   # Databases registered (config.databases) on any provider this app serves.
@@ -55,7 +55,7 @@ rec {
       };
     }
     // lib.optionalAttrs (provisioned != [ ]) {
-      # One key per extra database, e.g. "booklore-password" -- kept out
+      # One key per extra database, e.g. "romm-password" -- kept out
       # of the customScripts ConfigMap (which is plaintext, committed to
       # git) and injected into the mariadb container as env vars instead
       # (see defaultValues.env below and extraDbEnvVar).

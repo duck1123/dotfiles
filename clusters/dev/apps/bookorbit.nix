@@ -9,7 +9,7 @@
 
     databaseTarget = "postgresql";
 
-    # Same NAS library booklore/komga already point at.
+    # Same NAS library komga already points at.
     nfsTarget = "nas";
     nfsSubPath = "Books";
     nfs.enable = true;
