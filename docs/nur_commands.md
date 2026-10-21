@@ -169,7 +169,7 @@ Copies detached Longhorn volumes (apps that are off but whose data you want to k
 
 | Command | What it does |
 |---|---|
-| `nur longhorn cold-archive <ns>/<pvc> \| <ns> \| <volume>` | For each matching detached volume: snapshot plus Longhorn backup (`cold-<id>`), a read-only file copy checked against a sha256 manifest, then a restore of the block backup into a scratch volume checked against the same manifest, owners and modes. Labels the Backup `cold-verified=true`. Scratch PVs/PVCs/pods go in the `volume-export` namespace and are removed afterwards. A bare `<ns>` takes all its detached volumes. Two volumes sharing a PVC name get `-<id>` added to their export folder. |
+| `nur longhorn cold-archive <ns>/<pvc> \| <ns> \| <volume> [--as <ns>/<pvc>]` | For each matching detached volume: snapshot plus Longhorn backup (`cold-<id>`), a read-only file copy checked against a sha256 manifest, then a restore of the block backup into a scratch volume checked against the same manifest, owners and modes. Labels the Backup `cold-verified=true`. Scratch PVs/PVCs/pods go in the `volume-export` namespace and are removed afterwards. A bare `<ns>` takes all its detached volumes. Two volumes sharing a PVC name get `-<id>` added to their export folder. `--as` names the export for a volume given by name whose PVC Longhorn no longer records. |
 | `nur longhorn cold-list` | Detached volumes with their app's `enable` state in `clusters/dev/apps`, and their cold backup's state and whether the restore check passed. |
 
 ### Other cluster helpers
