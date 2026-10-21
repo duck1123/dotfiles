@@ -1629,7 +1629,7 @@ def cold-run-pod [name: string, claim: string, script: string, pod_env: record]:
       }]
       volumes: [
         {name: "src", persistentVolumeClaim: {claimName: $claim, readOnly: true}}
-        {name: "nas", nfs: $CLUSTER_BACKUPS}
+        {name: "nas", persistentVolumeClaim: {claimName: "cluster-backups"}}
       ]
     }
   }]
@@ -1649,6 +1649,44 @@ def cold-run-pod [name: string, claim: string, script: string, pod_env: record]:
     let term = (kget pod $name "{.status.containerStatuses[0].state.terminated.reason} exit={.status.containerStatuses[0].state.terminated.exitCode} {.status.containerStatuses[0].state.terminated.message}" -n $COLD_NS)
     error make {msg: $"($name) failed \(($term)\):\n($logs)\n(cold-pod-events $name)"}
   }
+}
+
+# ClusterBackups as a PV/PVC in COLD_NS rather than an inline `nfs:` pod
+# volume, which can't take mount options: without nfsvers=3 some nodes'
+# clients try NFSv4.2 first, the NAS's v4 pseudo-root fails ("Cannot export
+# /"), and the mount ends in "No such file or directory" with no v3 retry.
+const COLD_NAS_PV = "cold-archive-cluster-backups"
+
+def cold-nas-claim []: nothing -> nothing {
+  # A PV left Released by an earlier run keeps a stale claimRef; start over.
+  ^kubectl delete pv $COLD_NAS_PV --ignore-not-found --wait=true | ignore
+  kapply [
+    {
+      apiVersion: "v1"
+      kind: "PersistentVolume"
+      metadata: {name: $COLD_NAS_PV}
+      spec: {
+        capacity: {storage: "1Ti"}
+        accessModes: ["ReadWriteMany"]
+        persistentVolumeReclaimPolicy: "Retain"
+        storageClassName: ""
+        mountOptions: ["nfsvers=3" "nolock" "hard"]
+        claimRef: {namespace: $COLD_NS, name: "cluster-backups"}
+        nfs: $CLUSTER_BACKUPS
+      }
+    }
+    {
+      apiVersion: "v1"
+      kind: "PersistentVolumeClaim"
+      metadata: {name: "cluster-backups", namespace: $COLD_NS}
+      spec: {
+        accessModes: ["ReadWriteMany"]
+        storageClassName: ""
+        volumeName: $COLD_NAS_PV
+        resources: {requests: {storage: "1Gi"}}
+      }
+    }
+  ]
 }
 
 def cold-pod-events [name: string]: nothing -> string {
@@ -1772,10 +1810,17 @@ def cold-archive-one [v: record, out_rel: string]: nothing -> nothing {
 # Archive detached Longhorn volumes to the NAS (block backup + file export, verified by a restore)
 export def "nur longhorn cold-archive" [
   target: string   # <namespace>/<pvc>, <namespace> (all its detached volumes) or a volume name
+  --as: string = ""  # With a volume name: the <namespace>/<pvc> it belongs to, when Longhorn no longer knows
 ]: nothing -> nothing {
   let all = (lh-volumes)
   let matches = if ($target | str starts-with "pvc-") {
-    $all | where name == $target
+    let found = ($all | where name == $target)
+    if ($as | is-empty) {
+      $found
+    } else {
+      let p = ($as | split row "/")
+      $found | update namespace ($p | first) | update pvc ($p | last)
+    }
   } else if ($target | str contains "/") {
     let p = ($target | split row "/")
     $all | where namespace == ($p | first) and pvc == ($p | last)
@@ -1786,6 +1831,7 @@ export def "nur longhorn cold-archive" [
     error make {msg: $"No Longhorn volume matches ($target)"}
   }
   ^kubectl create namespace $COLD_NS --dry-run=client -o yaml | ^kubectl apply -f - | ignore
+  cold-nas-claim
   for v in $matches {
     # Two volumes can share a namespace/pvc (an app re-created its PVC):
     # tell their exports apart by the volume's short id.
@@ -1795,6 +1841,7 @@ export def "nur longhorn cold-archive" [
     cold-archive-one $v $out_rel
   }
   ^kubectl delete namespace $COLD_NS --ignore-not-found | ignore
+  ^kubectl delete pv $COLD_NAS_PV --ignore-not-found | ignore
 }
 
 # Detached Longhorn volumes, their app's state in clusters/dev/apps, and how far their cold archive got
