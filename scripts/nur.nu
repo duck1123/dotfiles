@@ -1886,6 +1886,145 @@ export def "nur longhorn cold-list" []: nothing -> table {
   } | sort-by app_enabled pvc
 }
 
+const VOLUME_PINS = "clusters/dev/volume-pins.json"
+
+# Bring a cold-archived volume back from its block backup, under its original
+# volume name, so the app's pin (clusters/dev/volume-pins.json) binds to it
+# unchanged. The restored volume gets dataLocality best-effort: its replica
+# follows the app's pod to whichever node it runs on.
+export def "nur longhorn cold-restore" [
+  target: string        # <namespace>/<pvc> it was archived as
+  --volume: string = "" # Which source volume, when the PVC had more than one (e.g. tube-archivist)
+  --backup: string = "" # A specific cold-* backup (default: the newest verified one)
+  --pin: string = ""    # <app>.<key> to add to volume-pins.json, for a volume that isn't pinned yet
+  --verify              # Also check the restored files against the export's manifest, owners and modes
+]: nothing -> nothing {
+  let backups = (
+    ^kubectl -n $LH_NS get backups.longhorn.io -o json | from json | get items
+    | where { |b| ($b.metadata.name | str starts-with "cold-") and ($b.spec.labels? | default {} | get --optional pvc) == $target and $b.status.state? == "Completed" }
+    | each { |b|
+      {
+        name: $b.metadata.name
+        volume: ($b.metadata.labels | get --optional backup-volume | default "")
+        verified: (($b.metadata.labels | get --optional cold-verified | default "") == "true")
+        created: $b.status.backupCreatedAt
+        size: $b.status.volumeSize
+        url: $b.status.url
+      }
+    }
+  )
+  if ($backups | is-empty) {
+    error make {msg: $"No completed cold-* backup for ($target); see `nur longhorn cold-list`"}
+  }
+  let sources = ($backups | get volume | uniq)
+  let source = if ($volume | is-not-empty) {
+    if $volume not-in $sources {
+      error make {msg: $"($volume) isn't one of ($target)'s archived volumes: ($sources | str join ', ')"}
+    }
+    $volume
+  } else if ($sources | length) > 1 {
+    error make {msg: $"($target) had more than one volume; pick one with --volume: ($sources | str join ', ')"}
+  } else {
+    $sources | first
+  }
+  let candidates = ($backups | where volume == $source)
+  let b = if ($backup | is-not-empty) {
+    let named = ($candidates | where name == $backup)
+    if ($named | is-empty) {
+      error make {msg: $"($backup) isn't a completed backup of ($source)"}
+    }
+    $named | first
+  } else {
+    $candidates | sort-by verified created | last
+  }
+  if not $b.verified {
+    print $"Note: ($b.name) never passed cold-archive's restore check."
+  }
+
+  if (kget volumes.longhorn.io $source "{.metadata.name}" -n $LH_NS | is-not-empty) {
+    error make {msg: $"Longhorn volume ($source) still exists; nothing to restore"}
+  }
+
+  # The pin points at the source volume's name, so restoring under that name
+  # is all the app needs. An unpinned one would get a fresh empty PVC instead.
+  let pins = (open $VOLUME_PINS)
+  let pinned = (
+    $pins | transpose app keys | each { |a|
+      $a.keys | transpose key handle | where handle == $source | each { |k| $"($a.app).($k.key)" }
+    } | flatten
+  )
+  let pin_name = if ($pinned | is-not-empty) {
+    $pinned | first
+  } else if ($pin | is-empty) {
+    error make {msg: $"($source) isn't in ($VOLUME_PINS), so the app wouldn't use it. Re-run with --pin <app>.<key> to add the pin."}
+  } else {
+    let p = ($pin | split row ".")
+    if ($p | length) != 2 {
+      error make {msg: $"--pin takes <app>.<key>, got ($pin)"}
+    }
+    let app = ($p | first)
+    let key = ($p | last)
+    let current = ($pins | get --optional $app | default {} | get --optional $key)
+    if $current != null {
+      error make {msg: $"($pin) is already pinned to ($current)"}
+    }
+    $pins | upsert $app (($pins | get --optional $app | default {}) | upsert $key $source | sort) | sort
+    | to json --indent 2 | $"($in)\n" | save --force $VOLUME_PINS
+    print $"Pinned ($pin) to ($source) in ($VOLUME_PINS); commit it before deploying."
+    $pin
+  }
+  let app = ($pin_name | split row "." | first)
+
+  print $"=== ($target): restoring ($b.name) as ($source)"
+  kapply [{
+    apiVersion: "longhorn.io/v1beta2"
+    kind: "Volume"
+    metadata: {name: $source, namespace: $LH_NS}
+    spec: {
+      size: ($b.size | into string)
+      numberOfReplicas: 1
+      frontend: "blockdev"
+      dataEngine: "v1"
+      accessMode: "rwo"
+      dataLocality: "best-effort"
+      fromBackup: $b.url
+    }
+  }]
+  wait-for $"restore of ($b.name)" 2hr {
+    (kget volumes.longhorn.io $source "{.status.restoreRequired}/{.status.state}" -n $LH_NS) == "false/detached"
+  }
+  print "  restored"
+
+  if $verify {
+    # cold-archive gives a PVC that had several volumes one export per
+    # volume, suffixed with the volume's short id.
+    let short = ($source | str substring 4..11)
+    let out_rel = if ($sources | length) > 1 { $"exports/($target)-($short)" } else { $"exports/($target)" }
+    wait-for $"namespace ($COLD_NS) to finish deleting" 10min {
+      (kget namespace $COLD_NS "{.status.phase}") != "Terminating"
+    }
+    ^kubectl create namespace $COLD_NS --dry-run=client -o yaml | ^kubectl apply -f - | ignore
+    cold-nas-claim
+    print $"  checking against ClusterBackups/($out_rel)"
+    let pod_env = {OUT: $"/nas/($out_rel)", VOL: $source, PVC: $target, BACKUP: $b.name}
+    try {
+      kapply (cold-claim $"restore-($short)" $"restore-($short)" $source ($b.size | into int) "ext4")
+      cold-run-pod $"verify-($short)" $"restore-($short)" $COLD_VERIFY_SCRIPT $pod_env
+    } catch { |err|
+      cold-cleanup $short $source
+      error make {msg: $"($target): restored, but the check failed: ($err.msg)"}
+    }
+    # Only the scratch pod, PVC and PV: cold-cleanup would also delete a
+    # Longhorn volume named restore-<short>, which this isn't.
+    ^kubectl -n $COLD_NS delete pod $"verify-($short)" --ignore-not-found --wait=true | ignore
+    ^kubectl -n $COLD_NS delete pvc $"restore-($short)" --ignore-not-found --wait=true | ignore
+    ^kubectl delete pv $"restore-($short)" --ignore-not-found --wait=true | ignore
+    ^kubectl delete namespace $COLD_NS --ignore-not-found --wait=true | ignore
+    ^kubectl delete pv $COLD_NAS_PV --ignore-not-found | ignore
+  }
+  print $"OK: ($source) is back \(pinned as ($pin_name)\). Set `enable = true` in clusters/dev/apps/($app).nix and deploy."
+}
+
 # ─── SQLite (app databases on Longhorn PVCs) ────────────────────────────────
 
 const SQLITE_BACKUP_DIR = "./backups/sqlite"
