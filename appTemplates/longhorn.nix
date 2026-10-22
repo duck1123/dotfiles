@@ -71,6 +71,10 @@ with lib;
   defaultValues = cfg: {
     defaultSettings = {
       defaultReplicaCount = 1;
+      # Keep a volume's one replica on the node its pod runs on, so a pod
+      # doesn't lose its storage when the network to another node breaks.
+      # Only applies to new volumes; existing ones need spec.dataLocality.
+      defaultDataLocality = "best-effort";
       replicaFileSyncHttpClientTimeout = 120;
     };
 
@@ -89,6 +93,8 @@ with lib;
     persistence = {
       defaultClass = false;
       defaultClassReplicaCount = 1;
+      # The StorageClass's own value wins over defaultDataLocality
+      defaultDataLocality = "best-effort";
       reclaimPolicy = "Retain";
     };
 
