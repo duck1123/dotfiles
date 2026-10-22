@@ -29,6 +29,92 @@ let
       meta.mainProgram = "wmill";
     };
 
+  # Caldera's desktop Plexamp-style player. Upstream only ships a Flatpak
+  # bundle, so unpack it and patch the binary to run natively.
+  caldera-amp =
+    let
+      version = "1.1.1";
+    in
+    pkgs.stdenv.mkDerivation {
+      pname = "caldera-amp";
+      inherit version;
+      src = pkgs.fetchurl {
+        url = "https://releases.caldera.homes/music/amp/linux/v${version}/CalderaAmp-${version}-x64.flatpak";
+        hash = "sha256-74XAIg5WcWh0Sza/myCKtncrU/1mHp5daFK/4qDODlw=";
+      };
+      nativeBuildInputs = with pkgs; [
+        autoPatchelfHook
+        flatpak
+        ostree
+        wrapGAppsHook4
+      ];
+      buildInputs = with pkgs; [
+        alsa-lib
+        brotli
+        cairo
+        gdk-pixbuf
+        glib
+        gtk4
+        libGL
+        libidn2
+        libvdpau
+        nghttp2
+        openssl
+        pipewire
+        stdenv.cc.cc.lib
+        zlib
+        zstd
+      ];
+      unpackPhase = ''
+        export HOME=$TMPDIR
+        ostree init --repo=repo --mode=archive-z2
+        flatpak build-import-bundle repo $src
+        ostree checkout --repo=repo -U app/com.caldera.CalderaAmp/x86_64/master app
+      '';
+      dontBuild = true;
+      installPhase = ''
+        mkdir -p $out/bin $out/lib/caldera-amp $out/share
+        cp app/files/bin/caldera-amp $out/bin/
+        # Bundled ffmpeg 8 libs, so the binary gets the exact ABI it was built against
+        cp -P app/files/lib/lib*.so* $out/lib/caldera-amp/
+        cp -r app/files/share/{applications,caldera-amp,icons,metainfo} $out/share/
+
+        # Besides /app and /usr, it finds its data by walking up from the
+        # executable to its source-tree layout
+        data=$out/share/caldera-amp
+        mkdir -p $out/platform/linux "$out/vendor/MilkDrop Data"
+        ln -s $data/opengl_shaders $out/platform/linux/opengl_shaders
+        ln -s $data/fonts $out/vendor/fonts
+        ln -s $data/presets "$out/vendor/MilkDrop Data/presets"
+      '';
+      meta.mainProgram = "caldera-amp";
+    };
+
+  # Caldera's headless Plex Companion player. Upstream only publishes a
+  # `latest` tarball, so this hash breaks on every release; bump it then.
+  caldera-music = pkgs.stdenv.mkDerivation {
+    pname = "caldera-music";
+    version = "1.1.0";
+    src = pkgs.fetchurl {
+      url = "https://releases.caldera.homes/music/headless/latest/caldera-music-linux-x86_64.tar.gz";
+      hash = "sha256-R2giaoB3vwHDfK9iL9wvMXsCAYqV1fwLH3hntB/aGJ8=";
+    };
+    sourceRoot = ".";
+    nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+    buildInputs = with pkgs; [
+      alsa-lib
+      stdenv.cc.cc.lib
+      zlib
+    ];
+    dontBuild = true;
+    installPhase = ''
+      mkdir -p $out/bin $out/lib/caldera-music
+      cp bin/caldera-music $out/bin/
+      cp -P lib/lib*.so* $out/lib/caldera-music/
+    '';
+    meta.mainProgram = "caldera-music";
+  };
+
   soap-cli = pkgs.stdenv.mkDerivation {
     pname = "soap-cli";
     version = "1.3";
@@ -112,6 +198,8 @@ in
       {
         packages = {
           inherit
+            caldera-amp
+            caldera-music
             ngit
             niri
             pnu
