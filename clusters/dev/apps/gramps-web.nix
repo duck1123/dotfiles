@@ -1,6 +1,6 @@
 _: {
   services.gramps-web = {
-    enable = true;
+    enable = false;
 
     redisTarget = "redis";
 
