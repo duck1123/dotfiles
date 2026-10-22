@@ -1609,13 +1609,14 @@ def cold-claim [pv: string, claim: string, volume: string, size: int, fs: string
 }
 
 # Run a script in a pod with the claim read-only at /src and ClusterBackups
-# at /nas; fail if it fails
-def cold-run-pod [name: string, claim: string, script: string, pod_env: record]: nothing -> nothing {
+# at /nas (on --node, if given); fail if it fails
+def cold-run-pod [name: string, claim: string, script: string, pod_env: record, --node: string = ""]: nothing -> nothing {
+  let selector = if ($node | is-empty) { {} } else { {nodeSelector: {"kubernetes.io/hostname": $node}} }
   kapply [{
     apiVersion: "v1"
     kind: "Pod"
     metadata: {name: $name, namespace: $COLD_NS}
-    spec: {
+    spec: ($selector | merge {
       restartPolicy: "Never"
       containers: [{
         name: "main"
@@ -1631,7 +1632,7 @@ def cold-run-pod [name: string, claim: string, script: string, pod_env: record]:
         {name: "src", persistentVolumeClaim: {claimName: $claim, readOnly: true}}
         {name: "nas", persistentVolumeClaim: {claimName: "cluster-backups"}}
       ]
-    }
+    })
   }]
   let started = (date now)
   wait-for $"pod ($name)" 2hr {
@@ -1794,7 +1795,9 @@ def cold-archive-one [v: record, out_rel: string]: nothing -> nothing {
       apiVersion: "longhorn.io/v1beta2"
       kind: "Volume"
       metadata: {name: $"restore-($short)", namespace: $LH_NS}
-      spec: {size: ($v.size | into string), numberOfReplicas: 1, frontend: "blockdev", dataEngine: "v1", accessMode: "rwo", fromBackup: $url}
+      # disabled: a scratch volume isn't worth moving its replica to
+      # wherever the verify pod lands (the default is best-effort)
+      spec: {size: ($v.size | into string), numberOfReplicas: 1, frontend: "blockdev", dataEngine: "v1", accessMode: "rwo", dataLocality: "disabled", fromBackup: $url}
     }]
     wait-for $"restore of ($tag)" 2hr {
       (kget volumes.longhorn.io $"restore-($short)" "{.status.restoreRequired}/{.status.state}" -n $LH_NS) == "false/detached"
@@ -1898,6 +1901,7 @@ export def "nur longhorn cold-restore" [
   --backup: string = "" # A specific cold-* backup (default: the newest verified one)
   --pin: string = ""    # <app>.<key> to add to volume-pins.json, for a volume that isn't pinned yet
   --verify              # Also check the restored files against the export's manifest, owners and modes
+  --node: string = ""   # Node for the --verify pod (default: the app's hostAffinity)
 ]: nothing -> nothing {
   let backups = (
     ^kubectl -n $LH_NS get backups.longhorn.io -o json | from json | get items
@@ -1996,6 +2000,18 @@ export def "nur longhorn cold-restore" [
   print "  restored"
 
   if $verify {
+    # The replica follows whichever node mounts the volume (best-effort), so
+    # check it on the node the app will run on rather than move it twice.
+    let app_file = $"clusters/dev/apps/($app).nix"
+    let affinity = if ($app_file | path exists) {
+      open $app_file | parse --regex '(?m)^\s*hostAffinity = "(?P<n>[^"]+)";' | get --optional 0.n | default ""
+    } else { "" }
+    let verify_node = if ($node | is-not-empty) { $node } else { $affinity }
+    if ($verify_node | is-empty) {
+      print $"Note: ($app) has no hostAffinity, so the check runs wherever its pod lands and the replica may move again when the app starts. Pass --node to choose."
+    } else {
+      print $"  checking on ($verify_node)"
+    }
     # cold-archive gives a PVC that had several volumes one export per
     # volume, suffixed with the volume's short id.
     let short = ($source | str substring 4..11)
@@ -2009,7 +2025,7 @@ export def "nur longhorn cold-restore" [
     let pod_env = {OUT: $"/nas/($out_rel)", VOL: $source, PVC: $target, BACKUP: $b.name}
     try {
       kapply (cold-claim $"restore-($short)" $"restore-($short)" $source ($b.size | into int) "ext4")
-      cold-run-pod $"verify-($short)" $"restore-($short)" $COLD_VERIFY_SCRIPT $pod_env
+      cold-run-pod $"verify-($short)" $"restore-($short)" $COLD_VERIFY_SCRIPT $pod_env --node $verify_node
     } catch { |err|
       cold-cleanup $short $source
       error make {msg: $"($target): restored, but the check failed: ($err.msg)"}
