@@ -2,8 +2,8 @@
 {
   services.kite = {
     inherit (secrets.kite) encryptKey jwtSecret;
-    enable = false;
-    # hostAffinity = "edgenix";
+    enable = true;
+    hostAffinity = "edgenix";
     storageClassName = "longhorn";
 
     ingressProvider = "traefik-lan";
