@@ -2208,16 +2208,25 @@ def nas-archive-install []: nothing -> nothing {
 }
 
 # Install the script and run it as the transient unit nas-archive-<path>
-# (one at a time per path)
-def nas-archive-start [rel: string, flags: list<string>]: nothing -> nothing {
+# (one at a time per path). The unit's reads and writes on /volume1 and the
+# drive are capped at $bwlimit (cgroup io.max), so hashing is throttled as
+# well as rsync: an uncapped hash of the drive hung the whole NAS.
+def nas-archive-start [rel: string, flags: list<string>, bwlimit: string]: nothing -> nothing {
   nas-archive-install
   let q = (sh-quote $rel)
   let args = ($flags | append ["--" $q] | str join " ")
+  let caps = if $bwlimit == "0" { "" } else {
+    ["/volume1" "$drive"]
+    | each { |dev| [IOReadBandwidthMax IOWriteBandwidthMax] | each { |p| $"-p \"($p)=($dev) ($bwlimit)\"" } }
+    | flatten | str join " "
+  }
   let cmd = $"set -e
 unit=\"nas-archive-$\(systemd-escape -- ($q))\"
 if systemctl is-active --quiet \"$unit\"; then echo \"$unit is already running\" >&2; exit 1; fi
 sudo systemctl reset-failed \"$unit\" 2>/dev/null || true
-sudo systemd-run --quiet --unit=\"$unit\" -p Nice=10 -p IOSchedulingClass=best-effort -p IOSchedulingPriority=7 ($NAS_ARCHIVE_BIN) ($args)
+drive=$\(findmnt -rn -S LABEL=RECOVERY_BACKUP -o TARGET | head -n1)
+[ -n \"$drive\" ] || { echo \"RECOVERY_BACKUP isn't mounted\" >&2; exit 1; }
+sudo systemd-run --quiet --unit=\"$unit\" -p Nice=10 -p IOSchedulingClass=best-effort -p IOSchedulingPriority=7 ($caps) ($NAS_ARCHIVE_BIN) ($args)
 echo \"Started $unit\""
   try {
     nas-ssh $cmd
@@ -2274,21 +2283,23 @@ export def "nur nas archive" [
   if not $skip_arr {
     arr-unmonitor $path
   }
-  nas-archive-start $path [$"--bwlimit=(sh-quote $bwlimit)"]
+  nas-archive-start $path [$"--bwlimit=(sh-quote $bwlimit)"] $bwlimit
 }
 
 # Re-check an archived folder on the drive against its .archive.sha256
 export def "nur nas archive-verify" [
   path: string        # Same path as given to `nur nas archive`
+  --bwlimit: string = "60M" # Disk read/write cap (0 = none)
 ]: nothing -> nothing {
-  nas-archive-start $path ["--verify"]
+  nas-archive-start $path ["--verify"] $bwlimit
 }
 
 # Write a .archive.sha256 (and fix UGOS's 000 directory modes) for a folder moved onto the drive some other way
 export def "nur nas archive-adopt" [
   path: string        # Its path on the drive, e.g. "TV/MythBusters"
+  --bwlimit: string = "60M" # Disk read/write cap (0 = none)
 ]: nothing -> nothing {
-  nas-archive-start $path ["--adopt"]
+  nas-archive-start $path ["--adopt"] $bwlimit
 }
 
 # Show archive jobs on the NAS, the drive's free space and the end of ARCHIVE.log
