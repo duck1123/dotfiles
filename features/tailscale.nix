@@ -13,6 +13,16 @@
           Routes still require approval in the Tailscale admin console.
         '';
       };
+      acceptRoutes = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Use subnet routes advertised by other nodes (--accept-routes).
+          Leave off on hosts on the home LAN: tailscale's routing table wins
+          over the main one, so nasnix's 192.168.0.0/24 route would send LAN
+          traffic (k3s's flannel VXLAN included) into the tunnel.
+        '';
+      };
     };
 
   nixos =
@@ -26,7 +36,7 @@
       cfg = config.host.features.tailscale;
       setFlags = [
         "--accept-dns=false"
-        "--accept-routes=true"
+        "--accept-routes=${lib.boolToString cfg.acceptRoutes}"
       ]
       ++ lib.optional (cfg.advertiseRoutes != [ ]) (
         "--advertise-routes=" + lib.concatStringsSep "," cfg.advertiseRoutes
