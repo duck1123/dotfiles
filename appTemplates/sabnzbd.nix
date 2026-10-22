@@ -6,6 +6,7 @@ in
 rec {
   name = "sabnzbd";
   uses-ingress = true;
+  uses-replicas = true;
 
   # Shape only -- no volumeHandle here, that's environment-specific (see
   # env/dev/sabnzbd.nix and docs/pinned-volumes.md).
@@ -108,12 +109,6 @@ rec {
       description = mdDoc "Enable debug logging in SABnzbd (log_level = 2)";
       type = types.bool;
       default = false;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
 
     useProbes = mkOption {

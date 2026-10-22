@@ -11,6 +11,7 @@ in
 rec {
   name = "slskd";
   uses-ingress = true;
+  uses-replicas = true;
 
   # Shape only -- no volumeHandle here, that's environment-specific (see
   # env/dev/slskd.nix and docs/pinned-volumes.md).
@@ -47,12 +48,6 @@ rec {
       description = mdDoc "Web UI / API port";
       type = types.int;
       default = 5030;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
 
     useProbes = mkOption {

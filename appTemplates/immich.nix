@@ -23,6 +23,8 @@ rec {
     }
   ];
   requires-redis = true;
+  # Scales immich-server only, not machine-learning.
+  uses-replicas = true;
 
   sopsSecrets = cfg: {
     ${password-secret} = {
@@ -88,12 +90,6 @@ rec {
           version = 2;
         };
       };
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of immich-server replicas";
-      type = types.int;
-      default = 1;
     };
 
     redis = {

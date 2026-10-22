@@ -2,7 +2,6 @@
 {
   services.pihole = {
     auth = { inherit (secrets.pihole) email password; };
-    enable = false;
     hostAffinity = "nasnix";
 
     ingressProvider = "traefik-lan";
@@ -18,6 +17,5 @@
       "address=/.dev.kronkltd.net/192.168.0.242"
       "address=/.home.kronkltd.net/192.168.0.242"
     ];
-
   };
 }

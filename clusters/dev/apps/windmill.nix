@@ -1,7 +1,6 @@
 { secrets, ... }:
 {
   services.windmill = {
-    enable = true;
     # hostAffinity = "nixmini";
     image = "ghcr.io/windmill-labs/windmill-full:latest";
 
@@ -15,7 +14,6 @@
     };
 
     storageClassName = "longhorn";
-    replicas = 1;
 
     # nfsTarget defaults to "nas" and nfsSubPath defaults to "", so this mounts
     # the whole nasnix media export at /media in both worker deployments --

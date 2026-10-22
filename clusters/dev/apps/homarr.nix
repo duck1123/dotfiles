@@ -1,7 +1,6 @@
 { config, secrets, ... }:
 {
   services.homarr = {
-    enable = false;
     # hostAffinity = "edgenix";
 
     ingressProvider = "traefik-lan";
@@ -10,6 +9,5 @@
     monitoring.autokuma.enable = true;
     secretEncryptionKey = secrets.homarr.secretEncryptionKey;
     storageClassName = "longhorn";
-
   };
 }

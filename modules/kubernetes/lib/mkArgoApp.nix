@@ -61,6 +61,12 @@ _: {
       # Can this app not run without redis? Then a disabled redis.enable
       # fails the build instead of rendering a broken app. Implies uses-redis.
       requires-redis ? false,
+      # Does this app scale its own workload by services.<name>.replicas?
+      # The template wires cfg.replicas into it; without this the option
+      # doesn't exist, so setting it (e.g. in state.json) fails the build.
+      uses-replicas ? false,
+      # Default for services.<name>.replicas.
+      default-replicas ? 1,
     }:
     with lib;
     let
@@ -609,6 +615,13 @@ _: {
           description = "All the values";
           type = types.attrsOf types.anything;
           default = { };
+        };
+      }
+      // lib.optionalAttrs uses-replicas {
+        replicas = mkOption {
+          description = mdDoc "Number of ${name} replicas. 0 stops the app but keeps it deployed.";
+          type = types.ints.unsigned;
+          default = default-replicas;
         };
       }
       // lib.optionalAttrs uses-nfs {

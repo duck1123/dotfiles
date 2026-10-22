@@ -858,6 +858,60 @@ def "nu-complete apps" []: nothing -> list<string> {
   | sort
 }
 
+# Each app's enable, replicas and pinned volumes (see clusters/dev/state.nix).
+# The build rejects unknown apps and keys, so the tasks below don't check them.
+const CLUSTER_STATE = "clusters/dev/state.json"
+
+def cluster-state []: nothing -> record {
+  open $CLUSTER_STATE
+}
+
+# Set one key of one app in state.json, keeping it sorted
+def cluster-state-set [app: string, key: string, value: any]: nothing -> nothing {
+  let state = (cluster-state)
+  $state | upsert $app (($state | get --optional $app | default {}) | upsert $key $value | sort) | sort
+  | to json --indent 2 | $"($in)\n" | save --force $CLUSTER_STATE
+}
+
+def check-app [name: string]: nothing -> nothing {
+  if not ($name in (nu-complete apps)) {
+    error make {msg: $"Unknown app ($name). Run `nur apps list` to see valid names."}
+  }
+}
+
+# Turn an app on in clusters/dev/state.json (deploy to apply)
+export def "nur apps enable" [
+  name: string   # App name — see `nur apps list`
+]: nothing -> nothing {
+  check-app $name
+  cluster-state-set $name enable true
+  print $"Enabled ($name) in ($CLUSTER_STATE); commit it, then deploy."
+}
+
+# Turn an app off in clusters/dev/state.json (deploy to apply). ArgoCD prunes
+# its resources, PVCs included; pinned volumes survive.
+export def "nur apps disable" [
+  name: string   # App name — see `nur apps list`
+]: nothing -> nothing {
+  check-app $name
+  cluster-state-set $name enable false
+  print $"Disabled ($name) in ($CLUSTER_STATE); commit it, then deploy."
+}
+
+# Set an app's replicas in clusters/dev/state.json (deploy to apply). 0 stops
+# it but keeps it deployed. Use this, not `kubectl scale`, which ArgoCD reverts.
+export def "nur apps scale" [
+  name: string   # App name — see `nur apps list`
+  replicas: int  # Replica count (0 stops it)
+]: nothing -> nothing {
+  check-app $name
+  if $replicas < 0 {
+    error make {msg: "replicas can't be negative"}
+  }
+  cluster-state-set $name replicas $replicas
+  print $"Set ($name) to ($replicas) replica\(s\) in ($CLUSTER_STATE); commit it, then deploy."
+}
+
 # List every app name accepted by `nur apps restart` (one per line)
 export def "nur apps list" [] {
   nu-complete apps | str join "\n" | print
@@ -871,9 +925,7 @@ export def "nur apps list" [] {
 export def "nur apps restart" [
   name: string   # App name — see `nur apps list`
 ]: nothing -> nothing {
-  if not ($name in (nu-complete apps)) {
-    error make {msg: $"Unknown app ($name). Run `nur apps list` to see valid names."}
-  }
+  check-app $name
 
   if (^kubectl get deployment $name -n $name | complete).exit_code == 0 {
     try {
@@ -1855,7 +1907,7 @@ export def "nur longhorn cold-archive" [
   ^kubectl delete pv $COLD_NAS_PV --ignore-not-found | ignore
 }
 
-# Detached Longhorn volumes, their app's state in clusters/dev/apps, and how far their cold archive got
+# Detached Longhorn volumes, whether their app is enabled in clusters/dev/state.json, and how far their cold archive got
 export def "nur longhorn cold-list" []: nothing -> table {
   let backups = (
     ^kubectl -n $LH_NS get backups.longhorn.io -o json | from json | get items
@@ -1869,13 +1921,12 @@ export def "nur longhorn cold-list" []: nothing -> table {
     }
   )
   lh-volumes | where state == "detached" | each { |v|
-    let f = $"clusters/dev/apps/($v.namespace).nix"
     let app = if ($v.namespace | is-empty) {
       "-"
-    } else if not ($f | path exists) {
+    } else if $v.namespace not-in (nu-complete apps) {
       "gone"
     } else {
-      open $f | parse --regex '(?m)^    enable = (?P<e>true|false);' | get --optional 0.e | default "?"
+      cluster-state | get --optional $v.namespace | default {} | get --optional enable | default false | into string
     }
     let b = ($backups | where volume == $v.name | get --optional 0 | default {backup: "", verified: false})
     {
@@ -1889,17 +1940,15 @@ export def "nur longhorn cold-list" []: nothing -> table {
   } | sort-by app_enabled pvc
 }
 
-const VOLUME_PINS = "clusters/dev/volume-pins.json"
-
 # Bring a cold-archived volume back from its block backup, under its original
-# volume name, so the app's pin (clusters/dev/volume-pins.json) binds to it
+# volume name, so the app's pin (clusters/dev/state.json) binds to it
 # unchanged. The restored volume gets dataLocality best-effort: its replica
 # follows the app's pod to whichever node it runs on.
 export def "nur longhorn cold-restore" [
   target: string        # <namespace>/<pvc> it was archived as
   --volume: string = "" # Which source volume, when the PVC had more than one (e.g. tube-archivist)
   --backup: string = "" # A specific cold-* backup (default: the newest verified one)
-  --pin: string = ""    # <app>.<key> to add to volume-pins.json, for a volume that isn't pinned yet
+  --pin: string = ""    # <app>.<key> to add to state.json's pins, for a volume that isn't pinned yet
   --verify              # Also check the restored files against the export's manifest, owners and modes
   --node: string = ""   # Node for the --verify pod (default: the app's hostAffinity)
 ]: nothing -> nothing {
@@ -1951,16 +2000,16 @@ export def "nur longhorn cold-restore" [
 
   # The pin points at the source volume's name, so restoring under that name
   # is all the app needs. An unpinned one would get a fresh empty PVC instead.
-  let pins = (open $VOLUME_PINS)
+  let state = (cluster-state)
   let pinned = (
-    $pins | transpose app keys | each { |a|
-      $a.keys | transpose key handle | where handle == $source | each { |k| $"($a.app).($k.key)" }
+    $state | transpose app s | each { |a|
+      $a.s.pins? | default {} | transpose key handle | where handle == $source | each { |k| $"($a.app).($k.key)" }
     } | flatten
   )
   let pin_name = if ($pinned | is-not-empty) {
     $pinned | first
   } else if ($pin | is-empty) {
-    error make {msg: $"($source) isn't in ($VOLUME_PINS), so the app wouldn't use it. Re-run with --pin <app>.<key> to add the pin."}
+    error make {msg: $"($source) isn't pinned in ($CLUSTER_STATE), so the app wouldn't use it. Re-run with --pin <app>.<key> to add the pin."}
   } else {
     let p = ($pin | split row ".")
     if ($p | length) != 2 {
@@ -1968,13 +2017,13 @@ export def "nur longhorn cold-restore" [
     }
     let app = ($p | first)
     let key = ($p | last)
-    let current = ($pins | get --optional $app | default {} | get --optional $key)
+    let pins = ($state | get --optional $app | default {} | get --optional pins | default {})
+    let current = ($pins | get --optional $key)
     if $current != null {
       error make {msg: $"($pin) is already pinned to ($current)"}
     }
-    $pins | upsert $app (($pins | get --optional $app | default {}) | upsert $key $source | sort) | sort
-    | to json --indent 2 | $"($in)\n" | save --force $VOLUME_PINS
-    print $"Pinned ($pin) to ($source) in ($VOLUME_PINS); commit it before deploying."
+    cluster-state-set $app pins ($pins | upsert $key $source | sort)
+    print $"Pinned ($pin) to ($source) in ($CLUSTER_STATE); commit it before deploying."
     $pin
   }
   let app = ($pin_name | split row "." | first)
@@ -2038,7 +2087,7 @@ export def "nur longhorn cold-restore" [
     ^kubectl delete namespace $COLD_NS --ignore-not-found --wait=true | ignore
     ^kubectl delete pv $COLD_NAS_PV --ignore-not-found | ignore
   }
-  print $"OK: ($source) is back \(pinned as ($pin_name)\). Set `enable = true` in clusters/dev/apps/($app).nix and deploy."
+  print $"OK: ($source) is back \(pinned as ($pin_name)\). Run `nur apps enable ($app)` and deploy."
 }
 
 # ─── SQLite (app databases on Longhorn PVCs) ────────────────────────────────
@@ -2286,7 +2335,7 @@ export def "nur sqlite restore" [
 
   let users = (sqlite-users $ns $claims)
   if ($users | is-not-empty) {
-    error make {msg: $"($users | get name | str join ', ') still mount ($claims | str join ', '). Scale the app to 0 first: set its replicas to 0 in clusters/dev/apps/ and deploy \(not `kubectl scale`, which ArgoCD reverts\), then re-run."}
+    error make {msg: $"($users | get name | str join ', ') still mount ($claims | str join ', '). Scale the app to 0 first: `nur apps scale <app> 0` and deploy \(not `kubectl scale`, which ArgoCD reverts\), then re-run."}
   }
 
   print $"=== SQLite Restore: ($ns) ==="
@@ -2326,7 +2375,7 @@ rm -f /tmp/in.db'
   sqlite-helper-down $ns $pod
   print ""
   print $"=== Restore Complete. Pre-restore copies: ($safety_dir) ==="
-  print "Scale the app back up (replicas in clusters/dev/apps/, then deploy)."
+  print "Scale the app back up (`nur apps scale <app> <n>`, then deploy)."
   $result
 }
 

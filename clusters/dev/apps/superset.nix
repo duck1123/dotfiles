@@ -9,7 +9,6 @@
 
     database.password = (secrets.superset or { }).database.password or "";
     databaseTarget = "postgresql";
-    enable = false;
 
     homepage.group = "Analytics";
     ingress.tls.enable = true;

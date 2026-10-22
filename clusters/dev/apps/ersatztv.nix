@@ -1,7 +1,6 @@
 { config, ... }:
 {
   services.ersatztv = {
-    enable = false;
     # logLevel = "Debug";
     hostAffinity = "edgenix";
 

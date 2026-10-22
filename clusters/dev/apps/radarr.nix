@@ -4,7 +4,6 @@
     databaseTarget = "postgresql";
     database.enable = true;
 
-    enable = false;
     apiKey = secrets.radarr.key;
     hostAffinity = "edgenix";
     image = "linuxserver/radarr:6.4.4.10685-ls319";
@@ -19,9 +18,7 @@
       path = "${config.devDefaults.nasBase}";
     };
 
-    replicas = 1;
     storageClassName = "longhorn";
     vpn.enable = false;
-
   };
 }

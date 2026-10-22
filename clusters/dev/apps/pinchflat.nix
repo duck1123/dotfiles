@@ -1,7 +1,6 @@
 { secrets, ... }:
 {
   services.pinchflat = {
-    enable = true;
     hostAffinity = "edgenix";
 
     ingressProvider = "traefik-lan";

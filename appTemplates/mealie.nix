@@ -7,6 +7,7 @@ rec {
   name = "mealie";
   uses-ingress = true;
   uses-database = true;
+  uses-replicas = true;
 
   extraOptions = {
     image = mkOption {
@@ -19,12 +20,6 @@ rec {
       description = mdDoc "The service port";
       type = types.int;
       default = 9000;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
 
   };

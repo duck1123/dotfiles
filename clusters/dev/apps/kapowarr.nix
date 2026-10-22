@@ -1,7 +1,6 @@
 { config, ... }:
 {
   services.kapowarr = {
-    enable = false;
     hostAffinity = "edgenix";
 
     ingressProvider = "traefik-lan";
@@ -18,9 +17,7 @@
       };
     };
 
-    replicas = 1;
     storageClassName = "longhorn";
     vpn.enable = false;
-
   };
 }

@@ -1,8 +1,6 @@
 { secrets, ... }:
 {
   services.securo = {
-    enable = true;
-
     databaseTarget = "postgresql";
 
     # Alembic's `config.set_main_option("sqlalchemy.url", ...)` runs the URL

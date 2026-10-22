@@ -3,6 +3,7 @@ with lib;
 rec {
   name = "tunarr";
   uses-ingress = true;
+  uses-replicas = true;
 
   extraOptions = {
     image = mkOption {
@@ -74,12 +75,6 @@ rec {
       description = mdDoc "Log level (trace, debug, info, warn, error, fatal, silent)";
       type = types.str;
       default = "info";
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
 
     useProbes = mkOption {

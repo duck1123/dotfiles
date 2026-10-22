@@ -1,6 +1,5 @@
 _: {
   services.hivemq = {
-    enable = false;
     hostAffinity = "nixmini";
 
     serviceType = "LoadBalancer";

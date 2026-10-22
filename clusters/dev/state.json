@@ -1,0 +1,399 @@
+{
+  "argocd": {
+    "enable": true
+  },
+  "attic": {
+    "enable": true
+  },
+  "authentik": {
+    "enable": false
+  },
+  "autokuma": {
+    "enable": true
+  },
+  "bookorbit": {
+    "enable": false,
+    "pins": {
+      "data": "pvc-51d3f19b-d08c-4486-8da0-586d5cf841fe"
+    }
+  },
+  "cert-manager": {
+    "enable": true
+  },
+  "cloudbeaver": {
+    "enable": false,
+    "pins": {
+      "data": "pvc-44f776b3-80c5-4edc-9398-e681cab79b16"
+    }
+  },
+  "cloudflared": {
+    "enable": true
+  },
+  "crafty-controller": {
+    "enable": false
+  },
+  "ditto-relay": {
+    "enable": true,
+    "pins": {
+      "opensearch-data": "pvc-5baee1d1-efe8-464b-ae93-910d4c7c593d"
+    }
+  },
+  "dozzle": {
+    "enable": false
+  },
+  "duck1123": {
+    "enable": true
+  },
+  "elasticvue": {
+    "enable": false
+  },
+  "ersatztv": {
+    "enable": false
+  },
+  "fileflows": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-238a7fe1-5d70-45c2-8a5f-1752cf171b36",
+      "temp": "pvc-6e5f5c78-e4d4-47ff-a407-9f1cefd37ea3"
+    },
+    "replicas": 1
+  },
+  "flaresolverr": {
+    "enable": true
+  },
+  "forgejo": {
+    "enable": false,
+    "pins": {
+      "data": "pvc-13e105ec-412c-4937-a19c-1b385f026664"
+    }
+  },
+  "garage": {
+    "enable": true
+  },
+  "gluetun": {
+    "enable": true,
+    "pins": {
+      "gluetun": "pvc-e563a1f5-1f3b-437e-ac58-77f4414da611"
+    }
+  },
+  "grafana": {
+    "enable": false
+  },
+  "gramps-web": {
+    "enable": false,
+    "pins": {
+      "cache": "pvc-49f888aa-c2b9-4a5a-9b6f-ee96c10f8e6a",
+      "db": "pvc-c70d1079-d1bb-4af0-9993-dab06212b2ae",
+      "index": "pvc-e22a2754-8e27-4e49-a1e2-074974ed07c8",
+      "media": "pvc-71a522a9-32bb-409d-b63d-e4c4555784b9",
+      "secret": "pvc-c604575b-fd8f-4597-b3f5-dd1a51a1aef4",
+      "thumbcache": "pvc-adc04280-f619-48cf-b8ce-b7dbe015e01a",
+      "users": "pvc-e13b7369-d016-4516-a7e0-135610b7b749"
+    }
+  },
+  "harbor": {
+    "enable": false
+  },
+  "hivemq": {
+    "enable": false
+  },
+  "homarr": {
+    "enable": false,
+    "pins": {
+      "appdata": "pvc-fde5f73c-9f19-4e30-8874-46cbe0a2f6a3"
+    }
+  },
+  "home-assistant": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-fbf41b36-718b-4942-bbe1-adf65e5bc7d1"
+    }
+  },
+  "homepage": {
+    "enable": true
+  },
+  "immich": {
+    "enable": true
+  },
+  "kapowarr": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-aa4bb624-7cf8-4fbc-a6c9-7e09e50f53f6"
+    },
+    "replicas": 1
+  },
+  "keycloak": {
+    "enable": false
+  },
+  "kite": {
+    "enable": true,
+    "pins": {
+      "data": "pvc-0ef43a60-ec9c-4a49-8da3-a38827d3c53a"
+    }
+  },
+  "komga": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-a982e08c-30f2-4e21-928f-970d367e417f"
+    }
+  },
+  "lidarr": {
+    "enable": true,
+    "pins": {
+      "config": "pvc-fbb22ab2-e000-4d67-a760-1d14cac3bdc9"
+    },
+    "replicas": 1
+  },
+  "listenarr": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-39d3b055-b19f-4454-b84a-0609fdae6109"
+    },
+    "replicas": 1
+  },
+  "lldap": {
+    "enable": false
+  },
+  "longhorn": {
+    "enable": true
+  },
+  "mariadb": {
+    "enable": true,
+    "pins": {
+      "backups": "pvc-f42c562c-5275-4ae2-999c-94eab513bcd9",
+      "data": "pvc-42f3e481-1462-4e9c-95ae-7f7025ff5d8b"
+    }
+  },
+  "marquez": {
+    "enable": false
+  },
+  "mealie": {
+    "enable": false,
+    "pins": {
+      "data": "pvc-4e3d0692-5c4d-4a65-9f62-3c0f43326ede"
+    }
+  },
+  "mediamanager": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-e7e0590b-7088-4ab6-9ed7-2970efd4d0cf",
+      "images": "pvc-f3b8c4b8-3e08-4072-96fb-7ca3962ea7a2"
+    }
+  },
+  "memos": {
+    "enable": false
+  },
+  "metabase": {
+    "enable": false
+  },
+  "metallb": {
+    "enable": true
+  },
+  "mindsdb": {
+    "enable": false
+  },
+  "n8n": {
+    "enable": false
+  },
+  "navidrome": {
+    "enable": false,
+    "pins": {
+      "data": "pvc-883bbf8c-bcb0-48e6-a6d3-b68277d13af8"
+    }
+  },
+  "nix-csi": {
+    "enable": true
+  },
+  "nocodb": {
+    "enable": false,
+    "pins": {
+      "data": "pvc-31a2f2bc-8818-4500-ab0a-88f2db40d7b7"
+    }
+  },
+  "opensearch-dashboards": {
+    "enable": false
+  },
+  "paperless-ngx": {
+    "enable": false,
+    "pins": {
+      "consume": "pvc-594d132e-e8f6-444a-988d-f649856d055a",
+      "data": "pvc-a4fa895d-d3ee-46de-85ad-d25e2b4be3b2",
+      "export": "pvc-867ee2c3-0479-48dd-8788-45cbc629bf59",
+      "media": "pvc-9ac4dcc3-29d3-4acc-8b6d-8dc96d0ff256"
+    }
+  },
+  "pihole": {
+    "enable": false,
+    "pins": {
+      "data": "pvc-131cfa45-b850-44ac-a9b1-81fadbc4bdd2"
+    }
+  },
+  "pinchflat": {
+    "enable": true,
+    "pins": {
+      "config": "pvc-b4c68721-cd07-48d7-8ca5-0d5bbff3298e"
+    }
+  },
+  "postgresql": {
+    "enable": true,
+    "pins": {
+      "backups": "pvc-4a9e7907-8262-4938-b52b-3b5971935619",
+      "data": "pvc-f011e680-b80d-4628-abbd-8641d837938b"
+    }
+  },
+  "prometheus": {
+    "enable": false
+  },
+  "prowlarr": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-ee5907d3-b4e4-4da5-91dc-d013f243b741"
+    },
+    "replicas": 1
+  },
+  "qbittorrent": {
+    "enable": true,
+    "pins": {
+      "config": "pvc-bc3fea68-9795-4b43-87f3-49f7a7ebd41c"
+    }
+  },
+  "radarr": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-979d8477-4390-4d8e-b559-7839008e080b"
+    },
+    "replicas": 1
+  },
+  "redis": {
+    "enable": true,
+    "pins": {
+      "data": "pvc-3432cb71-7a05-4ef4-b957-20ba12c4ab8d"
+    },
+    "replicas": 1
+  },
+  "romm": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-ea7b5294-72ac-4166-a0a0-e7592fc2989f",
+      "data": "pvc-7110c6e5-4b49-4a94-82f0-191140656ab0"
+    }
+  },
+  "rustfs": {
+    "enable": false
+  },
+  "sabnzbd": {
+    "enable": true,
+    "pins": {
+      "config": "pvc-10cc181a-263c-4782-bad6-8ecd421f37d7"
+    },
+    "replicas": 1
+  },
+  "satisfactory": {
+    "enable": false
+  },
+  "securo": {
+    "enable": true,
+    "pins": {
+      "agent-knowledge": "pvc-f37b9cbf-5ffc-4e38-bffe-c8dabbceda5a",
+      "attachments": "pvc-26f98910-ffc8-42d0-a147-9662c23cd2ae",
+      "embedding-models": "pvc-94cacd5e-4f3a-4100-a179-fad968db8019"
+    }
+  },
+  "slskd": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-3daa90da-e4b2-4dd2-8cfe-9a1f98764991"
+    },
+    "replicas": 1
+  },
+  "sonarr": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-bda437d3-382b-4c6b-bbd1-3982593d07fb"
+    },
+    "replicas": 1
+  },
+  "sops": {
+    "enable": true
+  },
+  "soularr": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-25589b0e-1276-441e-a91a-2e4e78ec378c"
+    }
+  },
+  "stashapp": {
+    "enable": true,
+    "pins": {
+      "config": "pvc-9d446279-6623-466b-9937-143eeca518ca"
+    },
+    "replicas": 1
+  },
+  "storybook": {
+    "enable": true
+  },
+  "superset": {
+    "enable": false
+  },
+  "tailscale": {
+    "enable": true
+  },
+  "tdarr": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-b11637b3-e2c3-4f93-82a3-2a19c53d0aff",
+      "temp": "pvc-157c8a73-0af2-4625-b441-2183651d25b5"
+    },
+    "replicas": 1
+  },
+  "tempo": {
+    "enable": false
+  },
+  "traefik": {
+    "enable": true
+  },
+  "trilium": {
+    "enable": true,
+    "pins": {
+      "data": "pvc-582855f1-f480-4983-bf80-eb22b9f2ac0a"
+    }
+  },
+  "tube-archivist": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-2757b763-263a-4dff-9d2c-f1e4a32b9902",
+      "es-data": "pvc-53b575a7-ad04-4b11-95b1-cd6e3a3c905e"
+    },
+    "replicas": 1
+  },
+  "tunarr": {
+    "enable": false,
+    "replicas": 1
+  },
+  "uptime-kuma": {
+    "enable": false,
+    "pins": {
+      "data": "pvc-1d098edf-77ca-4e22-9742-312c090598b5"
+    }
+  },
+  "whisparr": {
+    "enable": false,
+    "pins": {
+      "config": "pvc-7635e288-2ecd-476b-9cc8-e6355eb2ee27"
+    },
+    "replicas": 1
+  },
+  "windmill": {
+    "enable": true,
+    "replicas": 1
+  },
+  "xyops": {
+    "enable": false,
+    "pins": {
+      "data": "pvc-8c803a5c-b039-4ed1-bcec-6726d2f8276b"
+    }
+  },
+  "xysat": {
+    "enable": false
+  }
+}

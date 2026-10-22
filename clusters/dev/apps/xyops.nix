@@ -1,8 +1,6 @@
 { secrets, ... }:
 {
   services.xyops = {
-    enable = false;
-
     databaseTarget = "postgresql";
 
     s3 = {
@@ -17,6 +15,5 @@
 
     ingressProvider = "traefik-lan";
     homepage.group = "Automation";
-
   };
 }

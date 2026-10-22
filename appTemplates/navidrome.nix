@@ -4,6 +4,7 @@ rec {
   name = "navidrome";
   uses-ingress = true;
   uses-nfs = true;
+  uses-replicas = true;
 
   # Shape only -- no volumeHandle here, that's environment-specific (see
   # env/dev/navidrome.nix and docs/pinned-volumes.md).
@@ -34,12 +35,6 @@ rec {
       description = mdDoc "The user ID";
       type = types.int;
       default = 1000;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
   };
 

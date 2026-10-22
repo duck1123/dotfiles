@@ -1,8 +1,6 @@
 { config, secrets, ... }:
 {
   services.bookorbit = {
-    enable = false;
-
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
     homepage.group = "Media";

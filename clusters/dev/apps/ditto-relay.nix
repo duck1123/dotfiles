@@ -1,8 +1,6 @@
 { secrets, ... }:
 {
   services.ditto-relay = {
-    enable = true;
-
     relayUrl = "wss://relay.duck1123.com/";
     nsec = secrets.ditto-relay.nsec;
 

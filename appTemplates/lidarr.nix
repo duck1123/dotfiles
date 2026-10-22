@@ -13,6 +13,7 @@ rec {
   name = "lidarr";
   uses-ingress = true;
   uses-database = true;
+  uses-replicas = true;
   # Main and log databases, both owned by the app's role.
   databases = cfg: [
     { }
@@ -123,12 +124,6 @@ rec {
       description = mdDoc "The user ID";
       type = types.int;
       default = 1000;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
 
     useProbes = mkOption {

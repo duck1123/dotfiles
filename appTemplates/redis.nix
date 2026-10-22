@@ -5,6 +5,7 @@ let
 in
 rec {
   name = "redis";
+  uses-replicas = true;
 
   sopsSecrets = cfg: {
     ${password-secret} = {
@@ -35,12 +36,6 @@ rec {
       description = mdDoc "The Redis port";
       type = types.int;
       default = 6379;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of Redis replicas";
-      type = types.int;
-      default = 1;
     };
 
     repairAof = mkOption {

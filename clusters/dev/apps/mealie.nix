@@ -1,7 +1,6 @@
 { config, secrets, ... }:
 {
   services.mealie = {
-    enable = false;
     # hostAffinity = "edgenix";
     image = "ghcr.io/mealie-recipes/mealie:v3.25.1";
 
@@ -15,6 +14,5 @@
     ingress.tls.enable = true;
 
     storageClassName = "longhorn";
-
   };
 }

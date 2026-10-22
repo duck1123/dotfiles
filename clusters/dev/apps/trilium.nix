@@ -1,7 +1,6 @@
 { secrets, ... }:
 {
   services.trilium = {
-    enable = true;
     apiKey = secrets.trilium.key;
     claudeCode = {
       enable = true;
@@ -15,6 +14,5 @@
     homepage.group = "Organization";
 
     storageClassName = "longhorn";
-
   };
 }

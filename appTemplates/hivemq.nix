@@ -6,6 +6,8 @@ in
 rec {
   inherit name;
   uses-ingress = false;
+  # Keep replicas at 1: the PVC is ReadWriteOnce.
+  uses-replicas = true;
 
   extraOptions = {
     image = mkOption {
@@ -45,12 +47,6 @@ rec {
       description = mdDoc "Optional fixed MetalLB IP when `serviceType` is LoadBalancer";
       type = types.nullOr types.str;
       default = null;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Replica count (keep 1 with ReadWriteOnce PVC)";
-      type = types.int;
-      default = 1;
     };
 
     useProbes = mkOption {

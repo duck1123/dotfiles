@@ -1,7 +1,5 @@
 _: {
   services.elasticvue = {
-    enable = false;
-
     ingressProvider = "traefik-lan";
 
     # tube-archivist's Elasticsearch entry removed -- tube-archivist is

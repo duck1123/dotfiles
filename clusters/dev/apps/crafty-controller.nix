@@ -1,7 +1,5 @@
 _: {
   services.crafty-controller = {
-    enable = false;
-
     serviceType = "LoadBalancer";
     storageClassName = "longhorn";
     # loadBalancerIP = "192.168.0.244";

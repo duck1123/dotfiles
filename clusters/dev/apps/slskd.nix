@@ -2,7 +2,6 @@
 {
   services.slskd = {
     apiKey = (secrets.slskd or { }).apiKey or "";
-    enable = false;
     # hostAffinity = "edgenix";
 
     homepage.group = "Download";
@@ -15,8 +14,6 @@
       server = config.devDefaults.nasHost;
       path = "${config.devDefaults.nasBase}/slskd_downloads";
     };
-
-    replicas = 1;
 
     shares = {
       enable = true;
@@ -36,6 +33,5 @@
       username = (secrets.slskd or { }).username or "";
       password = (secrets.slskd or { }).password or "";
     };
-
   };
 }

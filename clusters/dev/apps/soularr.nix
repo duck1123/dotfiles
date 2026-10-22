@@ -1,7 +1,6 @@
 { config, secrets, ... }:
 {
   services.soularr = {
-    enable = false;
     # hostAffinity = "edgenix";
 
     lidarr = {
@@ -25,6 +24,5 @@
 
     scriptInterval = 300;
     storageClassName = "longhorn";
-
   };
 }

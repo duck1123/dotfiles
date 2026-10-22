@@ -20,7 +20,7 @@ Because `00-master`'s child Applications all inherit `selfHeal: true`, ArgoCD ac
 
 The correct sequence, which actually sticks:
 
-1. Change the desired state in the Nix source — typically `replicas = 0;` under `services.<name>` in `clusters/dev/apps/<name>.nix` (add a `replicas` option to the app template if it lacks one).
+1. Change the desired state in git — typically `nur apps scale <name> 0`, which sets `replicas` in `clusters/dev/state.json` (if the app's template lacks the option, give it `uses-replicas = true` and wire `cfg.replicas` into its workload).
 2. `nur switch k8s` (or `nur k8s switch-charts --fallback` + `nur k8s push` if the local binary cache is being flaky).
 3. Force immediate reconciliation instead of waiting for ArgoCD's poll interval:
    ```sh

@@ -1,7 +1,5 @@
 _: {
   services.gramps-web = {
-    enable = false;
-
     redisTarget = "redis";
 
     ingressProvider = "traefik-lan";

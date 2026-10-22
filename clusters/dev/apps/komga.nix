@@ -1,7 +1,6 @@
 { config, secrets, ... }:
 {
   services.komga = {
-    enable = false;
     apiKey = secrets.komga.key;
 
     ingressProvider = "traefik-lan";
@@ -13,6 +12,5 @@
       server = config.devDefaults.nasHost;
       path = "${config.devDefaults.nasBase}/Books";
     };
-
   };
 }

@@ -30,13 +30,14 @@ Get the hash with `nix run nixpkgs#prefetch-npm-deps -- package-lock.json`. For 
 ```nix
 _: {
   services.<site> = {
-    enable = true;
     ingressProvider = "traefik-lan";   # LAN only; sets class, issuer, <site>.home.kronkltd.net
     ingress.tls.enable = true;
     homepage.group = "Apps";
   };
 }
 ```
+
+Turn it on with `nur apps enable <site>`, which sets `enable` in `clusters/dev/state.json`.
 
 ## 5. Check, then deploy
 

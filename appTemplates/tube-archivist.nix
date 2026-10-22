@@ -34,8 +34,9 @@ rec {
   name = "tube-archivist";
   uses-ingress = true;
   requires-redis = true;
+  uses-replicas = true;
 
-  # Shape only -- no volumeHandle here (see clusters/dev/volume-pins.json and
+  # Shape only -- no volumeHandle here (see clusters/dev/state.json and
   # docs/pinned-volumes.md). es-data keeps its old flat PVC name.
   volumes =
     cfg:
@@ -112,12 +113,6 @@ rec {
       description = mdDoc "The user ID";
       type = types.int;
       default = 1000;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of Tube Archivist replicas";
-      type = types.int;
-      default = 1;
     };
 
     esUrl = mkOption {

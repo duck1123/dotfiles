@@ -1,7 +1,6 @@
 { config, ... }:
 {
   services.tunarr = {
-    enable = false;
     enableGPU = true;
     # hostAffinity = "edgenix";
     resetDatabase = false;
@@ -19,7 +18,6 @@
       };
     };
 
-    replicas = 1;
     storageClassName = "local-path";
   };
 }

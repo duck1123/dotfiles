@@ -13,6 +13,7 @@ in
 rec {
   name = "homarr";
   uses-ingress = true;
+  uses-replicas = true;
 
   sopsSecrets = cfg: {
     ${secret-encryption-key-secret}.SECRET_ENCRYPTION_KEY = cfg.secretEncryptionKey;
@@ -53,12 +54,6 @@ rec {
       description = mdDoc "Disable analytics";
       type = types.bool;
       default = true;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
   };
 

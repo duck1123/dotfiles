@@ -3,7 +3,6 @@
   services.nocodb = {
     allowLocalExternalDatabases = true;
     auth.jwtSecret = (secrets.nocodb or { }).jwtSecret or "";
-    enable = false;
 
     homepage.group = "Database";
 
@@ -30,6 +29,5 @@
     };
 
     publicUrl = "https://nocodb.${config.devDefaults.homeDomain}";
-
   };
 }

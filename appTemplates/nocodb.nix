@@ -15,6 +15,7 @@ rec {
   uses-ingress = true;
   uses-database = true;
   uses-redis = true;
+  uses-replicas = true;
 
   # `pvcName = "${name}-data"` (not the usual "${name}-${name}-<key>"
   # convention). Shape only -- no volumeHandle here, that's
@@ -125,12 +126,6 @@ rec {
       description = mdDoc "Disable telemetry";
       type = types.bool;
       default = true;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
 
     # https://nocodb.com/docs/self-hosting/environment-variables — defaults to false (blocks private IPs).

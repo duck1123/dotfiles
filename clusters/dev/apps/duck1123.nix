@@ -4,8 +4,6 @@ _: {
   # site — see resources/apps/duck1123-site/src/config.js and
   # public/.well-known/nostr.json to change them.
   services.duck1123 = {
-    enable = true;
-
     # duck1123 has no k8s Ingress (it's reached via the Cloudflare Tunnel, see
     # appTemplates/duck1123.nix), so homepage/monitoring.autokuma have
     # no ingress domain to default their href/url to — set both explicitly.

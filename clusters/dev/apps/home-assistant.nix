@@ -1,7 +1,6 @@
 { config, ... }:
 {
   services.home-assistant = {
-    enable = false;
     # hostAffinity = "edgenix";
 
     # https://github.com/AiDot-Development-Team/hass-AiDot
@@ -12,6 +11,5 @@
 
     monitoring.autokuma.enable = true;
     storageClassName = "longhorn";
-
   };
 }

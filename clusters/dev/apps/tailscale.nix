@@ -1,7 +1,6 @@
 { secrets, ... }:
 {
   services.tailscale = {
-    enable = true;
     oauth = { inherit (secrets.tailscale) authKey clientId clientSecret; };
     # The operator may stay on nasnix, which is tainted to keep ordinary
     # workloads off it. It's a chart workload, so allowControlPlane can't reach it.

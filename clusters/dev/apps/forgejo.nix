@@ -2,7 +2,6 @@
 {
   services.forgejo = {
     admin = { inherit (secrets.forgejo.admin) password username; };
-    enable = false;
     databaseTarget = "postgresql";
     ingressProvider = "traefik-lan";
     monitoring.autokuma.enable = true;
@@ -14,6 +13,5 @@
     };
 
     storageClassName = "longhorn";
-
   };
 }

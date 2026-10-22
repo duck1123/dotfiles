@@ -1,7 +1,6 @@
 { config, ... }:
 {
   services.cloudbeaver = {
-    enable = false;
     hostAffinity = "edgenix";
 
     ingressProvider = "traefik-lan";
@@ -9,6 +8,5 @@
     homepage.group = "Database";
 
     storageClassName = "longhorn";
-
   };
 }

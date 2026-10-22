@@ -1,8 +1,6 @@
 { config, secrets, ... }:
 {
   services.homepage = {
-    enable = true;
-
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
 

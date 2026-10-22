@@ -1,8 +1,6 @@
 { config, secrets, ... }:
 {
   services.garage = {
-    enable = true;
-
     # Metadata and data live in a plain directory on nixmini's NVMe. They
     # used to be single-replica Longhorn volumes on nasnix, the NAS VM, whose
     # one virtual disk saturates whenever the NAS is busy; the metadata DB was

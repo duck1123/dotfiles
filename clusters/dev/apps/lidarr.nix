@@ -4,7 +4,6 @@
     databaseTarget = "postgresql";
     database.enable = true;
 
-    enable = true;
     apiKey = secrets.lidarr.key;
     hostAffinity = "edgenix";
 
@@ -25,13 +24,11 @@
       };
     };
 
-    replicas = 1;
     storageClassName = "longhorn";
 
     vpn = {
       enable = false;
       sharedGluetunService = "gluetun.gluetun";
     };
-
   };
 }

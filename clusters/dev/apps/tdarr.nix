@@ -1,7 +1,6 @@
 { config, ... }:
 {
   services.tdarr = {
-    enable = false;
     image = "ghcr.io/haveagitgat/tdarr:2.86.01";
     healthcheckcpuWorkers = 1;
     healthcheckgpuWorkers = 1;
@@ -20,7 +19,6 @@
     puid = 1000;
     pgid = 1000;
 
-    replicas = 1;
     storageClassName = "longhorn";
     useProbes = true;
     vpn.enable = false;

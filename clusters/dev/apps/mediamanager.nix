@@ -1,8 +1,6 @@
 { secrets, ... }:
 {
   services.mediamanager = {
-    enable = false;
-
     databaseTarget = "postgresql";
     database.enable = true;
     # Dedicated alphanumeric-only password -- see env/dev/securo.nix for why

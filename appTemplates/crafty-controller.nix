@@ -10,6 +10,7 @@ rec {
   # is exposed directly via a MetalLB LoadBalancer Service instead (same
   # pattern as appTemplates/hivemq.nix).
   uses-ingress = false;
+  uses-replicas = true;
 
   # Shape only -- no volumeHandle here, that's environment-specific (see
   # env/dev/crafty-controller.nix and docs/pinned-volumes.md).
@@ -85,12 +86,6 @@ rec {
       description = mdDoc "Optional fixed MetalLB IP when `serviceType` is LoadBalancer";
       type = types.nullOr types.str;
       default = null;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
 
     useProbes = mkOption {

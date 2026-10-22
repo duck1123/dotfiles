@@ -4,8 +4,6 @@
     databaseTarget = "postgresql";
     database.enable = true;
 
-    enable = false;
-
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;
 
@@ -20,13 +18,11 @@
       };
     };
 
-    replicas = 1;
     storageClassName = "longhorn";
 
     vpn = {
       enable = false;
       sharedGluetunService = "gluetun.gluetun";
     };
-
   };
 }

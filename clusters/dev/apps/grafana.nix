@@ -8,7 +8,6 @@
   services.grafana = {
     inherit (config.devDefaults) enableLogging;
     adminPassword = secrets.grafana.password or "";
-    enable = false;
     hostAffinity = "edgenix";
 
     ingressProvider = "traefik-lan";

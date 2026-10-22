@@ -53,7 +53,7 @@ Cachix: `features.nix.cachixPush` (off on every host since 2026-10-19) used to p
 
 ## RustFS — the previous backend, now disabled but still configured (not deleted)
 
-Garage replaced RustFS as Attic's storage backend on 2026-08-31 (`appTemplates/rustfs.nix`/`clusters/dev/apps/rustfs.nix` still exist with `enable = false;`, kept around rather than deleted). `clusters/dev/apps/nocodb.nix` was migrated to Garage on 2026-09-06 (re-enabled at the same time, see `appTemplates/nocodb.nix`'s `storage.endpoint` doc for why it uses Garage's ingress domain rather than the in-cluster `garage.garage` ClusterIP).
+Garage replaced RustFS as Attic's storage backend on 2026-08-31 (`appTemplates/rustfs.nix`/`clusters/dev/apps/rustfs.nix` still exist, disabled in `clusters/dev/state.json`, kept around rather than deleted). `clusters/dev/apps/nocodb.nix` was migrated to Garage on 2026-09-06 (re-enabled at the same time, see `appTemplates/nocodb.nix`'s `storage.endpoint` doc for why it uses Garage's ingress domain rather than the in-cluster `garage.garage` ClusterIP).
 
 **One remaining loose end, as of this writing:** `clusters/dev/apps/longhorn.nix`'s `backupTargetCredential` still points at `rustfs-svc.rustfs:9000` using `secrets.rustfs.*` — Longhorn backups have not been migrated to Garage and are presumably non-functional while RustFS is disabled. Check this before relying on a Longhorn backup existing.
 

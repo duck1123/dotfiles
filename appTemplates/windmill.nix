@@ -249,6 +249,7 @@ rec {
   # category subfolder -- windmill workers get the same media library
   # every *arr app sees, not a curated slice of it.
   uses-nfs = true;
+  uses-replicas = true;
 
   # Store only the raw password; init container builds DATABASE_URL at runtime with proper URL encoding.
   sopsSecrets =
@@ -299,12 +300,6 @@ rec {
       description = mdDoc "The service port";
       type = types.int;
       default = 8000;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of Windmill replicas";
-      type = types.int;
-      default = 1;
     };
 
     workspace = mkOption {

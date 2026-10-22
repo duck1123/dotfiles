@@ -13,7 +13,6 @@ let
 in
 {
   services.longhorn = {
-    enable = true;
     # The NAS's ClusterBackups share (Longhorn owns backupstore/ in it; file
     # exports of volumes go next to it in exports/). NFSv3 like every other
     # NAS mount. soft, not hard: longhorn-manager mounts this itself, and a

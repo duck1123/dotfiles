@@ -25,7 +25,7 @@ Inside `modules/`:
 - `options/`: option declarations shared across classes (`host`, `hosts`, `identities`, the `simpleFeature` type)
 - `types/submodules/`: the submodule types for hosts, identities and features
 - `base.nix`: the `homeManager.base` / `nixos.base` entry modules; `state-version.nix`: state versions
-- `kubernetes/`: the cluster integration. `lib/` holds `mkArgoApp`, `mkPinnedVolume` and the other `flake.lib.*` helpers, `pkgs/` the packages some apps use, `applications.nix` turns every `appTemplates` entry into a `flake.nixidyApps` module, and `nixidy-apps/` holds the few apps that don't use `mkArgoApp`. The `_`-prefixed dirs (`_nixidy/`, `_generators/`) aren't flake-parts modules. The `dev` nixidy environment itself lives in `clusters/dev/`: `default.nix` for cluster-wide settings, `options.nix` for `devDefaults.*`, and `apps/<name>.nix` for per-app instance config.
+- `kubernetes/`: the cluster integration. `lib/` holds `mkArgoApp`, `mkPinnedVolume` and the other `flake.lib.*` helpers, `pkgs/` the packages some apps use, `applications.nix` turns every `appTemplates` entry into a `flake.nixidyApps` module, and `nixidy-apps/` holds the few apps that don't use `mkArgoApp`. The `_`-prefixed dirs (`_nixidy/`, `_generators/`) aren't flake-parts modules. The `dev` nixidy environment itself lives in `clusters/dev/`: `default.nix` for cluster-wide settings, `options.nix` for `devDefaults.*`, `apps/<name>.nix` for per-app instance config, and `state.json` for each app's `enable`, `replicas` and pinned volumes, which `nur apps` tasks edit.
 
 ## Registries
 

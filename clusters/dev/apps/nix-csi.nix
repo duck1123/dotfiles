@@ -1,6 +1,5 @@
 _: {
   services.nix-csi = {
-    enable = true;
     allowControlPlane = true;
     cache.storageClassName = "longhorn";
     authorizedKeys = [

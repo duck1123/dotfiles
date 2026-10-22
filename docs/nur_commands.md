@@ -129,8 +129,10 @@ App definitions live in `appTemplates/` and `clusters/dev/`. nixidy renders them
 |---|---|
 | `nur apps list` | Every app name (from `appTemplates/` and `modules/kubernetes/nixidy-apps/`). |
 | `nur apps restart <name>` | `kubectl rollout restart` the Deployment named `<name>` in namespace `<name>` (falling back to a StatefulSet) and wait for it. Apps with another namespace or several workloads (Helm charts, nix-csi) need a manual `kubectl` restart. |
+| `nur apps enable <name>` / `nur apps disable <name>` | Set the app's `enable` in `clusters/dev/state.json`. Disabling prunes its resources, PVCs included; pinned volumes survive. |
+| `nur apps scale <name> <n>` | Set the app's `replicas` in `clusters/dev/state.json`. 0 stops it but keeps it deployed. Only apps whose template sets `uses-replicas` have the option; for others the build fails. |
 
-To scale or pause an app, change `replicas` in `clusters/dev/apps/<name>.nix` and deploy. `kubectl scale` gets reverted by ArgoCD's selfHeal.
+These only edit `clusters/dev/state.json` (always the dev cluster); commit and deploy to apply. Don't use `kubectl scale`: ArgoCD's selfHeal reverts it.
 
 ### ArgoCD
 
@@ -161,7 +163,7 @@ To scale or pause an app, change `replicas` in `clusters/dev/apps/<name>.nix` an
 | `nur mariadb restore [--backup-file f]` | Restore a dump from the PVC via a Job (prompts with the list if no file is given). **Replaces all existing databases.** |
 | `nur sqlite list <ns>` | SQLite databases (found by file header) on the namespace's Longhorn PVCs, with sizes. NFS PVCs are skipped. `excluded` marks the ones `backup` skips by default. |
 | `nur sqlite backup <ns> [--pvc p] [--exclude re] [--output-dir dir]` | Consistent online copy of each database (`sqlite3 .backup`, then `integrity_check`), gzipped to `./backups/sqlite/<ns>/<timestamp>/<pvc>/<path>.gz`. Safe while the app runs: a throwaway `sqlite-helper-*` pod mounts the PVCs on the app's node. `--exclude` defaults to paths under a `backup/` or `backups/` dir; `""` keeps everything. |
-| `nur sqlite restore <dir-or-file>` | Restore a whole backup run directory or one `.gz` from it, inferring namespace, PVC and path from the layout. Refuses while any pod mounts the PVC: set the app's replicas to 0 and deploy first (not `kubectl scale`). Backs the current databases up to `<timestamp>-pre-restore/` first, keeps file owner and mode, and deletes stale `-wal`/`-shm`. |
+| `nur sqlite restore <dir-or-file>` | Restore a whole backup run directory or one `.gz` from it, inferring namespace, PVC and path from the layout. Refuses while any pod mounts the PVC: `nur apps scale <app> 0` and deploy first (not `kubectl scale`). Backs the current databases up to `<timestamp>-pre-restore/` first, keeps file owner and mode, and deletes stale `-wal`/`-shm`. |
 
 ### Longhorn cold archive
 
@@ -170,8 +172,8 @@ Copies detached Longhorn volumes (apps that are off but whose data you want to k
 | Command | What it does |
 |---|---|
 | `nur longhorn cold-archive <ns>/<pvc> \| <ns> \| <volume> [--as <ns>/<pvc>]` | For each matching detached volume: snapshot plus Longhorn backup (`cold-<id>`), a read-only file copy checked against a sha256 manifest, then a restore of the block backup into a scratch volume checked against the same manifest, owners and modes. Labels the Backup `cold-verified=true`. Scratch PVs/PVCs/pods go in the `volume-export` namespace and are removed afterwards. A bare `<ns>` takes all its detached volumes. Two volumes sharing a PVC name get `-<id>` added to their export folder. `--as` names the export for a volume given by name whose PVC Longhorn no longer records. |
-| `nur longhorn cold-list` | Detached volumes with their app's `enable` state in `clusters/dev/apps`, and their cold backup's state and whether the restore check passed. |
-| `nur longhorn cold-restore <ns>/<pvc> [--volume <name>] [--backup <cold-…>] [--pin <app>.<key>] [--verify] [--node <n>]` | Restore an archived volume from its newest verified `cold-*` backup under its original volume name, so the app's pin in `clusters/dev/volume-pins.json` binds to it unchanged; then set `enable = true` and deploy. Refuses while a volume of that name exists. `--volume` picks one when the PVC had several (tube-archivist). An unpinned volume needs `--pin`, which writes the pin. `--verify` checks the files against the export's manifest, owners and modes, on the app's `hostAffinity` node (or `--node`), since the replica moves to whichever node mounts the volume. The volume gets `dataLocality: best-effort`, so its replica follows the app's pod. |
+| `nur longhorn cold-list` | Detached volumes with their app's `enable` from `clusters/dev/state.json`, and their cold backup's state and whether the restore check passed. |
+| `nur longhorn cold-restore <ns>/<pvc> [--volume <name>] [--backup <cold-…>] [--pin <app>.<key>] [--verify] [--node <n>]` | Restore an archived volume from its newest verified `cold-*` backup under its original volume name, so the app's pin in `clusters/dev/state.json` binds to it unchanged; then `nur apps enable <app>` and deploy. Refuses while a volume of that name exists. `--volume` picks one when the PVC had several (tube-archivist). An unpinned volume needs `--pin`, which writes the pin. `--verify` checks the files against the export's manifest, owners and modes, on the app's `hostAffinity` node (or `--node`), since the replica moves to whichever node mounts the volume. The volume gets `dataLocality: best-effort`, so its replica follows the app's pod. |
 
 ### NAS archive (RECOVERY_BACKUP drive)
 

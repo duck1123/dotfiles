@@ -16,6 +16,7 @@ rec {
   uses-ingress = true;
   uses-database = true;
   requires-redis = true;
+  uses-replicas = true;
 
   # `pvcName` overrides since these predate the "${name}-${name}-<key>"
   # convention. Shape only -- no volumeHandle here, that's
@@ -51,12 +52,6 @@ rec {
       description = mdDoc "The service port";
       type = types.int;
       default = 8000;
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
 
     ocrLanguage = mkOption {

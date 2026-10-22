@@ -34,6 +34,9 @@ let
 in
 {
   inherit name;
+  uses-replicas = true;
+  # Cloudflare load-balances across connected replicas of the same tunnel.
+  default-replicas = 2;
 
   extraOptions = {
     # Token from a Cloudflare Zero Trust tunnel (Networks → Tunnels →
@@ -45,12 +48,6 @@ in
       description = mdDoc "Cloudflare Tunnel token";
       type = types.str;
       default = "";
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of cloudflared replicas (Cloudflare load-balances across connected replicas of the same tunnel)";
-      type = types.int;
-      default = 2;
     };
   };
 

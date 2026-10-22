@@ -27,6 +27,7 @@ in
 rec {
   name = "trilium";
   uses-ingress = true;
+  uses-replicas = true;
 
   # Shape only -- no volumeHandle here, that's environment-specific (see
   # env/dev/trilium.nix and docs/pinned-volumes.md).
@@ -120,12 +121,6 @@ rec {
       description = mdDoc "Size of the data PVC";
       type = types.str;
       default = "10Gi";
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
   };
 

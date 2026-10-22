@@ -57,6 +57,7 @@ in
 {
   inherit name;
   uses-ingress = true;
+  uses-replicas = true;
 
   # Secret plaintext must never flow through `self.lib.toYAML` (it round-trips
   # through the Nix store via `builtins.toFile`/`pkgs.runCommand`, which would
@@ -79,12 +80,6 @@ in
       description = mdDoc "The homepage docker image";
       type = types.str;
       default = "ghcr.io/gethomepage/homepage:latest";
-    };
-
-    replicas = mkOption {
-      description = mdDoc "Number of replicas";
-      type = types.int;
-      default = 1;
     };
 
     settings = mkOption {

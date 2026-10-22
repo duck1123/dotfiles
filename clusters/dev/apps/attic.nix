@@ -1,8 +1,6 @@
 { config, secrets, ... }:
 {
   services.attic = {
-    enable = true;
-
     homepage.group = "Storage";
 
     ingressProvider = "traefik-lan";

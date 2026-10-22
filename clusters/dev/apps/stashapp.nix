@@ -1,7 +1,6 @@
 { config, secrets, ... }:
 {
   services.stashapp = {
-    enable = true;
     apiKey = secrets.stashapp.key;
     hostAffinity = "nixmini";
 
@@ -15,8 +14,6 @@
       path = "${config.devDefaults.nasBase}/Videos";
     };
 
-    replicas = 1;
     enableGPU = true;
-
   };
 }

@@ -1,7 +1,6 @@
 { config, secrets, ... }:
 {
   services.qbittorrent = {
-    enable = true;
     allowControlPlane = true;
     hostAffinity = "nasnix";
 
@@ -16,6 +15,5 @@
     };
 
     webui = { inherit (secrets.qbittorrent) password username; };
-
   };
 }

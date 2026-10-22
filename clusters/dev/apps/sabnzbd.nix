@@ -1,7 +1,6 @@
 { config, secrets, ... }:
 {
   services.sabnzbd = {
-    enable = true;
     apiKey = secrets.sabnzbd.key;
     hostAffinity = "edgenix";
 
@@ -16,8 +15,6 @@
       path = "${config.devDefaults.nasBase}";
     };
 
-    replicas = 1;
     useProbes = false;
-
   };
 }

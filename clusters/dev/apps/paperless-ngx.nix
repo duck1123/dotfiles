@@ -1,8 +1,6 @@
 { secrets, ... }:
 {
   services.paperless-ngx = {
-    enable = false;
-
     databaseTarget = "postgresql";
 
     inherit (secrets.paperless-ngx) adminUser adminPassword secretKey;

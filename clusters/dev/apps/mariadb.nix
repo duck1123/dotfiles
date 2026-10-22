@@ -11,7 +11,6 @@
         ;
     };
 
-    enable = true;
     hostAffinity = "edgenix";
     storageClassName = "longhorn";
 
@@ -22,7 +21,7 @@
     # Databases come from the apps that use them (uses-database +
     # databaseTarget = "mariadb"); see config.databases.
 
-    # The `data` pin (volume-pins.json) is the fresh volume from the
+    # The `data` pin (state.json) is the fresh volume from the
     # bitnami->groundhog2k chart migration (dump/restore cutover, see
     # IMAGE-VERSIONS.md), confirmed stable. The old bitnami-formatted volume
     # (pvc-7ef8145c-...) is left orphaned (Retain policy) as a rollback
