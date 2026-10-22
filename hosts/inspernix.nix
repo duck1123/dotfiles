@@ -57,7 +57,11 @@ in
       };
     };
 
-    tailscale.enable = true;
+    tailscale = {
+      enable = true;
+      # Reach the home LAN through nasnix's subnet route when away
+      acceptRoutes = true;
+    };
     touch.enable = true;
     vpn.enable = true;
     vscode.enable = true;
