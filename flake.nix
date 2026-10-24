@@ -57,7 +57,7 @@
     # Deliberately not following our nixpkgs: Look pins its own rust toolchain
     # via rust-overlay, and keeping its lock intact is what lets the build come
     # from look.cachix.org instead of compiling from source.
-    look.url = "github:kunkka19xx/look?dir=apps/linows";
+    look.url = "github:kunkka19xx/look";
 
     # nixkube (formerly nix-csi), the CSI driver behind the "no Dockerfile"
     # pattern; consumed by appTemplates/nix-csi.nix.
