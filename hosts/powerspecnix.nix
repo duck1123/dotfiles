@@ -68,7 +68,7 @@ in
       server.enable = false;
     };
 
-    music.enable = true;
+    music.enable = false;
     network.enable = true;
     nfs.enable = false;
     nix = {
