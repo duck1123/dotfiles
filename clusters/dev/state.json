@@ -330,7 +330,7 @@
     "replicas": 1
   },
   "storybook": {
-    "enable": true
+    "enable": false
   },
   "superset": {
     "enable": false
