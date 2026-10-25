@@ -14,6 +14,7 @@ _: {
         imports = [
           homeManager.state-version
           homeManager.host-info
+          homeManager.emacs-parts
           generic.options
           inputs.stylix.homeModules.stylix
           inputs.zen-browser.homeModules.beta

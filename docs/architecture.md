@@ -125,6 +125,7 @@ Gotchas:
 
 - flake-parts types `flake.modules.<class>.<name>` as a `deferredModule`, so `features.<name>` can't be nested there. The registry sets `nestedModules.<class>.features` (`modules/flake/nested-modules.nix`), which is written into the *published* flake output through `touchup.attr.modules.finish`. So it's visible as `inputs.self.modules.<class>.features.<name>` but **not** as `config.flake.modules` inside flake-parts modules. `finish` only takes one definition, so any other nested group must go through `nestedModules` too.
 - A body that sets options that only exist on some hosts (e.g. `sops.*`) can't live in a feature that WSL also imports, because `mkIf false` still errors on an undeclared option. That's why `modules/nixos/nix-attic.nix` stays a standalone `modules.nixos.nix-attic` imported directly by `nixos.base`.
+- Emacs config is composed from `programs.emacs.parts.<name>` (`{ enable, order, packages, config }`, declared in `modules/homeManager/emacs-parts.nix`). `features/emacs.nix` defines the built-in parts, with their elisp in `resources/emacs/<part>.el`. Any other feature can add one (see `clojure`), and a host turns one off with `features.emacs.parts.<name> = false`. Some defaults follow other features: `org-roam` follows the syncthing `org-roam` share, and `magit` follows `git`.
 - Modules that aren't features (`state-version`, `boot`, `i18n`, `nix-attic`, `sddm`, `specialisations`, `users`) are plain `flake.modules.<class>.<name>` entries, listed explicitly in `modules/base.nix`.
 
 ## Environments

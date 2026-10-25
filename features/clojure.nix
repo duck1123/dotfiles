@@ -9,5 +9,10 @@
         clojure-lsp
         jet
       ];
+
+      programs.emacs.parts.clojure = {
+        order = 350;
+        config = builtins.readFile ../resources/emacs/clojure.el;
+      };
     };
 }
