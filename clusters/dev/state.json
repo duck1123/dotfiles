@@ -258,7 +258,7 @@
     }
   },
   "radarr": {
-    "enable": false,
+    "enable": true,
     "pins": {
       "config": "pvc-979d8477-4390-4d8e-b559-7839008e080b"
     },
@@ -307,7 +307,7 @@
     "replicas": 1
   },
   "sonarr": {
-    "enable": false,
+    "enable": true,
     "pins": {
       "config": "pvc-bda437d3-382b-4c6b-bbd1-3982593d07fb"
     },
