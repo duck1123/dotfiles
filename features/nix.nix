@@ -62,6 +62,7 @@
       nix.settings = {
         substituters = config.host.features.nix.substituters;
         trusted-public-keys = config.host.features.nix.trustedPublicKeys;
+        fallback = true;
       };
     };
 
@@ -104,6 +105,9 @@
           # (observed compiling gcc-4.6.4 bootstrap seeds from scratch).
           substituters = config.host.features.nix.substituters;
           trusted-public-keys = config.host.features.nix.trustedPublicKeys;
+          # Build locally when a substituter lists a path but can't deliver
+          # it (e.g. Attic serving a narinfo, then failing the NAR download).
+          fallback = true;
           trusted-users = [
             "root"
             config.host.identity.username

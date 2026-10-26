@@ -201,6 +201,12 @@
                   "--kubelet-arg=system-reserved=cpu=500m,memory=1Gi"
                   "--kubelet-arg=kube-reserved=cpu=500m,memory=1Gi"
                 ]
+                # CoreDNS forwards to this file instead of the host's /etc/resolv.conf,
+                # which DHCP fills with the ISP's IPv6 resolvers. Those time out from
+                # here, and pods can't reach the router's link-local entry, so CoreDNS
+                # (which picks an upstream at random) SERVFAILed most external lookups,
+                # e.g. atticd's storage host garage.home.kronkltd.net.
+                ++ [ "--resolv-conf=/etc/k3s-resolv.conf" ]
                 ++ kubernetes.extraK3sFlags;
             in
             {
@@ -225,6 +231,11 @@
             name = "${config.host.hostname}-initiatorhost";
           };
         };
+
+        environment.etc."k3s-resolv.conf".text = ''
+          nameserver 192.168.0.1
+          nameserver 1.1.1.1
+        '';
 
         system.activationScripts.makeUsrBinSymlinks = ''
           mkdir -p /usr/bin

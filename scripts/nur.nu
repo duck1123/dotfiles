@@ -449,6 +449,7 @@ export def "nur secrets check" [
 # Use --boot to set the os target as boot default instead of activating immediately (safe for slow activations).
 export def "nur switch" [
   --boot
+  --fallback  # Pass --fallback to Nix (build locally when a substituter fails, e.g. a flaky Attic)
   --no-review  # k8s: push manifests without reviewing them in magit first
   --host: string@home-hosts = ""
   ...only: string@only-targets
@@ -469,26 +470,29 @@ export def "nur switch" [
     }
   }
 
+  let args = (if $fallback { ["--fallback"] } else { [] })
+
   if $targets.home {
     if ($host | is-empty) {
       # Build with nom first so progress is visible; home-manager then finds it all in the store.
-      ^nom build $".#homeConfigurations.($env.USER)@((sys host).hostname).activationPackage" --no-link --show-trace
+      ^nom build ...$args $".#homeConfigurations.($env.USER)@((sys host).hostname).activationPackage" --no-link --show-trace
       let ts = (date now | format date '%s')
-      ^home-manager switch --flake . -b $"backup.($ts)" --show-trace
+      let hm_args = (if $fallback { ["--option" "fallback" "true"] } else { [] })
+      ^home-manager switch ...$hm_args --flake . -b $"backup.($ts)" --show-trace
     } else {
-      do-switch-remote-home $host
+      do-switch-remote-home $host --fallback=$fallback
     }
   }
 
   if $targets.os {
     if ($host | is-empty) {
       # Build with nom first so progress is visible; nixos-rebuild then finds it all in the store.
-      ^nom build $".#nixosConfigurations.((sys host).hostname).config.system.build.toplevel" --no-link --show-trace
+      ^nom build ...$args $".#nixosConfigurations.((sys host).hostname).config.system.build.toplevel" --no-link --show-trace
       if $boot {
-        ^sudo nixos-rebuild boot --flake . --show-trace
+        ^sudo nixos-rebuild boot ...$args --flake . --show-trace
       } else {
         try {
-          ^sudo nixos-rebuild switch --flake . --show-trace
+          ^sudo nixos-rebuild switch ...$args --flake . --show-trace
         } catch {|e|
           print "\n=== systemd journal (last 50 lines) ==="
           ^journalctl -xe --no-pager -n 50
@@ -500,15 +504,15 @@ export def "nur switch" [
       }
     } else {
       if $boot {
-        do-boot-remote-os $host
+        do-boot-remote-os $host --fallback=$fallback
       } else {
-        do-switch-remote-os $host
+        do-switch-remote-os $host --fallback=$fallback
       }
     }
   }
 
   if $targets.k8s {
-    if $no_review { nur k8s deploy --no-review } else { nur k8s deploy }
+    nur k8s deploy --no-review=$no_review --fallback=$fallback
   }
 }
 
@@ -676,12 +680,13 @@ def do-diff-remote-os [host: string] {
 }
 
 # Helper: build NixOS config locally with nom, copy and switch on remote host
-def do-switch-remote-os [host: string] {
+def do-switch-remote-os [host: string, --fallback] {
   let attr = (os-attr $host)
   let target = (ssh-target $host)
   print --stderr $"Building NixOS configuration for ($host) with nom..."
   let out_link = $"/tmp/($host)-system-result"
-  ^nom build $".#nixosConfigurations.($attr).config.system.build.toplevel" --out-link $out_link
+  let args = (if $fallback { ["--fallback"] } else { [] })
+  ^nom build ...$args $".#nixosConfigurations.($attr).config.system.build.toplevel" --out-link $out_link
   let system_path = (^realpath $out_link | str trim)
 
   if ($system_path | str starts-with "/nix/store") {
@@ -695,12 +700,13 @@ def do-switch-remote-os [host: string] {
 }
 
 # Helper: build NixOS config locally with nom, copy and set as boot default on remote host
-def do-boot-remote-os [host: string] {
+def do-boot-remote-os [host: string, --fallback] {
   let attr = (os-attr $host)
   let target = (ssh-target $host)
   print --stderr $"Building NixOS configuration for ($host) with nom..."
   let out_link = $"/tmp/($host)-system-result"
-  ^nom build $".#nixosConfigurations.($attr).config.system.build.toplevel" --out-link $out_link
+  let args = (if $fallback { ["--fallback"] } else { [] })
+  ^nom build ...$args $".#nixosConfigurations.($attr).config.system.build.toplevel" --out-link $out_link
   let system_path = (^realpath $out_link | str trim)
 
   if ($system_path | str starts-with "/nix/store") {
@@ -714,11 +720,12 @@ def do-boot-remote-os [host: string] {
 }
 
 # Helper: build home-manager package locally, copy and activate on remote host
-def do-switch-remote-home [host: string] {
+def do-switch-remote-home [host: string, --fallback] {
   print --stderr $"Building home-manager activation package for ($host)..."
   let out_link = $"/tmp/($host)-home-result"
   let target = (ssh-target $host)
-  ^nom build $".#homeConfigurations.(home-attr $host).activationPackage" --out-link $out_link
+  let args = (if $fallback { ["--fallback"] } else { [] })
+  ^nom build ...$args $".#homeConfigurations.(home-attr $host).activationPackage" --out-link $out_link
   let activation_path = (^realpath $out_link | str trim)
 
   if ($activation_path | str starts-with "/nix/store") {
@@ -809,9 +816,10 @@ def k8s-review-manifests []: nothing -> nothing {
 # (push them later with `nur k8s push`).
 export def "nur k8s deploy" [
   --no-review  # Commit and push without reviewing or confirming
+  --fallback  # Pass --fallback to the underlying nix build (rebuild locally if a substituter is unavailable)
 ] {
   nur k8s manifests sync
-  nur k8s switch-charts
+  nur k8s switch-charts --fallback=$fallback
 
   if not $no_review {
     if not (k8s-manifests-pending) {
