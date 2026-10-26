@@ -200,7 +200,7 @@ in
           inherit
             caldera-amp
             caldera-music
-            # ngit
+            ngit
             niri
             pnu
             soap-cli
