@@ -1,6 +1,10 @@
 { config, secrets, ... }:
 {
   services.slskd = {
+    # Pinned: with IfNotPresent, `:latest` meant whatever each node had cached
+    # (edgenix still had 0.24.3, which crashes on the schema 0.26 migrated
+    # to). 0.26.1 is what ran the 2026-10-20 migration and ran cleanly after.
+    image = "slskd/slskd:0.26.1";
     apiKey = (secrets.slskd or { }).apiKey or "";
     # hostAffinity = "edgenix";
 
