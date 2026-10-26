@@ -300,7 +300,7 @@
     }
   },
   "slskd": {
-    "enable": false,
+    "enable": true,
     "pins": {
       "config": "pvc-3daa90da-e4b2-4dd2-8cfe-9a1f98764991"
     },
@@ -317,7 +317,7 @@
     "enable": true
   },
   "soularr": {
-    "enable": false,
+    "enable": true,
     "pins": {
       "config": "pvc-25589b0e-1276-441e-a91a-2e4e78ec378c"
     }
