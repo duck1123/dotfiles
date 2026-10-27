@@ -1,6 +1,11 @@
 { secrets, ... }:
 {
   services.securo = {
+    # backend, beat and worker all mount the same RWO Longhorn volumes, so
+    # they have to share a node; otherwise a restart can split them and
+    # leave the losers stuck in ContainerCreating (2026-10-27).
+    hostAffinity = "edgenix";
+
     databaseTarget = "postgresql";
 
     # Alembic's `config.set_main_option("sqlalchemy.url", ...)` runs the URL
