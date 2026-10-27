@@ -22,7 +22,9 @@ with lib;
       image = mkOption {
         description = mdDoc "The pinchflat docker image";
         type = types.str;
-        default = "ghcr.io/kieraneglin/pinchflat:latest";
+        # Pinned by digest: upstream's newest release (v2025.9.26) was only
+        # published as `:latest` on ghcr; the newest versioned tag is v2025.6.6.
+        default = "ghcr.io/kieraneglin/pinchflat@sha256:01b4f98aabaf3f5fe394213f7a32578c9e84e42080f52e2f8334021a4473b202";
       };
 
       service.port = mkOption {

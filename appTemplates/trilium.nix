@@ -39,7 +39,7 @@ rec {
     image = mkOption {
       description = mdDoc "The docker image";
       type = types.str;
-      default = "triliumnext/trilium:v0.106.0";
+      default = "triliumnext/trilium:v0.106.1";
     };
 
     service.port = mkOption {

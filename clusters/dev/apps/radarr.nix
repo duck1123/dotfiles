@@ -6,7 +6,7 @@
 
     apiKey = secrets.radarr.key;
     hostAffinity = "edgenix";
-    image = "linuxserver/radarr:6.4.4.10685-ls319";
+    image = "linuxserver/radarr:6.4.4.10685-ls324";
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;

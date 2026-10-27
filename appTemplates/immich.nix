@@ -54,7 +54,7 @@ rec {
     image.tag = mkOption {
       description = mdDoc "The docker image tag";
       type = types.str;
-      default = "v3.3.1";
+      default = "v3.3.5";
     };
 
     adminApiKey = mkOption {

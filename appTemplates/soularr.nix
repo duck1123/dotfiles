@@ -94,7 +94,7 @@ rec {
     image = mkOption {
       description = mdDoc "Soularr Docker image (Lidarr–Soulseek companion)";
       type = types.str;
-      default = "mrusse08/soularr:latest";
+      default = "mrusse08/soularr:v1.2.3";
     };
 
     pgid = mkOption {

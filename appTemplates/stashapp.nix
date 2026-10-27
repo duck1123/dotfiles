@@ -18,7 +18,7 @@ rec {
     image = mkOption {
       description = mdDoc "The docker image";
       type = types.str;
-      default = "stashapp/stash:latest";
+      default = "stashapp/stash:v0.31.1";
     };
 
     service.port = mkOption {

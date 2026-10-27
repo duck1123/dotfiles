@@ -26,7 +26,7 @@ rec {
     image = mkOption {
       description = mdDoc "The docker image";
       type = types.str;
-      default = "linuxserver/qbittorrent:latest";
+      default = "linuxserver/qbittorrent:5.3.0_v2.1.2-ls485";
     };
 
     service.port = mkOption {

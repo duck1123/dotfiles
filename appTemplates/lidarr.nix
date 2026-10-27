@@ -30,7 +30,7 @@ rec {
     image = mkOption {
       description = mdDoc "The docker image";
       type = types.str;
-      default = "linuxserver/lidarr:latest";
+      default = "linuxserver/lidarr:3.1.6.5079-ls46";
     };
 
     service.port = mkOption {

@@ -18,7 +18,7 @@ rec {
     image = mkOption {
       description = mdDoc "The docker image";
       type = types.str;
-      default = "linuxserver/sabnzbd:latest";
+      default = "linuxserver/sabnzbd:4.5.5-ls250";
     };
 
     service.port = mkOption {

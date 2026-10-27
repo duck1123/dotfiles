@@ -79,7 +79,7 @@ in
     image = mkOption {
       description = mdDoc "The homepage docker image";
       type = types.str;
-      default = "ghcr.io/gethomepage/homepage:latest";
+      default = "ghcr.io/gethomepage/homepage:v2.7.0";
     };
 
     settings = mkOption {

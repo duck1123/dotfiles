@@ -5,7 +5,7 @@
     database.enable = true;
 
     apiKey = secrets.sonarr.key;
-    image = "linuxserver/sonarr:4.0.20.3014-ls327";
+    image = "linuxserver/sonarr:4.0.20.3014-ls329";
     hostAffinity = "edgenix";
 
     ingressProvider = "traefik-lan";

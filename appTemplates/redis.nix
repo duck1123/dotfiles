@@ -23,7 +23,7 @@ rec {
     image = mkOption {
       description = mdDoc "The docker image";
       type = types.str;
-      default = "redis:8-alpine";
+      default = "redis:8.10.3-alpine";
     };
 
     password = mkOption {
