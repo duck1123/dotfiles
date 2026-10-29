@@ -3,26 +3,17 @@
   system = "x86_64-linux";
 
   features = {
-    battery.enable = true;
-    bluetooth.enable = true;
-    clojure.enable = true;
     common.enable = true;
     dbt.enable = true;
     developer.enable = true;
-    docker.enable = true;
     emacs.enable = true;
     font.enable = true;
     git.enable = true;
     java.enable = true;
-    jujutsu.enable = true;
     nix.enable = true;
     nushell.enable = true;
-    office.enable = false;
-    sddm.enable = true;
-    sound.enable = true;
     starship.enable = true;
     stylix.enable = true;
-    touch.enable = true;
     zsh.enable = true;
   };
 
@@ -51,13 +42,12 @@
         sessionPath = [ "$HOME/.local/bin" ];
 
         packages = with pkgs; [
-          bat
-          direnv
-          git
-          htop
-          nh
-          ripgrep
-          sqlcmd
+          # bat
+          # direnv
+          # htop
+          # nh
+          # ripgrep
+          # sqlcmd
         ];
       };
 
