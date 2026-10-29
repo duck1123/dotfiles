@@ -11,14 +11,13 @@ in
 
   environments = {
     primary = "niri";
-    hyprland.enable = true;
+    hyprland.enable = false;
     # niri.enable = true;
     plasma6.enable = true;
   };
 
   features = {
     backups.enable = true;
-    battery.enable = false;
     bitcoin.enable = false;
     bluetooth.enable = true;
     clojure.enable = false;
@@ -52,8 +51,8 @@ in
         }
       ];
     };
-    java.enable = true;
-    jujutsu.enable = true;
+    java.enable = false;
+    jujutsu.enable = false;
 
     kubernetes = {
       client.enable = true;
@@ -77,8 +76,8 @@ in
     };
     nostr.enable = true;
     nushell.enable = true;
-    obsidian.enable = true;
-    office.enable = true;
+    obsidian.enable = false;
+    office.enable = false;
     pictures.enable = false;
     python.enable = true;
     radio.enable = false;
@@ -112,11 +111,11 @@ in
       enable = true;
 
       shares = {
-        camera.enable = true;
+        camera.enable = false;
         keepass.enable = true;
-        org-roam.enable = true;
+        org-roam.enable = false;
         renpy.enable = true;
-        sims4.enable = true;
+        sims4.enable = false;
       };
     };
 
