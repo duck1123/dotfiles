@@ -10,8 +10,9 @@ in
 
   environments = {
     primary = "niri";
+    budgie.enable = true;
     gnome.enable = false;
-    hyprland.enable = true;
+    hyprland.enable = false;
     # niri.enable = true;
     plasma6.enable = true;
   };
@@ -20,17 +21,17 @@ in
     battery.enable = true;
     bluetooth.enable = true;
     claude.enable = true;
-    clojure.enable = true;
+    clojure.enable = false;
     common.enable = true;
-    docker.enable = true;
+    docker.enable = false;
     emacs.enable = true;
     firefox.enable = true;
     font.enable = true;
     gaming.enable = true;
     git.enable = true;
-    glances.enable = true;
+    glances.enable = false;
     java.enable = true;
-    jujutsu.enable = true;
+    jujutsu.enable = false;
     kubernetes.client.enable = true;
     network.enable = true;
     nfs.enable = true;
@@ -52,7 +53,7 @@ in
       shares = {
         camera.enable = false;
         keepass.enable = true;
-        org-roam.enable = true;
+        org-roam.enable = false;
         renpy.enable = true;
       };
     };
@@ -63,7 +64,7 @@ in
       acceptRoutes = true;
     };
     touch.enable = true;
-    vpn.enable = true;
+    vpn.enable = false;
     vscode.enable = true;
     windmill.enable = true;
     xserver.enable = true;
