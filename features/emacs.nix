@@ -77,7 +77,7 @@
                   paredit
                   rainbow-delimiters
                   smartparens
-                  which-key
+                  # which-key
                   windswap
                 ];
             };
