@@ -30,8 +30,6 @@ rec {
       ${db-secret}.password = cfg.database.password;
     };
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/mealie.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     data.size = "5Gi";
   };

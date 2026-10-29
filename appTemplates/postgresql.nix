@@ -39,10 +39,7 @@ in
 
   # `pvcName` overrides since these predate the "${name}-${name}-<key>"
   # convention (data's is flat, matching persistentVolumeClaimName
-  # below). Shape only -- no volumeHandle here, that's
-  # environment-specific (see env/dev/postgresql.nix and
-  # docs/pinned-volumes.md). Each key only exists at all when its
-  # gating option is on, same as before.
+  # below).
   volumes =
     cfg:
     lib.optionalAttrs cfg.persistenceEnabled {

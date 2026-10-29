@@ -7,8 +7,6 @@ rec {
   name = "komga";
   uses-ingress = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/komga.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config.size = "5Gi";
   };

@@ -24,7 +24,6 @@ A key present in `volumes` but with no `volumeHandle` anywhere (whether via `vol
 self.lib.mkArgoApp { inherit config lib self pkgs; } {
   name = "myapp";
 
-  # Shape only -- no volumeHandle here.
   volumes = cfg: {
     appdata = { size = "5Gi"; };
   };

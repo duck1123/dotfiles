@@ -23,8 +23,6 @@ rec {
     }
   ];
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/bookorbit.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     data = {
       size = "20Gi";

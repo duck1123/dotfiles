@@ -29,8 +29,6 @@ rec {
   uses-ingress = true;
   uses-replicas = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/trilium.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     data.size = cfg.dataStorage;
   };

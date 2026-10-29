@@ -14,8 +14,7 @@ with lib;
   uses-ingress = true;
 
   # `pvcName = "cloudbeaver"` to match the chart's `existingClaim` value
-  # below. Shape only -- no volumeHandle here, that's environment-specific
-  # (see env/dev/cloudbeaver.nix and docs/pinned-volumes.md).
+  # below.
   volumes = cfg: {
     data = {
       pvcName = "cloudbeaver";

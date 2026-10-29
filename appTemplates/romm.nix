@@ -12,8 +12,6 @@ rec {
   uses-database = true;
   uses-redis = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/romm.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     data.size = "5Gi";
     config.size = "1Gi";

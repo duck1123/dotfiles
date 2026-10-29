@@ -19,8 +19,6 @@ rec {
     ${secret-encryption-key-secret}.SECRET_ENCRYPTION_KEY = cfg.secretEncryptionKey;
   };
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/homarr.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     appdata.size = "1Gi";
   };

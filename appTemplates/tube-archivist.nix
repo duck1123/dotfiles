@@ -36,8 +36,6 @@ rec {
   requires-redis = true;
   uses-replicas = true;
 
-  # Shape only -- no volumeHandle here (see clusters/dev/state.json and
-  # docs/pinned-volumes.md). es-data keeps its old flat PVC name.
   volumes =
     cfg:
     {

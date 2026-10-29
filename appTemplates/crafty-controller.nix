@@ -12,8 +12,6 @@ rec {
   uses-ingress = false;
   uses-replicas = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/crafty-controller.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config.size = "1Gi";
     backups.size = "10Gi";

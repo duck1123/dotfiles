@@ -18,8 +18,7 @@ rec {
   uses-replicas = true;
 
   # `pvcName = "${name}-data"` (not the usual "${name}-${name}-<key>"
-  # convention). Shape only -- no volumeHandle here, that's
-  # environment-specific (see env/dev/nocodb.nix and docs/pinned-volumes.md).
+  # convention).
   volumes = cfg: {
     data = {
       pvcName = "${name}-data";

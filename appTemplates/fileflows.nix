@@ -5,8 +5,6 @@ rec {
   uses-ingress = true;
   uses-replicas = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/fileflows.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config.size = "5Gi";
     temp.size = "50Gi";

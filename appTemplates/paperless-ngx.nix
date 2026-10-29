@@ -19,9 +19,7 @@ rec {
   uses-replicas = true;
 
   # `pvcName` overrides since these predate the "${name}-${name}-<key>"
-  # convention. Shape only -- no volumeHandle here, that's
-  # environment-specific (see env/dev/paperless-ngx.nix and
-  # docs/pinned-volumes.md).
+  # convention.
   volumes = cfg: {
     data = {
       pvcName = "${name}-data";

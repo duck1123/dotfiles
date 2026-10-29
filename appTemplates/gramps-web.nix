@@ -28,8 +28,6 @@ rec {
   uses-ingress = true;
   requires-redis = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/gramps-web.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     users.size = "100Mi";
     index.size = "1Gi";

@@ -13,13 +13,8 @@ rec {
   uses-ingress = true;
   uses-replicas = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/slskd.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config = {
-      # Real storageClassName (not the "" default) so Longhorn's resize
-      # webhook treats this as expandable -- it was full, see
-      # modules/lib/mkPinnedVolume.nix for why "" blocks resize.
       storageClassName = "longhorn";
       size = "40Gi";
     };

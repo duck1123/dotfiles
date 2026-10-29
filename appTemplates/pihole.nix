@@ -10,9 +10,7 @@ in
 
   # `pvcName = "pihole"` (not the usual "${name}-${name}-<key>" convention)
   # to match the chart's `existingClaim` value below, which is a literal
-  # string the chart's own template plumbing already expects. Shape only
-  # -- no volumeHandle here, that's environment-specific (see
-  # env/dev/pihole.nix and docs/pinned-volumes.md).
+  # string the chart's own template plumbing already expects.
   volumes = cfg: {
     data = {
       pvcName = "pihole";

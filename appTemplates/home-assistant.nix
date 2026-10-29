@@ -4,8 +4,6 @@ rec {
   name = "home-assistant";
   uses-ingress = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/home-assistant.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config.size = cfg.configSize;
   };

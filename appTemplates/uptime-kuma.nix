@@ -4,8 +4,6 @@ rec {
   name = "uptime-kuma";
   uses-ingress = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/uptime-kuma.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     data.size = "5Gi";
   };

@@ -13,8 +13,6 @@ rec {
     };
   };
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # docs/pinned-volumes.md).
   volumes = cfg: {
     data.size = "10Gi";
   };

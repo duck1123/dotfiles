@@ -15,8 +15,7 @@ with lib;
 
   # `pvcName = "gitea-shared-storage"` to match the chart's own default
   # claimName (persistence.create = false below, so nothing else creates
-  # this PVC). Shape only -- no volumeHandle here, that's
-  # environment-specific (see env/dev/forgejo.nix and docs/pinned-volumes.md).
+  # this PVC).
   volumes = cfg: {
     data = {
       pvcName = "gitea-shared-storage";

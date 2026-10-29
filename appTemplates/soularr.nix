@@ -70,8 +70,6 @@ rec {
   name = "soularr";
   uses-ingress = false;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/soularr.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config.size = "1Gi";
   };

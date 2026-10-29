@@ -10,8 +10,6 @@ rec {
   uses-ingress = true;
   uses-replicas = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/tdarr.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config.size = "10Gi";
     temp.size = "50Gi";

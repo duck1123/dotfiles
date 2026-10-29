@@ -4,8 +4,6 @@ rec {
   name = "gluetun";
   uses-ingress = false;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/gluetun.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     gluetun.size = "1Gi";
   };

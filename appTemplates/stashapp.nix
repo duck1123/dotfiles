@@ -8,8 +8,6 @@ rec {
   uses-ingress = true;
   uses-replicas = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/stashapp.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config.size = "200Gi";
   };

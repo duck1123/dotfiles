@@ -27,16 +27,11 @@ in
     };
   };
 
-  # No published Helm chart repo exists upstream (only a chart living
-  # inside the garage git repo, meant to be cloned+installed locally) —
-  # hand-rolled resources give the same control with no extra fetch.
-
   # Only `meta` goes through here -- `data` conditionally swaps between a
   # pinned Longhorn volume and an NFS-backed one under the same PVC name
   # depending on cfg.nfs.enable (see extraResources below), which doesn't
   # fit this shape+override model, so it keeps its own hand-rolled
-  # mkPinnedVolume call. Shape only -- no volumeHandle here, that's
-  # environment-specific (see env/dev/garage.nix and docs/pinned-volumes.md).
+  # mkPinnedVolume call.
   volumes =
     cfg:
     optionalAttrs (cfg.hostPath == null) {

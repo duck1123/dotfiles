@@ -7,8 +7,6 @@ rec {
   name = "qbittorrent";
   uses-ingress = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/qbittorrent.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config.size = "5Gi";
   };

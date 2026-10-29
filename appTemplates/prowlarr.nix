@@ -20,8 +20,6 @@ rec {
     { name = self.lib.arrLogDbName { inherit lib; } cfg.database.name; }
   ];
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/prowlarr.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     config.size = "5Gi";
   };

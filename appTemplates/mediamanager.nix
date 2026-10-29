@@ -40,8 +40,6 @@ rec {
   uses-nfs = true;
   uses-database = true;
 
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/mediamanager.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     images.size = "5Gi";
     config.size = "500Mi";

@@ -14,8 +14,7 @@ with lib;
   uses-ingress = true;
 
   # `pvcName = "kite-storage"` to match the chart's `existingClaim` value
-  # below. Shape only -- no volumeHandle here, that's environment-specific
-  # (see env/dev/kite.nix and docs/pinned-volumes.md).
+  # below.
   volumes = cfg: {
     data = {
       pvcName = "kite-storage";

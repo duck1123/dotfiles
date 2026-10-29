@@ -28,15 +28,6 @@ in
 {
   inherit name;
 
-  # No k8s Ingress -- reached over a Cloudflare Tunnel public hostname
-  # (see appTemplates/cloudflared.nix), same as duck1123. Add a "Public
-  # Hostname" route in the Cloudflare Zero Trust dashboard for
-  # relay.duck1123.com pointed at
-  # ditto-relay.ditto-relay.svc.cluster.local:13131 -- no repo change
-  # needed for that step.
-
-  # Shape only -- no volumeHandle here, that's environment-specific (see
-  # env/dev/ditto-relay.nix and docs/pinned-volumes.md).
   volumes = cfg: {
     opensearch-data.size = "20Gi";
   };
