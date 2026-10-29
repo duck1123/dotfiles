@@ -143,6 +143,11 @@ in
           };
 
           kernelModules = [ "kvm-amd" ];
+
+          # tiny_power_button turns the firmware's power-button notify on
+          # lid-open wake into SIGRTMIN+4 to PID 1, powering off on resume
+          # (NixOS/nixpkgs#577729)
+          blacklistedKernelModules = [ "tiny_power_button" ];
         };
 
         fileSystems = {
