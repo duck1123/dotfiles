@@ -37,6 +37,11 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {};
 
+/** As on a phone: the capture box has the focus instead of the topic search. */
+export const FocusCapture: Story = {
+  args: { focusCapture: true },
+};
+
 export const LoadError: Story = {
   args: { inbox: createMockInboxSource({ latencyMs: 300, failList: "Windmill job failed (502)" }) },
 };

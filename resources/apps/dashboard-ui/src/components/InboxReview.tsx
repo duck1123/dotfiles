@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { InboxItem, InboxSource, ReviewChanges } from "../inbox/types";
 import type { NoteScope, NoteSource } from "../notes/types";
+import { CaptureBox } from "./CaptureBox";
 import { ReviewItem } from "./ReviewItem";
 import { ReviewQueue } from "./ReviewQueue";
 import "./InboxReview.css";
@@ -11,16 +12,20 @@ export interface InboxReviewProps {
   notes: NoteSource;
   topicScope: NoteScope;
   kinds?: string[];
+  /** Focus the capture box on load instead of the first item's topic search. */
+  focusCapture?: boolean;
 }
 
 /** The whole review page: the queue on one side, the selected item's editor on the other. */
-export function InboxReview({ inbox, notes, topicScope, kinds }: InboxReviewProps) {
+export function InboxReview({ inbox, notes, topicScope, kinds, focusCapture = false }: InboxReviewProps) {
   const [items, setItems] = useState<InboxItem[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState<string>();
   const [detail, setDetail] = useState<InboxItem>();
   const [reviewed, setReviewed] = useState(0);
+  // While typing a capture, a newly shown item mustn't take the focus.
+  const [capturing, setCapturing] = useState(focusCapture);
 
   const load = useCallback(() => {
     setStatus("loading");
@@ -76,9 +81,25 @@ export function InboxReview({ inbox, notes, topicScope, kinds }: InboxReviewProp
     }
   }
 
+  // The queue is oldest first, so a new capture goes at the end.
+  async function capture(text: string) {
+    const item = await inbox.capture!(text);
+    setItems((list) => [...list.filter((i) => i.noteId !== item.noteId), { ...item, preview: undefined }]);
+    setSelectedId((current) => current ?? item.noteId);
+    return item;
+  }
+
   return (
     <div className="dui-inbox">
       <aside className="dui-inbox__queue">
+        {inbox.capture && (
+          <CaptureBox
+            onCapture={capture}
+            autoFocus={focusCapture}
+            onFocus={() => setCapturing(true)}
+            onBlur={() => setCapturing(false)}
+          />
+        )}
         <ReviewQueue
           items={items}
           selectedId={selectedId}
@@ -100,7 +121,7 @@ export function InboxReview({ inbox, notes, topicScope, kinds }: InboxReviewProp
             onSave={save}
             // Each item mounts a fresh editor (key), so after "Mark reviewed"
             // or a click in the queue the topic search is focused, ready for typing.
-            autoFocusTopics
+            autoFocusTopics={!capturing}
           />
         ) : (
           status === "ready" && <p className="dui-inbox__empty">Pick an item to review.</p>

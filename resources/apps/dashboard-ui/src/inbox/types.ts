@@ -38,4 +38,6 @@ export interface InboxSource {
   get(noteId: string): Promise<InboxItem>;
   /** Write the changes; returns the updated item. */
   save(noteId: string, changes: ReviewChanges): Promise<InboxItem>;
+  /** Capture new text into the inbox; returns the created item. Without it, no capture box. */
+  capture?(text: string): Promise<InboxItem>;
 }

@@ -1,0 +1,69 @@
+.dui-capture {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 16px;
+  font-family: var(--dui-font);
+  font-size: var(--dui-font-size);
+  color: var(--dui-text);
+}
+
+.dui-capture__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  border: 1px solid var(--dui-border);
+  border-radius: var(--dui-radius);
+  background: var(--dui-bg);
+  color: inherit;
+  font: inherit;
+  resize: vertical;
+}
+
+.dui-capture__input:focus-visible {
+  outline: 2px solid var(--dui-accent);
+  outline-offset: -1px;
+}
+
+.dui-capture__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.dui-capture__button {
+  padding: 4px 12px;
+  border: 1px solid var(--dui-accent);
+  border-radius: var(--dui-radius);
+  background: var(--dui-accent);
+  color: var(--dui-accent-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dui-capture__button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.dui-capture__done {
+  min-width: 0;
+  color: var(--dui-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.dui-capture__kind {
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--dui-chip-bg);
+  font-size: 0.85em;
+}
+
+.dui-capture__error {
+  padding: 4px 8px;
+  border-radius: var(--dui-radius);
+  background: var(--dui-danger-bg);
+  color: var(--dui-danger);
+}

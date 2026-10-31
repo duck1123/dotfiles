@@ -1,3 +1,4 @@
+export { CaptureBox, type CaptureBoxProps } from "./components/CaptureBox";
 export { InboxReview, type InboxReviewProps } from "./components/InboxReview";
 export { NoteChip, type NoteChipProps } from "./components/NoteChip";
 export { NotePicker, type NotePickerProps } from "./components/NotePicker";

@@ -114,3 +114,46 @@ test("focuses the topic search for each new item, ready for typing", async () =>
   await screen.findByDisplayValue(sampleItems[3].title);
   expect(topicsField()).toHaveFocus();
 });
+
+test("a capture joins the end of the queue without taking the selection", async () => {
+  const { user } = setup();
+  await screen.findByDisplayValue(sampleItems[0].title);
+
+  await user.click(screen.getByRole("textbox", { name: "Capture" }));
+  await user.keyboard("task: water the plants{Enter}");
+
+  expect(await screen.findByRole("status")).toHaveTextContent("Captured task water the plants");
+  expect(screen.getByRole("textbox", { name: "Capture" })).toHaveValue("");
+  expect(queueItems()).toHaveLength(sampleItems.length + 1);
+  expect(within(queueItems()[sampleItems.length]).getByText("water the plants")).toBeInTheDocument();
+  expect(titleField()).toHaveValue(sampleItems[0].title);
+});
+
+test("with focusCapture, the capture box keeps the focus and the first capture is selected", async () => {
+  const user = userEvent.setup();
+  render(<InboxReview inbox={createMockInboxSource({ items: [] })} notes={createMockSource()} topicScope={topics} focusCapture />);
+  const box = screen.getByRole("textbox", { name: "Capture" });
+  expect(box).toHaveFocus();
+  await screen.findByText("Nothing left to review.");
+
+  await user.keyboard("first line{Shift>}{Enter}{/Shift}second line{Enter}");
+  expect(await screen.findByDisplayValue("first line")).toBeInTheDocument();
+  expect(box).toHaveFocus();
+});
+
+test("a failed capture shows the error and keeps the text", async () => {
+  const { user } = setup(createMockInboxSource({ failCapture: "boom" }));
+  await screen.findByDisplayValue(sampleItems[0].title);
+
+  await user.click(screen.getByRole("textbox", { name: "Capture" }));
+  await user.keyboard("a thought{Enter}");
+  expect(await screen.findByText("Couldn't capture: boom")).toBeInTheDocument();
+  expect(screen.getByRole("textbox", { name: "Capture" })).toHaveValue("a thought");
+});
+
+test("no capture box when the source can't capture", async () => {
+  const { capture: _capture, ...inbox } = createMockInboxSource();
+  setup(inbox);
+  await screen.findByDisplayValue(sampleItems[0].title);
+  expect(screen.queryByRole("textbox", { name: "Capture" })).not.toBeInTheDocument();
+});
