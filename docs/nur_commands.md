@@ -120,7 +120,7 @@ App definitions live in `appTemplates/` and `clusters/dev/`. nixidy renders them
 - The review step needs a terminal and blocks until you close the emacs frame (`C-x 5 0`). If you abort, the changes stay uncommitted in `kubernetes/manifests/`; push them later with `nur k8s push`, before the next render resets them away. If nothing changed, it says so and stops.
 - The dotfiles source change still needs committing to this repo separately.
 
-> **Agents:** `nur switch k8s` / `nur k8s deploy` / `nur k8s push` deploy to the cluster, so confirm before running them, and pass `--no-review` (there's no terminal). Use `nur k8s switch-charts` when you only need to see the rendered diff.
+> **Agents:** `nur switch k8s` / `nur k8s deploy` / `nur k8s push` deploy to the cluster, so confirm before running them. Pass `--no-review` to `switch k8s` and `k8s deploy` (there's no terminal); `push` has no review step and takes no flag. Use `nur k8s switch-charts` when you only need to see the rendered diff.
 
 ## Cluster operations
 

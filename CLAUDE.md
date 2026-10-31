@@ -31,7 +31,7 @@ nur lint                      # statix
 ## Rules
 
 - **Never put a secret value into the conversation.** Don't run `sops -d` or `nur secrets decrypt`, and don't read `secrets/k8s.yaml`. Find a path with `nur secrets keys`, check it with `nur secrets check`, and use it via `nur secrets exec VAR=path sh -c '... "$VAR" ...'`, which redacts values in the output. Never pass `--no-redact`.
-- **`nur switch k8s`, `nur k8s deploy` and `nur k8s push` deploy to the cluster.** Confirm before running them, and pass `--no-review` (there's no terminal). Use `nur k8s switch-charts` to render manifests without deploying.
+- **`nur switch k8s`, `nur k8s deploy` and `nur k8s push` deploy to the cluster.** Confirm before running them, and pass `--no-review` to the first two (there's no terminal); `push` has no review step and takes no flag. Use `nur k8s switch-charts` to render manifests without deploying.
 - **`git add` new files.** The flake only sees git-tracked files; an untracked `hosts/`, `features/`, `appTemplates/` (etc.) file is silently ignored (`does not provide attribute ...`). Staging is enough.
 - **Feature and environment files hold bodies only.** A `features/<name>.nix` `homeManager`/`nixos` body has no `config =` or `mkIf enable` wrapper; the registry adds the gate. Don't enable environment-owned features (`hyprland`, `gnome`, `i3`, `wayle`) by hand in host files.
 - When adding or changing a `nur` task, update [docs/nur_commands.md](docs/nur_commands.md) to match. `scripts/nur.nu` is local to this repo; it isn't deployed to hosts.
