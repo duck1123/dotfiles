@@ -50,6 +50,7 @@
 
         nushell = {
           enable = true;
+          loadSessionVariables = true;
           configFile.source = ../nushell/config.nu;
           envFile.source = ../nushell/env.nu;
 
