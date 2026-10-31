@@ -12,7 +12,8 @@ let fish_completer = {|spans|
 }
 
 # This completer will use carapace by default
-let external_completer = {|spans|
+let external_completer = {|place|
+  let spans = $place.command
   let expanded_alias = scope aliases
     | where name == $spans.0?
     | get --optional 0.expansion
