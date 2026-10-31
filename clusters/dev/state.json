@@ -338,6 +338,9 @@
   "tailscale": {
     "enable": true
   },
+  "tautulli": {
+    "enable": true
+  },
   "tdarr": {
     "enable": false,
     "pins": {
