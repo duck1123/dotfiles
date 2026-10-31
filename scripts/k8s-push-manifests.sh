@@ -5,7 +5,7 @@
 # Run nur k8s switch-charts first to generate/update the manifests.
 #
 # Usage:
-#   ./scripts/k8s-push-manifests.sh
+#   ./scripts/k8s-push-manifests.sh      # message = latest dotfiles commit's
 #   COMMIT_MSG="custom message" ./scripts/k8s-push-manifests.sh
 set -euo pipefail
 
@@ -27,7 +27,14 @@ if ! git diff --cached --quiet; then
   echo "Changes staged:"
   git --no-pager diff --cached --stat
 
-  COMMIT_MSG="${COMMIT_MSG:-Update manifests $(date -u +%Y-%m-%dT%H:%M:%SZ)}"
+  if [[ -z "${COMMIT_MSG:-}" ]]; then
+    COMMIT_MSG="$(git -C "$DOTFILES_ROOT" log -1 --format=%B)"
+    # Uncommitted tracked changes were rendered too (untracked files are
+    # invisible to the flake), so HEAD's message doesn't fully describe them.
+    if [[ -n "$(git -C "$DOTFILES_ROOT" status --porcelain --untracked-files=no)" ]]; then
+      COMMIT_MSG="[dirty] $COMMIT_MSG"
+    fi
+  fi
   git commit -m "$COMMIT_MSG"
 elif [[ "$(git rev-list --count '@{u}..HEAD')" -eq 0 ]]; then
   # Nothing staged and nothing committed ahead of upstream (commits made by
