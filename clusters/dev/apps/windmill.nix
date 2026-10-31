@@ -2,9 +2,9 @@
 {
   services.windmill = {
     # hostAffinity = "nixmini";
-    # Pinned to what `:latest` was actually running (2026-10-27). Upgrading
-    # also means bumping wmill-cli (modules/kubernetes/pkgs/windmill-sync.nix).
-    image = "ghcr.io/windmill-labs/windmill-full:1.687.0";
+    # Upgrading also means bumping wmill-cli to the same version
+    # (modules/kubernetes/pkgs/windmill-sync.nix and wmill-cli/package.json).
+    image = "ghcr.io/windmill-labs/windmill-full:1.855.1";
 
     ingressProvider = "traefik-lan";
     ingress.tls.enable = true;

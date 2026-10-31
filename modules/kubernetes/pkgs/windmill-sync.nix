@@ -9,10 +9,10 @@ _: {
       # together, then `nix build .#wmill-cli` to get the new npmDepsHash.
       wmill-cli = pkgs.buildNpmPackage {
         pname = "wmill-cli";
-        version = "1.719.0";
+        version = "1.855.1";
         src = ./wmill-cli;
         # nix build .#wmill-cli  →  first failure shows the correct hash
-        npmDepsHash = "sha256-noy8fkzzhNsAACto88WbsmPyrPVSpLCnspnbZVzkpSw=";
+        npmDepsHash = "sha256-JzEOMiXB5eoMIZAHOachMNcdPwst5A2HzQUGHZyW4Eo=";
         dontNpmBuild = true;
         nativeBuildInputs = [ pkgs.makeWrapper ];
         installPhase = ''
