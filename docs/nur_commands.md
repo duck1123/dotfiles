@@ -109,15 +109,15 @@ App definitions live in `appTemplates/` and `clusters/dev/`. nixidy renders them
 
 | Command | What it does |
 |---|---|
-| `nur k8s deploy [--no-review] [--fallback]` | `manifests sync` + `switch-charts` (`--fallback` is passed on to it), then (unless `--no-review`) opens the changes in magit and asks before running `push` (the prompt starts on Abort, so a bare Enter doesn't deploy). **Deploys.** `nur switch k8s` calls this. |
-| `nur k8s switch-charts [--fallback]` | Render manifests into `kubernetes/manifests/dev/` (plus sops secrets, post-processing, and pushing pinned store paths to Attic). Local only; inspect with `git -C kubernetes/manifests diff`. |
+| `nur k8s deploy [--no-review] [--fallback]` | `switch-charts` (`--fallback` is passed on to it), then (unless `--no-review`) opens the changes in magit and asks before running `push` (the prompt starts on Abort, so a bare Enter doesn't deploy). **Deploys.** `nur switch k8s` calls this. |
+| `nur k8s switch-charts [--fallback]` | Fetch and hard-reset `kubernetes/manifests/` to its upstream (dropping any uncommitted or unpushed changes there), then render manifests into `kubernetes/manifests/dev/` (plus sops secrets, post-processing, and pushing pinned store paths to Attic). Local only; inspect with `git -C kubernetes/manifests diff`. |
 | `nur k8s push` | Commit and push whatever changed in `kubernetes/manifests/`, reusing the latest dotfiles commit's message, prefixed with `[dirty]` if dotfiles has uncommitted changes (override with `COMMIT_MSG=...`). **This is the deploy step.** |
 | `nur k8s manifests init` | One-time: clone `argo-manifests` into `kubernetes/manifests/`. |
 | `nur k8s manifests sync` | `git pull` the manifests checkout. |
 | `nur k8s generate-deploy-key` | Generate an SSH deploy key pair for `argo-manifests`. |
 | `nur k8s bootstrap-argocd-repo` | One-time: apply ArgoCD's repo credential for `argo-manifests` from secrets. |
 
-- The review step needs a terminal and blocks until you close the emacs frame (`C-x 5 0`). If you abort, the changes stay uncommitted in `kubernetes/manifests/`; push them later with `nur k8s push`. If nothing changed, it says so and stops.
+- The review step needs a terminal and blocks until you close the emacs frame (`C-x 5 0`). If you abort, the changes stay uncommitted in `kubernetes/manifests/`; push them later with `nur k8s push`, before the next render resets them away. If nothing changed, it says so and stops.
 - The dotfiles source change still needs committing to this repo separately.
 
 > **Agents:** `nur switch k8s` / `nur k8s deploy` / `nur k8s push` deploy to the cluster, so confirm before running them, and pass `--no-review` (there's no terminal). Use `nur k8s switch-charts` when you only need to see the rendered diff.

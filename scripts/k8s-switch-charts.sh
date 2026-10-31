@@ -23,6 +23,16 @@ if [[ ! -d "$MANIFESTS_DIR/.git" ]]; then
   exit 1
 fi
 
+# Start from what's deployed: fetch and hard-reset the checkout to its
+# upstream, dropping leftovers of an earlier render or an aborted review, so
+# they can't block the next pull or slip into the next push. Nothing is lost:
+# this run renders everything again, and the SopsSecret snapshot below then
+# compares against the deployed secrets.
+echo "Resetting $MANIFESTS_DIR to its upstream..."
+git -C "$MANIFESTS_DIR" fetch --quiet
+git -C "$MANIFESTS_DIR" reset --quiet --hard '@{u}'
+git -C "$MANIFESTS_DIR" clean -fdq
+
 SOPS=(sops)
 if ! command -v sops >/dev/null 2>&1; then
   SOPS=(nix run nixpkgs#sops --)

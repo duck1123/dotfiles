@@ -775,7 +775,7 @@ export def "nur k8s manifests sync" []: nothing -> nothing {
   ^git -C kubernetes/manifests pull
 }
 
-# Build nixidy manifests and write to kubernetes/manifests/
+# Reset kubernetes/manifests/ to origin, then build nixidy manifests into it
 export def "nur k8s switch-charts" [
   --fallback  # Pass --fallback to the underlying nix build (rebuild locally if a substituter is unavailable)
 ] {
@@ -808,9 +808,9 @@ def k8s-review-manifests []: nothing -> nothing {
   ^emacsclient $frame -a "" --eval $expr
 }
 
-# Build manifests and push to private repo (sync + switch-charts + review + push).
-# Syncing first keeps the local checkout from being stale relative to origin,
-# so `git push` in `nur k8s push` doesn't get rejected as non-fast-forward.
+# Build manifests and push to private repo (switch-charts + review + push).
+# switch-charts resets the checkout to origin first, so `git push` in
+# `nur k8s push` doesn't get rejected as non-fast-forward.
 # Unless --no-review, the changes are opened in magit first and pushing needs
 # confirmation; aborting leaves them uncommitted in kubernetes/manifests
 # (push them later with `nur k8s push`).
@@ -818,7 +818,6 @@ export def "nur k8s deploy" [
   --no-review  # Commit and push without reviewing or confirming
   --fallback  # Pass --fallback to the underlying nix build (rebuild locally if a substituter is unavailable)
 ] {
-  nur k8s manifests sync
   nur k8s switch-charts --fallback=$fallback
 
   if not $no_review {
