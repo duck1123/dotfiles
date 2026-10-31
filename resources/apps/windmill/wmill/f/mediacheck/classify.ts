@@ -53,7 +53,7 @@ export const RULES: Rule[] = [
 
   // Noise
   { id: "timestamps", kind: "benign", re: /non monotonically increasing dts|Timestamps are unset|Invalid timestamp|out of order|Packet with invalid duration|Could not update timestamps|pts has no value|DTS discontinuity/ },
-  { id: "h264-refs", kind: "benign", re: /number of reference frames .* exceeds max|mmco: unref short failure|co located POCs unavailable|Increasing reorder buffer|first frame is no keyframe/ },
+  { id: "h264-refs", kind: "benign", re: /number of reference frames .* exceeds max|mmco: unref short failure|co located POCs unavailable|illegal short term buffer state|Increasing reorder buffer|first frame is no keyframe/ },
   { id: "probe", kind: "benign", re: /Could not find codec parameters|not enough frames to estimate rate|max_analyze_duration .* reached|Estimating duration from bitrate|decoding for stream \d+ failed/ },
   { id: "metadata", kind: "benign", re: /Referenced QT chapter track not found|Unknown cover type|Discarding ID3 tags|deprecated pixel format|Unsupported encoding type|Ignoring attempt to set invalid timebase/ },
   // Old DivX/MS-MPEG4 encoders leave these all through files that play fine.

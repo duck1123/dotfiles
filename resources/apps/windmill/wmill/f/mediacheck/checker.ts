@@ -20,6 +20,8 @@
 // - stats {}: file count per status and library.
 //
 // Schema: f/mediacheck/schema.pg.sql. Paths are relative to the library root.
+// JSON goes in as text cast to jsonb: a bare ::jsonb makes Bun bind the
+// already-serialised string as JSON again, storing a jsonb string.
 import * as wmill from "windmill-client";
 import { SQL } from "bun";
 import { classify, type LogLine } from "./classify.ts";
@@ -125,7 +127,7 @@ async function report(r: Report) {
       status = ${findings.verdict}, claimed_by = null, claimed_at = null, checked_at = now(),
       check_seconds = ${r.checkSeconds}, duration = ${r.duration}, decoded = ${r.decoded},
       exit_code = ${r.exitCode}, line_count = ${r.lineCount},
-      log = ${JSON.stringify(r.log)}::jsonb, findings = ${JSON.stringify(findings)}::jsonb
+      log = ${JSON.stringify(r.log)}::text::jsonb, findings = ${JSON.stringify(findings)}::text::jsonb
     where id = ${r.id}`;
   return { id: r.id, status: findings.verdict, damage: findings.damage, unknown: findings.unknown };
 }
@@ -138,7 +140,7 @@ async function reclassify() {
   for (const row of rows) {
     const findings = classify(row.log, { duration: row.duration, decoded: row.decoded, exitCode: row.exit_code ?? 0 });
     const [before] = await db`
-      update media_file m set status = ${findings.verdict}, findings = ${JSON.stringify(findings)}::jsonb
+      update media_file m set status = ${findings.verdict}, findings = ${JSON.stringify(findings)}::text::jsonb
       from (select status from media_file where id = ${row.id}) old
       where m.id = ${row.id}
       returning old.status as old`;
