@@ -20,7 +20,14 @@ in
   features = {
     battery.enable = true;
     bluetooth.enable = true;
-    claude.enable = true;
+    claude = {
+      enable = true;
+      gortex = {
+        enable = true;
+        hooks.enable = true;
+        skills.enable = true;
+      };
+    };
     clojure.enable = false;
     common.enable = true;
     docker.enable = false;

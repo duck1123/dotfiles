@@ -183,6 +183,30 @@ in
           in features/claude.nix.
         '';
       };
+
+      gortex = {
+        enable = lib.mkEnableOption "the Gortex code-intelligence daemon and MCP server (gortex.dev)";
+
+        hooks = {
+          enable = lib.mkEnableOption "Gortex's Claude Code hooks";
+          mode = lib.mkOption {
+            type = lib.types.enum [
+              "deny"
+              "enrich"
+              "consult-unlock"
+              "nudge"
+            ];
+            default = "deny";
+            description = ''
+              Hook posture (`gortex install --hook-mode`). `deny` redirects
+              Grep/Glob/Read of indexed source to the graph; `enrich` never
+              denies and appends graph context instead.
+            '';
+          };
+        };
+
+        skills.enable = lib.mkEnableOption "Gortex's Claude Code skills and subagents";
+      };
     };
 
   homeManager =
@@ -193,11 +217,76 @@ in
       ...
     }:
     let
-      managed = pkgs.writeText "claude-settings.json" (
+      cfg = config.host.features.claude;
+
+      # Not in nixpkgs, and the source build needs a newer Go plus CGO for ~250
+      # tree-sitter grammars. The release binary is statically linked, so use it as is.
+      gortex =
+        let
+          version = "0.64.11";
+        in
+        pkgs.stdenv.mkDerivation {
+          pname = "gortex";
+          inherit version;
+          src = pkgs.fetchurl {
+            url = "https://github.com/zzet/gortex/releases/download/v${version}/gortex_linux_amd64.tar.gz";
+            hash = "sha256-3BNyVNgfodymo9tCOfLTwEXbvKZrCweHC05RLSVqK8c=";
+          };
+          sourceRoot = ".";
+          dontBuild = true;
+          dontStrip = true;
+          installPhase = ''
+            install -Dm755 gortex $out/bin/gortex
+          '';
+          meta = {
+            mainProgram = "gortex";
+            platforms = [ "x86_64-linux" ];
+            license = lib.licenses.asl20;
+          };
+        };
+
+      # Loaded as a Claude Code plugin named `gortex`, the layout upstream's
+      # marketplace plugin uses, so its tools are mcp__plugin_gortex_gortex__*
+      # (its hook matchers already expect that). The skills, subagents and
+      # hooks come from `gortex install` run at build time, so they always
+      # match the pinned binary.
+      gortexPlugin = pkgs.runCommand "gortex-claude-plugin" { nativeBuildInputs = [ pkgs.jq ]; } ''
+        export HOME=$TMPDIR
+        ${lib.getExe gortex} install --agents claude-code --claude-config-dir "$TMPDIR/claude" \
+          --yes --no-telemetry --no-claude-md --no-progress \
+          --hook-mode ${cfg.gortex.hooks.mode} > /dev/null
+        cd "$TMPDIR/claude"
+        mkdir "$out"
+
+        jq -n --arg exe ${lib.getExe gortex} '{gortex: {command: $exe, args: ["mcp"]}}' > "$out/.mcp.json"
+        jq '.permissions.allow | map(sub("^mcp__gortex__"; "mcp__plugin_gortex_gortex__"))' \
+          settings.json > "$out/permissions.json"
+        ${lib.optionalString cfg.gortex.skills.enable ''
+          # No commands/: each one duplicates the skill of the same name.
+          cp -r skills agents "$out/"
+          find "$out/skills" "$out/agents" -type f -exec sed -i 's/mcp__gortex__/mcp__plugin_gortex_gortex__/g' {} +
+        ''}
+        ${lib.optionalString cfg.gortex.hooks.enable ''
+          mkdir "$out/hooks"
+          jq --arg exe ${lib.getExe gortex} \
+            '{hooks: .hooks | walk(if type == "object" and has("command") then .command |= sub("^gortex "; $exe + " ") else . end)}' \
+            settings.json > "$out/hooks/hooks.json"
+        ''}
+      '';
+
+      managedBase = pkgs.writeText "claude-settings.json" (
         builtins.toJSON {
-          permissions.allow = lib.unique (sharedAllow ++ config.host.features.claude.allow);
+          permissions.allow = lib.unique (sharedAllow ++ cfg.allow);
         }
       );
+      managed =
+        if cfg.gortex.enable then
+          pkgs.runCommand "claude-settings.json" { nativeBuildInputs = [ pkgs.jq ]; } ''
+            jq --slurpfile gortex ${gortexPlugin}/permissions.json \
+              '.permissions.allow = (.permissions.allow + $gortex[0] | unique)' ${managedBase} > "$out"
+          ''
+        else
+          managedBase;
       # Claude Code runs this when connecting and merges the JSON it prints into the request headers.
       headersHelper =
         name:
@@ -206,8 +295,30 @@ in
         '';
     in
     {
+      home.packages = lib.optional cfg.gortex.enable gortex;
+
+      # `gortex mcp` only proxies to this shared daemon (mcp.allow_embedded is
+      # false by default). Tracked repos live in ~/.gortex/config.yaml, which
+      # stays mutable: `gortex track` / `gortex init` write it.
+      systemd.user.services.gortex = lib.mkIf cfg.gortex.enable {
+        Unit = {
+          Description = "Gortex code intelligence daemon";
+          Documentation = "https://github.com/zzet/gortex";
+        };
+        Service = {
+          ExecStart = "${lib.getExe gortex} daemon start";
+          # It shells out to git and language servers, so give it the user's PATH.
+          Environment = "PATH=${lib.makeBinPath [ pkgs.git ]}:${config.home.profileDirectory}/bin:/run/current-system/sw/bin";
+          Restart = "on-failure";
+          RestartSec = 2;
+        };
+        Install.WantedBy = [ "default.target" ];
+      };
+
       programs.claude-code = {
         enable = true;
+
+        plugins = lib.optionalAttrs cfg.gortex.enable { gortex = gortexPlugin; };
 
         mcpServers = {
           nixos.command = lib.getExe pkgs.mcp-nixos;

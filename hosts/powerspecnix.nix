@@ -23,7 +23,14 @@ in
     clojure.enable = false;
     common.enable = true;
     chat.enable = false;
-    claude.enable = true;
+    claude = {
+      enable = true;
+      gortex = {
+        enable = true;
+        hooks.enable = true;
+        skills.enable = true;
+      };
+    };
     dbt.enable = false;
     developer.enable = true;
     docker.enable = false;
