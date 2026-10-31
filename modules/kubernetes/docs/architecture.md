@@ -53,7 +53,7 @@ flowchart LR
 | nixkube (nix-csi) | `appTemplates/nix-csi.nix` | A CSI driver that mounts a Nix store closure into a pod at `/nix`. This is how apps run without a container image of their own ([nix-csi-and-binary-cache.md](nix-csi-and-binary-cache.md)). |
 | Attic | `appTemplates/attic.nix`, storage on Garage | The LAN binary cache that nixkube pulls store paths from. |
 | sops-secrets-operator | `appTemplates/sops.nix` | Turns `SopsSecret` manifests (encrypted in argo-manifests) into Kubernetes Secrets. |
-| Traefik + cert-manager | `appTemplates/traefik.nix`, `appTemplates/cert-manager.nix` | Ingress and TLS. An app picks an `ingressProvider` (`traefik-lan`, `tailscale`, `traefik-dev` in `clusters/dev/default.nix`), which fills in its class, issuer and domain. |
+| Traefik + cert-manager | `appTemplates/traefik.nix`, `appTemplates/cert-manager.nix` | Ingress and TLS. An app picks an `ingressProvider` (`traefik-lan` or `traefik-dev` in `clusters/dev/default.nix`), which fills in its class, issuer and domain. |
 | Homepage, AutoKuma | `appTemplates/homepage.nix`, `appTemplates/autokuma.nix` | Every app with an ingress gets a homepage link and an Uptime Kuma monitor by default ([homepage-dashboard.md](homepage-dashboard.md)). |
 | Windmill sync | `appTemplates/windmill.nix`, `modules/kubernetes/pkgs/windmill-sync.nix` | A `Sync` hook job that pushes `resources/apps/windmill/wmill/f/**` into Windmill. |
 

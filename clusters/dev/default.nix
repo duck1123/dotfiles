@@ -60,11 +60,6 @@ in
       clusterIssuer = config.devDefaults.clusterIssuer;
       domain = config.devDefaults.homeDomain;
     };
-    tailscale = {
-      ingressClassName = "tailscale";
-      clusterIssuer = "tailscale";
-      domain = config.devDefaults.tailDomain;
-    };
     traefik-dev = {
       ingressClassName = "traefik";
       clusterIssuer = config.devDefaults.clusterIssuer;

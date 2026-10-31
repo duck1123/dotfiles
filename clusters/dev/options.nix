@@ -13,12 +13,6 @@
       description = "LAN-facing domain fronted by the Traefik ingress";
     };
 
-    tailDomain = lib.mkOption {
-      type = lib.types.str;
-      default = "bearded-snake.ts.net";
-      description = "Tailscale MagicDNS domain for tailscale-routed ingresses";
-    };
-
     clusterIssuer = lib.mkOption {
       type = lib.types.str;
       default = "letsencrypt-prod";

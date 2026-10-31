@@ -336,9 +336,6 @@
   "superset": {
     "enable": false
   },
-  "tailscale": {
-    "enable": true
-  },
   "tautulli": {
     "enable": true
   },
