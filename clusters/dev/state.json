@@ -245,7 +245,7 @@
     "enable": false
   },
   "prowlarr": {
-    "enable": false,
+    "enable": true,
     "pins": {
       "config": "pvc-ee5907d3-b4e4-4da5-91dc-d013f243b741"
     },
