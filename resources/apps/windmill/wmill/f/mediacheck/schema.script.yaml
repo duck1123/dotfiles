@@ -1,0 +1,17 @@
+summary: Create or update the media integrity queue's schema
+description: >-
+  Creates the media_file table in the mediacheck database if it doesn't exist,
+  refreshes its status constraint, and reports the file count per status. Safe
+  to run again; never drops or rewrites data.
+lock: ''
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties:
+    database:
+      type: object
+      format: resource-postgresql
+      description: The mediacheck database.
+      default: $res:f/fleetops/db_mediacheck
+  required: []

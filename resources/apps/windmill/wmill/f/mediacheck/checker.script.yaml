@@ -1,0 +1,30 @@
+summary: Media integrity queue for the powerspecnix checker
+description: >-
+  Called by the mediacheck service on powerspecnix: sync records a library
+  scan, claim hands out the next file to decode, report stores a decode's
+  error output with its verdict from f/mediacheck/classify. Also release,
+  reclassify (after a rule change) and stats.
+lock: '!inline f/mediacheck/checker.script.lock'
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties:
+    action:
+      type: string
+      description: What to do.
+      enum:
+        - sync
+        - sync_done
+        - claim
+        - release
+        - report
+        - reclassify
+        - stats
+      default: stats
+    args:
+      type: object
+      description: The action's arguments.
+      default: {}
+  required:
+    - action

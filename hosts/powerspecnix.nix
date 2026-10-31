@@ -74,6 +74,8 @@ in
       server.enable = false;
     };
 
+    mediacheck.enable = true;
+
     music.enable = false;
     network.enable = true;
     nfs.enable = false;

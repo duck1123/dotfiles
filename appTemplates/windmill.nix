@@ -243,6 +243,14 @@ rec {
       name = "phototags";
       username = "phototags";
     }
+    # The media integrity queue: one row per video file on the NAS with its
+    # last full-decode check and verdict, used by f/mediacheck scripts and
+    # fed by the powerspecnix checker (features/mediacheck.nix). Schema in
+    # resources/apps/windmill/wmill/f/mediacheck/schema.pg.sql.
+    {
+      name = "mediacheck";
+      username = "mediacheck";
+    }
   ];
   # nfsSubPath left at its "" default, so cfg.nfs.path resolves to the
   # whole nfsTarget basePath (all of nasnix:/mnt/media) rather than one

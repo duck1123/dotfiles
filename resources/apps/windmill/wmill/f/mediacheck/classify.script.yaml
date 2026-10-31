@@ -1,0 +1,31 @@
+summary: Sort a decode's error output into a verdict
+description: >-
+  Matches each line of a full ffmpeg decode's error output against the damage
+  and noise rules and returns the verdict (ok, suspect, unclear) with counts
+  and the damaged spots. Used by f/mediacheck/checker; run it by hand to try a
+  rule change on a stored log.
+lock: '!inline f/mediacheck/classify.script.lock'
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties:
+    log:
+      type: array
+      description: 'The error lines, as [{t, msg}] with t in seconds or null.'
+      items:
+        type: object
+      default: []
+    duration:
+      type: number
+      description: The container's duration in seconds.
+      default: null
+    decoded:
+      type: number
+      description: How far the decode got, in seconds.
+      default: null
+    exit_code:
+      type: integer
+      description: ffmpeg's exit code.
+      default: 0
+  required: []
