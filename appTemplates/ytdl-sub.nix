@@ -62,8 +62,13 @@ with lib;
 
     extraResources = cfg: {
       configMaps.${configMapName}.data = {
+        # The image defaults lock_directory to /config, which is this
+        # read-only ConfigMap.
         "config.yaml" = builtins.toJSON {
-          configuration.working_directory = "/tmp/ytdl-sub-working";
+          configuration = {
+            working_directory = "/tmp/ytdl-sub-working";
+            lock_directory = "/tmp";
+          };
         };
         "subscriptions.yaml" = builtins.toJSON {
           __preset__.overrides = {
