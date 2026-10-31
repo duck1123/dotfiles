@@ -10,6 +10,7 @@ with lib;
     inherit name;
     uses-ingress = true;
     uses-nfs = true;
+    uses-replicas = true;
 
     # Small precious volume (SQLite db + logs/metadata) -- see
     # docs/pinned-volumes.md if this ever needs pinning across an
@@ -53,6 +54,9 @@ with lib;
 
     extraResources = cfg: {
       deployments.${name}.spec = {
+        inherit (cfg) replicas;
+        # The SQLite db lives on an RWO volume; never run two pods at once.
+        strategy.type = "Recreate";
         selector.matchLabels = labels;
         template = {
           metadata.labels = labels;
@@ -88,15 +92,18 @@ with lib;
                   timeoutSeconds = 5;
                   failureThreshold = 6;
                 };
+                # Indexing a big channel can block /healthcheck for minutes;
+                # the old 3x5s budget killed the pod mid-download (51
+                # restarts in 4 days, 2026-10-31).
                 livenessProbe = {
                   httpGet = {
                     path = "/healthcheck";
                     port = cfg.service.port;
                   };
-                  initialDelaySeconds = 30;
-                  periodSeconds = 30;
-                  timeoutSeconds = 5;
-                  failureThreshold = 3;
+                  initialDelaySeconds = 60;
+                  periodSeconds = 60;
+                  timeoutSeconds = 30;
+                  failureThreshold = 10;
                 };
                 resources = {
                   requests = {
@@ -201,12 +208,14 @@ with lib;
           spec = {
             capacity.storage = "2Ti";
             accessModes = [ "ReadWriteMany" ];
+            # hard, not soft: a soft mount turns a NAS stall into EIO, and
+            # Pinchflat treats an unreadable file as missing.
             mountOptions = [
               "nolock"
               "nfsvers=3"
               "noexec"
-              "soft"
-              "timeo=30"
+              "hard"
+              "timeo=600"
             ];
             nfs = {
               server = cfg.nfs.server;
