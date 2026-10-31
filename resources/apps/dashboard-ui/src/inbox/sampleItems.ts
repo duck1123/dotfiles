@@ -10,6 +10,7 @@ export const sampleItems: InboxItem[] = [
     url: "https://example.com/blog/sourdough-starter-vacation",
     topicIds: [],
     tagIds: [],
+    notes: "",
     preview: "A short guide to drying, freezing or feeding a starter less often while you're away.",
   },
   {
@@ -21,6 +22,7 @@ export const sampleItems: InboxItem[] = [
     topicIds: ["mockKeybrd01"],
     tagIds: [],
     preview: "Channel: Example Maker. Wiring the matrix, flashing firmware, and choosing switches.",
+    notes: "Skip to 12:30 for the diode orientation.\n\nCompare with the build log on the forum before ordering parts.",
   },
   {
     noteId: "mockInbox003",
@@ -29,6 +31,7 @@ export const sampleItems: InboxItem[] = [
     created: "2026-10-15",
     topicIds: [],
     tagIds: ["mockTomato01"],
+    notes: "",
   },
   {
     noteId: "mockInbox004",
@@ -37,6 +40,7 @@ export const sampleItems: InboxItem[] = [
     created: "2026-10-16T19:02:00",
     topicIds: ["mockGarden01", "mockHobby001"],
     tagIds: [],
+    notes: "",
     preview: "We talked about seed swaps, the spring plant sale, and whether to move the meeting night.",
   },
   {
@@ -47,5 +51,6 @@ export const sampleItems: InboxItem[] = [
     url: "https://1abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstu.example.org/a/very/long/url/that/was/never/given/a/title?ref=share",
     topicIds: [],
     tagIds: [],
+    notes: "",
   },
 ];

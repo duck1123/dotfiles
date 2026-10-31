@@ -32,6 +32,9 @@ export function ReviewItem({
   const [title, setTitle] = useState(item.title);
   const [kind, setKind] = useState(item.kind ?? "");
   const [topicIds, setTopicIds] = useState(item.topicIds);
+  // Undefined until edited: the item's notes arrive with its preview, after the
+  // form is already showing.
+  const [notesEdit, setNotesEdit] = useState<string>();
   const [saving, setSaving] = useState<"save" | "done" | null>(null);
   const [error, setError] = useState("");
   const [tags, setTags] = useState<NoteSummary[]>([]);
@@ -51,7 +54,11 @@ export function ReviewItem({
   }, [source, item.tagIds]);
 
   const kindOptions = kind && !kinds.includes(kind) ? [...kinds, kind] : kinds;
+  const notesLoaded = item.notes !== undefined;
+  const notes = notesEdit ?? item.notes ?? "";
+  const notesChanged = notesEdit !== undefined && notesEdit.trim() !== (item.notes ?? "").trim();
   const dirty =
+    notesChanged ||
     title.trim() !== item.title ||
     kind !== (item.kind ?? "") ||
     topicIds.length !== item.topicIds.length ||
@@ -64,7 +71,7 @@ export function ReviewItem({
     setSaving(done ? "done" : "save");
     setError("");
     try {
-      await onSave({ title: title.trim(), kind, topicIds, done });
+      await onSave({ title: title.trim(), kind, topicIds, ...(notesChanged && { notes: notesEdit }), done });
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -155,6 +162,21 @@ export function ReviewItem({
       )}
 
       {item.preview && <p className="dui-review__preview">{item.preview}</p>}
+
+      <div className="dui-review__row">
+        <label className="dui-review__label" htmlFor={`${id}-notes`}>
+          My notes
+        </label>
+        <textarea
+          id={`${id}-notes`}
+          className="dui-review__input dui-review__textarea"
+          value={notes}
+          onChange={(event) => setNotesEdit(event.target.value)}
+          disabled={!notesLoaded}
+          placeholder={notesLoaded ? "Your own description, kept apart from the generated content" : "Loading…"}
+          rows={3}
+        />
+      </div>
 
       {error && (
         <p className="dui-review__error" role="alert">

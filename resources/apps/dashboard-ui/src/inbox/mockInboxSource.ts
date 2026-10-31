@@ -34,12 +34,12 @@ export function createMockInboxSource(options: MockInboxOptions = {}): InboxSour
       if (options.failList) {
         throw new Error(options.failList);
       }
-      return items.map(({ preview: _preview, ...rest }) => ({ ...rest }));
+      return items.map(({ preview: _preview, notes: _notes, ...rest }) => ({ ...rest }));
     },
 
     async get(noteId: string) {
       await wait(latencyMs);
-      return { ...find(noteId) };
+      return { notes: "", ...find(noteId) };
     },
 
     async save(noteId: string, changes: ReviewChanges) {
@@ -47,7 +47,8 @@ export function createMockInboxSource(options: MockInboxOptions = {}): InboxSour
       if (options.failSave) {
         throw new Error(options.failSave);
       }
-      const updated = { ...find(noteId), title: changes.title, kind: changes.kind, topicIds: changes.topicIds };
+      const item = find(noteId);
+      const updated = { ...item, title: changes.title, kind: changes.kind, topicIds: changes.topicIds, notes: changes.notes ?? item.notes };
       items = changes.done ? items.filter((i) => i.noteId !== noteId) : items.map((i) => (i.noteId === noteId ? updated : i));
       return updated;
     },

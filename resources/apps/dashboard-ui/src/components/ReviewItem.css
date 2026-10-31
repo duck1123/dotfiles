@@ -40,6 +40,16 @@
   box-sizing: border-box;
 }
 
+.dui-review__textarea {
+  min-height: 4.5em;
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.dui-review__textarea:disabled {
+  opacity: 0.6;
+}
+
 .dui-review__input:focus,
 .dui-review__select:focus {
   outline: none;

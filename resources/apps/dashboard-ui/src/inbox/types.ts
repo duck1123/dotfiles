@@ -14,8 +14,10 @@ export interface InboxItem {
   topicIds: string[];
   /** Targets of older ~tag relations (shown, not edited). */
   tagIds: string[];
-  /** Plain-text start of the note's content, if loaded. */
+  /** Plain-text start of the note's content (without the notes), if loaded. */
   preview?: string;
+  /** The reviewer's own notes, kept apart from the generated content; loaded with the preview. */
+  notes?: string;
 }
 
 /** What the reviewer changed; sent to the host to write back. */
@@ -23,6 +25,8 @@ export interface ReviewChanges {
   title: string;
   kind: string;
   topicIds: string[];
+  /** Replaces the reviewer's notes (empty removes them); only sent when edited. */
+  notes?: string;
   /** Clear #inbox, i.e. mark reviewed. */
   done: boolean;
 }

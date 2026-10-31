@@ -35,8 +35,14 @@ type Story = StoryObj<typeof meta>;
 /** A link with no topics yet. */
 export const Link: Story = {};
 
+/** A video with the reviewer's own notes below the generated description. */
 export const VideoWithTopic: Story = {
   args: { item: sampleItems[1] },
+};
+
+/** As shown from the queue, before the item's preview and notes have loaded. */
+export const NotesLoading: Story = {
+  args: { item: { ...sampleItems[0], preview: undefined, notes: undefined } },
 };
 
 /** An item with an older ~tag, which can be copied over as a topic. */

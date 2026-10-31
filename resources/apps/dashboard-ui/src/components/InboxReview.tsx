@@ -76,15 +76,15 @@ export function InboxReview({ inbox, notes, topicScope, kinds, focusCapture = fa
       setSelectedId(rest[Math.min(index, rest.length - 1)]?.noteId);
       setReviewed((n) => n + 1);
     } else {
-      setItems(items.map((i) => (i.noteId === updated.noteId ? { ...updated, preview: undefined } : i)));
-      setDetail({ ...updated, preview: current?.preview });
+      setItems(items.map((i) => (i.noteId === updated.noteId ? { ...updated, preview: undefined, notes: undefined } : i)));
+      setDetail({ ...updated, preview: current?.preview, notes: changes.notes ?? current?.notes });
     }
   }
 
   // The queue is oldest first, so a new capture goes at the end.
   async function capture(text: string) {
     const item = await inbox.capture!(text);
-    setItems((list) => [...list.filter((i) => i.noteId !== item.noteId), { ...item, preview: undefined }]);
+    setItems((list) => [...list.filter((i) => i.noteId !== item.noteId), { ...item, preview: undefined, notes: undefined }]);
     setSelectedId((current) => current ?? item.noteId);
     return item;
   }

@@ -4,17 +4,26 @@
 // Actions:
 // - list_inbox: every #inbox note, oldest first
 // - get_item { noteId }: one item with a plain-text preview of its content
+//   and the reviewer's own notes
 // - search_topics { text, limit }: topics whose title contains `text`
 // - get_notes { noteIds }: topic summaries for chips
-// - save_item { noteId, title, kind, topicIds, done, apply }: write the
-//   review back (~topic relations, #kind, title; done clears #inbox).
-//   Without apply=true it only returns the planned changes.
+// - save_item { noteId, title, kind, topicIds, notes?, done, apply }: write
+//   the review back (~topic relations, #kind, title, the notes section; done
+//   clears #inbox). Without apply=true it only returns the planned changes.
+//
+// The reviewer's notes are a "My notes" <h2> section in the note's content,
+// kept apart from what capture and youtube_ingest write there: the preview
+// leaves it out, and saving notes rewrites only that section.
 //
 // "Topics" (and the ETAPI client) come from the shared f/lib/trilium module:
 // notes under the Topics root, minus #topicScope exclusions, per placement.
 import { connect, label, own, relations, TOPICS_ROOT, type EtapiNote, type Trilium } from "/f/lib/trilium.ts";
 
 const PREVIEW_CHARS = 1200;
+const NOTES_HEADING = "<h2>My notes</h2>";
+// The section runs from its heading to the next h2/h3 (youtube_ingest's
+// description heading is an h3) or the end.
+const NOTES_SECTION = /<h2[^>]*>\s*My notes\s*<\/h2>[\s\S]*?(?=<h[23][\s>]|$)/i;
 
 type NoteSummary = { noteId: string; title: string; icon?: string; path: string[] };
 type InboxItem = {
@@ -26,6 +35,7 @@ type InboxItem = {
   topicIds: string[];
   tagIds: string[];
   preview?: string;
+  notes?: string;
 };
 
 let etapi: Trilium["etapi"];
@@ -72,14 +82,44 @@ function rank(text: string, title: string): number {
   return (t === q ? 0 : t.startsWith(q) ? 1 : 2) * 1000 + Math.min(title.length, 999);
 }
 
+function escape(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// Split content into the reviewer's notes (plain text) and everything else.
+function splitNotes(html: string): { notes: string; rest: string } {
+  const match = html.match(NOTES_SECTION);
+  if (!match) return { notes: "", rest: html };
+  // A blank line between paragraphs, as withNotes reads them.
+  const body = match[0].replace(/^<h2[^>]*>[\s\S]*?<\/h2>/i, "").replace(/<\/p>/gi, "</p>\n");
+  return { notes: htmlToText(body), rest: html.replace(match[0], "") };
+}
+
+// Content with the notes section replaced (or added at the end, or removed
+// when the notes are empty). Blank lines separate paragraphs.
+function withNotes(html: string, notes: string): string {
+  const paras = notes
+    .trim()
+    .split(/\n\s*\n/)
+    .filter((p) => p.trim())
+    .map((p) => `<p>${escape(p.trim()).replace(/\n/g, "<br>")}</p>`);
+  const section = paras.length ? NOTES_HEADING + paras.join("") : "";
+  return NOTES_SECTION.test(html) ? html.replace(NOTES_SECTION, section) : html + section;
+}
+
 async function listInbox(): Promise<InboxItem[]> {
   return (await search("#inbox orderBy #created", { limit: "1000" })).map(toItem);
 }
 
 async function getItem(noteId: string): Promise<InboxItem> {
   const [note, content] = await Promise.all([getNote(noteId), etapi("GET", `/notes/${noteId}/content`)]);
-  const text = htmlToText(String(content ?? ""));
-  return { ...toItem(note), preview: text.length > PREVIEW_CHARS ? `${text.slice(0, PREVIEW_CHARS)}…` : text || undefined };
+  const { notes, rest } = splitNotes(String(content ?? ""));
+  const text = htmlToText(rest);
+  return {
+    ...toItem(note),
+    preview: text.length > PREVIEW_CHARS ? `${text.slice(0, PREVIEW_CHARS)}…` : text || undefined,
+    notes,
+  };
 }
 
 async function searchTopics(text: string, limit = 20): Promise<NoteSummary[]> {
@@ -111,13 +151,15 @@ async function getNotes(noteIds: string[]): Promise<NoteSummary[]> {
   return found.filter((n): n is NoteSummary => n !== null);
 }
 
-type Change = { what: string; method: string; path: string; body?: unknown };
+type Change = { what: string; method: string; path: string; body?: unknown; raw?: boolean };
 
 async function saveItem(args: {
   noteId: string;
   title: string;
   kind: string;
   topicIds: string[];
+  /** Replaces the notes section; left out, the content isn't touched. */
+  notes?: string;
   done: boolean;
   apply?: boolean;
 }) {
@@ -150,6 +192,13 @@ async function saveItem(args: {
     }
   }
 
+  if (args.notes !== undefined) {
+    const content = String((await etapi("GET", `/notes/${note.noteId}/content`)) ?? "");
+    if (splitNotes(content).notes !== splitNotes(withNotes("", args.notes)).notes) {
+      changes.push({ what: args.notes.trim() ? "set notes" : "remove notes", method: "PUT", path: `/notes/${note.noteId}/content`, body: withNotes(content, args.notes), raw: true });
+    }
+  }
+
   if (args.done) {
     for (const attr of own(note).filter((a) => a.type === "label" && a.name === "inbox")) {
       changes.push({ what: "remove #inbox", method: "DELETE", path: `/attributes/${attr.attributeId}` });
@@ -160,7 +209,7 @@ async function saveItem(args: {
     return { applied: false, changes: changes.map((c) => c.what) };
   }
   for (const change of changes) {
-    await etapi(change.method, change.path, change.body);
+    await etapi(change.method, change.path, change.body, change.raw);
   }
   return toItem(await getNote(note.noteId, true));
 }

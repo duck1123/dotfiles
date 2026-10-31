@@ -68,6 +68,27 @@ test("Save keeps the item in the queue", async () => {
   expect(within(queueItems()[0]).getByText("journal")).toBeInTheDocument();
 });
 
+test("notes are saved only when edited, apart from the preview", async () => {
+  const { save, user } = setup();
+  await screen.findByText(sampleItems[0].preview!);
+  const notesField = screen.getByRole("textbox", { name: "My notes" });
+  await waitFor(() => expect(notesField).toBeEnabled());
+
+  await user.click(screen.getByRole("button", { name: "Mark reviewed" }));
+  await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
+  expect(save.mock.calls[0][1]).not.toHaveProperty("notes");
+
+  await screen.findByText(sampleItems[1].preview!);
+  expect(screen.getByRole("textbox", { name: "My notes" })).toHaveValue(sampleItems[1].notes);
+  await user.clear(screen.getByRole("textbox", { name: "My notes" }));
+  await user.type(screen.getByRole("textbox", { name: "My notes" }), "Worth a rewatch");
+  await user.click(screen.getByRole("button", { name: "Save" }));
+
+  await waitFor(() => expect(save).toHaveBeenLastCalledWith(sampleItems[1].noteId, expect.objectContaining({ notes: "Worth a rewatch", done: false })));
+  await waitFor(() => expect(screen.getByRole("button", { name: "Save" })).toBeDisabled());
+  expect(screen.getByRole("textbox", { name: "My notes" })).toHaveValue("Worth a rewatch");
+});
+
 test("a failed save shows the error and keeps the edits", async () => {
   const { user } = setup(createMockInboxSource({ failSave: "boom" }));
   await screen.findByDisplayValue(sampleItems[0].title);
