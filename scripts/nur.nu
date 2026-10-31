@@ -1232,7 +1232,7 @@ export def "nur postgres list" []: nothing -> table {
   }
 }
 
-# List available PostgreSQL backups on the postgresql-backups PVC
+# List available PostgreSQL backups on the NAS (DatabaseBackups/postgresql)
 export def "nur postgres list-backups" []: nothing -> nothing {
   let pod_name = "postgresql-backup-lister"
   let pod_spec = {

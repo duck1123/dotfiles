@@ -160,7 +160,6 @@
   "mariadb": {
     "enable": true,
     "pins": {
-      "backups": "pvc-f42c562c-5275-4ae2-999c-94eab513bcd9",
       "data": "pvc-42f3e481-1462-4e9c-95ae-7f7025ff5d8b"
     }
   },
@@ -238,7 +237,6 @@
   "postgresql": {
     "enable": true,
     "pins": {
-      "backups": "pvc-4a9e7907-8262-4938-b52b-3b5971935619",
       "data": "pvc-f011e680-b80d-4628-abbd-8641d837938b"
     }
   },

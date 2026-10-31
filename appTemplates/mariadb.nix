@@ -23,26 +23,17 @@ rec {
   # NFS is only the backup target (see persistentVolumes below).
   uses-nfs = true;
 
-  # `pvcName` overrides since these are flat names, not the usual
-  # "${name}-${name}-<key>" convention -- data's matches the chart's
+  # `pvcName` override since this is a flat name, not the usual
+  # "${name}-${name}-<key>" convention -- it matches the chart's
   # storage.persistentVolumeClaimName value below. Shape only -- no
   # volumeHandle here, that's environment-specific (see
-  # env/dev/mariadb.nix and docs/pinned-volumes.md). backups only
-  # exists at all when cfg.backup.enable, same as before.
-  volumes =
-    cfg:
-    {
-      data = {
-        pvcName = "mariadb-data";
-        size = "8Gi";
-      };
-    }
-    // lib.optionalAttrs cfg.backup.enable {
-      backups = {
-        pvcName = "mariadb-backups";
-        size = cfg.backup.storageSize;
-      };
+  # docs/pinned-volumes.md).
+  volumes = cfg: {
+    data = {
+      pvcName = "mariadb-data";
+      size = "8Gi";
     };
+  };
 
   sopsSecrets =
     cfg:
@@ -107,7 +98,7 @@ rec {
 
     backup = {
       enable = mkOption {
-        description = mdDoc "Enable automated database backups";
+        description = mdDoc "Enable automated database backups (to the NAS; needs nfs.enable)";
         type = types.bool;
         default = true;
       };
@@ -122,12 +113,6 @@ rec {
         description = mdDoc "Number of days to retain backups";
         type = types.int;
         default = 30;
-      };
-
-      storageSize = mkOption {
-        description = mdDoc "Storage size for backup PVC";
-        type = types.str;
-        default = "50Gi";
       };
     };
   };
@@ -271,13 +256,11 @@ rec {
                         }
                       ];
                       volumeMounts = [
-                        (
-                          {
-                            name = "backup-storage";
-                            mountPath = "/backups";
-                          }
-                          // optionalAttrs cfg.nfs.enable { subPath = name; }
-                        )
+                        {
+                          name = "backup-storage";
+                          mountPath = "/backups";
+                          subPath = name;
+                        }
                       ];
                     }
                   ];
@@ -285,7 +268,10 @@ rec {
                     {
                       name = "backup-storage";
                       persistentVolumeClaim.claimName =
-                        if cfg.nfs.enable then backups-nas else cfg.volumes.backups.pvcName;
+                        if cfg.nfs.enable then
+                          backups-nas
+                        else
+                          throw "mariadb: backup.enable needs nfs.enable (backups only go to the NAS)";
                     }
                   ];
                 };
@@ -296,8 +282,7 @@ rec {
       };
     };
 
-    # With nfs.enable, backups go to <nfs.path>/mariadb on the NAS instead
-    # of the Longhorn backups PVC.
+    # Backups go to <nfs.path>/mariadb on the NAS.
     persistentVolumes = optionalAttrs (cfg.backup.enable && cfg.nfs.enable) {
       ${backups-nas} = {
         apiVersion = "v1";

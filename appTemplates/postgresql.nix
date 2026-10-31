@@ -37,21 +37,14 @@ in
   # NFS is only the backup target (see persistentVolumes below).
   uses-nfs = true;
 
-  # `pvcName` overrides since these predate the "${name}-${name}-<key>"
-  # convention (data's is flat, matching persistentVolumeClaimName
-  # below).
+  # `pvcName` override since this predates the "${name}-${name}-<key>"
+  # convention (it's flat, matching persistentVolumeClaimName below).
   volumes =
     cfg:
     lib.optionalAttrs cfg.persistenceEnabled {
       data = {
         pvcName = "postgresql-data";
         size = cfg.persistenceSize;
-      };
-    }
-    // lib.optionalAttrs cfg.backup.enable {
-      backups = {
-        pvcName = "${name}-backups";
-        size = cfg.backup.storageSize;
       };
     };
 
@@ -195,7 +188,7 @@ in
 
     backup = {
       enable = mkOption {
-        description = mdDoc "Enable automated database backups";
+        description = mdDoc "Enable automated database backups (to the NAS; needs nfs.enable)";
         type = types.bool;
         default = true;
       };
@@ -229,12 +222,6 @@ in
         '';
         type = types.listOf types.str;
         default = [ ];
-      };
-
-      storageSize = mkOption {
-        description = mdDoc "Storage size for backup PVC";
-        type = types.str;
-        default = "50Gi";
       };
     };
   };
@@ -503,13 +490,11 @@ in
                         }
                       ];
                       volumeMounts = [
-                        (
-                          {
-                            mountPath = "/backups";
-                            name = "backup-storage";
-                          }
-                          // optionalAttrs cfg.nfs.enable { subPath = name; }
-                        )
+                        {
+                          mountPath = "/backups";
+                          name = "backup-storage";
+                          subPath = name;
+                        }
                       ];
                     }
                   ];
@@ -517,7 +502,10 @@ in
                     {
                       name = "backup-storage";
                       persistentVolumeClaim.claimName =
-                        if cfg.nfs.enable then backups-nas else cfg.volumes.backups.pvcName;
+                        if cfg.nfs.enable then
+                          backups-nas
+                        else
+                          throw "${name}: backup.enable needs nfs.enable (backups only go to the NAS)";
                     }
                   ];
                 };
@@ -528,8 +516,7 @@ in
       };
     };
 
-    # With nfs.enable, backups go to <nfs.path>/postgresql on the NAS
-    # instead of the Longhorn backups PVC.
+    # Backups go to <nfs.path>/postgresql on the NAS.
     persistentVolumes = optionalAttrs (cfg.backup.enable && cfg.nfs.enable) {
       ${backups-nas} = {
         apiVersion = "v1";
