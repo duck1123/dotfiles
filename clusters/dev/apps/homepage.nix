@@ -117,7 +117,6 @@
     # entry above (Plex isn't a mkArgoApp service).
     widgetSecrets = {
       IMMICH_API_KEY = config.services.immich.adminApiKey;
-      KOMGA_API_KEY = config.services.komga.apiKey;
       LIDARR_API_KEY = config.services.lidarr.apiKey;
       PLEX_API_KEY = secrets.plex.key;
       PROWLARR_API_KEY = config.services.prowlarr.apiKey;

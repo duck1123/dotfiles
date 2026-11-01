@@ -40,7 +40,7 @@ This needs `cfg = config.services.<name>;` bound in the file's outer `let` (some
 
 Then in `clusters/dev/apps/<name>.nix`: `apiKey = secrets.<name>.key;`, and in `clusters/dev/apps/homepage.nix`'s `widgetSecrets`: `<NAME>_API_KEY = config.services.<name>.apiKey;`.
 
-Check [gethomepage's widget docs](https://gethomepage.dev/widgets/services/) for the exact `type`/field names and any `version` field before assuming a widget just needs `type`/`url`/`key` — several widgets don't map 1:1 to their app's own name (Stash's widget `type` is `"stash"`, not `"stashapp"`) and some need an explicit API-version field once the backing app crosses a version threshold (Immich's widget needs `version = 2` for Immich >= v1.118; Komga's needs it for Komga v2+; Glances needs `version = 4`) — the 404s just look like a broken URL/key if you don't know to check this.
+Check [gethomepage's widget docs](https://gethomepage.dev/widgets/services/) for the exact `type`/field names and any `version` field before assuming a widget just needs `type`/`url`/`key` — several widgets don't map 1:1 to their app's own name (Stash's widget `type` is `"stash"`, not `"stashapp"`) and some need an explicit API-version field once the backing app crosses a version threshold (Immich's widget needs `version = 2` for Immich >= v1.118; Glances needs `version = 4`) — the 404s just look like a broken URL/key if you don't know to check this.
 
 ## Out-of-cluster services (not a `mkArgoApp` service)
 

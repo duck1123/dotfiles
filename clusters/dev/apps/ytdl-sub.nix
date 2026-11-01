@@ -1,7 +1,7 @@
 _: {
   services.ytdl-sub = {
-    # Shares Pinchflat's NAS folder (already mounted on edgenix as
-    # /mnt/pinchflat for Plex); shows land in /mnt/pinchflat/ytdl-sub.
+    # The NAS's Pinchflat share (mounted on edgenix as /mnt/pinchflat for
+    # Plex); shows land in /mnt/pinchflat/ytdl-sub.
     nfsTarget = "nas";
     nfsSubPath = "Pinchflat";
     nfs.enable = true;

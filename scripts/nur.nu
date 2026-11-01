@@ -1953,7 +1953,7 @@ export def "nur longhorn cold-list" []: nothing -> table {
 # follows the app's pod to whichever node it runs on.
 export def "nur longhorn cold-restore" [
   target: string        # <namespace>/<pvc> it was archived as
-  --volume: string = "" # Which source volume, when the PVC had more than one (e.g. tube-archivist)
+  --volume: string = "" # Which source volume, when the PVC had more than one
   --backup: string = "" # A specific cold-* backup (default: the newest verified one)
   --pin: string = ""    # <app>.<key> to add to state.json's pins, for a volume that isn't pinned yet
   --verify              # Also check the restored files against the export's manifest, owners and modes

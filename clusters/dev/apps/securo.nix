@@ -28,8 +28,8 @@
       # Celery apps. securo-worker crash-looped on startup picking up a
       # stale application/x-signed-pickle pidbox message left behind by
       # tube-archivist's Celery setup (see
-      # incident-tube-archivist-celery-pickle-crashloop in memory) even
-      # though tube-archivist is disabled -- the poisoned message was still
+      # incident-tube-archivist-celery-pickle-crashloop in memory) after
+      # tube-archivist was disabled -- the poisoned message was still
       # sitting in db 0. Giving securo its own db avoids that collision
       # without touching any other app's (currently-working) redis config.
       dbIndex = 2;

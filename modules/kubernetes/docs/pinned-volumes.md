@@ -61,7 +61,7 @@ self.lib.mkArgoApp { inherit config lib self pkgs; } {
 This does three things automatically:
 - Generates the `PersistentVolumeClaim` (and, once a handle exists, its matching pinned `PersistentVolume`) and merges them into the app's resources -- no need to spread anything into `extraResources` yourself.
 - Exposes `cfg.volumes.appdata.pvcName` (the generated PVC's k8s name) and `cfg.volumes.appdata.volume` (a ready `{ name; persistentVolumeClaim.claimName; }` entry) so `extraResources`/`extraAppConfig` can reference it without hand-typing the naming convention.
-- Supports multiple entries per app -- see `appTemplates/paperless-ngx.nix` (`data`/`media`/`export`/`consume`) or `appTemplates/tdarr.nix` for apps with more than one volume.
+- Supports multiple entries per app -- see `appTemplates/paperless-ngx.nix` (`data`/`media`/`export`/`consume`).
 
 An app can freely mix pinned and dynamic/NFS volumes -- the common pattern across `*arr` apps is a small (potentially pinned) `config` volume alongside a large dynamic or NFS-backed `downloads`/`media` volume that's fine to lose. See `appTemplates/sonarr.nix` or `appTemplates/lidarr.nix`.
 

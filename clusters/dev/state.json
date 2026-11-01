@@ -47,17 +47,6 @@
   "elasticvue": {
     "enable": false
   },
-  "ersatztv": {
-    "enable": false
-  },
-  "fileflows": {
-    "enable": false,
-    "pins": {
-      "config": "pvc-238a7fe1-5d70-45c2-8a5f-1752cf171b36",
-      "temp": "pvc-6e5f5c78-e4d4-47ff-a407-9f1cefd37ea3"
-    },
-    "replicas": 1
-  },
   "flaresolverr": {
     "enable": true
   },
@@ -97,12 +86,6 @@
   "hivemq": {
     "enable": false
   },
-  "homarr": {
-    "enable": false,
-    "pins": {
-      "appdata": "pvc-fde5f73c-9f19-4e30-8874-46cbe0a2f6a3"
-    }
-  },
   "home-assistant": {
     "enable": false,
     "pins": {
@@ -129,12 +112,6 @@
     "enable": true,
     "pins": {
       "data": "pvc-0ef43a60-ec9c-4a49-8da3-a38827d3c53a"
-    }
-  },
-  "komga": {
-    "enable": false,
-    "pins": {
-      "config": "pvc-a982e08c-30f2-4e21-928f-970d367e417f"
     }
   },
   "lidarr": {
@@ -188,9 +165,6 @@
   "metallb": {
     "enable": true
   },
-  "mindsdb": {
-    "enable": false
-  },
   "n8n": {
     "enable": false
   },
@@ -226,13 +200,6 @@
     "pins": {
       "data": "pvc-131cfa45-b850-44ac-a9b1-81fadbc4bdd2"
     }
-  },
-  "pinchflat": {
-    "enable": true,
-    "pins": {
-      "config": "pvc-b4c68721-cd07-48d7-8ca5-0d5bbff3298e"
-    },
-    "replicas": 0
   },
   "postgresql": {
     "enable": true,
@@ -337,14 +304,6 @@
   "tautulli": {
     "enable": true
   },
-  "tdarr": {
-    "enable": false,
-    "pins": {
-      "config": "pvc-b11637b3-e2c3-4f93-82a3-2a19c53d0aff",
-      "temp": "pvc-157c8a73-0af2-4625-b441-2183651d25b5"
-    },
-    "replicas": 1
-  },
   "tempo": {
     "enable": false
   },
@@ -356,14 +315,6 @@
     "pins": {
       "data": "pvc-582855f1-f480-4983-bf80-eb22b9f2ac0a"
     }
-  },
-  "tube-archivist": {
-    "enable": false,
-    "pins": {
-      "config": "pvc-2757b763-263a-4dff-9d2c-f1e4a32b9902",
-      "es-data": "pvc-53b575a7-ad04-4b11-95b1-cd6e3a3c905e"
-    },
-    "replicas": 1
   },
   "tunarr": {
     "enable": false,

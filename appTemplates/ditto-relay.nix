@@ -192,8 +192,7 @@ in
       };
 
       # Bundled single-node OpenSearch (required by ditto-relay, not
-      # otherwise deployed in this cluster) -- same pattern as
-      # appTemplates/tube-archivist.nix's bundled Elasticsearch:
+      # otherwise deployed in this cluster):
       # security plugin disabled since it's only reachable inside the
       # cluster, and a chown initContainer since the data PVC may start
       # root-owned while the image runs as uid 1000.
