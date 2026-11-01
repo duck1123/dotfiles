@@ -103,8 +103,10 @@ class Arr {
     return movie.movieFile ? join(movie.path, movie.movieFile.relativePath).slice(this.root.length + 1) : null;
   }
 
-  rescan(parent: number) {
-    return this.command(this.library === "tv" ? { name: "RescanSeries", seriesId: parent } : { name: "RescanMovie", movieId: parent });
+  // The database hands a bigint back as a string, and a command's ids have to be numbers.
+  rescan(parent: number | string) {
+    const id = Number(parent);
+    return this.command(this.library === "tv" ? { name: "RescanSeries", seriesId: id } : { name: "RescanMovie", movieId: id });
   }
 
   search(items: number[]) {
