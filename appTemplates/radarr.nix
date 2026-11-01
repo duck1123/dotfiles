@@ -397,8 +397,8 @@ rec {
             "nolock"
             "nfsvers=3"
             "noexec"
-            "soft"
-            "timeo=30"
+            "hard"
+            "timeo=600"
           ];
           nfs = {
             server = cfg.nfs.server;
@@ -418,12 +418,14 @@ rec {
             storage = "1Ti";
           };
           accessModes = [ "ReadWriteMany" ];
+          # hard, not soft: imports are copied here from the downloads share, and
+          # a NAS stall on a soft mount truncates the copy after the source is gone.
           mountOptions = [
             "nolock"
             "nfsvers=3"
             "noexec"
-            "soft"
-            "timeo=30"
+            "hard"
+            "timeo=600"
           ];
           nfs = {
             server = cfg.nfs.server;

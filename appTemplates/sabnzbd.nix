@@ -420,12 +420,14 @@ rec {
         spec = {
           accessModes = [ "ReadWriteMany" ];
           capacity.storage = "1Ti";
+          # hard, not soft: a soft mount turns a NAS stall into a lost write,
+          # which leaves zero-filled holes and truncated files in the downloads.
           mountOptions = [
             "nolock"
             "nfsvers=3"
             "noexec"
-            "soft"
-            "timeo=30"
+            "hard"
+            "timeo=600"
           ];
           nfs = {
             server = cfg.nfs.server;
@@ -443,8 +445,8 @@ rec {
             "nolock"
             "nfsvers=3"
             "noexec"
-            "soft"
-            "timeo=30"
+            "hard"
+            "timeo=600"
           ];
           nfs = {
             server = cfg.nfs.server;
