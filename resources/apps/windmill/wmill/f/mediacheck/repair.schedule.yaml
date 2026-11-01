@@ -1,7 +1,0 @@
-summary: Replace flagged media files
-schedule: "0 */15 * * * *"
-timezone: America/New_York
-script_path: f/mediacheck/repair
-is_flow: false
-args: {}
-enabled: true
