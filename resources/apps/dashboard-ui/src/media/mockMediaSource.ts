@@ -52,7 +52,7 @@ export function createMockMediaSource(options: MockMediaOptions = {}): MediaSour
         throw new Error(options.failDecide);
       }
       const file = find(id);
-      if (decision === "remove_original") {
+      if (decision === "remove_original" || decision === "remove_leftover") {
         const removing = { ...file, repair: { ...file.repair!, removing: true } };
         files = files.map((f) => (f.id === id ? removing : f));
         return removing;

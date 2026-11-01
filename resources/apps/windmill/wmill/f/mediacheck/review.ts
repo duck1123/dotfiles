@@ -11,7 +11,8 @@
 // - decide { id, decision }: "good" keeps the file and stops flagging it until
 //   it changes, "replace" asks for a replacement, "reopen" undoes either one
 //   until the repair has moved the file. "remove_original" has the next repair
-//   run delete a replaced file's quarantined copies.
+//   run delete a replaced file's quarantined copies, and "remove_leftover" an
+//   untracked file that has a tracked copy.
 //
 // Nothing here touches the files. f/mediacheck/repair acts on these decisions.
 import * as wmill from "windmill-client";
@@ -54,6 +55,7 @@ function toFile(row: Row) {
             note: row.repair_note ?? undefined,
             attempts: row.repair_attempts,
             quarantined: row.repair_quarantined ?? [],
+            trackedCopy: row.tracked_copy ?? undefined,
             replacement: row.replacement_path ?? undefined,
             replacementVerdict: row.replacement_status ?? undefined,
             removing: row.remove_requested_at !== null,
@@ -66,7 +68,7 @@ function toFile(row: Row) {
 // A file's latest repair, with the findings from before any replacement took
 // its row. A replacement at a new path has a row of its own, which stays out of
 // the review list until its repair is done with it.
-const OPEN_REPAIR_STATES = ["searching", "verifying", "no_release", "attention"];
+const OPEN_REPAIR_STATES = ["searching", "verifying", "no_release", "attention", "untracked"];
 
 async function list(args: { view?: string }) {
   const view = args.view ?? "open";
@@ -94,7 +96,7 @@ function repairRows(where: unknown): Promise<Row[]> {
       coalesce(r.original_size, m.size) as size, m.duration, m.decoded, m.checked_at, m.line_count,
       coalesce(r.original_findings, m.findings) as findings,
       r.state as repair_state, r.note as repair_note, r.attempts as repair_attempts,
-      r.quarantined as repair_quarantined, r.remove_requested_at,
+      r.quarantined as repair_quarantined, r.remove_requested_at, r.tracked_copy,
       n.path as replacement_path, n.status as replacement_status
     from media_file m
     left join media_repair r on r.media_file_id = m.id
@@ -109,7 +111,7 @@ async function get(args: { id: number }) {
       coalesce(r.original_size, m.size) as size, m.duration, m.decoded, m.checked_at, m.line_count,
       coalesce(r.original_findings, m.findings) as findings, m.log,
       r.state as repair_state, r.note as repair_note, r.attempts as repair_attempts,
-      r.quarantined as repair_quarantined, r.remove_requested_at,
+      r.quarantined as repair_quarantined, r.remove_requested_at, r.tracked_copy,
       n.path as replacement_path, n.status as replacement_status
     from media_file m
     left join lateral (
@@ -130,11 +132,19 @@ async function decide(args: { id: number; decision: string }) {
     if (!removing.length) throw new Error(`media_file ${args.id} has no replaced original`);
     return get({ id: args.id });
   }
+  if (args.decision === "remove_leftover") {
+    const removing = await db`
+      update media_repair set remove_requested_at = now(), updated_at = now()
+      where media_file_id = ${args.id} and state = 'untracked' and tracked_copy is not null
+      returning id`;
+    if (!removing.length) throw new Error(`media_file ${args.id} isn't a leftover`);
+    return get({ id: args.id });
+  }
   // Once the repair has moved the file, it has to run its course.
   const [moving] = await db`
     select 1 from media_repair where media_file_id = ${args.id} and state in ('searching', 'verifying', 'attention')`;
   if (moving) throw new Error(`media_file ${args.id} is being replaced, so it can't take that decision now`);
-  await db`delete from media_repair where media_file_id = ${args.id} and state = 'no_release'`;
+  await db`delete from media_repair where media_file_id = ${args.id} and state in ('no_release', 'untracked')`;
   const decided = [...VIEWS.replace, ...VIEWS.good];
   const rows =
     args.decision === "good" || args.decision === "replace"

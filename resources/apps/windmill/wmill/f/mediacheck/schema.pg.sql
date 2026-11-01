@@ -29,6 +29,9 @@
 --   removed    Duck removed the original
 --   no_release nothing to download; the original is in place, retried at retry_at
 --   attention  stuck; note says why. Nothing moves until Duck looks
+--   untracked  Sonarr/Radarr doesn't track this file, so it can't be replaced. It's
+--              still in place. tracked_copy is the copy it does track for the same
+--              episode or movie, if any, which makes this one a leftover
 
 create table if not exists media_file (
   id            bigserial primary key,
@@ -64,7 +67,7 @@ alter table media_file add column if not exists check_first boolean not null def
 create table if not exists media_repair (
   id                  bigserial primary key,
   media_file_id       bigint not null references media_file (id),
-  state               text not null check (state in ('searching', 'verifying', 'replaced', 'removed', 'no_release', 'attention')),
+  state               text not null check (state in ('searching', 'verifying', 'replaced', 'removed', 'no_release', 'attention', 'untracked')),
   original_path       text not null,
   original_size       bigint not null,
   original_findings   jsonb,
@@ -80,6 +83,12 @@ create table if not exists media_repair (
   started_at          timestamptz not null default now(),
   updated_at          timestamptz not null default now()
 );
+
+alter table media_repair add column if not exists tracked_copy text;  -- relative to the library root
+
+alter table media_repair drop constraint if exists media_repair_state_check;
+alter table media_repair add constraint media_repair_state_check
+  check (state in ('searching', 'verifying', 'replaced', 'removed', 'no_release', 'attention', 'untracked'));
 
 create unique index if not exists media_repair_open on media_repair (media_file_id)
   where state not in ('replaced', 'removed');

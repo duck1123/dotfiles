@@ -51,7 +51,7 @@ test("a replacement request moves on to the next file and shows up in its own vi
   expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("S02E06");
 
   await user.click(screen.getByRole("button", { name: "Replacement requested" }));
-  await waitFor(() => expect(fileButtons()).toHaveLength(2));
+  await waitFor(() => expect(fileButtons()).toHaveLength(4));
   expect(fileButtons()[0]).toHaveTextContent("S01E10");
   expect(screen.getByText("Waiting its turn")).toBeInTheDocument();
 });
@@ -84,7 +84,7 @@ test("a replaced original is only removed after confirming, and stays listed unt
   await user.click(screen.getByRole("button", { name: "Remove original" }));
   await user.click(screen.getByRole("button", { name: "Permanently delete 1 quarantined file" }));
   expect(decide).toHaveBeenCalledWith(6, "remove_original");
-  expect(await screen.findByText(/Removing the original on the next repair run/)).toBeInTheDocument();
+  expect(await screen.findByText(/Removing it on the next repair run/)).toBeInTheDocument();
   expect(fileButtons()).toHaveLength(1);
   expect(screen.queryByRole("button", { name: "Remove original" })).not.toBeInTheDocument();
 });
@@ -93,6 +93,29 @@ test("a file that's still in place can go back to review, and says why it waits"
   const { user } = setup();
   await user.click(screen.getByRole("button", { name: "Replacement requested" }));
   expect(await screen.findByText("No usable release right now. Trying again in a week.")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Back to review" })).toBeInTheDocument();
+});
+
+test("a leftover can be removed once a tracked copy exists", async () => {
+  const { decide, user } = setup();
+  await user.click(screen.getByRole("button", { name: "Replacement requested" }));
+  await user.click(await screen.findByRole("button", { name: /S04E02/ }));
+  expect(await screen.findByText(/Sonarr tracks a different copy/)).toBeInTheDocument();
+
+  await user.click(screen.getByRole("button", { name: "Remove leftover" }));
+  expect(decide).not.toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: "Permanently delete this file" }));
+  expect(decide).toHaveBeenCalledWith(8, "remove_leftover");
+  expect(await screen.findByText(/Removing it on the next repair run/)).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Back to review" })).not.toBeInTheDocument();
+});
+
+test("an untracked file with no tracked copy can't be removed, because it may be the only one", async () => {
+  const { user } = setup();
+  await user.click(screen.getByRole("button", { name: "Replacement requested" }));
+  await user.click(await screen.findByRole("button", { name: /Gag Reel/ }));
+  expect(await screen.findByText(/doesn't track this file/)).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Remove leftover" })).not.toBeInTheDocument();
   expect(screen.getByRole("button", { name: "Back to review" })).toBeInTheDocument();
 });
 

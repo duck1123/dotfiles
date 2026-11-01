@@ -2,7 +2,8 @@
 // schedule; the only mediacheck script that touches files or Sonarr/Radarr.
 //
 // Each run:
-// 1. Deletes the quarantined copies of repairs Duck chose to clean up.
+// 1. Deletes the quarantined copies of repairs Duck chose to clean up, and the
+//    leftovers he chose to remove.
 // 2. Files whose new copy has been decoded: clean or minor means replaced, and
 //    the original waits for Duck. Damaged goes to quarantine and is tried again,
 //    without blocklisting: the same releases have come back intact, so the
@@ -11,6 +12,10 @@
 //    Nothing downloading after SEARCH_IDLE_HOURS puts the original back.
 // 4. Starts new repairs, up to MAX_ACTIVE, while the NAS keeps MIN_FREE_BYTES.
 //    A file with no usable release stays in place and is retried in a week.
+//
+// A file Sonarr/Radarr doesn't track can't be replaced, so it stays in place and
+// waits for Duck. It's only a leftover if another copy of the same episode or
+// movie is tracked; plenty of untracked files are extras, the only copy they have.
 //
 // A move is a rename inside the library's export, so it needs no space. Nothing
 // here overwrites a file, and only step 1 deletes one. Schema:
@@ -89,6 +94,25 @@ class Arr {
     }
     const movie = (await this.call("movie")).find((m: Row) => m.path === `${this.root}/${group}`);
     return movie?.movieFile?.relativePath === inside ? { parent: movie.id, items: [movie.id] } : null;
+  }
+
+  /** The copy tracked for the same episode or movie as this untracked file, or null. */
+  async trackedCopy(rel: string): Promise<string | null> {
+    const [group, ...rest] = rel.split("/");
+    if (this.library === "movies") {
+      const movie = (await this.call("movie")).find((m: Row) => m.path === `${this.root}/${group}`);
+      return movie?.movieFile ? `${group}/${movie.movieFile.relativePath}` : null;
+    }
+    const episode = (name: string) => {
+      const match = name.match(/S(\d+)E(\d+)/i);
+      return match ? `${Number(match[1])}x${Number(match[2])}` : null;
+    };
+    const wanted = episode(rest[rest.length - 1] ?? "");
+    const series = (await this.call("series")).find((s: Row) => s.path === `${this.root}/${group}`);
+    if (!wanted || !series) return null;
+    const files = await this.call(`episodefile?seriesId=${series.id}`);
+    const file = files.find((f: Row) => episode(f.relativePath.split("/").pop()) === wanted);
+    return file ? `${group}/${file.relativePath}` : null;
   }
 
   /** The file a replaced item has now, relative to the library root, or null. */
@@ -185,6 +209,33 @@ async function removeOriginals(arrs: Record<Library, Arr>) {
     await update(repair.id, { state: "removed", note: null });
   }
   return rows.length;
+}
+
+async function removeLeftovers(arrs: Record<Library, Arr>) {
+  const rows = await db`
+    select r.*, m.library from media_repair r join media_file m on m.id = r.media_file_id
+    where r.state = 'untracked' and r.tracked_copy is not null and r.remove_requested_at is not null`;
+  let removed = 0;
+  for (const repair of rows) {
+    const arr = arrs[repair.library as Library];
+    const path = arr.file(repair.original_path);
+    // Only as Duck saw it: still untracked, unchanged, and the tracked copy still there.
+    const safe =
+      !(await arr.lookup(repair.original_path)) &&
+      (await arr.lookup(repair.tracked_copy)) &&
+      existsSync(arr.file(repair.tracked_copy)) &&
+      existsSync(path) &&
+      statSync(path).size === Number(repair.original_size);
+    if (!safe) {
+      await update(repair.id, { remove_requested_at: null, note: "This changed since you asked, so it wasn't removed." });
+      continue;
+    }
+    await unlink(path);
+    await db`update media_file set status = 'missing', check_first = false where id = ${repair.media_file_id}`;
+    await update(repair.id, { state: "removed", note: null });
+    removed++;
+  }
+  return removed;
 }
 
 async function retrySearch(arr: Arr, repair: Row) {
@@ -292,7 +343,15 @@ async function startOne(arr: Arr, file: Row): Promise<boolean> {
   }
   const found = await arr.lookup(file.path);
   if (!found) {
-    await openRepair(file, { state: "attention", note: `${arr.library === "tv" ? "Sonarr" : "Radarr"} doesn't list this file.` });
+    const app = arr.library === "tv" ? "Sonarr" : "Radarr";
+    const tracked_copy = await arr.trackedCopy(file.path);
+    await openRepair(file, {
+      state: "untracked",
+      tracked_copy,
+      note: tracked_copy
+        ? `${app} tracks a different copy: ${tracked_copy}`
+        : `${app} doesn't track this file, so it can't download a replacement. It may be an extra, or a show or movie that isn't in ${app}.`,
+    });
     return false;
   }
   if (!(await arr.hasRelease(found.items))) {
@@ -361,7 +420,7 @@ export async function main() {
       select
         exists (select 1 from media_file where status = 'replace_requested') as requested,
         exists (select 1 from media_repair where state in ('searching', 'verifying')
-          or (state = 'replaced' and remove_requested_at is not null)) as active`;
+          or (state in ('replaced', 'untracked') and remove_requested_at is not null)) as active`;
     if (!pending.requested && !pending.active) return { idle: true };
 
     const arrs: Record<Library, Arr> = {
@@ -369,7 +428,7 @@ export async function main() {
       movies: new Arr("movies", "http://radarr.radarr:7878", await wmill.getVariable("f/mediacheck/radarr_api_key"), "/media/Movies", "/movies"),
     };
 
-    const removed = await removeOriginals(arrs);
+    const removed = (await removeOriginals(arrs)) + (await removeLeftovers(arrs));
     const errors: string[] = [];
     const active = await db`
       select r.*, m.library from media_repair r join media_file m on m.id = r.media_file_id

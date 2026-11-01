@@ -78,6 +78,7 @@ const REPAIR_STATES: Record<MediaRepair["state"], string> = {
   removed: "Original removed",
   no_release: "Left in place: nothing to download",
   attention: "Stuck: needs you",
+  untracked: "Left in place: not tracked",
 };
 
 function repairStatus(file: MediaFile): string {
@@ -94,15 +95,29 @@ function copies(file: MediaFile): string {
 
 /** A repair that has moved the file has to run its course. */
 function canReopen(file: MediaFile): boolean {
-  return !file.repair || file.repair.state === "no_release";
+  return !file.repair || file.repair.state === "no_release" || file.repair.state === "untracked";
+}
+
+/** What the remove button deletes here, if it has one. Without a tracked copy, an untracked file may be the only one. */
+function removal(view: MediaView, file: MediaFile): { decision: MediaDecision; label: string; what: string } | undefined {
+  if (view === "replaced") {
+    return { decision: "remove_original", label: "Remove original", what: copies(file) };
+  }
+  if (view === "replace" && file.repair?.state === "untracked" && file.repair.trackedCopy) {
+    return { decision: "remove_leftover", label: "Remove leftover", what: "this file" };
+  }
+  return undefined;
 }
 
 function hint(view: MediaView, file: MediaFile): string {
+  if (file.repair?.removing) {
+    return "Removing it on the next repair run, within 15 minutes.";
+  }
   if (view === "open") {
     return "A replacement request moves the file out of Plex when its turn comes. It's kept in quarantine until you remove it.";
   }
   if (view === "replaced") {
-    return file.repair?.removing ? "Removing the original on the next repair run, within 15 minutes." : "The original stays in quarantine until you remove it.";
+    return "The original stays in quarantine until you remove it.";
   }
   if (view === "replace") {
     return canReopen(file) ? "The file is still in place, so this can be undone." : "The original is in quarantine, out of Plex.";
@@ -180,6 +195,7 @@ export function MediaReview({ source }: MediaReviewProps) {
 
   const selected = files.find((f) => f.id === selectedId);
   const current = detail?.id === selectedId ? detail : selected;
+  const remove = current && !current.repair?.removing ? removal(view, current) : undefined;
 
   async function decide(decision: MediaDecision) {
     if (!current) {
@@ -189,7 +205,7 @@ export function MediaReview({ source }: MediaReviewProps) {
     setSaveError("");
     try {
       const updated = await source.decide(current.id, decision);
-      if (decision === "remove_original") {
+      if (decision === "remove_original" || decision === "remove_leftover") {
         // It stays in this view, marked, until the repair run has removed it.
         setDetail(updated);
         setFiles(files.map((f) => (f.id === updated.id ? updated : f)));
@@ -321,22 +337,22 @@ export function MediaReview({ source }: MediaReviewProps) {
                   </button>
                 </>
               )}
-              {view === "replaced" && !current.repair?.removing && !confirmingRemove && (
+              {remove && !confirmingRemove && (
                 <button type="button" className="dui-media__button" disabled={saving} onClick={() => setConfirmingRemove(true)}>
-                  Remove original
+                  {remove.label}
                 </button>
               )}
-              {view === "replaced" && !current.repair?.removing && confirmingRemove && (
+              {remove && confirmingRemove && (
                 <>
-                  <button type="button" className="dui-media__button dui-media__button--danger" disabled={saving} onClick={() => decide("remove_original")}>
-                    Permanently delete {copies(current)}
+                  <button type="button" className="dui-media__button dui-media__button--danger" disabled={saving} onClick={() => decide(remove.decision)}>
+                    Permanently delete {remove.what}
                   </button>
                   <button type="button" className="dui-media__button" disabled={saving} onClick={() => setConfirmingRemove(false)}>
                     Keep
                   </button>
                 </>
               )}
-              {(view === "good" || (view === "replace" && canReopen(current))) && (
+              {(view === "good" || (view === "replace" && canReopen(current) && !current.repair?.removing)) && (
                 <button type="button" className="dui-media__button" disabled={saving} onClick={() => decide("reopen")}>
                   Back to review
                 </button>
