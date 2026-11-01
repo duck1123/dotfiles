@@ -38,6 +38,14 @@
         path = "f/phototags/immich_api_key";
         value = secrets.immich.phototagsApiKey;
       }
+      {
+        path = "f/mediacheck/sonarr_api_key";
+        value = secrets.sonarr.key;
+      }
+      {
+        path = "f/mediacheck/radarr_api_key";
+        value = secrets.radarr.key;
+      }
     ];
   };
 }

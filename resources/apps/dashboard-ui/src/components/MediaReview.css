@@ -169,6 +169,24 @@
   color: var(--dui-accent-text);
 }
 
+.dui-media__button--danger {
+  border-color: var(--dui-danger);
+  background: var(--dui-danger-bg);
+  color: var(--dui-danger);
+}
+
+.dui-media__repair {
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border-radius: var(--dui-radius);
+  background: var(--dui-surface);
+  overflow-wrap: anywhere;
+}
+
+.dui-media__repair p {
+  margin: 4px 0 0;
+}
+
 .dui-media__hint {
   margin: 8px 0 0;
   font-size: 0.85em;

@@ -32,12 +32,29 @@ export interface MediaFile {
   fatal?: { exitCode: number; last: string };
   /** The error lines, once loaded. */
   log?: { t: number | null; msg: string }[];
+  /** How replacing it is going, once a replacement has been requested. */
+  repair?: MediaRepair;
+}
+
+export interface MediaRepair {
+  state: "searching" | "verifying" | "replaced" | "removed" | "no_release" | "attention";
+  /** Why it's stuck or waiting. */
+  note?: string;
+  /** Replacements that failed their decode. */
+  attempts: number;
+  /** What's kept in quarantine, relative to the library root. */
+  quarantined: string[];
+  replacement?: string;
+  /** The replacement's check result: ok, or minor with a glitch or two. */
+  replacementVerdict?: string;
+  /** Removing the original was requested; the next repair run does it. */
+  removing: boolean;
 }
 
 /** Which files to show: waiting on a decision, or already decided. */
-export type MediaView = "open" | "replace" | "good";
+export type MediaView = "open" | "replace" | "replaced" | "good";
 
-export type MediaDecision = "good" | "replace" | "reopen";
+export type MediaDecision = "good" | "replace" | "reopen" | "remove_original";
 
 /** Where a media review gets its files and records decisions. */
 export interface MediaSource {

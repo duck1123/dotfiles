@@ -18,6 +18,17 @@
 --   marked_good  reviewed and kept; not flagged again until the file changes
 --   replace_requested  reviewed; a replacement is wanted
 --   missing   not seen by the latest scan of its library
+--
+-- media_repair: replacing one flagged file, driven by f/mediacheck/repair. The
+--   original sits in the library's .quarantine folder until Duck removes it.
+--
+-- States:
+--   searching  original quarantined; waiting for Sonarr/Radarr to import a new file
+--   verifying  imported; waiting for a full decode (media_file check_first)
+--   replaced   the new file decoded clean; the original waits for Duck
+--   removed    Duck removed the original
+--   no_release nothing to download; the original is in place, retried at retry_at
+--   attention  stuck; note says why. Nothing moves until Duck looks
 
 create table if not exists media_file (
   id            bigserial primary key,
@@ -46,5 +57,31 @@ alter table media_file add constraint media_file_status_check
   check (status in ('queued', 'checking', 'ok', 'minor', 'suspect', 'unclear', 'marked_good', 'replace_requested', 'missing'));
 
 create index if not exists media_file_queue on media_file (status, mtime desc);
+
+-- Checked ahead of the rest of the queue: a replacement waiting on its decode.
+alter table media_file add column if not exists check_first boolean not null default false;
+
+create table if not exists media_repair (
+  id                  bigserial primary key,
+  media_file_id       bigint not null references media_file (id),
+  state               text not null check (state in ('searching', 'verifying', 'replaced', 'removed', 'no_release', 'attention')),
+  original_path       text not null,
+  original_size       bigint not null,
+  original_findings   jsonb,
+  arr_parent_id       bigint,           -- Sonarr series or Radarr movie
+  arr_item_ids        jsonb,            -- Sonarr episodes or Radarr movie
+  quarantined         jsonb not null default '[]',  -- paths relative to the library root
+  attempts            integer not null default 0,   -- replacements that failed their decode
+  replacement_file_id bigint references media_file (id),
+  search_started_at   timestamptz,
+  retry_at            timestamptz,
+  remove_requested_at timestamptz,
+  note                text,
+  started_at          timestamptz not null default now(),
+  updated_at          timestamptz not null default now()
+);
+
+create unique index if not exists media_repair_open on media_repair (media_file_id)
+  where state not in ('replaced', 'removed');
 
 select status, count(*) as files from media_file group by status order by status;

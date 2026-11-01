@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { MediaDecision, MediaFile, MediaSource, MediaSpot, MediaView } from "../media/types";
+import type { MediaDecision, MediaFile, MediaRepair, MediaSource, MediaSpot, MediaView } from "../media/types";
 import "./MediaReview.css";
 
 export interface MediaReviewProps {
@@ -9,6 +9,7 @@ export interface MediaReviewProps {
 const VIEWS: { view: MediaView; label: string }[] = [
   { view: "open", label: "To review" },
   { view: "replace", label: "Replacement requested" },
+  { view: "replaced", label: "Replaced" },
   { view: "good", label: "Marked good" },
 ];
 
@@ -70,6 +71,45 @@ function summary(file: MediaFile): string {
   return file.fatal ? "Decode crashed" : "Unknown errors";
 }
 
+const REPAIR_STATES: Record<MediaRepair["state"], string> = {
+  searching: "Moved out of Plex, waiting for a download",
+  verifying: "Downloaded, waiting for its full decode",
+  replaced: "Replaced: the new file passed a full decode",
+  removed: "Original removed",
+  no_release: "Left in place: nothing to download",
+  attention: "Stuck: needs you",
+};
+
+function repairStatus(file: MediaFile): string {
+  if (file.repair) {
+    return REPAIR_STATES[file.repair.state];
+  }
+  return file.status === "replace_requested" ? "Waiting its turn" : "";
+}
+
+function copies(file: MediaFile): string {
+  const count = file.repair?.quarantined.length ?? 0;
+  return count === 1 ? "1 quarantined file" : `${count} quarantined files`;
+}
+
+/** A repair that has moved the file has to run its course. */
+function canReopen(file: MediaFile): boolean {
+  return !file.repair || file.repair.state === "no_release";
+}
+
+function hint(view: MediaView, file: MediaFile): string {
+  if (view === "open") {
+    return "A replacement request moves the file out of Plex when its turn comes. It's kept in quarantine until you remove it.";
+  }
+  if (view === "replaced") {
+    return file.repair?.removing ? "Removing the original on the next repair run, within 15 minutes." : "The original stays in quarantine until you remove it.";
+  }
+  if (view === "replace") {
+    return canReopen(file) ? "The file is still in place, so this can be undone." : "The original is in quarantine, out of Plex.";
+  }
+  return "This only records your decision. The file isn't moved or deleted.";
+}
+
 function groupFiles(files: MediaFile[]): { group: string; files: MediaFile[] }[] {
   const groups = new Map<string, MediaFile[]>();
   for (const file of files) {
@@ -79,7 +119,7 @@ function groupFiles(files: MediaFile[]): { group: string; files: MediaFile[] }[]
   return [...groups].map(([group, grouped]) => ({ group, files: grouped }));
 }
 
-/** Review the files the media integrity checker flagged. Recording a decision never touches a file. */
+/** Review the files the media integrity checker flagged. Decisions are recorded here; f/mediacheck/repair acts on them. */
 export function MediaReview({ source }: MediaReviewProps) {
   const [view, setView] = useState<MediaView>("open");
   const [files, setFiles] = useState<MediaFile[]>([]);
@@ -89,6 +129,7 @@ export function MediaReview({ source }: MediaReviewProps) {
   const [detail, setDetail] = useState<MediaFile>();
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
 
   const load = useCallback(() => {
     let cancelled = false;
@@ -118,6 +159,7 @@ export function MediaReview({ source }: MediaReviewProps) {
 
   useEffect(() => {
     setSaveError("");
+    setConfirmingRemove(false);
     if (selectedId === undefined) {
       return;
     }
@@ -146,7 +188,14 @@ export function MediaReview({ source }: MediaReviewProps) {
     setSaving(true);
     setSaveError("");
     try {
-      await source.decide(current.id, decision);
+      const updated = await source.decide(current.id, decision);
+      if (decision === "remove_original") {
+        // It stays in this view, marked, until the repair run has removed it.
+        setDetail(updated);
+        setFiles(files.map((f) => (f.id === updated.id ? updated : f)));
+        setConfirmingRemove(false);
+        return;
+      }
       // Whatever the decision, the file leaves this view; the next one takes its place.
       const index = files.findIndex((f) => f.id === current.id);
       const remaining = files.filter((f) => f.id !== current.id);
@@ -206,7 +255,7 @@ export function MediaReview({ source }: MediaReviewProps) {
                         <span className="dui-media__item-title">{shortTitle(file)}</span>
                         <span className="dui-media__item-meta">
                           {file.verdict && <span className="dui-media__verdict">{file.verdict}</span>}
-                          <span>{summary(file)}</span>
+                          <span>{view === "open" ? summary(file) : repairStatus(file) || summary(file)}</span>
                         </span>
                       </button>
                     </li>
@@ -224,6 +273,19 @@ export function MediaReview({ source }: MediaReviewProps) {
             <p className="dui-media__path">
               {current.library}/{current.path}
             </p>
+            {current.repair && (
+              <div className="dui-media__repair">
+                <strong>{REPAIR_STATES[current.repair.state]}</strong>
+                {current.repair.note && <p>{current.repair.note}</p>}
+                {current.repair.attempts > 0 && <p>Replacements that failed their decode: {current.repair.attempts}</p>}
+                {current.repair.replacement && (
+                  <p>
+                    New file: {current.repair.replacement}
+                    {current.repair.replacementVerdict === "minor" && " (a glitch or two; it's also in To review)"}
+                  </p>
+                )}
+              </div>
+            )}
             <ul className="dui-media__findings">
               {current.truncated && (
                 <li>
@@ -249,7 +311,7 @@ export function MediaReview({ source }: MediaReviewProps) {
               ))}
             </ul>
             <div className="dui-media__actions">
-              {view === "open" ? (
+              {view === "open" && (
                 <>
                   <button type="button" className="dui-media__button dui-media__button--primary" disabled={saving} onClick={() => decide("replace")}>
                     Request replacement
@@ -258,13 +320,29 @@ export function MediaReview({ source }: MediaReviewProps) {
                     Mark good
                   </button>
                 </>
-              ) : (
+              )}
+              {view === "replaced" && !current.repair?.removing && !confirmingRemove && (
+                <button type="button" className="dui-media__button" disabled={saving} onClick={() => setConfirmingRemove(true)}>
+                  Remove original
+                </button>
+              )}
+              {view === "replaced" && !current.repair?.removing && confirmingRemove && (
+                <>
+                  <button type="button" className="dui-media__button dui-media__button--danger" disabled={saving} onClick={() => decide("remove_original")}>
+                    Permanently delete {copies(current)}
+                  </button>
+                  <button type="button" className="dui-media__button" disabled={saving} onClick={() => setConfirmingRemove(false)}>
+                    Keep
+                  </button>
+                </>
+              )}
+              {(view === "good" || (view === "replace" && canReopen(current))) && (
                 <button type="button" className="dui-media__button" disabled={saving} onClick={() => decide("reopen")}>
                   Back to review
                 </button>
               )}
             </div>
-            <p className="dui-media__hint">This only records your decision. The file isn't moved or deleted.</p>
+            <p className="dui-media__hint">{hint(view, current)}</p>
             {saveError && (
               <p className="dui-media__message dui-media__message--error" role="alert">
                 Couldn't save: {saveError}

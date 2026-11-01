@@ -15,6 +15,7 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const STATUS: Record<MediaView, (file: MediaFile) => boolean> = {
   open: (f) => ["suspect", "unclear", "minor"].includes(f.status),
   replace: (f) => f.status === "replace_requested",
+  replaced: (f) => f.repair?.state === "replaced",
   good: (f) => f.status === "marked_good",
 };
 
@@ -51,6 +52,11 @@ export function createMockMediaSource(options: MockMediaOptions = {}): MediaSour
         throw new Error(options.failDecide);
       }
       const file = find(id);
+      if (decision === "remove_original") {
+        const removing = { ...file, repair: { ...file.repair!, removing: true } };
+        files = files.map((f) => (f.id === id ? removing : f));
+        return removing;
+      }
       const status = decision === "good" ? "marked_good" : decision === "replace" ? "replace_requested" : (file.verdict ?? "suspect");
       const updated = { ...file, status };
       files = files.map((f) => (f.id === id ? updated : f));

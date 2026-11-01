@@ -7,6 +7,7 @@ skipResourceTypes: false
 skipScripts: false
 skipFlows: false
 skipApps: false
+includeSchedules: true
 # Secret *values* never round-trip through git either direction -- variable
 # definitions (path/is_secret/description) sync normally, but wmill sync push
 # always omits the value of anything with is_secret: true. Actual values are

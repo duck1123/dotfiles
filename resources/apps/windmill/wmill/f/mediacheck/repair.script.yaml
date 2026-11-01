@@ -1,0 +1,13 @@
+summary: Replace flagged media files through Sonarr and Radarr
+description: >-
+  Runs on a schedule. Takes files Duck asked to replace, a few at a time and
+  only while the NAS has room: moves each to its library's .quarantine folder,
+  searches, and has the new file checked with a full decode. The original stays
+  in quarantine until Duck removes it in the review app.
+lock: '!inline f/mediacheck/repair.script.lock'
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties: {}
+  required: []

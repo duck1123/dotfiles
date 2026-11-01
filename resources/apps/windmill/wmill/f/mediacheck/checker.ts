@@ -8,9 +8,10 @@
 //   seconds) and missing ones that came back are queued.
 // - sync_done { library, scanStarted }: files of that library the scan didn't
 //   see become missing.
-// - claim { host }: the next file to check, or null: files of a whole number
-//   of MiB first (a failed copy leaves that size, so they're likely truncated),
-//   then newest first. A claim older than CLAIM_HOURS is taken over.
+// - claim { host }: the next file to check, or null: replacements waiting on
+//   their decode first (f/mediacheck/repair), then files of a whole number of
+//   MiB (a failed copy leaves that size, so they're likely truncated), then
+//   newest first. A claim older than CLAIM_HOURS is taken over.
 // - release { host }: hand that host's claims back, for a checker that was
 //   stopped mid-file.
 // - report { id, size, mtime, checkSeconds, duration, decoded, exitCode,
@@ -84,7 +85,7 @@ async function claim(args: { host: string }) {
       select id from media_file
       where status = 'queued'
         or (status = 'checking' and claimed_at < now() - make_interval(hours => ${CLAIM_HOURS}))
-      order by (size % 1048576 = 0) desc, mtime desc
+      order by check_first desc, (size % 1048576 = 0) desc, mtime desc
       limit 1
       for update skip locked)
     returning id, library, path, size, extract(epoch from mtime)::bigint as mtime`;
@@ -125,7 +126,7 @@ async function report(r: Report) {
   const findings = classify(r.log, { duration: r.duration, decoded: r.decoded, exitCode: r.exitCode });
   await db`
     update media_file set
-      status = ${findings.verdict}, claimed_by = null, claimed_at = null, checked_at = now(),
+      status = ${findings.verdict}, claimed_by = null, claimed_at = null, checked_at = now(), check_first = false,
       check_seconds = ${r.checkSeconds}, duration = ${r.duration}, decoded = ${r.decoded},
       exit_code = ${r.exitCode}, line_count = ${r.lineCount},
       log = ${JSON.stringify(r.log)}::text::jsonb, findings = ${JSON.stringify(findings)}::text::jsonb
