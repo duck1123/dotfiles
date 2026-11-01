@@ -7,3 +7,26 @@ body {
 .app {
   padding: 16px;
 }
+
+.app__tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+  font-family: var(--dui-font);
+  font-size: var(--dui-font-size);
+}
+
+.app__tab {
+  padding: 4px 14px;
+  border: 1px solid var(--dui-border);
+  border-radius: var(--dui-radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.app__tab[aria-pressed="true"] {
+  border-color: var(--dui-accent);
+  background: var(--dui-highlight);
+}

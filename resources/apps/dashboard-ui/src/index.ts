@@ -1,5 +1,6 @@
 export { CaptureBox, type CaptureBoxProps } from "./components/CaptureBox";
 export { InboxReview, type InboxReviewProps } from "./components/InboxReview";
+export { MediaReview, type MediaReviewProps } from "./components/MediaReview";
 export { NoteChip, type NoteChipProps } from "./components/NoteChip";
 export { NotePicker, type NotePickerProps } from "./components/NotePicker";
 export { ReviewItem, type ReviewItemProps } from "./components/ReviewItem";
@@ -7,5 +8,8 @@ export { ReviewQueue, type ReviewQueueProps } from "./components/ReviewQueue";
 export { createMockInboxSource, type MockInboxOptions } from "./inbox/mockInboxSource";
 export { sampleItems } from "./inbox/sampleItems";
 export { defaultKinds, type InboxItem, type InboxSource, type ReviewChanges } from "./inbox/types";
+export { createMockMediaSource, type MockMediaOptions } from "./media/mockMediaSource";
+export { sampleFiles } from "./media/sampleFiles";
+export type { MediaDecision, MediaFile, MediaSource, MediaSpot, MediaView } from "./media/types";
 export { createMockSource, sampleNotes, type MockSourceOptions } from "./notes/mockSource";
 export type { NoteScope, NoteSource, NoteSummary, SearchOptions } from "./notes/types";

@@ -16,6 +16,7 @@
 --   suspect   damage found; waits for review
 --   unclear   only errors the rules don't know; waits for a rule or review
 --   marked_good  reviewed and kept; not flagged again until the file changes
+--   replace_requested  reviewed; a replacement is wanted
 --   missing   not seen by the latest scan of its library
 
 create table if not exists media_file (
@@ -42,7 +43,7 @@ create table if not exists media_file (
 
 alter table media_file drop constraint if exists media_file_status_check;
 alter table media_file add constraint media_file_status_check
-  check (status in ('queued', 'checking', 'ok', 'minor', 'suspect', 'unclear', 'marked_good', 'missing'));
+  check (status in ('queued', 'checking', 'ok', 'minor', 'suspect', 'unclear', 'marked_good', 'replace_requested', 'missing'));
 
 create index if not exists media_file_queue on media_file (status, mtime desc);
 

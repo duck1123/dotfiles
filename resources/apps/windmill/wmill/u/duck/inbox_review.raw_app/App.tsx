@@ -1,8 +1,10 @@
 // Inbox review: work through the Trilium #inbox queue, setting kind, title and
-// ~topic relations, then mark each item reviewed. The UI is dashboard-ui's
-// InboxReview (see https://storybook.home.kronkltd.net); this file only wires
-// it to the `trilium` and `capture` backend runnables.
-import { InboxReview, type InboxSource, type NoteSource } from "dashboard-ui";
+// ~topic relations, then mark each item reviewed. The Media tab does the same
+// for files the integrity checker flagged. The UI is dashboard-ui's InboxReview
+// and MediaReview (see https://storybook.home.kronkltd.net); this file only
+// wires them to the `trilium`, `capture` and `mediacheck` backend runnables.
+import { useState } from "react";
+import { InboxReview, MediaReview, type InboxSource, type MediaSource, type NoteSource } from "dashboard-ui";
 import "dashboard-ui/theme.css";
 import "./index.css";
 import { backend } from "./wmill";
@@ -34,14 +36,37 @@ const inbox: InboxSource = {
   },
 };
 
+function media<T>(action: string, args: Record<string, unknown> = {}): Promise<T> {
+  return backend.mediacheck({ action, args }) as Promise<T>;
+}
+
+const mediaSource: MediaSource = {
+  list: (view) => media("list", { view }),
+  get: (id) => media("get", { id }),
+  decide: (id, decision) => media("decide", { id, decision }),
+};
+
 // On a phone the page is mostly for capturing, so the capture box gets the
 // focus rather than the first item's topic search.
 const narrow = window.matchMedia("(max-width: 720px)").matches;
 
 export default function App() {
+  const [tab, setTab] = useState<"inbox" | "media">("inbox");
   return (
     <div className="app">
-      <InboxReview inbox={inbox} notes={notes} topicScope={TOPICS} focusCapture={narrow} />
+      <div className="app__tabs" role="group" aria-label="Section">
+        <button type="button" className="app__tab" aria-pressed={tab === "inbox"} onClick={() => setTab("inbox")}>
+          Inbox
+        </button>
+        <button type="button" className="app__tab" aria-pressed={tab === "media"} onClick={() => setTab("media")}>
+          Media
+        </button>
+      </div>
+      {tab === "inbox" ? (
+        <InboxReview inbox={inbox} notes={notes} topicScope={TOPICS} focusCapture={narrow} />
+      ) : (
+        <MediaReview source={mediaSource} />
+      )}
     </div>
   );
 }

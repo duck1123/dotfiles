@@ -3,11 +3,13 @@
 
 export declare const backend: {
   capture: (args: { text?: string; url?: string; createdAt?: string; dry_run?: boolean }) => Promise<any>;
+  mediacheck: (args: { action: string; args?: any }) => Promise<any>;
   trilium: (args: { action: string; args?: any }) => Promise<any>;
 };
 
 export declare const backendAsync: {
   capture: (args: { text?: string; url?: string; createdAt?: string; dry_run?: boolean }) => Promise<string>;
+  mediacheck: (args: { action: string; args?: any }) => Promise<string>;
   trilium: (args: { action: string; args?: any }) => Promise<string>;
 };
 

@@ -1,0 +1,25 @@
+summary: Review decisions for the media integrity queue
+description: >-
+  Backs the Media tab of the inbox review app: list files waiting on a decision,
+  get one with its error log, and decide (mark good, request a replacement, or
+  reopen). Records decisions only; it never touches the files.
+lock: '!inline f/mediacheck/review.script.lock'
+kind: script
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  properties:
+    action:
+      type: string
+      description: What to do.
+      enum:
+        - list
+        - get
+        - decide
+      default: list
+    args:
+      type: object
+      description: The action's arguments.
+      default: {}
+  required:
+    - action
