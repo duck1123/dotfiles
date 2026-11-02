@@ -48,8 +48,12 @@ with lib;
       };
 
       subscriptions = mkOption {
-        description = mdDoc "Show name -> channel/playlist URL. Each becomes one Plex show folder.";
-        type = types.attrsOf types.str;
+        description = mdDoc ''
+          Show name -> channel/playlist URL, or a list of them. Each becomes one
+          Plex show folder. A bare channel URL stops at the first old video in its
+          Videos tab and never reaches Shorts, so list the tabs separately.
+        '';
+        type = types.attrsOf (types.either types.str (types.listOf types.str));
         default = { };
       };
 
