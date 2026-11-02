@@ -22,7 +22,7 @@
 // f/mediacheck/schema.pg.sql.
 import * as wmill from "windmill-client";
 import { SQL } from "bun";
-import { existsSync, mkdirSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, statSync, writeFileSync } from "node:fs";
 import { rename, unlink } from "node:fs/promises";
 import { dirname, join, normalize } from "node:path";
 
@@ -160,15 +160,27 @@ class Arr {
   }
 }
 
+/** Whether a file is there. Unlike existsSync, a NAS error (EIO, ESTALE) throws
+ * rather than reading as a missing file. */
+function exists(path: string): boolean {
+  try {
+    statSync(path);
+    return true;
+  } catch (e: any) {
+    if (e.code === "ENOENT") return false;
+    throw e;
+  }
+}
+
 /** A rename that won't overwrite. A soft mount can report failure for a rename
  * that happened, so the result is what's on disk. */
 async function move(from: string, to: string) {
-  if (existsSync(to)) throw new Error(`already exists: ${to}`);
+  if (exists(to)) throw new Error(`already exists: ${to}`);
   mkdirSync(dirname(to), { recursive: true });
   try {
     await rename(from, to);
   } catch (e) {
-    if (existsSync(from) || !existsSync(to)) throw e;
+    if (exists(from) || !exists(to)) throw e;
   }
 }
 
@@ -190,7 +202,7 @@ async function quarantine(arr: Arr, repair: Row, rel: string, suffix = ""): Prom
   const name = `${QUARANTINE}/${rel}${suffix}`;
   const marker = arr.file(`${QUARANTINE}/.plexignore`);
   mkdirSync(dirname(marker), { recursive: true });
-  if (!existsSync(marker)) writeFileSync(marker, "*\n");
+  if (!exists(marker)) writeFileSync(marker, "*\n");
   await move(arr.file(rel), arr.file(name));
   await setQuarantined(repair, [...repair.quarantined, name]);
 }
@@ -204,7 +216,7 @@ async function removeOriginals(arrs: Record<Library, Arr>) {
     for (const name of repair.quarantined) {
       if (!name.startsWith(`${QUARANTINE}/`)) throw new Error(`not a quarantined path: ${name}`);
       const path = arr.file(name);
-      if (existsSync(path)) await unlink(path);
+      if (exists(path)) await unlink(path);
     }
     await update(repair.id, { state: "removed", note: null });
   }
@@ -223,8 +235,8 @@ async function removeLeftovers(arrs: Record<Library, Arr>) {
     const safe =
       !(await arr.lookup(repair.original_path)) &&
       (await arr.lookup(repair.tracked_copy)) &&
-      existsSync(arr.file(repair.tracked_copy)) &&
-      existsSync(path) &&
+      exists(arr.file(repair.tracked_copy)) &&
+      exists(path) &&
       statSync(path).size === Number(repair.original_size);
     if (!safe) {
       await update(repair.id, { remove_requested_at: null, note: "This changed since you asked, so it wasn't removed." });
@@ -265,24 +277,47 @@ async function checkDecoded(arr: Arr, repair: Row) {
   }
   await quarantine(arr, repair, file.path, `.bad-${attempts}`);
   await db`update media_file set status = 'missing', check_first = false where id = ${file.id}`;
-  await update(repair.id, { attempts, replacement_file_id: null });
+  // Back to searching first, so a failed rescan or search resumes from checkSearch.
+  await update(repair.id, { state: "searching", attempts, replacement_file_id: null, search_started_at: null });
   await retrySearch(arr, repair);
 }
 
 /** Put the original back and try again in a week. Only into an empty slot. */
 async function restore(arr: Arr, repair: Row, note: string) {
   const name = `${QUARANTINE}/${repair.original_path}`;
-  await move(arr.file(name), arr.file(repair.original_path));
+  // Already back if a run stopped after the move; skipped only then.
+  if (exists(arr.file(name)) || !exists(arr.file(repair.original_path))) {
+    await move(arr.file(name), arr.file(repair.original_path));
+  }
   await arr.rescan(repair.arr_parent_id);
   await db`update media_file set status = 'replace_requested', check_first = false where id = ${repair.media_file_id}`;
   await setQuarantined(repair, repair.quarantined.filter((q: string) => q !== name));
   await update(repair.id, { state: "no_release", note, retry_at: new Date(Date.now() + RETRY_DAYS * 86_400_000) });
 }
 
+/** Finishes the move of a run that stopped partway, going by what's on disk.
+ * Whether the search can go ahead. */
+async function finishMove(arr: Arr, repair: Row): Promise<boolean> {
+  const name = `${QUARANTINE}/${repair.original_path}`;
+  if (!repair.quarantined.includes(name)) {
+    if (exists(arr.file(name))) {
+      await setQuarantined(repair, [...repair.quarantined, name]);
+    } else {
+      if (statSync(arr.file(repair.original_path)).size !== Number(repair.original_size)) {
+        await needsDuck(repair.id, `The file changed before it could be moved, so it's still in the library: ${repair.original_path}`);
+        return false;
+      }
+      await quarantine(arr, repair, repair.original_path);
+    }
+  }
+  await db`update media_file set status = 'missing', check_first = false where id = ${repair.media_file_id}`;
+  return true;
+}
+
 async function checkSearch(arr: Arr, repair: Row) {
-  // A run that stopped between the move and the search picks it up here.
+  // A run that stopped before the search picks it up here, wherever the move got to.
   if (!repair.search_started_at) {
-    await retrySearch(arr, repair);
+    if (await finishMove(arr, repair)) await retrySearch(arr, repair);
     return;
   }
   const rel = await arr.currentFile(repair.arr_parent_id, repair.arr_item_ids);
@@ -334,7 +369,7 @@ async function openRepair(file: Row, fields: Row): Promise<Row> {
 /** Whether this file's repair started. */
 async function startOne(arr: Arr, file: Row): Promise<boolean> {
   const path = arr.file(file.path);
-  const stat = existsSync(path) ? statSync(path) : null;
+  const stat = exists(path) ? statSync(path) : null;
   const mtime = stat ? Math.floor(stat.mtimeMs / 1000) : 0;
   if (!stat || stat.size !== Number(file.size) || mtime !== Math.floor(new Date(file.mtime).getTime() / 1000)) {
     // It changed since the check, so the request no longer applies to it.
