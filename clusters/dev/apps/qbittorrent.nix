@@ -1,8 +1,7 @@
 { config, secrets, ... }:
 {
   services.qbittorrent = {
-    allowControlPlane = true;
-    hostAffinity = "nasnix";
+    hostAffinity = "edgenix";
 
     homepage.group = "Download";
 
