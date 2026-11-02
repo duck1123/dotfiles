@@ -256,7 +256,7 @@ async function retrySearch(arr: Arr, repair: Row) {
     throw new Error("Sonarr/Radarr still lists a file after the rescan");
   }
   await arr.search(repair.arr_item_ids);
-  await update(repair.id, { state: "searching", search_started_at: new Date() });
+  await update(repair.id, { state: "searching", search_started_at: new Date(), note: null });
 }
 
 async function checkDecoded(arr: Arr, repair: Row) {
