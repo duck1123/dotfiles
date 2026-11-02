@@ -5,30 +5,6 @@ let
     system = "x86_64-linux";
   };
 
-  windmill-cli =
-    let
-      version = "1.691.0";
-    in
-    pkgs.stdenv.mkDerivation {
-      pname = "windmill-cli";
-      inherit version;
-      src = pkgs.fetchurl {
-        url = "https://registry.npmjs.org/windmill-cli/-/windmill-cli-${version}.tgz";
-        hash = "sha256-EPYT4k54o863TZjqGlpw/bPLSx7liYbgZV6y9N+vFxU=";
-      };
-      sourceRoot = "package";
-      nativeBuildInputs = [ pkgs.makeWrapper ];
-      dontBuild = true;
-      installPhase = ''
-        mkdir -p $out/lib/windmill-cli
-        cp -r . $out/lib/windmill-cli/
-        mkdir -p $out/bin
-        makeWrapper ${pkgs.nodejs}/bin/node $out/bin/wmill \
-          --add-flags "$out/lib/windmill-cli/esm/main.js"
-      '';
-      meta.mainProgram = "wmill";
-    };
-
   # Caldera's desktop Plexamp-style player. Upstream only ships a Flatpak
   # bundle, so unpack it and patch the binary to run natively.
   caldera-amp =
@@ -204,7 +180,6 @@ in
             niri
             pnu
             soap-cli
-            windmill-cli
             ;
         };
       }

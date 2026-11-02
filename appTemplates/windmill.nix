@@ -15,7 +15,7 @@ let
 
   # The declarative sync tooling -- the `wmill` CLI, its shell dependencies,
   # and resources/apps/windmill/wmill/** itself -- is built as the
-  # `windmill-sync-bundle` flake package (modules/pkgs/windmill-sync.nix,
+  # `windmill-sync-bundle` flake package (modules/kubernetes/pkgs/windmill-sync.nix,
   # symlinkJoin of wmill-cli + bash/curl/jq/coreutils + the wmill/ config
   # tree at share/windmill-wmill). Its output store path is resolved right
   # here at `nur switch` time and passed to nix-csi via the CSI driver's
@@ -35,7 +35,7 @@ let
   # inside the ${name}-worker-native container so "native"-tagged Windmill
   # scripts have something to run beyond the windmill-labs image itself --
   # built as the `windmill-worker-native-tools` flake package
-  # (modules/pkgs/windmill-sync.nix) and resolved via the same
+  # (modules/kubernetes/pkgs/windmill-sync.nix) and resolved via the same
   # storePath convention as windmillSyncBundle above, rather than a
   # nixExpr string nix-csi would have to fetch nixpkgs and re-evaluate
   # for on every mount (the pattern appTemplates/xysat.nix uses instead,
@@ -158,7 +158,7 @@ let
       fi
     done
 
-    echo "Pushing declarative config from applications/windmill/wmill ..."
+    echo "Pushing declarative config from resources/apps/windmill/wmill ..."
     cd /nix/var/result/share/windmill-wmill
     wmill sync push \
       --workspace "$WORKSPACE" \
@@ -217,7 +217,7 @@ let
       # Windmill's).
       body=$(echo "$conn" | jq \
         --arg path "$resource_path" \
-        --arg desc "Reporting connection for the $conn_name database on the shared postgresql instance -- managed by the windmill-sync ArgoCD hook job, sourced from env/dev/windmill.nix's reportingConnections." \
+        --arg desc "Reporting connection for the $conn_name database on the shared postgresql instance -- managed by the windmill-sync ArgoCD hook job, sourced from the windmill app's reportingConnections." \
         --arg password_ref "\$var:$password_var_path" \
         '{path: $path, resource_type: "postgresql", description: $desc, value: {host: .host, port: .port, user: .username, dbname: .name, sslmode: "disable", password: $password_ref}}')
 

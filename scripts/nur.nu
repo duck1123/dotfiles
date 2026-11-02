@@ -2593,7 +2593,7 @@ def wmill-bin []: nothing -> string {
 # installed as a copy, see the app's .npmrc)
 def inbox-deps []: nothing -> nothing {
   rm -rf $"($INBOX_APP_DIR)/node_modules/dashboard-ui"
-  ^npm install --prefix $INBOX_APP_DIR --no-audit --no-fund
+  ^nix shell nixpkgs#nodejs -c npm install --prefix $INBOX_APP_DIR --no-audit --no-fund
 }
 
 # Run the inbox review app locally with live reload; backend calls run on the

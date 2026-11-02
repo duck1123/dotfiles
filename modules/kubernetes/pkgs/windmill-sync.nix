@@ -3,10 +3,12 @@ _: {
     { pkgs, ... }:
     let
       # windmill-cli (the `wmill` binary) isn't in nixpkgs. Package the published
-      # npm module directly: modules/pkgs/wmill-cli/{package.json,package-lock.json}
-      # depend on nothing but windmill-cli@<version>, pinned the same way
-      # IMAGE-VERSIONS.md pins container tags -- bump the version there and here
-      # together, then `nix build .#wmill-cli` to get the new npmDepsHash.
+      # npm module directly: wmill-cli/{package.json,package-lock.json} depend on
+      # nothing but windmill-cli@<version> -- bump the version there and here
+      # together, then `nix build .#wmill-cli` to get the new npmDepsHash. Going
+      # through npm is what brings in the windmill-parser-wasm-* packages that
+      # `wmill generate-metadata` needs. Hosts get this build too
+      # (features/windmill.nix).
       wmill-cli = pkgs.buildNpmPackage {
         pname = "wmill-cli";
         version = "1.855.1";

@@ -2,13 +2,13 @@
   homeManager =
     { inputs, pkgs, ... }:
     {
-      home.packages = [ inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.windmill-cli ];
+      home.packages = [ inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.wmill-cli ];
 
       xdg.configFile."fish/completions/wmill.fish".source =
         pkgs.runCommand "wmill-fish-completions" { }
           ''
             ${
-              inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.windmill-cli
+              inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.wmill-cli
             }/bin/wmill completions fish > $out
           '';
     };
