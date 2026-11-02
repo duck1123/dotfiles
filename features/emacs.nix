@@ -57,6 +57,13 @@
         "text/x-org" = [ "emacsclient.desktop" ];
       };
 
+      # lsp-mode looks for tsserver on PATH as well as the language server.
+      # `typescript` is now 7.x, the native port, which doesn't ship tsserver.
+      home.packages = with pkgs; [
+        typescript_5
+        typescript-language-server
+      ];
+
       programs.ripgrep.enable = true;
       programs.emacs = {
         enable = true;
@@ -105,6 +112,10 @@
                   reformatter
                   tree-sitter
                   yaml-mode
+                  (epkgs.treesit-grammars.with-grammars (g: [
+                    g.tree-sitter-typescript
+                    g.tree-sitter-tsx
+                  ]))
                 ];
             };
 

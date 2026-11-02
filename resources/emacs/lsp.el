@@ -7,6 +7,8 @@
   :commands (lsp lsp-deferred)
   :hook
   ((js2-mode . lsp)
+   (typescript-ts-mode . lsp)
+   (tsx-ts-mode . lsp)
    (clojure-mode . lsp)
    (clojurescript-mode . lsp)
    (clojurec-mode . 'lsp)
