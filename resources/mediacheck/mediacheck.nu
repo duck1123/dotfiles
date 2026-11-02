@@ -56,7 +56,9 @@ def decode [file: path] {
   # -progress on stderr interleaves out_time_us with the error lines, so each
   # line gets the position it was printed at. ffmpeg's exit code comes last,
   # through sh, since nushell drops either it or the output otherwise.
-  let state = ^sh -c 'ffmpeg "$@"; echo "mediacheck-exit=$?" >&2' sh -hide_banner -nostdin -nostats -v error -progress pipe:2 -stats_period 5 -i $file -map '0:v?' -map '0:a?' -f null - e>| lines
+  # 0:V leaves out cover art: an image that won't decode stalls the muxer, which
+  # then buffers every decoded frame of the film until memory runs out.
+  let state = ^sh -c 'ffmpeg "$@"; echo "mediacheck-exit=$?" >&2' sh -hide_banner -nostdin -nostats -v error -progress pipe:2 -stats_period 5 -i $file -map '0:V?' -map '0:a?' -f null - e>| lines
   | reduce --fold {t: null, log: [], count: 0, exit: null} {|line, s|
     if ($line | str starts-with "mediacheck-exit=") {
       $s | upsert exit ($line | str replace "mediacheck-exit=" "" | into int)

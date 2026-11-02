@@ -69,6 +69,10 @@ in
           Nice = 19;
           CPUSchedulingPolicy = "idle";
           IOSchedulingClass = "idle";
+          # A runaway decode kills only ffmpeg: the exit code gets reported, so
+          # the file leaves the queue instead of being claimed again on restart.
+          MemoryMax = "8G";
+          OOMPolicy = "continue";
           Restart = "on-failure";
           RestartSec = "5min";
         };
