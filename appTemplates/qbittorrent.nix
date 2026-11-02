@@ -514,12 +514,14 @@ rec {
             storage = "1Ti";
           };
           accessModes = [ "ReadWriteMany" ];
+          # hard, not soft: downloads are written here, and a NAS stall on a soft
+          # mount loses writes or stops the torrent with an I/O error.
           mountOptions = [
             "nolock"
             "nfsvers=3"
             "noexec"
-            "soft"
-            "timeo=30"
+            "hard"
+            "timeo=600"
           ];
           nfs = {
             server = cfg.nfs.server;
