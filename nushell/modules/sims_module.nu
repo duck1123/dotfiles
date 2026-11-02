@@ -496,3 +496,405 @@ export def "sims manifest" [
   }
   $r.stdout | from json
 }
+
+# Importing a folder of mods. Every file is copied into the blob store (the folder
+# itself is only read: blobs are chmod 444, so they must not share an inode with it).
+# What the files are goes in the catalog, mods/<creator>/<mod>.json, and in
+# import/<name>.json, a record of every file in the folder.
+#
+# A mod is a top-level folder, or the loose files sharing a name prefix. Mods the
+# catalog already has get a new version if the files differ. import/grouping.json
+# (hand-edited, optional) overrides the guesses:
+#   groups:    { "<folder or loose file, relative to Mods/>": { mod: "creator/mod", version?: "label" } }
+#              a nested folder here becomes a mod of its own
+#   rules:     [{ match: regex, mod: "creator/mod", version?: "label" }]  the first match wins;
+#              all a mod's matches are one mod, installed at the paths they have now
+#   state:     [regex]  paths the mods write
+#   files:     [regex]  paths that are part of a mod, whatever their extension
+#   unmanaged: [regex]  paths that belong to no mod
+
+const state_exts = [log dat ini cfg html htm json simshare]
+const archive_exts = [7z rar zip]
+const game_files = [resource.cfg]
+const version_res = [
+  '(?i)(?:^|[ _-])v(?:er(?:sion)?)?[ ._-]*(?<v>\d+(?:[._]\d+)*[a-z]?)(?=$|[ _-])'
+  '(?:^|[ _-])(?<v>\d{4}[_.-]\d{1,2}[_.-]\d{1,2})(?=$|[ _-])'
+  '(?i)(?:^|[ _-])(?<v>(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*[ _-]?\d{4})(?=$|[ _-])'
+  '(?:^|[ _-])(?<v>\d+(?:\.\d+)+[a-z]?)(?=$|[ _-])'
+]
+
+def slug []: string -> string {
+  str lowercase | str replace -a -r '[^a-z0-9]+' '-' | str trim -c '-'
+}
+
+# A folder or file name as its name without the version, and that version (or null)
+def split-version [name: string]: nothing -> record {
+  for re in $version_res {
+    let found = $name | parse --regex $re
+    if ($found | is-not-empty) {
+      return {stem: ($name | str replace -r $re ''), version: ($found.0.v | str replace -a -r '[_ ]' '.')}
+    }
+  }
+  {stem: $name, version: null}
+}
+
+def without-ext [name: string]: nothing -> string {
+  let ext = $name | path parse | get extension
+  if $ext in [package ts4script ...$archive_exts] { $name | path parse | get stem } else { $name }
+}
+
+def first-token [name: string]: nothing -> string {
+  $name | str replace -a -r '[^A-Za-z0-9]+' ' ' | str trim | split row ' ' | first
+}
+
+# Every file under a folder: path (relative), size, date (modified), sha256
+def hash-tree [dir: path]: nothing -> table {
+  let listing = ^find $dir -type f -printf "%s\t%TY-%Tm-%Td\t%P\\0" | complete
+  if $listing.exit_code != 0 { error make {msg: $"can't read ($dir): ($listing.stderr)"} }
+  $listing.stdout | split row (char nul) | where $it != '' | par-each {|e|
+    let parts = $e | split row (char tab)
+    let rel = $parts | skip 2 | str join (char tab)
+    let sum = ^sha256sum -z -- $"($dir)/($rel)" | complete
+    if $sum.exit_code != 0 { error make {msg: $"can't hash ($rel): ($sum.stderr)"} }
+    {path: $rel, size: ($parts.0 | into int), date: $parts.1, sha256: ($sum.stdout | str substring 0..<64)}
+  } | sort-by path
+}
+
+def total-size []: table -> filesize {
+  reduce -f 0b {|f, acc| $acc + ($f.size | into int | $in * 1b) }
+}
+
+def blob-root []: nothing -> path {
+  sims-config | get blobDir | path expand | path join sha256
+}
+
+# Copy a file into the blob store, checking it still has the hash we recorded
+def store-blob [root: path, src: path, sha256: string] {
+  let dst = $root | path join $sha256
+  if ($dst | path exists) { return }
+  let tmp = $"($dst).tmp"
+  ^cp --preserve=timestamps -- $src $tmp
+  let got = ^sha256sum -z -- $tmp | complete | get stdout | str substring 0..<64
+  if $got != $sha256 {
+    rm $tmp
+    error make {msg: $"($src) changed during the import"}
+  }
+  ^chmod 444 -- $tmp
+  ^mv -- $tmp $dst
+}
+
+def file-kind [rel: string, grouping: record]: nothing -> string {
+  let matches = {|res| $res | any {|re| $rel =~ $re } }
+  let ext = $rel | path parse | get extension | str lowercase
+  if (do $matches $grouping.unmanaged) { 'unmanaged'
+  } else if (do $matches $grouping.state) { 'state'
+  } else if (do $matches $grouping.files) { 'file'
+  } else if ($rel | path basename | str lowercase) in $game_files { 'unmanaged'
+  } else if $ext in $state_exts { 'state'
+  } else { 'file' }
+}
+
+def read-grouping [data: path]: nothing -> record {
+  let file = $data | path join import grouping.json
+  let found = if ($file | path exists) { open $file } else { {} }
+  {groups: {}, rules: [], state: [], files: [], unmanaged: []} | merge $found
+}
+
+# The catalog as written: [{ id, path, mod }]
+def read-catalog [data: path]: nothing -> table {
+  let dir = $data | path join mods
+  if not ($dir | path exists) { return [] }
+  ls $dir | where type == dir | each {|c|
+    ls $c.name | where {|f| $f.name | str ends-with .json } | each {|f|
+      let creator = $c.name | path basename
+      let mod = $f.name | path parse | get stem
+      {id: $"($creator)/($mod)", path: $f.name, mod: (open $f.name)}
+    }
+  } | flatten
+}
+
+# Download pages from the spreadsheets (mods*.xlsx, title and Site columns), by slug of
+# the top-level folder or loose file with its version removed
+def read-pages [data: path]: nothing -> record {
+  let sheets = ls $data | where {|f| ($f.name | path basename) =~ '^mods.*\.xlsx$' } | sort-by name --reverse
+  let rows = $sheets | each {|f|
+    open $f.name | values | first | where Site != null | select title Site
+  } | flatten
+  $rows | each {|r|
+    let top = $r.title | path split | first
+    {key: (split-version (without-ext $top) | get stem | slug), page: $r.Site}
+  } | uniq-by key | reduce -f {} {|r, acc| $acc | merge {($r.key): $r.page} }
+}
+
+# Which group each file is in: the longest matching key of `groups`, else the first
+# matching rule, else its top-level folder, else its loose-file prefix (when several
+# loose files share one)
+def assign-groups [files: table, grouping: record]: nothing -> table {
+  let keys = $grouping.groups | columns | sort-by {|k| $k | str length } --reverse
+  let tokens = $files | where {|f| not ($f.path | str contains '/') } | each {|f| first-token $f.path | str lowercase }
+  let shared = $tokens | uniq --repeated
+  $files | each {|f|
+    let key = $keys | where {|k| $f.path == $k or ($f.path | str starts-with $"($k)/") } | get -o 0
+    let rule = if $key == null { $grouping.rules | where {|r| $f.path =~ $r.match } | get -o 0 }
+    let is_folder = ($f.path | str contains '/') and $rule == null
+    let group = if $key != null { $key
+    } else if $rule != null { $rule.mod
+    } else if $is_folder { $f.path | path split | first
+    } else if ((first-token $f.path | str lowercase) in $shared) { first-token $f.path
+    } else { $f.path }
+    let folder = if $key != null {
+      if $f.path == $key { null } else { $key }
+    } else if $is_folder { $group } else { null }
+    let kind = file-kind $f.path $grouping
+    let name = if $folder == null { $f.path } else { $f.path | str substring (($folder | str length -g) + 1).. -g }
+    $f | insert group $group | insert folder $folder | insert name $name | insert kind (
+      if $folder == null and $kind == state { 'unmanaged' } else { $kind }
+    )
+  }
+}
+
+# The known mod a group is another copy of: the same name, the same name without its
+# version, or mostly the same .package/.ts4script names as its newest files (at least
+# half of each side's, so part of a big catch-all folder doesn't count as all of it)
+def match-known [group: string, files: table, known: table]: nothing -> any {
+  let exact = $known | where title == $group | get -o 0.id
+  if $exact != null { return $exact }
+  let stem = split-version (without-ext $group) | get stem | slug
+  let by_name = $known | where {|k| $k.stem == $stem } | get -o 0.id
+  if $by_name != null { return $by_name }
+  let names = $files | where {|f| ($f.name | path parse | get extension | str lowercase) in [package ts4script] } | get name | each { path basename }
+  if ($names | is-empty) { return null }
+  let scored = $known | each {|k|
+    {id: $k.id, n: ($names | where $it in $k.names | length), size: ($k.names | length)}
+  } | where n > 0
+  if ($scored | is-empty) { return null }
+  let best = $scored | sort-by n --reverse | first
+  if $best.n * 2 >= ($names | length) and $best.n * 2 >= $best.size { $best.id } else { null }
+}
+
+def guess-id [group: string, tokens: list<string>]: nothing -> string {
+  let bare = split-version (without-ext $group) | get stem
+  let token = first-token $bare
+  let rest = $bare | str replace $token '' | slug
+  let shared = ($tokens | where $it == ($token | str lowercase) | length) > 1
+  if $shared {
+    $"($token | slug)/($rest | default -e ($token | slug))"
+  } else {
+    $"unknown/($bare | slug | default -e mod)"
+  }
+}
+
+def state-glob [name: string]: nothing -> string {
+  let p = $name | path parse
+  if ($p.extension | str lowercase) == log {
+    if $p.parent == '' { '*.log' } else { $"($p.parent)/*.log" }
+  } else { $name }
+}
+
+# The plan for one group: which mod, and what changes in its JSON
+def plan-group [g: record, label: string, is_live: bool, name: string]: nothing -> record {
+  let files = $g.items | where kind == file | sort-by name | select name sha256
+  let state = $g.items | where kind == state
+  let mod = $g.existing | default {}
+  let versions = $mod.versions? | default {}
+  let same = $versions | transpose label v | where {|r|
+    ($r.v.files | each {|f| {name: $f.name, sha256: $f.sha256} } | sort-by name) == $files
+  } | get -o 0.label
+  let wanted = $g.version | default $label
+  let new_label = if $same != null { $same
+  } else if ($wanted in ($versions | columns)) { $"($wanted)+($name)"
+  } else { $wanted }
+  let archives = $files | where {|f| ($f.name | path parse | get extension | str lowercase) in $archive_exts }
+  let scripts = $files | where {|f| ($f.name | str lowercase | str ends-with .ts4script) }
+  let installs = ($files | length) > ($archives | length)
+  let new_versions = if ($same != null) or ($files | is-empty) { $versions } else {
+    $versions | merge {($new_label): {added: (date now | format date '%Y-%m-%d'), files: $files}}
+  }
+  let merged = $mod | merge {
+    title: ($mod.title? | default $g.group)
+    downloadPage: ($mod.downloadPage? | default $g.page)
+    tags: ($mod.tags? | default [] | append (if ($scripts | is-empty) { [] } else { [script] }) | uniq | sort)
+    folder: (if $mod == {} { $g.folder } else { $mod.folder })
+    include: ['.*']
+    exclude: (if ($archives | is-empty) { $mod.exclude? | default [] } else { ['.*\.(7z|rar|zip)'] })
+    stateFiles: ($mod.stateFiles? | default [] | append ($state | get name | each {|n| state-glob $n }) | uniq | sort)
+    versions: $new_versions
+  }
+  let final = if $is_live and $installs { $merged | merge {version: $new_label} } else { $merged }
+  {
+    id: $g.id
+    json: $final
+    inProfile: ($is_live and $installs)
+    change: (if $mod == {} { 'new mod' } else if $same == null and ($files | is-not-empty) { 'new version' } else { 'same' })
+    version: $new_label
+    group: $g.group
+    folder: $g.folder
+    files: ($files | length)
+    state: ($state | length)
+    page: $final.downloadPage
+  }
+}
+
+# Import a folder of mods into the blob store and the catalog. Dry run unless --apply.
+#
+# --profile marks this as the set in use: its mods are pinned to these versions and
+# listed in that profile. Without it the folder is history: older versions of known
+# mods, and unknown mods in no profile.
+export def "sims import" [
+  dir: path                # folder to import; only read
+  --name (-n): string      # name of this import, for import/<name>.json
+  --profile (-p): string   # write this profile from the folder
+  --apply                  # write the blobs and the catalog
+]: nothing -> record {
+  if $name == null { error make {msg: "give the import a --name"} }
+  let dir = $dir | path expand
+  let data = sims-config | get dataDir | path expand
+  let grouping = read-grouping $data
+  let is_live = $profile != null
+  let scanned = hash-tree $dir
+  let today = date now | format date '%Y-%m-%d'
+  let files = assign-groups $scanned $grouping
+  let catalog = read-catalog $data
+  let known = $catalog | each {|c|
+    let label = $c.mod.version? | default ($c.mod.versions | columns | sort | last)
+    {
+      id: $c.id
+      title: ($c.mod.title? | default $c.id)
+      stem: (split-version (without-ext ($c.mod.title? | default $c.id)) | get stem | slug)
+      names: ($c.mod.versions | get -o $label | get -o files | default [] | get name | each { path basename })
+    }
+  }
+  let pages = read-pages $data
+  let tokens = $files | get group | uniq | each {|g| first-token (split-version (without-ext $g) | get stem) | str lowercase }
+
+  let groups = $files | group-by group | transpose group items
+  mut taken = $catalog | get -o id | default []
+  mut plans = []
+  for g in $groups {
+    if ($g.items | where kind == file | is-empty) { continue }
+    let override = $grouping.groups | transpose k v | where k == $g.group | get -o 0.v | default ($grouping.rules | where mod == $g.group | get -o 0)
+    let matched = if $override != null { $override.mod } else {
+      match-known $g.group ($g.items | where kind == file) $known
+    }
+    let date = $g.items | get date | sort | last
+    let split = split-version (without-ext $g.group)
+    let id = if $matched != null { $matched } else {
+      let guess = guess-id $g.group $tokens
+      if $guess in $taken { $"($guess)-($taken | where $it == $guess | length | $in + 2)" } else { $guess }
+    }
+    $taken = $taken | append $id
+    let earlier = $plans | where id == $id
+    let existing = if ($earlier | is-empty) { $catalog | where id == $id | get -o 0.mod } else { $earlier | last | get json }
+    let plan = plan-group {
+      group: $g.group
+      items: $g.items
+      id: $id
+      existing: $existing
+      folder: $g.items.0.folder
+      version: ($override.version? | default $split.version)
+      page: ($pages | transpose k v | where k == ($split.stem | slug) | get -o 0.v)
+    } $date $is_live $name
+    $plans = $plans | append $plan
+  }
+  let plans = $plans
+
+  let owner = $files | each {|f|
+    let group = $f.group
+    let mod = if $f.kind == unmanaged { null } else { $plans | where group == $group | get -o 0.id }
+    # a folder with nothing but state files has no mod to own them
+    $f | update kind (if $mod == null { 'unmanaged' } else { $f.kind }) | insert mod $mod
+  }
+  let root = blob-root
+  let new_blobs = $scanned | uniq-by sha256 | where {|f| not ($root | path join $f.sha256 | path exists) }
+  let summary = {
+    name: $name
+    dir: $dir
+    files: ($scanned | length)
+    size: ($scanned | total-size)
+    distinctHashes: ($scanned | get sha256 | uniq | length)
+    newBlobs: ($new_blobs | length)
+    newBlobSize: ($new_blobs | total-size)
+    modFiles: ($owner | where kind == file | length)
+    stateFiles: ($owner | where kind == state | length)
+    unmanagedFiles: ($owner | where kind == unmanaged | get path)
+    changes: ($plans | group-by change | transpose change mods | each {|c| {change: $c.change, mods: ($c.mods | length)} })
+    mods: ($plans | reject json inProfile | sort-by id)
+    sharedHashes: ($owner | where kind == file | group-by sha256 | values | where {|v| ($v | get mod | uniq | length) > 1 } | each {|v| $v | get path })
+    applied: false
+  }
+  if not $apply {
+    print 'dry run: add --apply to write the blobs and the catalog'
+    return $summary
+  }
+
+  mkdir $root
+  $new_blobs | par-each {|f| store-blob $root $"($dir)/($f.path)" $f.sha256 }
+  # several groups can be versions of one mod: the last plan has them all
+  for p in ($plans | reverse | uniq-by id) {
+    let file = $data | path join mods $"($p.id).json"
+    mkdir ($file | path dirname)
+    $p.json | to json -i 2 | save -f $file
+  }
+  mkdir ($data | path join import)
+  {
+    name: $name
+    dir: $dir
+    date: $today
+    files: ($owner | select path size sha256 kind mod)
+  } | to json -i 2 | save -f ($data | path join import $"($name).json")
+  if $is_live {
+    mkdir ($data | path join profiles)
+    {mods: ($plans | where inProfile | get id | uniq | sort)} | to json -i 2 | save -f ($data | path join profiles $"($profile).json")
+  }
+  $summary | update applied true
+}
+
+# Compare an instance's Mods/ with a profile, and the catalog with the blob store
+export def "sims status" [
+  --instance (-i): string@"nu-complete sims instances" # instance (default from config)
+  --profile (-p): string                                # profile (default: the one last switched to, else current)
+]: nothing -> record {
+  let i = instance $instance
+  let mods_dir = $i.documents | path join Mods
+  let state_file = $mods_dir | path join .simsnix-state.json
+  let active = if ($state_file | path exists) { open $state_file | get -o profile }
+  let name = $profile | default $active | default current
+  let manifest = sims manifest $name
+  let live = hash-tree $mods_dir | where path != .simsnix-state.json
+  let wanted = $manifest.files | select mod target sha256
+  let joined = $wanted | join --left ($live | select path sha256 | rename target live) target
+  let extra = $live | where path not-in $wanted.target
+  let state_res = $manifest.mods | each {|m|
+    $m.stateFiles | each {|g|
+      let rel = if $m.folder == null { $g } else { $"($m.folder)/($g)" }
+      '^' + ($rel | str escape-regex | str replace -a '\*' '[^/]*') + '$'
+    }
+  } | flatten
+  let state = $extra | where {|f| $state_res | any {|re| $f.path =~ $re } }
+  let unmanaged = $extra | where path not-in $state.path
+
+  let data = sims-config | get dataDir | path expand
+  let catalog_hashes = read-catalog $data | each {|c|
+    $c.mod.versions | values | each {|v| $v.files | get sha256 } | flatten
+  } | flatten | uniq
+  let imports_dir = $data | path join import
+  let reports = if ($imports_dir | path exists) { ls $imports_dir | where {|f| ($f.name | path basename) != grouping.json and ($f.name | str ends-with .json) } } else { [] }
+  let report_hashes = $reports | each {|r| open $r.name | get files | get sha256 } | flatten | uniq
+  let root = blob-root
+  let blob_list = if ($root | path exists) { ^find $root -type f -printf "%s %f\n" | lines | parse '{size} {sha256}' } else { [] }
+  let known = $catalog_hashes | append $report_hashes | uniq
+  {
+    instance: $i.name
+    profile: $name
+    switched: ($active != null)
+    ok: ($joined | where {|f| $f.live == $f.sha256 } | length)
+    changed: ($joined | where {|f| $f.live != null and $f.live != $f.sha256 } | get target)
+    missing: ($joined | where live == null | get target)
+    stateFiles: ($state | length)
+    unmanaged: ($unmanaged | get path)
+    blobs: ($blob_list | length)
+    blobSize: ($blob_list | total-size)
+    blobsMissing: ($known | where $it not-in ($blob_list | get -o sha256 | default []))
+    blobsUnreferenced: ($blob_list | where sha256 not-in $known | length)
+  }
+}
