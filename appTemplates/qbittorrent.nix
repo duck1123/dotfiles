@@ -311,6 +311,53 @@ rec {
                     ];
                   }
                 ])
+                # gluetun's HTTP proxy only carries TCP, so turn off what needs UDP.
+                ++ (lib.optionals cfg.vpn.enable [
+                  {
+                    name = "configure-vpn-proxy";
+                    image = "busybox:latest";
+                    command = [
+                      "sh"
+                      "-c"
+                      ''
+                        mkdir -p /config/qBittorrent
+                        CONFIG_FILE="/config/qBittorrent/qBittorrent.conf"
+                        touch "$CONFIG_FILE"
+
+                        set_key() {
+                          grep -q "^\[$1\]$" "$CONFIG_FILE" || printf '\n[%s]\n' "$1" >> "$CONFIG_FILE"
+                          S="[$1]" K="$2=" L="$2=$3" awk '
+                            BEGIN { s = ENVIRON["S"]; k = ENVIRON["K"]; l = ENVIRON["L"] }
+                            index($0, k) == 1 { next }
+                            { print }
+                            $0 == s { print l }
+                          ' "$CONFIG_FILE" > /tmp/qBittorrent.conf
+                          cat /tmp/qBittorrent.conf > "$CONFIG_FILE"
+                        }
+
+                        set_key Network 'Proxy\Type' HTTP
+                        set_key Network 'Proxy\IP' ${cfg.vpn.sharedGluetunService}
+                        set_key Network 'Proxy\Port' 8888
+                        set_key Network 'Proxy\AuthEnabled' false
+                        set_key Network 'Proxy\HostnameLookupEnabled' true
+                        set_key Network 'Proxy\Profiles\BitTorrent' true
+                        set_key Network 'Proxy\Profiles\Misc' true
+                        set_key Network 'Proxy\Profiles\RSS' true
+                        set_key BitTorrent 'Session\ProxyPeerConnections' true
+                        set_key BitTorrent 'Session\BTProtocol' TCP
+                        set_key BitTorrent 'Session\DHTEnabled' false
+                        set_key BitTorrent 'Session\LSDEnabled' false
+                        set_key BitTorrent 'Session\PeXEnabled' false
+                      ''
+                    ];
+                    volumeMounts = [
+                      {
+                        mountPath = "/config";
+                        name = "config";
+                      }
+                    ];
+                  }
+                ])
                 ++ [
                   {
                     name = "configure-downloads-path";
@@ -501,6 +548,51 @@ rec {
       };
 
       type = "ClusterIP";
+    };
+
+    # Kill switch: with the VPN on, the pod can only reach DNS and gluetun, so
+    # nothing goes out directly if the proxy or the Mullvad account stops working.
+    networkPolicies = lib.optionalAttrs cfg.vpn.enable {
+      "${name}-vpn-only".spec = {
+        podSelector.matchLabels."app.kubernetes.io/name" = name;
+        policyTypes = [ "Egress" ];
+        egress = [
+          {
+            to = [
+              {
+                namespaceSelector.matchLabels."kubernetes.io/metadata.name" = "kube-system";
+                podSelector.matchLabels.k8s-app = "kube-dns";
+              }
+            ];
+            ports = [
+              {
+                port = 53;
+                protocol = "UDP";
+              }
+              {
+                port = 53;
+                protocol = "TCP";
+              }
+            ];
+          }
+          {
+            to = [
+              {
+                namespaceSelector.matchLabels."kubernetes.io/metadata.name" =
+                  lib.last (lib.splitString "." cfg.vpn.sharedGluetunService);
+                podSelector.matchLabels."app.kubernetes.io/name" =
+                  lib.head (lib.splitString "." cfg.vpn.sharedGluetunService);
+              }
+            ];
+            ports = [
+              {
+                port = 8888;
+                protocol = "TCP";
+              }
+            ];
+          }
+        ];
+      };
     };
 
     # Create NFS PersistentVolume for downloads when NFS is enabled
