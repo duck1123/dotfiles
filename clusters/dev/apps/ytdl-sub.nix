@@ -21,6 +21,7 @@ _: {
       "Brennan Mulligan" = "https://www.youtube.com/@BrennanMulligan/shorts";
       "captainmidnight" = "https://www.youtube.com/@captainmidnight";
       "Casually Comics" = "https://www.youtube.com/@CasuallyComics";
+      "catieosaurus" = "https://www.youtube.com/@catieosaurus";
       "Channel Awesome" = "https://www.youtube.com/@ChannelAwesome";
       "Chris Boden" = "https://www.youtube.com/@Physicsduck";
       "Cleo Abram" = "https://www.youtube.com/@CleoAbram";
