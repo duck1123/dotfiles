@@ -18,7 +18,7 @@
     storageClassName = "longhorn";
 
     # nfsTarget defaults to "nas" and nfsSubPath defaults to "", so this mounts
-    # the whole nasnix media export at /media in both worker deployments --
+    # the whole nasnix media export at /media in every Windmill pod --
     # the same library every *arr app sees.
     nfs.enable = true;
 

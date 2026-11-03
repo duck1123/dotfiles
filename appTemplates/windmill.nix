@@ -310,6 +310,12 @@ rec {
       default = 8000;
     };
 
+    workerReplicas = mkOption {
+      description = mdDoc "Worker-only pods for the default group, on top of the main pod's own worker.";
+      type = types.int;
+      default = 2;
+    };
+
     workspace = mkOption {
       description = mdDoc "Windmill workspace id that resources/apps/windmill/wmill/** is synced into.";
       type = types.str;
@@ -441,144 +447,406 @@ rec {
   extraResources =
     cfg:
     {
-      deployments = {
-        "${name}-worker-native" = {
-          metadata.labels = {
-            "app.kubernetes.io/instance" = "${name}-worker-native";
-            "app.kubernetes.io/name" = "${name}-worker-native";
-          };
-
-          spec = {
-            replicas = 1;
-            selector.matchLabels = {
-              "app.kubernetes.io/instance" = "${name}-worker-native";
-              "app.kubernetes.io/name" = "${name}-worker-native";
-            };
-
-            template = {
+      deployments =
+        let
+          workerDeployment =
+            {
+              instance,
+              replicas,
+              workerEnv,
+              startCommand,
+            }:
+            {
               metadata.labels = {
-                "app.kubernetes.io/instance" = "${name}-worker-native";
-                "app.kubernetes.io/name" = "${name}-worker-native";
+                "app.kubernetes.io/instance" = instance;
+                "app.kubernetes.io/name" = instance;
               };
 
               spec = {
-                automountServiceAccountToken = true;
-                serviceAccountName = "default";
+                inherit replicas;
+                selector.matchLabels = {
+                  "app.kubernetes.io/instance" = instance;
+                  "app.kubernetes.io/name" = instance;
+                };
 
-                initContainers = lib.optionals (cfg.database.password != "") [
-                  {
-                    name = "build-database-url";
-                    image = "python:3-alpine";
-                    imagePullPolicy = "IfNotPresent";
-                    command = [
-                      "python3"
-                      "-c"
-                      ''
-                        import urllib.parse
-                        import os
-                        user = os.environ["PGUSER"]
-                        password = os.environ["PGPASSWORD"]
-                        host = os.environ["PGHOST"]
-                        port = os.environ["PGPORT"]
-                        db = os.environ["PGDATABASE"]
-                        enc = urllib.parse.quote(password, safe="")
-                        url = f"postgresql://{user}:{enc}@{host}:{port}/{db}?sslmode=disable"
-                        with open("/work/database_url", "w") as f:
-                            f.write(url)
-                      ''
-                    ];
-                    env = [
-                      {
-                        name = "PGUSER";
-                        value = cfg.database.username;
-                      }
-                      {
-                        name = "PGHOST";
-                        value = cfg.database.host;
-                      }
-                      {
-                        name = "PGPORT";
-                        value = toString cfg.database.port;
-                      }
-                      {
-                        name = "PGDATABASE";
-                        value = cfg.database.name;
-                      }
-                      {
-                        name = "PGPASSWORD";
-                        valueFrom.secretKeyRef = {
-                          name = db-password-secret;
-                          key = "password";
-                        };
-                      }
-                    ];
-                    volumeMounts = [
-                      {
-                        mountPath = "/work";
-                        name = shared-work-volume;
-                      }
-                    ];
-                  }
-                ];
+                template = {
+                  metadata.labels = {
+                    "app.kubernetes.io/instance" = instance;
+                    "app.kubernetes.io/name" = instance;
+                  };
 
-                containers = [
-                  (
-                    {
-                      name = "${name}-worker-native";
-                      inherit (cfg) image;
-                      imagePullPolicy = "IfNotPresent";
-                      env = [
-                        {
-                          name = "TZ";
-                          value = cfg.tz;
-                        }
-                        {
-                          name = "MODE";
-                          value = "worker";
-                        }
-                        {
-                          name = "WORKER_GROUP";
-                          value = "native";
-                        }
-                        {
-                          name = "WORKER_TAGS";
-                          value = "native";
-                        }
-                        {
-                          name = "PATH";
-                          value = "/nix/var/result/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
-                        }
-                        {
-                          # See appTemplates/xysat.nix for why store/sandbox/build-users-group
-                          # are set this way -- same rationale applies here.
-                          name = "NIX_CONFIG";
-                          value = ''
-                            experimental-features = nix-command flakes
-                            extra-substituters = https://attic.home.kronkltd.net/nixos
-                            extra-trusted-public-keys = nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4=
-                            store = local?root=/var/lib/nix-scratch
-                            sandbox = false
-                            build-users-group =
-                          '';
-                        }
-                      ];
-                    }
-                    // lib.optionalAttrs (cfg.database.password != "") {
-                      command = [
-                        "/bin/sh"
-                        "-c"
-                        "export DATABASE_URL=$(cat /work/database_url) && exec windmill"
-                      ];
-                    }
-                    // {
-                      volumeMounts =
-                        lib.optionals (cfg.database.password != "") [
+                  spec = {
+                    automountServiceAccountToken = true;
+                    serviceAccountName = "default";
+
+                    initContainers = lib.optionals (cfg.database.password != "") [
+                      {
+                        name = "build-database-url";
+                        image = "python:3-alpine";
+                        imagePullPolicy = "IfNotPresent";
+                        command = [
+                          "python3"
+                          "-c"
+                          ''
+                            import urllib.parse
+                            import os
+                            user = os.environ["PGUSER"]
+                            password = os.environ["PGPASSWORD"]
+                            host = os.environ["PGHOST"]
+                            port = os.environ["PGPORT"]
+                            db = os.environ["PGDATABASE"]
+                            enc = urllib.parse.quote(password, safe="")
+                            url = f"postgresql://{user}:{enc}@{host}:{port}/{db}?sslmode=disable"
+                            with open("/work/database_url", "w") as f:
+                                f.write(url)
+                          ''
+                        ];
+                        env = [
+                          {
+                            name = "PGUSER";
+                            value = cfg.database.username;
+                          }
+                          {
+                            name = "PGHOST";
+                            value = cfg.database.host;
+                          }
+                          {
+                            name = "PGPORT";
+                            value = toString cfg.database.port;
+                          }
+                          {
+                            name = "PGDATABASE";
+                            value = cfg.database.name;
+                          }
+                          {
+                            name = "PGPASSWORD";
+                            valueFrom.secretKeyRef = {
+                              name = db-password-secret;
+                              key = "password";
+                            };
+                          }
+                        ];
+                        volumeMounts = [
                           {
                             mountPath = "/work";
                             name = shared-work-volume;
                           }
+                        ];
+                      }
+                    ];
+
+                    containers = [
+                      (
+                        {
+                          name = instance;
+                          inherit (cfg) image;
+                          imagePullPolicy = "IfNotPresent";
+                          env = [
+                            {
+                              name = "TZ";
+                              value = cfg.tz;
+                            }
+                            {
+                              name = "MODE";
+                              value = "worker";
+                            }
+                          ]
+                          ++ workerEnv
+                          ++ [
+                            {
+                              # See appTemplates/xysat.nix for why store/sandbox/build-users-group
+                              # are set this way -- same rationale applies here.
+                              name = "NIX_CONFIG";
+                              value = ''
+                                experimental-features = nix-command flakes
+                                extra-substituters = https://attic.home.kronkltd.net/nixos
+                                extra-trusted-public-keys = nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4=
+                                store = local?root=/var/lib/nix-scratch
+                                sandbox = false
+                                build-users-group =
+                              '';
+                            }
+                          ];
+                        }
+                        // lib.optionalAttrs (cfg.database.password != "") {
+                          command = [
+                            "/bin/sh"
+                            "-c"
+                            startCommand
+                          ];
+                        }
+                        // {
+                          volumeMounts =
+                            lib.optionals (cfg.database.password != "") [
+                              {
+                                mountPath = "/work";
+                                name = shared-work-volume;
+                              }
+                            ]
+                            ++ [
+                              {
+                                mountPath = "/nix";
+                                name = "nix";
+                                subPath = "nix";
+                              }
+                              {
+                                mountPath = "/var/lib/nix-scratch";
+                                name = "nix-scratch";
+                              }
+                            ]
+                            ++ mediaVolumeMounts cfg;
+                        }
+                      )
+                    ];
+
+                    volumes =
+                      lib.optionals (cfg.database.password != "") [
+                        {
+                          name = shared-work-volume;
+                          emptyDir = { };
+                        }
+                      ]
+                      ++ [
+                        {
+                          name = "nix";
+                          csi = {
+                            driver = "nixkube";
+                            volumeAttributes."x86_64-linux" = "${windmillWorkerTools}";
+                          };
+                        }
+                        {
+                          # Writable, node-local, wiped on pod restart -- see the
+                          # NIX_CONFIG `store` setting above.
+                          name = "nix-scratch";
+                          emptyDir = { };
+                        }
+                      ]
+                      ++ mediaVolumes cfg;
+                  };
+                };
+              };
+            };
+        in
+        {
+          "${name}-worker-native" = workerDeployment {
+            instance = "${name}-worker-native";
+            replicas = 1;
+            workerEnv = [
+              {
+                name = "WORKER_GROUP";
+                value = "native";
+              }
+              {
+                name = "WORKER_TAGS";
+                value = "native";
+              }
+              {
+                name = "PATH";
+                value = "/nix/var/result/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+              }
+            ];
+            startCommand = "export DATABASE_URL=$(cat /work/database_url) && exec windmill";
+          };
+
+          # More workers for the default group. Each runs one job at a time, so with
+          # only the main pod's worker a long job holds up every other one. Worker-only
+          # pods rather than more main replicas: a server takes far more of the shared
+          # postgres' connections. With no server of their own, jobs reach the API
+          # through the service. Scaling the app to 0 stops these too.
+          "${name}-worker" = workerDeployment {
+            instance = "${name}-worker";
+            replicas = if cfg.replicas == 0 then 0 else cfg.workerReplicas;
+            workerEnv = [
+              {
+                name = "WORKER_GROUP";
+                value = "default";
+              }
+              {
+                name = "BASE_INTERNAL_URL";
+                value = "http://${name}.${name}:${toString cfg.service.port}";
+              }
+            ];
+            # Prepends to PATH, as the main pod does: these jobs need the image's runtimes.
+            startCommand = "export DATABASE_URL=$(cat /work/database_url) && export PATH=\"/nix/var/result/bin:$PATH\" && exec windmill";
+          };
+
+          ${name} = {
+            metadata.labels = {
+              "app.kubernetes.io/instance" = name;
+              "app.kubernetes.io/name" = name;
+              "app.kubernetes.io/version" = "latest";
+            };
+
+            spec = {
+              inherit (cfg) replicas;
+              selector.matchLabels = {
+                "app.kubernetes.io/instance" = name;
+                "app.kubernetes.io/name" = name;
+              };
+
+              template = {
+                metadata.labels = {
+                  "app.kubernetes.io/instance" = name;
+                  "app.kubernetes.io/name" = name;
+                };
+
+                spec = {
+                  automountServiceAccountToken = true;
+                  serviceAccountName = "default";
+
+                  # Build DATABASE_URL at runtime with proper URL encoding (handles special chars in password).
+                  initContainers = lib.optionals (cfg.database.password != "") [
+                    {
+                      name = "build-database-url";
+                      image = "python:3-alpine";
+                      imagePullPolicy = "IfNotPresent";
+                      command = [
+                        "python3"
+                        "-c"
+                        ''
+                          import urllib.parse
+                          import os
+                          user = os.environ["PGUSER"]
+                          password = os.environ["PGPASSWORD"]
+                          host = os.environ["PGHOST"]
+                          port = os.environ["PGPORT"]
+                          db = os.environ["PGDATABASE"]
+                          enc = urllib.parse.quote(password, safe="")
+                          url = f"postgresql://{user}:{enc}@{host}:{port}/{db}?sslmode=disable"
+                          with open("/work/database_url", "w") as f:
+                              f.write(url)
+                        ''
+                      ];
+                      env = [
+                        {
+                          name = "PGUSER";
+                          value = cfg.database.username;
+                        }
+                        {
+                          name = "PGHOST";
+                          value = cfg.database.host;
+                        }
+                        {
+                          name = "PGPORT";
+                          value = toString cfg.database.port;
+                        }
+                        {
+                          name = "PGDATABASE";
+                          value = cfg.database.name;
+                        }
+                        {
+                          name = "PGPASSWORD";
+                          valueFrom.secretKeyRef = {
+                            name = db-password-secret;
+                            key = "password";
+                          };
+                        }
+                      ];
+                      volumeMounts = [
+                        {
+                          mountPath = "/work";
+                          name = shared-work-volume;
+                        }
+                      ];
+                    }
+                  ];
+
+                  containers = [
+                    (
+                      {
+                        inherit name;
+                        inherit (cfg) image;
+                        imagePullPolicy = "IfNotPresent";
+                        env = [
+                          {
+                            name = "TZ";
+                            value = cfg.tz;
+                          }
+                          {
+                            name = "MODE";
+                            value = "standalone";
+                          }
+                          {
+                            name = "BASE_URL";
+                            value = "https://${cfg.ingress.domain}";
+                          }
+                          {
+                            name = "WORKER_TAGS";
+                            value = "deno,python3,bash,go,dependency,flow,hub";
+                          }
+                          {
+                            # Gives this pod's own worker (the one that actually
+                            # runs bash/nu-tagged jobs, unlike windmill-worker-native
+                            # below which Windmill forces into a fixed "native jobs
+                            # only" mode -- see the PATH-prepending command below for
+                            # why nix isn't just added to PATH here directly) access
+                            # to `nix`. See appTemplates/xysat.nix for why
+                            # store/sandbox/build-users-group are set this way.
+                            name = "NIX_CONFIG";
+                            value = ''
+                              experimental-features = nix-command flakes
+                              extra-substituters = https://attic.home.kronkltd.net/nixos
+                              extra-trusted-public-keys = nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4=
+                              store = local?root=/var/lib/nix-scratch
+                              sandbox = false
+                              build-users-group =
+                            '';
+                          }
                         ]
-                        ++ [
+                        ++ lib.optionals (cfg.superadminSecret != "") [
+                          {
+                            name = "SUPERADMIN_SECRET";
+                            valueFrom.secretKeyRef = {
+                              name = superadmin-secret;
+                              key = "SUPERADMIN_SECRET";
+                            };
+                          }
+                        ];
+                        ports = [
+                          {
+                            containerPort = cfg.service.port;
+                            name = "http";
+                            protocol = "TCP";
+                          }
+                        ];
+                        readinessProbe = {
+                          httpGet = {
+                            path = "/healthz";
+                            port = cfg.service.port;
+                          };
+                          initialDelaySeconds = 20;
+                          periodSeconds = 10;
+                          timeoutSeconds = 5;
+                          successThreshold = 1;
+                          failureThreshold = 5;
+                        };
+                        livenessProbe = {
+                          httpGet = {
+                            path = "/healthz";
+                            port = cfg.service.port;
+                          };
+                          initialDelaySeconds = 40;
+                          periodSeconds = 30;
+                          timeoutSeconds = 5;
+                          successThreshold = 1;
+                          failureThreshold = 5;
+                        };
+                      }
+                      // lib.optionalAttrs (cfg.database.password != "") {
+                        command = [
+                          "/bin/sh"
+                          "-c"
+                          # Prepend rather than replace PATH -- unlike
+                          # windmill-worker-native's container (which has no other
+                          # runtime to preserve), this pod's default PATH still needs
+                          # to resolve the image's own bundled deno/python3/go/etc.
+                          "export DATABASE_URL=$(cat /work/database_url) && export PATH=\"/nix/var/result/bin:$PATH\" && exec windmill standalone"
+                        ];
+                        volumeMounts = [
+                          {
+                            mountPath = "/work";
+                            name = shared-work-volume;
+                          }
                           {
                             mountPath = "/nix";
                             name = "nix";
@@ -590,254 +858,34 @@ rec {
                           }
                         ]
                         ++ mediaVolumeMounts cfg;
-                    }
-                  )
-                ];
-
-                volumes =
-                  lib.optionals (cfg.database.password != "") [
-                    {
-                      name = shared-work-volume;
-                      emptyDir = { };
-                    }
-                  ]
-                  ++ [
-                    {
-                      name = "nix";
-                      csi = {
-                        driver = "nixkube";
-                        volumeAttributes."x86_64-linux" = "${windmillWorkerTools}";
-                      };
-                    }
-                    {
-                      # Writable, node-local, wiped on pod restart -- see the
-                      # NIX_CONFIG `store` setting above.
-                      name = "nix-scratch";
-                      emptyDir = { };
-                    }
-                  ]
-                  ++ mediaVolumes cfg;
-              };
-            };
-          };
-        };
-
-        ${name} = {
-          metadata.labels = {
-            "app.kubernetes.io/instance" = name;
-            "app.kubernetes.io/name" = name;
-            "app.kubernetes.io/version" = "latest";
-          };
-
-          spec = {
-            inherit (cfg) replicas;
-            selector.matchLabels = {
-              "app.kubernetes.io/instance" = name;
-              "app.kubernetes.io/name" = name;
-            };
-
-            template = {
-              metadata.labels = {
-                "app.kubernetes.io/instance" = name;
-                "app.kubernetes.io/name" = name;
-              };
-
-              spec = {
-                automountServiceAccountToken = true;
-                serviceAccountName = "default";
-
-                # Build DATABASE_URL at runtime with proper URL encoding (handles special chars in password).
-                initContainers = lib.optionals (cfg.database.password != "") [
-                  {
-                    name = "build-database-url";
-                    image = "python:3-alpine";
-                    imagePullPolicy = "IfNotPresent";
-                    command = [
-                      "python3"
-                      "-c"
-                      ''
-                        import urllib.parse
-                        import os
-                        user = os.environ["PGUSER"]
-                        password = os.environ["PGPASSWORD"]
-                        host = os.environ["PGHOST"]
-                        port = os.environ["PGPORT"]
-                        db = os.environ["PGDATABASE"]
-                        enc = urllib.parse.quote(password, safe="")
-                        url = f"postgresql://{user}:{enc}@{host}:{port}/{db}?sslmode=disable"
-                        with open("/work/database_url", "w") as f:
-                            f.write(url)
-                      ''
-                    ];
-                    env = [
-                      {
-                        name = "PGUSER";
-                        value = cfg.database.username;
                       }
+                    )
+                  ];
+
+                  volumes =
+                    lib.optionals (cfg.database.password != "") [
                       {
-                        name = "PGHOST";
-                        value = cfg.database.host;
-                      }
-                      {
-                        name = "PGPORT";
-                        value = toString cfg.database.port;
-                      }
-                      {
-                        name = "PGDATABASE";
-                        value = cfg.database.name;
-                      }
-                      {
-                        name = "PGPASSWORD";
-                        valueFrom.secretKeyRef = {
-                          name = db-password-secret;
-                          key = "password";
-                        };
-                      }
-                    ];
-                    volumeMounts = [
-                      {
-                        mountPath = "/work";
                         name = shared-work-volume;
+                        emptyDir = { };
                       }
-                    ];
-                  }
-                ];
-
-                containers = [
-                  (
-                    {
-                      inherit name;
-                      inherit (cfg) image;
-                      imagePullPolicy = "IfNotPresent";
-                      env = [
-                        {
-                          name = "TZ";
-                          value = cfg.tz;
-                        }
-                        {
-                          name = "MODE";
-                          value = "standalone";
-                        }
-                        {
-                          name = "BASE_URL";
-                          value = "https://${cfg.ingress.domain}";
-                        }
-                        {
-                          name = "WORKER_TAGS";
-                          value = "deno,python3,bash,go,dependency,flow,hub";
-                        }
-                        {
-                          # Gives this pod's own worker (the one that actually
-                          # runs bash/nu-tagged jobs, unlike windmill-worker-native
-                          # below which Windmill forces into a fixed "native jobs
-                          # only" mode -- see the PATH-prepending command below for
-                          # why nix isn't just added to PATH here directly) access
-                          # to `nix`. See appTemplates/xysat.nix for why
-                          # store/sandbox/build-users-group are set this way.
-                          name = "NIX_CONFIG";
-                          value = ''
-                            experimental-features = nix-command flakes
-                            extra-substituters = https://attic.home.kronkltd.net/nixos
-                            extra-trusted-public-keys = nixos:/5T+7JIEApx8OL/j4HhK1koV6jMPu3rZV098GsuBAi4=
-                            store = local?root=/var/lib/nix-scratch
-                            sandbox = false
-                            build-users-group =
-                          '';
-                        }
-                      ]
-                      ++ lib.optionals (cfg.superadminSecret != "") [
-                        {
-                          name = "SUPERADMIN_SECRET";
-                          valueFrom.secretKeyRef = {
-                            name = superadmin-secret;
-                            key = "SUPERADMIN_SECRET";
-                          };
-                        }
-                      ];
-                      ports = [
-                        {
-                          containerPort = cfg.service.port;
-                          name = "http";
-                          protocol = "TCP";
-                        }
-                      ];
-                      readinessProbe = {
-                        httpGet = {
-                          path = "/healthz";
-                          port = cfg.service.port;
+                      {
+                        name = "nix";
+                        csi = {
+                          driver = "nixkube";
+                          volumeAttributes."x86_64-linux" = "${windmillWorkerTools}";
                         };
-                        initialDelaySeconds = 20;
-                        periodSeconds = 10;
-                        timeoutSeconds = 5;
-                        successThreshold = 1;
-                        failureThreshold = 5;
-                      };
-                      livenessProbe = {
-                        httpGet = {
-                          path = "/healthz";
-                          port = cfg.service.port;
-                        };
-                        initialDelaySeconds = 40;
-                        periodSeconds = 30;
-                        timeoutSeconds = 5;
-                        successThreshold = 1;
-                        failureThreshold = 5;
-                      };
-                    }
-                    // lib.optionalAttrs (cfg.database.password != "") {
-                      command = [
-                        "/bin/sh"
-                        "-c"
-                        # Prepend rather than replace PATH -- unlike
-                        # windmill-worker-native's container (which has no other
-                        # runtime to preserve), this pod's default PATH still needs
-                        # to resolve the image's own bundled deno/python3/go/etc.
-                        "export DATABASE_URL=$(cat /work/database_url) && export PATH=\"/nix/var/result/bin:$PATH\" && exec windmill standalone"
-                      ];
-                      volumeMounts = [
-                        {
-                          mountPath = "/work";
-                          name = shared-work-volume;
-                        }
-                        {
-                          mountPath = "/nix";
-                          name = "nix";
-                          subPath = "nix";
-                        }
-                        {
-                          mountPath = "/var/lib/nix-scratch";
-                          name = "nix-scratch";
-                        }
-                      ]
-                      ++ mediaVolumeMounts cfg;
-                    }
-                  )
-                ];
-
-                volumes =
-                  lib.optionals (cfg.database.password != "") [
-                    {
-                      name = shared-work-volume;
-                      emptyDir = { };
-                    }
-                    {
-                      name = "nix";
-                      csi = {
-                        driver = "nixkube";
-                        volumeAttributes."x86_64-linux" = "${windmillWorkerTools}";
-                      };
-                    }
-                    {
-                      name = "nix-scratch";
-                      emptyDir = { };
-                    }
-                  ]
-                  ++ mediaVolumes cfg;
+                      }
+                      {
+                        name = "nix-scratch";
+                        emptyDir = { };
+                      }
+                    ]
+                    ++ mediaVolumes cfg;
+                };
               };
             };
           };
         };
-      };
 
       ingresses.${name} = with cfg.ingress; {
         metadata.annotations."cert-manager.io/cluster-issuer" = clusterIssuer;
