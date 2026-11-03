@@ -59,7 +59,6 @@ let
     "Music"
     "Podcasts"
     "Youtube"
-    "YT-Cache"
     "Videos"
     "Books"
     "Photos"
