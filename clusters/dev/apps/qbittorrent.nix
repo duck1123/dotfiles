@@ -13,6 +13,11 @@
       path = "${config.devDefaults.nasBase}";
     };
 
+    vpn = {
+      wireguardPrivateKey = secrets.mullvad.qbittorrentWireguardKey;
+      wireguardAddresses = "10.162.206.243/32";
+    };
+
     webui = { inherit (secrets.qbittorrent) password username; };
   };
 }

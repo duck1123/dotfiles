@@ -2,6 +2,7 @@
 with lib;
 let
   password-secret = "qbittorrent-webui-credentials";
+  wireguard-secret = "qbittorrent-mullvad-wireguard";
 in
 rec {
   name = "qbittorrent";
@@ -18,6 +19,9 @@ rec {
         username = cfg.webui.username;
         password = cfg.webui.password;
       };
+    }
+    // lib.optionalAttrs cfg.vpn.enable {
+      ${wireguard-secret}.privateKey = cfg.vpn.wireguardPrivateKey;
     };
 
   extraOptions = {
@@ -35,15 +39,27 @@ rec {
 
     vpn = {
       enable = mkOption {
-        description = mdDoc "Enable VPN routing through shared gluetun service";
+        description = mdDoc "Route all of the pod's traffic through a gluetun sidecar";
         type = types.bool;
         default = true;
       };
 
-      sharedGluetunService = mkOption {
-        description = mdDoc "Service name for shared gluetun (e.g., gluetun.gluetun)";
+      image = mkOption {
+        description = mdDoc "The gluetun docker image";
         type = types.str;
-        default = "gluetun.gluetun";
+        default = "qmcgaw/gluetun:latest@sha256:b0ee2135e6ba52ad3f102aae9663707cd1c9531485117067a380d3b2b6dd991d";
+      };
+
+      wireguardPrivateKey = mkOption {
+        description = mdDoc "WireGuard private key for Mullvad. Don't share it with another tunnel.";
+        type = types.str;
+        default = "";
+      };
+
+      wireguardAddresses = mkOption {
+        description = mdDoc "Comma-separated WireGuard addresses assigned to the key";
+        type = types.str;
+        default = "";
       };
     };
 
@@ -126,6 +142,10 @@ rec {
             spec = {
               automountServiceAccountToken = true;
               serviceAccountName = "default";
+              # gluetun's firewall blocks everything but the tunnel, so DNS has to use
+              # its resolver on localhost too.
+              dnsPolicy = if cfg.vpn.enable then "None" else "ClusterFirst";
+              dnsConfig = if cfg.vpn.enable then { nameservers = [ "127.0.0.1" ]; } else null;
               initContainers =
                 (lib.optionals (cfg.webui.username != "" && cfg.webui.password != "") [
                   {
@@ -311,10 +331,11 @@ rec {
                     ];
                   }
                 ])
-                # gluetun's HTTP proxy only carries TCP, so turn off what needs UDP.
+                # The sidecar carries everything, UDP included, so qBittorrent needs no
+                # proxy. Clears the settings left by the old HTTP proxy setup.
                 ++ (lib.optionals cfg.vpn.enable [
                   {
-                    name = "configure-vpn-proxy";
+                    name = "configure-vpn";
                     image = "busybox:latest";
                     command = [
                       "sh"
@@ -335,19 +356,12 @@ rec {
                           cat /tmp/qBittorrent.conf > "$CONFIG_FILE"
                         }
 
-                        set_key Network 'Proxy\Type' HTTP
-                        set_key Network 'Proxy\IP' ${cfg.vpn.sharedGluetunService}
-                        set_key Network 'Proxy\Port' 8888
-                        set_key Network 'Proxy\AuthEnabled' false
-                        set_key Network 'Proxy\HostnameLookupEnabled' true
-                        set_key Network 'Proxy\Profiles\BitTorrent' true
-                        set_key Network 'Proxy\Profiles\Misc' true
-                        set_key Network 'Proxy\Profiles\RSS' true
-                        set_key BitTorrent 'Session\ProxyPeerConnections' true
-                        set_key BitTorrent 'Session\BTProtocol' TCP
-                        set_key BitTorrent 'Session\DHTEnabled' false
+                        set_key Network 'Proxy\Type' None
+                        set_key BitTorrent 'Session\ProxyPeerConnections' false
+                        set_key BitTorrent 'Session\BTProtocol' Both
+                        set_key BitTorrent 'Session\DHTEnabled' true
                         set_key BitTorrent 'Session\LSDEnabled' false
-                        set_key BitTorrent 'Session\PeXEnabled' false
+                        set_key BitTorrent 'Session\PeXEnabled' true
                       ''
                     ];
                     volumeMounts = [
@@ -394,7 +408,67 @@ rec {
                       }
                     ];
                   }
-                ];
+                ]
+                # A native sidecar: qBittorrent doesn't start until the tunnel is up, and
+                # the firewall stays in place if gluetun restarts.
+                ++ (lib.optionals cfg.vpn.enable [
+                  {
+                    name = "gluetun";
+                    inherit (cfg.vpn) image;
+                    imagePullPolicy = "IfNotPresent";
+                    restartPolicy = "Always";
+                    securityContext.capabilities.add = [
+                      "NET_ADMIN"
+                      "MKNOD"
+                      "NET_RAW"
+                    ];
+                    env = [
+                      {
+                        name = "VPN_SERVICE_PROVIDER";
+                        value = "mullvad";
+                      }
+                      {
+                        name = "VPN_TYPE";
+                        value = "wireguard";
+                      }
+                      {
+                        name = "WIREGUARD_PRIVATE_KEY";
+                        valueFrom.secretKeyRef = {
+                          name = wireguard-secret;
+                          key = "privateKey";
+                        };
+                      }
+                      {
+                        name = "WIREGUARD_ADDRESSES";
+                        value = cfg.vpn.wireguardAddresses;
+                      }
+                      # Lets the ingress and the *arr apps reach the web UI.
+                      {
+                        name = "FIREWALL_INPUT_PORTS";
+                        value = toString cfg.service.port;
+                      }
+                      {
+                        name = "HEALTH_SERVER_ADDRESS";
+                        value = ":9999";
+                      }
+                      {
+                        name = "TZ";
+                        value = cfg.tz;
+                      }
+                    ];
+                    startupProbe = {
+                      httpGet = {
+                        path = "/";
+                        port = 9999;
+                      };
+                      initialDelaySeconds = 5;
+                      periodSeconds = 5;
+                      timeoutSeconds = 3;
+                      successThreshold = 1;
+                      failureThreshold = 30;
+                    };
+                  }
+                ]);
               containers = [
                 {
                   inherit name;
@@ -413,22 +487,7 @@ rec {
                       name = "TZ";
                       value = cfg.tz;
                     }
-                  ]
-                  ++ (lib.optionalAttrs cfg.vpn.enable [
-                    # Configure qBittorrent to use shared gluetun's HTTP proxy
-                    {
-                      name = "HTTP_PROXY";
-                      value = "http://${cfg.vpn.sharedGluetunService}:8888";
-                    }
-                    {
-                      name = "HTTPS_PROXY";
-                      value = "http://${cfg.vpn.sharedGluetunService}:8888";
-                    }
-                    {
-                      name = "NO_PROXY";
-                      value = "localhost,127.0.0.1,.svc,.svc.cluster.local";
-                    }
-                  ]);
+                  ];
                   ports = [
                     {
                       containerPort = cfg.service.port;
@@ -548,51 +607,6 @@ rec {
       };
 
       type = "ClusterIP";
-    };
-
-    # Kill switch: with the VPN on, the pod can only reach DNS and gluetun, so
-    # nothing goes out directly if the proxy or the Mullvad account stops working.
-    networkPolicies = lib.optionalAttrs cfg.vpn.enable {
-      "${name}-vpn-only".spec = {
-        podSelector.matchLabels."app.kubernetes.io/name" = name;
-        policyTypes = [ "Egress" ];
-        egress = [
-          {
-            to = [
-              {
-                namespaceSelector.matchLabels."kubernetes.io/metadata.name" = "kube-system";
-                podSelector.matchLabels.k8s-app = "kube-dns";
-              }
-            ];
-            ports = [
-              {
-                port = 53;
-                protocol = "UDP";
-              }
-              {
-                port = 53;
-                protocol = "TCP";
-              }
-            ];
-          }
-          {
-            to = [
-              {
-                namespaceSelector.matchLabels."kubernetes.io/metadata.name" =
-                  lib.last (lib.splitString "." cfg.vpn.sharedGluetunService);
-                podSelector.matchLabels."app.kubernetes.io/name" =
-                  lib.head (lib.splitString "." cfg.vpn.sharedGluetunService);
-              }
-            ];
-            ports = [
-              {
-                port = 8888;
-                protocol = "TCP";
-              }
-            ];
-          }
-        ];
-      };
     };
 
     # Create NFS PersistentVolume for downloads when NFS is enabled
