@@ -31,7 +31,8 @@ export type Findings = {
   fatal?: { exitCode: number; last: string };
 };
 
-type Rule = { id: string; kind: "damage" | "benign"; re: RegExp };
+// `opening`: only before ffmpeg's first reported position, while it opens the file.
+type Rule = { id: string; kind: "damage" | "benign"; re: RegExp; opening?: boolean };
 
 export const RULES: Rule[] = [
   // Before invalid-data: a decoder rejecting one packet isn't container damage.
@@ -58,6 +59,9 @@ export const RULES: Rule[] = [
   { id: "metadata", kind: "benign", re: /Referenced QT chapter track not found|Unknown cover type|Discarding ID3 tags|deprecated pixel format|Unsupported encoding type|Ignoring attempt to set invalid timebase/ },
   // Old DivX/MS-MPEG4 encoders leave these all through files that play fine.
   { id: "divx-overflow", kind: "benign", re: /dc overflow|ignoring overflow at|I-frame too long, ignoring ext header/ },
+  // ffmpeg probes cover art when it opens a file, though the decode leaves it
+  // out. Later in the decode these lines come from MJPEG video, so stay unknown.
+  { id: "cover-art", kind: "benign", opening: true, re: /^\[mjpeg\] (No JPEG data found in image|bits \d+ is invalid)/ },
   { id: "empty", kind: "benign", re: /^\[[^\]]+\]\s*,?$/ },
 ];
 
@@ -114,7 +118,7 @@ export function classify(
       if (previous) count(previous.rule, previous.t, previous.msg, Number(repeated[1]));
       continue;
     }
-    const rule = RULES.find((r) => r.re.test(msg)) ?? null;
+    const rule = RULES.find((r) => r.re.test(msg) && (!r.opening || line.t === null)) ?? null;
     count(rule, line.t, msg, 1);
     previous = { rule, t: line.t, msg };
   }

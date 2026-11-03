@@ -5,9 +5,10 @@
 // 1. Deletes the quarantined copies of repairs Duck chose to clean up, and the
 //    leftovers he chose to remove.
 // 2. Files whose new copy has been decoded: clean or minor means replaced, and
-//    the original waits for Duck. Damaged goes to quarantine and is tried again,
-//    without blocklisting: the same releases have come back intact, so the
-//    damage was our write path. MAX_ATTEMPTS failures need Duck.
+//    the original waits for Duck. So does unclear, which isn't known damage, and
+//    the new file goes to To review. Damaged goes to quarantine and is tried
+//    again, without blocklisting: the same releases have come back intact, so
+//    the damage was our write path. MAX_ATTEMPTS failures need Duck.
 // 3. Files being searched for: an import queues the new file ahead of the rest.
 //    Nothing downloading after SEARCH_IDLE_HOURS puts the original back.
 // 4. Starts new repairs, up to MAX_ACTIVE, while the NAS keeps MIN_FREE_BYTES.
@@ -34,6 +35,7 @@ const SEARCH_STUCK_HOURS = 48;
 const RETRY_DAYS = 7;
 const LOCK_KEY = 7204411;
 const QUARANTINE = ".quarantine";
+const STILL_LISTED = "Sonarr/Radarr still lists a file after the rescan, and it isn't on disk";
 
 type Row = Record<string, any>;
 type Library = "tv" | "movies";
@@ -133,8 +135,10 @@ class Arr {
     return this.command(this.library === "tv" ? { name: "RescanSeries", seriesId: id } : { name: "RescanMovie", movieId: id });
   }
 
+  /** Queued, not waited for: a search can outlast command()'s wait, and
+   * checkSearch follows what comes of it. */
   search(items: number[]) {
-    return this.command(this.library === "tv" ? { name: "EpisodeSearch", episodeIds: items } : { name: "MoviesSearch", movieIds: items });
+    return this.call("command", this.library === "tv" ? { name: "EpisodeSearch", episodeIds: items } : { name: "MoviesSearch", movieIds: items });
   }
 
   /** Whether an indexer has a release we'd take. With the file still there every
@@ -250,10 +254,40 @@ async function removeLeftovers(arrs: Record<Library, Arr>) {
   return removed;
 }
 
+/** Queue a newly imported file for its decode, ahead of the rest. */
+async function queueDecode(arr: Arr, repair: Row, rel: string) {
+  const stat = statSync(arr.file(rel));
+  const mtime = new Date(Math.floor(stat.mtimeMs / 1000) * 1000);
+  const [file] = await db`
+    insert into media_file (library, path, size, mtime, status, check_first)
+    values (${arr.library}, ${rel}, ${stat.size}, ${mtime}, 'queued', true)
+    on conflict (library, path) do update set
+      check_first = true,
+      status = case
+        when media_file.size <> excluded.size or media_file.mtime <> excluded.mtime
+          or media_file.status in ('missing', 'replace_requested') then 'queued'
+        else media_file.status end,
+      size = excluded.size,
+      mtime = excluded.mtime
+    returning id`;
+  await update(repair.id, { state: "verifying", replacement_file_id: file.id, note: null });
+}
+
 async function retrySearch(arr: Arr, repair: Row) {
   await arr.rescan(repair.arr_parent_id);
-  if (await arr.currentFile(repair.arr_parent_id, repair.arr_item_ids)) {
-    throw new Error("Sonarr/Radarr still lists a file after the rescan");
+  const rel = await arr.currentFile(repair.arr_parent_id, repair.arr_item_ids);
+  if (rel) {
+    // The original is in quarantine, so a file on disk here is a new one.
+    if (exists(arr.file(rel))) {
+      await queueDecode(arr, repair, rel);
+      return;
+    }
+    // Its mount may not have seen the move yet, so this gets one more run.
+    if (repair.note === STILL_LISTED) {
+      await needsDuck(repair.id, STILL_LISTED);
+      return;
+    }
+    throw new Error(STILL_LISTED);
   }
   await arr.search(repair.arr_item_ids);
   await update(repair.id, { state: "searching", search_started_at: new Date(), note: null });
@@ -265,7 +299,11 @@ async function checkDecoded(arr: Arr, repair: Row) {
     await update(repair.id, { state: "replaced", note: null });
     return;
   }
-  if (file.status !== "suspect" && file.status !== "unclear") {
+  if (file.status === "unclear") {
+    await update(repair.id, { state: "replaced", note: "The new file's decode logged errors the checker doesn't recognize, so it's in To review." });
+    return;
+  }
+  if (file.status !== "suspect") {
     if (file.status === "missing") await needsDuck(repair.id, `The replacement disappeared: ${file.path}`);
     return;
   }
@@ -322,21 +360,7 @@ async function checkSearch(arr: Arr, repair: Row) {
   }
   const rel = await arr.currentFile(repair.arr_parent_id, repair.arr_item_ids);
   if (rel) {
-    const stat = statSync(arr.file(rel));
-    const mtime = new Date(Math.floor(stat.mtimeMs / 1000) * 1000);
-    const [file] = await db`
-      insert into media_file (library, path, size, mtime, status, check_first)
-      values (${arr.library}, ${rel}, ${stat.size}, ${mtime}, 'queued', true)
-      on conflict (library, path) do update set
-        check_first = true,
-        status = case
-          when media_file.size <> excluded.size or media_file.mtime <> excluded.mtime
-            or media_file.status in ('missing', 'replace_requested') then 'queued'
-          else media_file.status end,
-        size = excluded.size,
-        mtime = excluded.mtime
-      returning id`;
-    await update(repair.id, { state: "verifying", replacement_file_id: file.id, note: null });
+    await queueDecode(arr, repair, rel);
     return;
   }
   const hours = (Date.now() - new Date(repair.search_started_at).getTime()) / 3_600_000;
