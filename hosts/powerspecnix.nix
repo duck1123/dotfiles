@@ -76,7 +76,7 @@ in
 
     mediacheck.enable = true;
 
-    music.enable = false;
+    music.enable = true;
     network.enable = true;
     nfs.enable = false;
     nix = {
@@ -87,9 +87,9 @@ in
     nushell.enable = true;
     obsidian.enable = false;
     office.enable = false;
-    pictures.enable = false;
+    pictures.enable = true;
     python.enable = true;
-    radio.enable = false;
+    radio.enable = true;
     sddm.enable = false;
 
     sims4 = {
