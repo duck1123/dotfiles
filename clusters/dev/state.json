@@ -347,6 +347,6 @@
     "enable": false
   },
   "ytdl-sub": {
-    "enable": true
+    "enable": false
   }
 }
