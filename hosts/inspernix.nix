@@ -40,6 +40,7 @@ in
     java.enable = true;
     jujutsu.enable = false;
     kubernetes.client.enable = true;
+    music.enable = true;
     network.enable = true;
     nfs.enable = true;
     nix = {
