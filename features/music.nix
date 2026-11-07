@@ -3,6 +3,9 @@
     { pkgs, ... }:
     {
       home.packages = with pkgs; [
+        # amidi (sysex send/receive), aconnect, amixer/alsamixer
+        alsa-utils
+
         # Multi-track hard disk recording software
         ardour
 
@@ -10,6 +13,9 @@
 
         # Audio plugin host
         carla
+
+        # DX7 FM synth plugin and patch editor (FM-1 sysex banks)
+        dexed
 
         guitarix
 
@@ -20,6 +26,9 @@
         # lmms
 
         musescore
+
+        # PipeWire patchbay for audio/MIDI routing
+        qpwgraph
 
         qjackctl
 
