@@ -67,7 +67,11 @@
       cfg = config.host.features.sims4;
     in
     {
-      home.packages = [ pkgs.rsync ];
+      home.packages = [
+        pkgs.rsync
+        # `sims sources index` unpacks downloads with it: 7z, zip and rar
+        pkgs._7zz-rar
+      ];
 
       xdg.configFile."simsnix/config.json".text = builtins.toJSON {
         inherit (cfg)

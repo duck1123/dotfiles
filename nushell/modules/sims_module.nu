@@ -594,6 +594,16 @@ def file-kind [rel: string, grouping: record]: nothing -> string {
   } else { 'file' }
 }
 
+# The import/<name>.json records (not grouping.json or grouping.suggested.json)
+def import-reports [data: path]: nothing -> list<path> {
+  let dir = $data | path join import
+  if not ($dir | path exists) { return [] }
+  ls $dir | where {|f|
+    let base = $f.name | path basename
+    ($base | str ends-with .json) and not ($base | str starts-with grouping)
+  } | get name
+}
+
 def read-grouping [data: path]: nothing -> record {
   let file = $data | path join import grouping.json
   let found = if ($file | path exists) { open $file } else { {} }
@@ -828,10 +838,7 @@ export def "sims import" [
     sharedHashes: ($owner | where kind == file | group-by sha256 | values | where {|v| ($v | get mod | uniq | length) > 1 } | each {|v| $v | get path })
     applied: false
   }
-  let import_dir = $data | path join import
-  let old_reports = if ($import_dir | path exists) {
-    ls $import_dir | where {|f| ($f.name | path basename) != grouping.json and ($f.name | str ends-with .json) } | get name
-  } else { [] }
+  let old_reports = import-reports $data
   let summary = if $fresh {
     $summary | insert removes {mods: ($old_catalog | length), reports: ($old_reports | each { path basename })}
   } else { $summary }
@@ -897,12 +904,12 @@ export def "sims status" [
   let catalog_hashes = read-catalog $data | each {|c|
     $c.mod.versions | values | each {|v| $v.files | get sha256 } | flatten
   } | flatten | uniq
-  let imports_dir = $data | path join import
-  let reports = if ($imports_dir | path exists) { ls $imports_dir | where {|f| ($f.name | path basename) != grouping.json and ($f.name | str ends-with .json) } } else { [] }
-  let report_hashes = $reports | each {|r| open $r.name | get files | get sha256 } | flatten | uniq
+  let report_hashes = import-reports $data | each {|r| open $r | get files | get sha256 } | flatten | uniq
+  # downloads stored by `sims sources index --apply` (not the archives inside them)
+  let source_hashes = read-sources $data | where in == null | get -o sha256 | default []
   let root = blob-root
   let blob_list = if ($root | path exists) { ^find $root -type f -printf "%s %f\n" | lines | parse '{size} {sha256}' } else { [] }
-  let known = $catalog_hashes | append $report_hashes | uniq
+  let known = $catalog_hashes | append $report_hashes | append $source_hashes | uniq
   {
     instance: $i.name
     profile: $name
@@ -917,4 +924,261 @@ export def "sims status" [
     blobsMissing: ($known | where $it not-in ($blob_list | get -o sha256 | default []))
     blobsUnreferenced: ($blob_list | where sha256 not-in $known | length)
   }
+}
+
+# Download sources. The archives and loose mod files that mods were installed from,
+# indexed by what's inside them so installed files can be traced back to their download.
+# The index is <dataDir>/archives.json:
+#   [{ sha256, name, size, paths, in, error?, members: [{ path, size, sha256 }] }]
+# `paths` is where the file has been seen. An archive inside another has `in` (the
+# outer one's sha256) and is a source of its own.
+
+const mod_exts = [package ts4script]
+
+def read-sources [data: path]: nothing -> table {
+  let file = $data | path join archives.json
+  if ($file | path exists) { open $file } else { [] }
+}
+
+def ext-of [name: string]: nothing -> string {
+  $name | path parse | get extension | str lowercase
+}
+
+def sha256-of [file: path]: nothing -> string {
+  let r = ^sha256sum -z -- $file | complete
+  if $r.exit_code != 0 { error make {msg: $"can't hash ($file): ($r.stderr)"} }
+  $r.stdout | str substring 0..<64
+}
+
+# Index one archive: unpack it into a scratch folder, hash what's in it, then do the
+# same for the archives inside it
+def index-archive [file: path, sha256: string, name: string, parent: any, tmp: path, depth: int]: nothing -> list<record> {
+  let out = mktemp -d -p $tmp
+  let r = ^7zz x -y -bso0 -bsp0 -p- $"-o($out)" -- $file | complete
+  ^chmod -R u+rwX $out
+  let members = if $r.exit_code == 0 { hash-tree $out } else { [] }
+  let entry = {
+    sha256: $sha256
+    name: $name
+    size: (ls $file | get size.0 | into int)
+    paths: []
+    in: $parent
+    members: ($members | select -o path size sha256)
+  }
+  let entry = if $r.exit_code == 0 { $entry } else { $entry | insert error ($r.stderr | str trim) }
+  let nested = if $depth >= 3 { [] } else {
+    $members | where {|m| (ext-of $m.path) in $archive_exts } | each {|m|
+      index-archive ($out | path join $m.path) $m.sha256 ($m.path | path basename) $sha256 $tmp ($depth + 1)
+    } | flatten
+  }
+  rm -rf $out
+  [$entry ...$nested]
+}
+
+# Index the downloads in a folder: every archive (7z, rar, zip) and loose .package or
+# .ts4script file, at any depth. Dry run unless --apply, which unpacks the new ones in
+# a scratch folder beside the blob store, adds them to archives.json and copies each
+# download into the blob store. Downloads already indexed (by hash) aren't unpacked again.
+export def "sims sources index" [
+  dir: path                      # folder of downloads; only read
+  --skip (-s): list<string> = [] # regexes of paths (relative to dir) to leave out
+  --apply                        # unpack, index and store the new downloads
+]: nothing -> record {
+  let dir = $dir | path expand
+  let data = sims-config | get dataDir | path expand
+  let index = read-sources $data
+  let listing = ^find $dir -type f -printf "%s\t%P\\0" | complete
+  if $listing.exit_code != 0 { error make {msg: $"can't read ($dir): ($listing.stderr)"} }
+  let found = $listing.stdout | split row (char nul) | where $it != '' | each {|e|
+    let parts = $e | split row (char tab)
+    {path: ($parts | skip 1 | str join (char tab)), size: ($parts.0 | into int)}
+  } | where {|f| (ext-of $f.path) in [...$archive_exts ...$mod_exts] and not ($skip | any {|re| $f.path =~ $re }) }
+  let hashed = $found | par-each {|f| $f | insert sha256 (sha256-of ($dir | path join $f.path)) } | sort-by path
+  let known = $index | get -o sha256 | default []
+  let new = $hashed | where sha256 not-in $known | uniq-by sha256
+  let summary = {
+    dir: $dir
+    downloads: ($hashed | length)
+    size: ($hashed | total-size)
+    archives: ($hashed | where {|f| (ext-of $f.path) in $archive_exts } | length)
+    modFiles: ($hashed | where {|f| (ext-of $f.path) in $mod_exts } | length)
+    duplicates: (($hashed | length) - ($hashed | uniq-by sha256 | length))
+    new: ($new | length)
+    newSize: ($new | total-size)
+    applied: false
+  }
+  if not $apply {
+    print 'dry run: add --apply to unpack, index and store the new downloads'
+    return $summary
+  }
+
+  let root = blob-root
+  let tmp = sims-config | get blobDir | path expand | path join tmp
+  mkdir $root $tmp
+  let added = $new | par-each --threads 4 {|f|
+    let file = $dir | path join $f.path
+    store-blob $root $file $f.sha256
+    let name = $f.path | path basename
+    if (ext-of $f.path) in $mod_exts {
+      [{sha256: $f.sha256, name: $name, size: $f.size, paths: [], in: null, members: [{path: $name, size: $f.size, sha256: $f.sha256}]}]
+    } else {
+      index-archive $file $f.sha256 $name null $tmp 0
+    }
+  } | flatten
+  rm -rf $tmp
+  # where each download is now, added to where it was seen before
+  let home = $env.HOME
+  let seen = $hashed | group-by sha256 | transpose sha256 rows | reduce -f {} {|g, acc|
+    $acc | insert $g.sha256 ($g.rows | each {|r| $dir | path join $r.path | str replace -r $"^($home | str escape-regex)/" '~/' })
+  }
+  # a download that is also inside another archive is kept as a download
+  let merged = $index | append $added | sort-by {|s| $s.in != null } | uniq-by sha256 | each {|s|
+    $s | update paths ($s.paths | append ($seen | get -o $s.sha256 | default []) | uniq | sort)
+  } | sort-by name
+  $merged | to json -i 2 | save -f ($data | path join archives.json)
+  $summary | merge {
+    indexed: ($added | length)
+    errors: ($added | where {|s| $s.error? != null } | each {|s| {name: $s.name, error: $s.error} })
+    applied: true
+  }
+}
+
+# An id for a download that becomes a mod of its own: the creator of the mods its files
+# were in (when they agree), else a guess from its name, then its name without the
+# creator, the version or a WW_ prefix
+def source-id [name: string, was: list<string>, stems: list<string>]: nothing -> string {
+  let creators = $was | each {|m| $m | split row '/' | first } | uniq | where $it != unknown
+  if ($creators | length) != 1 { return (guess-id $name $stems) }
+  let creator = $creators.0
+  let stem = split-version (without-ext $name) | get stem
+  let rest = $stem | str replace -a -r '[^A-Za-z0-9]+' ' ' | str trim | split row ' ' | where {|t|
+    ($t | str lowercase) not-in [$creator ww]
+  } | str join '-' | slug
+  $"($creator)/($rest | default -e mod)"
+}
+
+# Trace an import's mod files back to the downloads they came from (index them with
+# `sims sources index` first). Each .package and .ts4script file is matched by hash.
+# When several downloads have it, the one most fully installed wins, then the one with
+# the fewest mod files, so a mod's own archive beats an older version or a bundle.
+#
+# Each download that matched is one row, with `change`:
+#   same     it is exactly one mod of the import, all of whose files it has
+#   partial  one mod, but only some of its files (often an older version)
+#   split    one of several downloads that one mod's files came from
+#   merge    it has the files of several mods
+# A split or merged download gets a new id: the creator of the mods it came from (when
+# they agree) and the download's name. --write saves import/grouping.suggested.json:
+# grouping.json plus a rule for each split or merge (ahead of the hand-written rules)
+# matching its files, and whole top folders that came from it alone. Hand-written
+# `groups` entries that would hide those rules become rules after them, so they still
+# take the files the downloads didn't.
+export def "sims sources match" [
+  --import (-i): string = 'frozen-live' # the import/<name>.json to match
+  --write                               # write import/grouping.suggested.json
+]: nothing -> record {
+  let data = sims-config | get dataDir | path expand
+  let sources = read-sources $data
+  if ($sources | is-empty) { error make {msg: "no archives.json: run `sims sources index` first"} }
+  let report_file = $data | path join import $"($import).json"
+  if not ($report_file | path exists) { error make {msg: $"no import ($import) in ($data)/import"} }
+  let report = open $report_file
+  let live = $report.files | where kind == file | where {|f| (ext-of $f.path) in $mod_exts } | select path sha256 mod
+  let live_hashes = $live | get sha256 | uniq
+  let names = $sources | reduce -f {} {|s, acc| $acc | upsert $s.sha256 $s.name }
+  let members = $sources | each {|s|
+    $s.members | where {|m| (ext-of $m.path) in $mod_exts } | get sha256 | uniq | each {|h| {sha256: $h, source: $s.sha256} }
+  } | flatten
+  let scored = $sources | each {|s|
+    let mine = $members | where source == $s.sha256
+    let matched = $mine | where sha256 in $live_hashes | length
+    {source: $s.sha256, name: $s.name, in: $s.in, n: ($mine | length), matched: $matched}
+  } | where matched > 0 | insert coverage {|s| $s.matched / $s.n }
+  let best = $live | join $members sha256 | join $scored source | group-by path | values | each {|rows|
+    $rows | sort-by -c {|a, b|
+      if $a.coverage != $b.coverage { $a.coverage > $b.coverage
+      } else if $a.n != $b.n { $a.n < $b.n
+      } else { $a.name > $b.name }
+    } | first
+  }
+  let unmatched = $live | where path not-in ($best | get -o path | default [])
+
+  # which downloads each mod of the import came from, and its unmatched files
+  let mod_spread = $live | get mod | uniq | each {|m|
+    {mod: $m, sources: ($best | where mod == $m | get source | uniq), unmatched: ($unmatched | where mod == $m | length)}
+  }
+  let stems = $best | get name | uniq | each {|n| first-token (split-version (without-ext $n) | get stem) | str lowercase }
+  # a mod that is split up or merged, with no files left over, frees its id for a piece
+  let merged_mods = $best | group-by source | values | where {|rows| ($rows | get mod | uniq | length) > 1 } | each { get mod } | flatten
+  let freed = $mod_spread | where {|m| $m.unmatched == 0 and (($m.sources | length) > 1 or $m.mod in $merged_mods) } | get mod
+  mut taken = read-catalog $data | get -o id | default [] | where $it not-in $freed
+  mut suggestions = []
+  for rows in ($best | group-by source | values | sort-by {|r| $r.0.name }) {
+    let r0 = $rows.0
+    let mods = $rows | get mod | uniq
+    let spread = $mod_spread | where mod in $mods
+    let change = if ($mods | length) > 1 { 'merge'
+    } else if ($spread.0.sources | length) > 1 { 'split'
+    } else if $spread.0.unmatched > 0 { 'partial'
+    } else { 'same' }
+    let id = if $change in [same partial] { $mods.0 } else {
+      let guess = source-id $r0.name $mods $stems
+      if $guess in $taken {
+        2.. | each {|n| $"($guess)-($n)" } | where $it not-in $taken | first
+      } else { $guess }
+    }
+    $taken = $taken | append $id
+    $suggestions = $suggestions | append {
+      change: $change
+      mod: $id
+      source: $r0.name
+      in: ($names | get -o ($r0.in | default ''))
+      version: (split-version (without-ext $r0.name) | get version)
+      files: ($rows | length)
+      of: $r0.n
+      was: $mods
+      paths: ($rows | get path | sort)
+    }
+  }
+  let suggestions = $suggestions
+
+  let summary = {
+    import: $import
+    modFiles: ($live | length)
+    matched: ($best | length)
+    unmatched: ($unmatched | length)
+    changes: ($suggestions | group-by change | transpose change rows | each {|c| {change: $c.change, downloads: ($c.rows | length)} })
+    mods: ($suggestions | reject paths | sort-by mod)
+    unmatchedByMod: ($unmatched | group-by mod | transpose mod rows | each {|g| {mod: $g.mod, files: ($g.rows | get path)} } | sort-by mod)
+    written: null
+  }
+  if not $write { return $summary }
+
+  let grouping = read-grouping $data
+  let all_paths = $report.files | where kind != unmanaged | get path
+  # one rule per download (a mod in both `groups` and `rules` would be two groups):
+  # whole top folders that came from it alone, then its other files
+  let rules = $suggestions | where change in [split merge] | each {|s|
+    let folders = $s.paths | where {|p| $p | str contains '/' } | each {|p| $p | path split | first } | uniq | where {|f|
+      $live | where {|l| $l.path | str starts-with $"($f)/" } | get path | all {|p| $p in $s.paths }
+    }
+    let loose = $s.paths | where {|p| not ($folders | any {|f| $p | str starts-with $"($f)/" }) }
+    let parts = ($folders | each {|f| ($f | str escape-regex) + '/.*' }) ++ ($loose | each { str escape-regex })
+    {match: ('^(?:' + ($parts | str join '|') + ')$'), mod: $s.mod, version: $s.version}
+  }
+  let ruled = $rules | each {|r| $all_paths | where $it =~ $r.match } | flatten
+  let hidden = {|k| $ruled | any {|p| $p == $k or ($p | str starts-with $"($k)/") } }
+  let kept = $grouping.groups | transpose k v | where {|g| not (do $hidden $g.k) } | reduce -f {} {|g, acc| $acc | insert $g.k $g.v }
+  # hand-written groups the new rules would hide become rules after them, so they
+  # still take the files the downloads didn't
+  let demoted = $grouping.groups | transpose k v | where {|g| do $hidden $g.k }
+  let demoted_rules = $demoted | each {|g| $g.v | insert match ('^' + ($g.k | str escape-regex) + '(?:/|$)') }
+  let file = $data | path join import grouping.suggested.json
+  $grouping | merge {
+    groups: $kept
+    rules: ([...$rules ...$demoted_rules ...$grouping.rules] | each {|r|
+      if $r.version? == null { $r | select match mod } else { $r | select match mod version }
+    })
+  } | to json -i 2 | save -f $file
+  $summary | update written $file | insert groupsToRules ($demoted | get k)
 }
