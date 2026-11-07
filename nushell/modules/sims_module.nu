@@ -657,8 +657,9 @@ def assign-groups [files: table, grouping: record]: nothing -> table {
     } else if $is_folder { $group } else { null }
     let kind = file-kind $f.path $grouping
     let name = if $folder == null { $f.path } else { $f.path | str substring (($folder | str length -g) + 1).. -g }
+    # a loose state file belongs to no mod, unless a rule or a `groups` key gives it one
     $f | insert group $group | insert folder $folder | insert name $name | insert kind (
-      if $folder == null and $kind == state { 'unmanaged' } else { $kind }
+      if $folder == null and $rule == null and $key == null and $kind == state { 'unmanaged' } else { $kind }
     )
   }
 }
