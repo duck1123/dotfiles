@@ -362,6 +362,15 @@ rec {
                         set_key BitTorrent 'Session\DHTEnabled' true
                         set_key BitTorrent 'Session\LSDEnabled' false
                         set_key BitTorrent 'Session\PeXEnabled' true
+                        # Bind to the tunnel by name. Bound to its address, qBittorrent lost
+                        # its tunnel sockets when gluetun recreated tun0 and never got them
+                        # back, which left DHT at 0 nodes.
+                        set_key BitTorrent 'Session\Interface' tun0
+                        set_key BitTorrent 'Session\InterfaceName' tun0
+                        set_key BitTorrent 'Session\InterfaceAddress' '''
+                        # POSIX-compliant disk I/O. The default, mmap, gives intermittent
+                        # "Permission denied" from file_open on the NFS downloads share.
+                        set_key BitTorrent 'Session\DiskIOType' 2
                       ''
                     ];
                     volumeMounts = [
