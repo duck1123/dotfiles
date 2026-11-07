@@ -368,9 +368,9 @@ rec {
                         set_key BitTorrent 'Session\Interface' tun0
                         set_key BitTorrent 'Session\InterfaceName' tun0
                         set_key BitTorrent 'Session\InterfaceAddress' '''
-                        # POSIX-compliant disk I/O. The default, mmap, gives intermittent
-                        # "Permission denied" from file_open on the NFS downloads share.
-                        set_key BitTorrent 'Session\DiskIOType' 2
+                        # POSIX-compliant disk I/O; libtorrent's default, mmap, is a poor fit
+                        # for the NFS downloads share. Enums are stored by name, not number.
+                        set_key BitTorrent 'Session\DiskIOType' Posix
                       ''
                     ];
                     volumeMounts = [
