@@ -740,10 +740,15 @@ def plan-group [g: record, label: string, is_live: bool, name: string]: nothing 
 # --profile marks this as the set in use: its mods are pinned to these versions and
 # listed in that profile. Without it the folder is history: older versions of known
 # mods, and unknown mods in no profile.
+#
+# --fresh starts the catalog over, after grouping.json changes: it ignores the mods
+# already in it and, with --apply, deletes them and every import/<name>.json first.
+# Re-run the other imports (without --fresh) after it. The blob store is kept.
 export def "sims import" [
   dir: path                # folder to import; only read
   --name (-n): string      # name of this import, for import/<name>.json
   --profile (-p): string   # write this profile from the folder
+  --fresh                  # start from an empty catalog
   --apply                  # write the blobs and the catalog
 ]: nothing -> record {
   if $name == null { error make {msg: "give the import a --name"} }
@@ -754,7 +759,8 @@ export def "sims import" [
   let scanned = hash-tree $dir
   let today = date now | format date '%Y-%m-%d'
   let files = assign-groups $scanned $grouping
-  let catalog = read-catalog $data
+  let old_catalog = read-catalog $data
+  let catalog = if $fresh { [] } else { $old_catalog }
   let known = $catalog | each {|c|
     let label = $c.mod.version? | default ($c.mod.versions | columns | sort | last)
     {
@@ -822,11 +828,25 @@ export def "sims import" [
     sharedHashes: ($owner | where kind == file | group-by sha256 | values | where {|v| ($v | get mod | uniq | length) > 1 } | each {|v| $v | get path })
     applied: false
   }
+  let import_dir = $data | path join import
+  let old_reports = if ($import_dir | path exists) {
+    ls $import_dir | where {|f| ($f.name | path basename) != grouping.json and ($f.name | str ends-with .json) } | get name
+  } else { [] }
+  let summary = if $fresh {
+    $summary | insert removes {mods: ($old_catalog | length), reports: ($old_reports | each { path basename })}
+  } else { $summary }
   if not $apply {
     print 'dry run: add --apply to write the blobs and the catalog'
     return $summary
   }
 
+  if $fresh {
+    for c in $old_catalog { rm $c.path }
+    for d in (ls ($data | path join mods) | where type == dir | get name) {
+      if (ls -a $d | is-empty) { rm $d }
+    }
+    for r in $old_reports { rm $r }
+  }
   mkdir $root
   $new_blobs | par-each {|f| store-blob $root $"($dir)/($f.path)" $f.sha256 }
   # several groups can be versions of one mod: the last plan has them all
