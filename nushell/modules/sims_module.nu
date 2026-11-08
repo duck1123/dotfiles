@@ -993,6 +993,198 @@ export def "sims validate" [
   {ok: $ok, catalog: $all.failures, profiles: $results}
 }
 
+# Switching an instance's Mods/ to a profile. simsnix owns only the files it installed
+# or adopted, as listed in Mods/.simsnix-state.json:
+#   { profile, switched, files: [{ target, sha256, mod }], dirs: [folder, ...] }
+# `dirs` are the folders a switch created; one is removed once it's empty. Every
+# other file in Mods/ is loose: never changed, moved or deleted.
+
+const switch_state = '.simsnix-state.json'
+
+def read-switch-state [mods_dir: path]: nothing -> record {
+  let file = $mods_dir | path join $switch_state
+  let found = if ($file | path exists) { open $file } else { {} }
+  {profile: null, switched: null, files: [], dirs: []} | merge $found
+}
+
+# By process name (Wine names the game's process after its .exe), not command line,
+# so a shell or editor that mentions it doesn't count
+def game-running []: nothing -> bool {
+  ^ps -eo comm= | lines | any {|c| ($c | str trim) =~ '^TS4_(DX9_)?x64\.exe$' }
+}
+
+# Put a manifest file at dest: a hardlink to its blob (a copy on another filesystem),
+# or unpacked from its archive's blob and checked against its hash
+def install-file [root: path, tmp: path, f: record, dest: path] {
+  if $f.archive? == null {
+    let src = $root | path join $f.sha256
+    if (^ln -- $src $dest | complete | get exit_code) != 0 {
+      let c = ^cp -- $src $dest | complete
+      if $c.exit_code != 0 { error make {msg: $"can't install ($f.target): ($c.stderr)"} }
+    }
+  } else {
+    let out = mktemp -d -p $tmp
+    # -spd: the member's name is not a wildcard
+    let r = ^7zz e -y -bso0 -bsp0 -p- -spd $"-o($out)" -- ($root | path join $f.archive) $f.member | complete
+    let file = $out | path join ($f.member | path basename)
+    if $r.exit_code != 0 or not ($file | path exists) {
+      rm -rf $out
+      error make {msg: $"can't unpack ($f.member) for ($f.target): ($r.stderr)"}
+    }
+    if (sha256-of $file) != $f.sha256 {
+      rm -rf $out
+      error make {msg: $"($f.member) in ($f.archive) doesn't match its recorded hash"}
+    }
+    ^chmod 444 -- $file
+    ^mv -- $file $dest
+    rm -rf $out
+  }
+}
+
+# Folders above `rel` (relative to Mods/) that don't exist yet, outermost first
+def missing-dirs [mods_dir: path, rel: string]: nothing -> list<string> {
+  let parts = $rel | path split | drop 1
+  0..<($parts | length) | each {|n| $parts | first ($n + 1) | path join } | where {|d|
+    not ($mods_dir | path join $d | path exists)
+  }
+}
+
+# Install a profile into an instance's Mods/. Dry run unless --apply.
+#
+# Every file of the profile is checked against what's there. A file with the right
+# content is kept (adopted, if simsnix didn't install it). A missing one is installed.
+# A file simsnix owns that the profile no longer has is removed. Nothing simsnix
+# doesn't own is ever touched: a different file at a profile's path is a conflict, and
+# --apply refuses until it's resolved by hand. A file simsnix installed that has changed
+# since is a conflict too, unless --force; one the profile dropped is then left in place
+# and disowned.
+#
+# --apply refuses while the game runs, and first backs up the newest save (`sims save
+# backup`) unless --no-backup.
+export def "sims switch" [
+  profile: string                                       # profile to install
+  --instance (-i): string@"nu-complete sims instances" # instance (default from config)
+  --apply                                               # change Mods/
+  --force                                               # replace or remove simsnix's files even if changed
+  --no-backup                                           # don't back up the newest save first
+]: nothing -> record {
+  let i = instance $instance
+  let mods_dir = $i.documents | path join Mods
+  if not ($mods_dir | path exists) { error make {msg: $"($mods_dir) not found"} }
+  let manifest = sims manifest $profile
+  let state = read-switch-state $mods_dir
+  let live = hash-tree $mods_dir | where path != $switch_state
+  let key = {|p| $p | str lowercase }
+  let live_by = $live | group-by {|f| do $key $f.path }
+  let owned_by = $state.files | group-by {|f| do $key $f.target }
+  let wanted_keys = $manifest.files | each {|f| do $key $f.target }
+
+  let wanted_ops = $manifest.files | each {|w|
+    let k = do $key $w.target
+    let l = $live_by | get -o $k | get -o 0
+    let o = $owned_by | get -o $k | get -o 0
+    let op = if $l == null { 'install'
+    } else if $l.sha256 == $w.sha256 { if $o != null { 'keep' } else { 'adopt' }
+    } else if $o != null and ($o.sha256 == $l.sha256 or $force) { 'replace'
+    } else { 'conflict' }
+    let reason = if $op != conflict { null } else if $o != null { 'changed since simsnix installed it' } else { "not simsnix's file" }
+    $w | insert op $op | insert path ($l.path? | default $w.target) | insert reason $reason
+  }
+  let dropped_ops = $state.files | where {|o| (do $key $o.target) not-in $wanted_keys } | each {|o|
+    let l = $live_by | get -o (do $key $o.target) | get -o 0
+    let op = if $l == null { 'gone' } else if $l.sha256 == $o.sha256 or $force { 'remove' } else { 'disown' }
+    $o | insert op $op | insert path ($l.path? | default $o.target)
+  }
+  let ops = [...$wanted_ops ...$dropped_ops]
+  let conflicts = $ops | where op == conflict
+  let owned_keys = $state.files | each {|o| do $key $o.target }
+  let loose = $live | where {|f| (do $key $f.path) not-in $wanted_keys and (do $key $f.path) not-in $owned_keys } | get path | each {|p| $mods_dir | path join $p }
+  let count = {|name| $ops | where op == $name | length }
+  let summary = {
+    instance: $i.name
+    profile: $profile
+    from: $state.profile
+    keep: (do $count keep)
+    adopt: (do $count adopt)
+    install: (do $count install)
+    replace: (do $count replace)
+    remove: (do $count remove)
+    disown: (do $count disown)
+    gone: (do $count gone)
+    changes: ($ops | where op in [install replace remove disown] | select op path mod)
+    conflicts: ($conflicts | select path mod reason)
+    loose: $loose
+    applied: false
+  }
+  if not $apply {
+    print 'dry run: add --apply to change Mods/'
+    return $summary
+  }
+  if ($conflicts | is-not-empty) {
+    error make {msg: $"($conflicts | length) conflict\(s\): resolve them by hand first \(see `sims switch ($profile)` without --apply\)"}
+  }
+  if (game-running) { error make {msg: 'the game is running: close it first'} }
+  let changing = ($ops | where op in [install replace remove] | is-not-empty)
+  if $changing and not $no_backup {
+    try {
+      sims save backup --instance $i.name --label $"before-switch-($profile)" | ignore
+    } catch {|e|
+      error make {msg: $"nothing changed: the save backup failed \(($e.msg)\); pass --no-backup to switch without one"}
+    }
+  }
+
+  let root = blob-root
+  let tmp = sims-config | get blobDir | path expand | path join tmp
+  mkdir $tmp
+  # removals first, so a path can move from one mod to another
+  let order = {|op| match $op { remove => 0, disown => 0, gone => 0, replace => 1, install => 2, _ => 3 } }
+  let start = {files: ($state.files | where {|o| (do $key $o.target) in $wanted_keys }), dirs: $state.dirs, error: null}
+  let result = $ops | sort-by {|op| do $order $op.op } | reduce -f $start {|op, acc|
+    if $acc.error != null { $acc } else {
+      try {
+        let dest = $mods_dir | path join $op.path
+        let k = do $key $op.target
+        let without = $acc.files | where {|f| (do $key $f.target) != $k }
+        let entry = {target: $op.path, sha256: $op.sha256, mod: $op.mod}
+        match $op.op {
+          'remove' => { rm -f $dest; $acc }
+          'disown' | 'gone' => { $acc }
+          'keep' | 'adopt' => { $acc | update files ($without | append $entry) }
+          _ => {
+            let new_dirs = missing-dirs $mods_dir $op.path
+            if $new_dirs != [] { mkdir ($dest | path dirname) }
+            if $op.op == replace { rm -f $dest }
+            install-file $root $tmp $op $dest
+            {files: ($without | append $entry), dirs: ($acc.dirs | append $new_dirs | uniq), error: null}
+          }
+        }
+      } catch {|e| $acc | update error $"($op.path): ($e.msg)" }
+    }
+  }
+  rm -rf $tmp
+  # the folders simsnix made that are now empty, deepest first
+  let dirs = $result.dirs | sort-by {|d| $d | path split | length } --reverse | reduce -f [] {|d, kept|
+    let full = $mods_dir | path join $d
+    if not ($full | path exists) { $kept
+    } else if (ls -a $full | is-empty) { rm $full; $kept
+    } else { $kept | append $d }
+  } | sort
+  {
+    profile: (if $result.error == null { $profile } else { $state.profile })
+    switched: (date now | format date '%Y-%m-%dT%H:%M:%S')
+    files: ($result.files | sort-by target)
+    dirs: $dirs
+  } | to json -i 2 | save -f ($mods_dir | path join $switch_state)
+  if $result.error != null {
+    error make {msg: $"switch stopped at ($result.error); .simsnix-state.json records what was done"}
+  }
+  let thumbs = $i.documents | path join localthumbcache.package
+  if $changing and ($thumbs | path exists) {
+    print $"mods changed: the game rebuilds ($thumbs) if you delete it"
+  }
+  $summary | update applied true
+}
+
 def "nu-complete sims mods" []: nothing -> list<string> {
   let dir = sims-config | get dataDir | path expand | path join mods
   if not ($dir | path exists) { return [] }

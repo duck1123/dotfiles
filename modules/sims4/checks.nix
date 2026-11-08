@@ -85,6 +85,22 @@ _: {
 
         "archive junk is not installed" = !(lib.any (lib.hasSuffix "readme.txt") (targets default));
 
+        "an archive member names its archive" =
+          lib.filter (f: f.target == "acme_widgets/widgets.package") default.manifest.files == [
+            {
+              mod = "acme/widgets";
+              version = "2.0";
+              target = "acme_widgets/widgets.package";
+              sha256 = "b202";
+              archive = "b200";
+              member = "Widgets/widgets.package";
+            }
+          ];
+
+        "a plain file names no archive" = lib.all (f: f.archive == null && f.member == null) (
+          lib.filter (f: f.target == "zed_loose.package") default.manifest.files
+        );
+
         "a mod's own option selects files" = lib.elem "acme_variants/variants-extras.package" (
           targets (run {
             extraModules = [ { sims4.mods.acme.variants.variant = lib.mkForce "full"; } ];

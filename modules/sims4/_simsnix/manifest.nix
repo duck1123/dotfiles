@@ -3,10 +3,12 @@
 # manifest = {
 #   profile;
 #   mods  = [ { id, version, folder, stateFiles } ];
-#   files = [ { mod, version, target, sha256 } ];   # target is relative to Mods/
+#   files = [ { mod, version, target, sha256, archive, member } ];
 # }
 #
-# An archive's members are installed, not the archive. A file is installed if
+# target is relative to Mods/. An archive's members are installed, not the
+# archive: a member's `archive` is the sha256 of the archive (its blob) and
+# `member` its path inside it; a plain file has both null. A file is installed if
 # its (stripped) path matches one of the mod's `include` regexes and none of
 # its `exclude` ones, compared lowercased. Targets, folders and depth limits
 # are compared case-insensitively, as the game sees them under Wine.
@@ -37,12 +39,16 @@ let
             {
               inherit (f) sha256;
               path = f.name;
+              archive = null;
+              member = null;
             }
           ]
         else
           map (mem: {
             inherit (mem) sha256;
             path = strip m.stripComponents mem.path;
+            archive = f.sha256;
+            member = mem.path;
           }) f.members
       ) (if v == null then [ ] else v.files);
       wanted = lib.filter (
@@ -53,7 +59,7 @@ let
       mod = m.id;
       version = m.selectedVersion;
       target = if m.folder == null then e.path else "${m.folder}/${e.path}";
-      inherit (e) sha256;
+      inherit (e) sha256 archive member;
     }) wanted;
 
   files = lib.sort (a: b: a.target < b.target) (lib.concatMap filesOf enabled);
