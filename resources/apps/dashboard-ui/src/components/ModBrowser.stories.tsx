@@ -43,6 +43,19 @@ export const LoadError: Story = {
   args: { source: createMockModSource({ fail: "nix eval failed: simsnix: 2 problem(s)" }) },
 };
 
+/** Writes take a second, as `sims` does with a commit. */
+export const SlowSaves: Story = {
+  args: { source: createMockModSource({ delay: 1000 }), selectedId: "acme/widgets-extra" },
+};
+
+export const SaveFails: Story = {
+  args: { source: createMockModSource({ failWrites: "git commit: index.lock exists" }) },
+};
+
+export const ReadOnly: Story = {
+  args: { source: createMockModSource({ readOnly: true }) },
+};
+
 export const EmptyCatalog: Story = {
   args: {
     source: createMockModSource({ list: { profile: "current", profiles: ["current"], problems: [], mods: [] } }),

@@ -51,7 +51,23 @@ export interface ModList {
   mods: ModSummary[];
 }
 
+/** Catalog fields to change; a field left out stays as it is, null clears it. */
+export interface ModChanges {
+  downloadPage?: string | null;
+  title?: string | null;
+  tags?: string[];
+}
+
+export interface WriteResult {
+  /** Short hash of the commit the change made, or null when nothing changed. */
+  commit: string | null;
+}
+
 export interface ModSource {
   /** The catalog as `profile` sees it (default: the last one switched to). */
   list(profile?: string, signal?: AbortSignal): Promise<ModList>;
+  /** Change a mod's catalog fields. A source without it is read-only. */
+  update?(id: string, changes: ModChanges): Promise<WriteResult>;
+  /** Add a mod to a profile or take it out. */
+  setInProfile?(profile: string, id: string, enabled: boolean): Promise<WriteResult>;
 }

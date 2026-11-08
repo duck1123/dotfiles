@@ -28,16 +28,96 @@ if (!simsModule) {
 
 const allowedHosts = new Set([`127.0.0.1:${port}`, `localhost:${port}`]);
 
+class SimsError extends Error {}
+class BadRequest extends Error {}
+
+const isString = (v) => typeof v === "string";
+const isStringList = (v) => Array.isArray(v) && v.every(isString);
+
+function requireFields(body, checks) {
+  for (const [key, ok, what] of checks) {
+    if (!ok(body[key])) {
+      throw new BadRequest(`${key}: expected ${what}`);
+    }
+  }
+}
+
 // Each route runs a fixed Nushell snippet. Request values reach it only as the
-// record $args (JSON in the environment), never as script text.
+// record $args (JSON in the environment), never as script text. Writes commit
+// in the private repo (`--commit`).
 const routes = {
   "GET /api/mods": {
     args: (url) => ({ profile: url.searchParams.get("profile") || null }),
     script: "sims mod list --profile $args.profile?",
   },
+  // A field left out stays as it is; "" clears downloadPage or title.
+  "POST /api/mod/set": {
+    args: (_url, body) => {
+      const optional = (check) => (v) => v === undefined || check(v);
+      requireFields(body, [
+        ["id", isString, "a mod id"],
+        ["downloadPage", optional(isString), "a URL or empty"],
+        ["title", optional(isString), "a string"],
+        ["tags", optional(isStringList), "a list of strings"],
+      ]);
+      const { id, downloadPage = null, title = null, tags = null } = body;
+      return { id, downloadPage, title, tags };
+    },
+    script: "sims mod set $args.id --page $args.downloadPage? --title $args.title? --tags $args.tags? --commit",
+  },
+  "POST /api/profile/add": {
+    args: (_url, body) => profileArgs(body),
+    script: "sims profile add $args.profile ...$args.ids --commit",
+  },
+  "POST /api/profile/remove": {
+    args: (_url, body) => profileArgs(body),
+    script: "sims profile remove $args.profile ...$args.ids --commit",
+  },
 };
 
-class SimsError extends Error {}
+function profileArgs(body) {
+  requireFields(body, [
+    ["profile", isString, "a profile name"],
+    ["ids", (v) => isStringList(v) && v.length > 0, "a list of mod ids"],
+  ]);
+  return { profile: body.profile, ids: body.ids };
+}
+
+// Writes run one at a time: each may commit, and git takes a lock.
+let writes = Promise.resolve();
+function queued(fn) {
+  const run = writes.then(fn, fn);
+  writes = run.catch(() => {});
+  return run;
+}
+
+const maxBody = 64 * 1024;
+
+async function readJson(req) {
+  if (!/^application\/json\b/.test(req.headers["content-type"] ?? "")) {
+    // a cross-site form can't send this type without a CORS preflight, which is never answered
+    throw new BadRequest("send the body as application/json");
+  }
+  let size = 0;
+  const chunks = [];
+  for await (const chunk of req) {
+    size += chunk.length;
+    if (size > maxBody) {
+      throw new BadRequest("body too large");
+    }
+    chunks.push(chunk);
+  }
+  let body;
+  try {
+    body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    throw new BadRequest("body isn't valid JSON");
+  }
+  if (body === null || typeof body !== "object" || Array.isArray(body)) {
+    throw new BadRequest("body must be a JSON object");
+  }
+  return body;
+}
 
 /** The message of a Nushell error, from its plain-style stderr. */
 export function nuErrorMessage(stderr) {
@@ -164,10 +244,18 @@ async function handle(req, res) {
     if (!route) {
       return sendJson(res, 404, { error: `no route ${req.method} ${url.pathname}` });
     }
+    const write = req.method !== "GET";
+    // Browsers send Origin on every POST; only this page's own may write.
+    if (write && req.headers.origin !== undefined && !allowedHosts.has(req.headers.origin.replace(/^http:\/\//, ""))) {
+      return sendJson(res, 403, { error: "writes only from this page" });
+    }
     try {
-      return sendJson(res, 200, await runSims(route.script, route.args(url)));
+      const args = route.args(url, write ? await readJson(req) : undefined);
+      const run = () => runSims(route.script, args);
+      return sendJson(res, 200, await (write ? queued(run) : run()));
     } catch (e) {
-      return sendJson(res, e instanceof SimsError ? 400 : 500, { error: e.message });
+      const known = e instanceof SimsError || e instanceof BadRequest;
+      return sendJson(res, known ? 400 : 500, { error: e.message });
     }
   }
   if (req.method !== "GET" && req.method !== "HEAD") {

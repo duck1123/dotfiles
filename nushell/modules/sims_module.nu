@@ -1460,6 +1460,67 @@ export def "sims mod list" [
   }
 }
 
+def "nu-complete sims profiles" []: nothing -> list<string> {
+  let dir = sims-config | get dataDir | path expand | path join profiles
+  if not ($dir | path exists) { return [] }
+  glob $"($dir)/*.json" | each { path parse | get stem } | sort
+}
+
+# Turn mods on or off in profiles/<profile>.json (the JSON half of a profile; one
+# defined only in Nix is edited by hand). `enable` adds them to `mods` and takes
+# them out of `remove`; disabling does the opposite, and lists them in `remove`
+# only when the profile has a base they could come from.
+def profile-edit [profile: string, ids: list<string>, enable: bool, commit: bool]: nothing -> record {
+  let data = sims-config | get dataDir | path expand
+  let file = $data | path join profiles $"($profile).json"
+  if not ($file | path exists) {
+    error make {msg: $"no profiles/($profile).json: a profile defined in Nix is edited by hand"}
+  }
+  if ($ids | is-empty) { error make {msg: 'give one or more mod ids'} }
+  let known = nu-complete sims mods
+  let unknown = $ids | where $it not-in $known
+  if ($unknown | is-not-empty) { error make {msg: $"not in the catalog: ($unknown | str join ', ')"} }
+
+  let p = open $file
+  let mods = $p.mods? | default []
+  let remove = $p.remove? | default []
+  let based = ($p.base? | default null) != null
+  let new_mods = if $enable { $mods | append $ids | uniq | sort } else { $mods | where $it not-in $ids }
+  let new_remove = if $enable { $remove | where $it not-in $ids } else if $based { $remove | append $ids | uniq | sort } else { $remove }
+  let next = $p | upsert mods $new_mods
+  # only write `remove` when there's one to keep or the file already has it
+  let next = if 'remove' in ($p | columns) or ($new_remove | is-not-empty) { $next | upsert remove $new_remove } else { $next }
+  let changed = $ids | where {|id|
+    if $enable { $id not-in $mods or $id in $remove } else { $id in $mods or ($based and $id not-in $remove) }
+  }
+  let hash = if ($changed | is-empty) { null } else {
+    $next | to json -i 2 | save -f $file
+    if $commit {
+      let verb = if $enable { 'enable' } else { 'disable' }
+      commit-data $data [$file] $"sims: ($verb) ($changed | str join ', ') in ($profile)"
+    }
+  }
+  {profile: $profile, enable: $enable, changed: $changed, commit: $hash}
+}
+
+# Add mods to a profile (profiles/<profile>.json). Writes right away.
+export def "sims profile add" [
+  profile: string@"nu-complete sims profiles" # the profile
+  ...ids: string@"nu-complete sims mods"      # mod ids, creator/mod
+  --commit                                    # commit the change
+]: nothing -> record {
+  profile-edit $profile $ids true $commit
+}
+
+# Take mods out of a profile (profiles/<profile>.json). Writes right away.
+export def "sims profile remove" [
+  profile: string@"nu-complete sims profiles" # the profile
+  ...ids: string@"nu-complete sims mods"      # mod ids, creator/mod
+  --commit                                    # commit the change
+]: nothing -> record {
+  profile-edit $profile $ids false $commit
+}
+
 # Serve the mod web UI on http://127.0.0.1:<port> until stopped (ctrl-c). The server
 # (dashboard-ui's apps/sims/server.mjs) runs these `sims` commands for the page.
 export def "sims web" [

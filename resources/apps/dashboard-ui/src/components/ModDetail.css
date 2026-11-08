@@ -152,3 +152,92 @@
 .dui-mod__members {
   color: var(--dui-text-muted);
 }
+
+.dui-mod__button {
+  padding: 3px 12px;
+  border: 1px solid var(--dui-border-strong);
+  border-radius: var(--dui-radius);
+  background: var(--dui-bg);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.dui-mod__button:hover:not(:disabled) {
+  background: var(--dui-surface);
+}
+
+.dui-mod__button:focus-visible {
+  outline: 2px solid var(--dui-accent);
+  outline-offset: 1px;
+}
+
+.dui-mod__button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.dui-mod__button--primary {
+  border-color: var(--dui-accent);
+  background: var(--dui-accent);
+  color: var(--dui-accent-text);
+}
+
+.dui-mod__button--primary:hover:not(:disabled) {
+  background: var(--dui-accent);
+  filter: brightness(1.08);
+}
+
+.dui-mod__notice {
+  margin: 0;
+  color: var(--dui-text-muted);
+}
+
+.dui-mod__error {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--dui-radius);
+  background: var(--dui-danger-bg);
+  color: var(--dui-danger);
+}
+
+.dui-mod__form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--dui-border);
+  border-radius: var(--dui-radius);
+  background: var(--dui-surface);
+}
+
+.dui-mod__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dui-mod__form label > span {
+  color: var(--dui-text-muted);
+  font-size: 0.9em;
+}
+
+.dui-mod__form input {
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--dui-border);
+  border-radius: var(--dui-radius);
+  background: var(--dui-bg);
+  color: inherit;
+  font: inherit;
+}
+
+.dui-mod__form input:focus-visible {
+  outline: 2px solid var(--dui-accent);
+  outline-offset: -1px;
+}
+
+.dui-mod__actions {
+  display: flex;
+  gap: 8px;
+}

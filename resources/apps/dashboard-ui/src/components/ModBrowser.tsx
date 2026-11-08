@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { ModList, ModSource, ModSummary } from "../mods/types";
+import type { ModChanges, ModList, ModSource, ModSummary } from "../mods/types";
 import { ModDetail } from "./ModDetail";
 import "./ModBrowser.css";
 
@@ -103,6 +103,35 @@ export function ModBrowser({ source, profile: initialProfile, selectedId: initia
     onSelect?.(id);
   }
 
+  function patch(id: string, fields: Partial<ModSummary>) {
+    setList((l) => l && { ...l, mods: l.mods.map((m) => (m.id === id ? { ...m, ...fields } : m)) });
+  }
+
+  // Reload without the loading state, for what a change may have moved
+  // elsewhere (problems, mods enabled through a base profile).
+  function refresh() {
+    source.list(list?.profile).then(setList, () => {});
+  }
+
+  const save =
+    source.update &&
+    ((id: string) => async (changes: ModChanges) => {
+      const result = await source.update!(id, changes);
+      patch(id, changes);
+      return result;
+    });
+
+  const toggle =
+    source.setInProfile &&
+    list &&
+    ((mod: ModSummary) => async (enabled: boolean) => {
+      const result = await source.setInProfile!(list.profile, mod.id, enabled);
+      const profiles = enabled ? [...new Set([...mod.profiles, list.profile])].sort() : mod.profiles.filter((p) => p !== list.profile);
+      patch(mod.id, { profiles, enable: enabled });
+      refresh();
+      return result;
+    });
+
   return (
     <div className="dui-mods">
       <aside className="dui-mods__side">
@@ -199,7 +228,16 @@ export function ModBrowser({ source, profile: initialProfile, selectedId: initia
       </aside>
       <main className="dui-mods__detail">
         {selected && list ? (
-          <ModDetail mod={selected} profile={list.profile} knownIds={knownIds} onSelect={select} />
+          <ModDetail
+            // a fresh editor (and messages) for each mod
+            key={selected.id}
+            mod={selected}
+            profile={list.profile}
+            knownIds={knownIds}
+            onSelect={select}
+            onSave={save?.(selected.id)}
+            onToggle={toggle ? toggle(selected) : undefined}
+          />
         ) : (
           status === "ready" && <p className="dui-mods__message">Pick a mod.</p>
         )}
