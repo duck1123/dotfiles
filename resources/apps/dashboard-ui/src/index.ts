@@ -1,6 +1,11 @@
 export { CaptureBox, type CaptureBoxProps } from "./components/CaptureBox";
 export { InboxReview, type InboxReviewProps } from "./components/InboxReview";
 export { MediaReview, type MediaReviewProps } from "./components/MediaReview";
+export { ModBrowser, type ModBrowserProps, type ModFilter } from "./components/ModBrowser";
+export { ModDetail, type ModDetailProps } from "./components/ModDetail";
+export { createMockModSource, type MockModOptions } from "./mods/mockModSource";
+export { sampleModList, sampleMods } from "./mods/sampleMods";
+export type { ModFile, ModList, ModSource, ModSummary, ModVersion } from "./mods/types";
 export { NoteChip, type NoteChipProps } from "./components/NoteChip";
 export { NotePicker, type NotePickerProps } from "./components/NotePicker";
 export { ReviewItem, type ReviewItemProps } from "./components/ReviewItem";

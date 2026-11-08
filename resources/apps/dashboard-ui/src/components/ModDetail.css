@@ -1,0 +1,154 @@
+.dui-mod {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  font-family: var(--dui-font);
+  font-size: var(--dui-font-size);
+  color: var(--dui-text);
+}
+
+.dui-mod__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+}
+
+.dui-mod__title {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 1.35em;
+  overflow-wrap: anywhere;
+}
+
+.dui-mod__id {
+  color: var(--dui-text-muted);
+}
+
+.dui-mod__state {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--dui-chip-bg);
+  font-size: 0.85em;
+}
+
+.dui-mod__state--on {
+  background: var(--dui-highlight);
+  color: var(--dui-accent);
+  font-weight: 600;
+}
+
+.dui-mod__problems {
+  margin: 0;
+  padding: 8px 10px 8px 28px;
+  border-radius: var(--dui-radius);
+  background: var(--dui-danger-bg);
+  color: var(--dui-danger);
+}
+
+.dui-mod__fields {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px 16px;
+  margin: 0;
+}
+
+.dui-mod__fields dt {
+  color: var(--dui-text-muted);
+}
+
+.dui-mod__fields dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.dui-mod__fields a {
+  color: var(--dui-accent);
+}
+
+.dui-mod__none {
+  color: var(--dui-text-muted);
+  font-style: italic;
+}
+
+.dui-mod__tags,
+.dui-mod__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dui-mod__tag {
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--dui-chip-bg);
+}
+
+.dui-mod__link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--dui-accent);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.dui-mod__missing {
+  color: var(--dui-danger);
+  text-decoration: line-through;
+}
+
+.dui-mod__subheading {
+  margin: 4px 0 0;
+  font-size: 1.05em;
+}
+
+.dui-mod__versions {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dui-mod__versions th,
+.dui-mod__versions td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--dui-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.dui-mod__versions thead th {
+  color: var(--dui-text-muted);
+  font-weight: 500;
+}
+
+.dui-mod__versions tr[aria-current="true"] {
+  background: var(--dui-highlight);
+}
+
+.dui-mod__badge {
+  display: block;
+  color: var(--dui-accent);
+  font-size: 0.8em;
+  font-weight: 500;
+}
+
+.dui-mod__files {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
+.dui-mod__more summary {
+  color: var(--dui-accent);
+  cursor: pointer;
+}
+
+.dui-mod__members {
+  color: var(--dui-text-muted);
+}

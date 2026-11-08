@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  padding: 0 16px 24px;
+  background: var(--dui-bg);
+  color: var(--dui-text);
+  font-family: var(--dui-font);
+  font-size: var(--dui-font-size);
+}
+
+.sims-app__header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 0;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--dui-border);
+}
+
+.sims-app__header h1 {
+  margin: 0;
+  font-size: 1.3em;
+}

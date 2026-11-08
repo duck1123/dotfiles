@@ -19,6 +19,8 @@
 # Restore and wipe are dry runs unless given --apply.
 
 const settings_files = [Options.ini UserSetting.ini Events.ini]
+# This file, for `sims web`'s server to `use`
+const sims_module = path self
 
 def sims-config []: nothing -> record {
   let file = $env.SIMSNIX_CONFIG? | default ($env.XDG_CONFIG_HOME? | default ($env.HOME | path join .config) | path join simsnix config.json)
@@ -1403,6 +1405,80 @@ export def "sims mod set" [
     }
   }
   {id: $id, changes: $changes, commit: $commit}
+}
+
+# The profile last switched to on an instance, else `current`
+def default-profile [instance?: string]: nothing -> string {
+  let i = try { instance $instance } catch { null }
+  let state = if $i != null { $i.documents | path join Mods $switch_state }
+  let active = if $state != null and ($state | path exists) { open $state | get -o profile }
+  $active | default current
+}
+
+# Every mod in the catalog, as the web UI browses it: its fields, versions, whether
+# `profile` enables it, which profiles list it, and the framework's problems that
+# name it. `problems` holds all of them, for the ones that name no mod.
+export def "sims mod list" [
+  --profile (-p): string                                # profile (default: the one last switched to, else current)
+  --instance (-i): string@"nu-complete sims instances" # instance whose last switch picks the default profile
+]: nothing -> record {
+  let name = $profile | default (default-profile $instance)
+  let body = '
+    let
+      c = r.config;
+      mods = lib.concatMap lib.attrValues (lib.attrValues c.mods);
+    in {
+      inherit (r) failures;
+      profiles = lib.mapAttrs (n: p: { inherit (p) base mods remove; }) c.profiles;
+      mods = map (m: {
+        inherit (m) id title downloadPage tags enable folder version selectedVersion requires conflicts;
+        versions = lib.mapAttrs (l: v: {
+          inherit (v) added gameVersion;
+          files = map (f: { inherit (f) name; members = lib.length f.members; }) v.files;
+        }) m.versions;
+      }) mods;
+    }'
+  let r = simsnix-eval $name $body --raw
+  if $name not-in ($r.profiles | columns) {
+    error make {msg: $"unknown profile ($name) \(known: ($r.profiles | columns | str join ', ')\)"}
+  }
+  let data = sims-config | get dataDir | path expand
+  let listed_in = $r.profiles | transpose name p | each {|e| $e.p.mods | each {|id| {id: $id, profile: $e.name} } } | flatten
+  let mods = $r.mods | each {|m|
+    $m | merge {
+      editable: ($data | path join mods $"($m.id).json" | path exists)
+      profiles: ($listed_in | where id == $m.id | get profile)
+      # the id as a whole word: acme/core must not match acme/core-extra
+      problems: ($r.failures | where {|f| $f =~ ('(^|[^\w/-])' + ($m.id | str escape-regex) + '($|[^\w/-])') })
+    }
+  } | sort-by id
+  {
+    profile: $name
+    profiles: ($r.profiles | columns | sort)
+    problems: $r.failures
+    mods: $mods
+  }
+}
+
+# Serve the mod web UI on http://127.0.0.1:<port> until stopped (ctrl-c). The server
+# (dashboard-ui's apps/sims/server.mjs) runs these `sims` commands for the page.
+export def "sims web" [
+  --port: int = 7341 # port on 127.0.0.1
+  --root: path       # a local build to serve instead (dashboard-ui's dist-sims, after `npm run build-sims`)
+] {
+  let web = sims-config | get -o web
+  # a local build is served by the server next to it, in the same checkout
+  let site = if $root != null {
+    let root = $root | path expand
+    {root: $root, server: ($root | path join .. apps sims server.mjs | path expand)}
+  } else if $web != null { $web } else {
+    error make {msg: 'no web UI in the simsnix config: switch home with the sims4 feature, or pass --root'}
+  }
+  let node = $web.node? | default (which node | get -o 0.path) | default node
+  print -e $"Sims mods: http://127.0.0.1:($port)/"
+  with-env {SIMS_MODULE: $sims_module, SIMS_NU: $nu.current-exe, SIMS_WEB_ROOT: $site.root, PORT: ($port | into string)} {
+    ^$node $site.server
+  }
 }
 
 # Download sources. The archives and loose mod files that mods were installed from,

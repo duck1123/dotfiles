@@ -62,9 +62,16 @@
     };
 
   homeManager =
-    { config, pkgs, ... }:
+    {
+      config,
+      inputs,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.host.features.sims4;
+      web = "${inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.simsnix-web}/share/simsnix-web";
     in
     {
       home.packages = [
@@ -85,6 +92,12 @@
           ;
         # What `sims manifest` evaluates the catalog with
         framework = "${../modules/sims4/_simsnix}";
+        # What `sims web` runs: the page and its server (modules/sims4/web.nix)
+        web = {
+          node = lib.getExe pkgs.nodejs;
+          root = "${web}/site";
+          server = "${web}/server.mjs";
+        };
         # just nixpkgs' lib/, not the whole source (~200 MiB) in the closure
         nixpkgsLib = "${builtins.path {
           name = "nixpkgs-lib";

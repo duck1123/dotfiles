@@ -18,7 +18,8 @@
     "storybook": "storybook dev --port 6006 --no-open",
     "build-storybook": "storybook build --output-dir storybook-static --disable-telemetry",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build-sims": "vite build --config vite.sims.config.ts"
   },
   "peerDependencies": {
     "react": "^19.0.0",
