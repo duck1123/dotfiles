@@ -116,6 +116,13 @@ in
               pynixd = {
                 inherit (cfg) authorizedKeys;
                 inherit (cfg.cache) storageClassName;
+                # The default 10Gi filled up (2026-11-08): pynixd's init then
+                # couldn't create a lock file in its store ("No space left on
+                # device"), and the nix-node pods crash-looped without their
+                # cache. volumeClaimTemplates are immutable, so on a live
+                # cluster changing this also needs the PVC resized by hand
+                # and the StatefulSet deleted with --cascade=orphan.
+                storageSize = "30Gi";
                 controller.nixConfig.settings = cacheSettings;
               };
             };
