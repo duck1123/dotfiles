@@ -57,5 +57,8 @@
       };
 
       users.users.${config.host.identity.username}.openssh.authorizedKeys.keys = hostPubkeys;
+
+      # So zsh on the remote end knows clients' $TERM (e.g. xterm-kitty).
+      environment.enableAllTerminfo = true;
     };
 }
