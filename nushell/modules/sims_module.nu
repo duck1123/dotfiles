@@ -1357,6 +1357,20 @@ def sha256-of [file: path]: nothing -> string {
   $r.stdout | str substring 0..<64
 }
 
+# Add new index entries to archives.json, and where downloads were seen
+# (`seen`: [{ sha256, file }]) to their `paths`
+def save-index [data: path, index: list, added: list, seen: list] {
+  let home = $env.HOME | str escape-regex
+  let where_seen = $seen | group-by sha256 | transpose sha256 rows | reduce -f {} {|g, acc|
+    $acc | insert $g.sha256 ($g.rows | each {|r| $r.file | str replace -r $"^($home)/" '~/' })
+  }
+  # a download that is also inside another archive is kept as a download
+  let merged = $index | append $added | sort-by {|s| $s.in != null } | uniq-by sha256 | each {|s|
+    $s | update paths ($s.paths | append ($where_seen | get -o $s.sha256 | default []) | uniq | sort)
+  } | sort-by name
+  $merged | to json -i 2 | save -f ($data | path join archives.json)
+}
+
 # Index one archive: unpack it into a scratch folder, hash what's in it, then do the
 # same for the archives inside it
 def index-archive [file: path, sha256: string, name: string, parent: any, tmp: path, depth: int]: nothing -> list<record> {
@@ -1433,16 +1447,7 @@ export def "sims sources index" [
     }
   } | flatten
   rm -rf $tmp
-  # where each download is now, added to where it was seen before
-  let home = $env.HOME
-  let seen = $hashed | group-by sha256 | transpose sha256 rows | reduce -f {} {|g, acc|
-    $acc | insert $g.sha256 ($g.rows | each {|r| $dir | path join $r.path | str replace -r $"^($home | str escape-regex)/" '~/' })
-  }
-  # a download that is also inside another archive is kept as a download
-  let merged = $index | append $added | sort-by {|s| $s.in != null } | uniq-by sha256 | each {|s|
-    $s | update paths ($s.paths | append ($seen | get -o $s.sha256 | default []) | uniq | sort)
-  } | sort-by name
-  $merged | to json -i 2 | save -f ($data | path join archives.json)
+  save-index $data $index $added ($hashed | each {|r| {sha256: $r.sha256, file: ($dir | path join $r.path)} })
   $summary | merge {
     indexed: ($added | length)
     errors: ($added | where {|s| $s.error? != null } | each {|s| {name: $s.name, error: $s.error} })
@@ -1588,4 +1593,196 @@ export def "sims sources match" [
     })
   } | to json -i 2 | save -f $file
   $summary | update written $file | insert groupsToRules ($demoted | get k)
+}
+
+# Adding downloads (the inbox). Each download becomes a version of a mod that installs
+# from it: an archive's version lists the archive with its members, so `sims switch`
+# unpacks them from the archive's blob, and a re-download of the same file is known by
+# its hash.
+
+def is-mod-file [p: string]: nothing -> bool { (ext-of $p) in $mod_exts }
+
+# Every file a version installs from: [{ path, sha256 }], an archive's members by
+# their path inside it
+def version-entries [v: record]: nothing -> list<record> {
+  $v.files | each {|f|
+    if ($f.members? | default [] | is-empty) { [{path: $f.name, sha256: $f.sha256}] } else {
+      $f.members | each {|m| {path: $m.path, sha256: $m.sha256} }
+    }
+  } | flatten
+}
+
+def strip-path [n: int, p: string]: nothing -> string {
+  let parts = $p | path split
+  if ($parts | length) <= $n { '' } else { $parts | skip $n | path join }
+}
+
+# The catalog mod a download is a version of: one with a version of exactly its mod
+# files (`same` names that version), else the one with mostly the same file names as
+# its newest version (at least half of each side's)
+def match-download [mod_files: list<record>, catalog: list]: nothing -> any {
+  let names = $mod_files | each {|f| $f.path | path basename | str lowercase } | uniq
+  let hashes = $mod_files | get sha256 | uniq | sort
+  let scored = $catalog | each {|c|
+    let versions = $c.mod.versions? | default {} | transpose label v | each {|r|
+      {label: $r.label, added: ($r.v.added? | default ''), entries: (version-entries $r.v | where {|e| is-mod-file $e.path })}
+    }
+    let same = $versions | where {|r| ($r.entries | get -o sha256 | default [] | uniq | sort) == $hashes } | get -o 0.label
+    let newest = $versions | sort-by added label | last | get -o entries | default []
+    let newest_names = $newest | each {|e| $e.path | path basename | str lowercase } | uniq
+    {id: $c.id, same: $same, n: ($names | where $it in $newest_names | length), size: ($newest_names | length)}
+  }
+  let exact = $scored | where same != null | get -o 0
+  if $exact != null { return {id: $exact.id, same: $exact.same} }
+  let best = $scored | where n > 0 | sort-by n --reverse | get -o 0
+  if $best != null and $best.n * 2 >= ($names | length) and $best.n * 2 >= $best.size {
+    {id: $best.id, same: null}
+  }
+}
+
+# How many leading folders of a download's members to drop so they land where the
+# mod's newest version put its files (0 when nothing lines up)
+def best-strip [mod_files: list<record>, mod: record]: nothing -> int {
+  let newest = $mod.versions | values | sort-by {|v| $v.added? | default '' } | last
+  let known = version-entries $newest | each {|e| $e.path | str lowercase }
+  0..3 | each {|n|
+    {n: $n, hits: ($mod_files | where {|f| (strip-path $n $f.path | str lowercase) in $known } | length)}
+  } | reduce -f {n: 0, hits: 0} {|r, best| if $r.hits > $best.hits { $r } else { $best } } | get n
+}
+
+# Add downloads to the catalog. Dry run unless --apply.
+#
+# Each download (an archive, or a loose .package/.ts4script) is indexed and stored in
+# the blob store like `sims sources index` does, then matched to a mod:
+#   known        a version already has exactly its mod files: nothing to add
+#   new version  mostly the same file names as a mod's newest version (or --mod names
+#                an existing mod): added as a version of it, its members placed where
+#                that version's files were
+#   new mod      no match: a mod of its own (--mod sets its id, else unknown/<name>),
+#                installed as laid out in the archive
+# The version label is --version, else a version in the file name, else today. --pin
+# installs the new version (sets the mod's `version`); a new mod is always pinned.
+# --profile adds the mod to a profile.
+export def "sims add" [
+  ...paths: path            # downloads, or folders of them
+  --mod (-m): string        # the mod's id (default: matched, or unknown/<name>)
+  --version (-v): string    # version label
+  --page: string            # download page, for a mod that has none
+  --pin                     # install this version
+  --profile (-p): string    # also add the mod to this profile
+  --apply                   # store, index and write the catalog
+]: nothing -> table {
+  if ($paths | is-empty) { error make {msg: 'give one or more downloads'} }
+  let data = sims-config | get dataDir | path expand
+  let files = $paths | each {|p|
+    let p = $p | path expand
+    if ($p | path type) == dir { glob $"($p)/**/*" --no-dir } else { [$p] }
+  } | flatten | where {|f| (ext-of $f) in [...$archive_exts ...$mod_exts] } | uniq | sort
+  if ($files | is-empty) { error make {msg: 'no archives or mod files in those paths'} }
+  if ($files | length) > 1 and ($mod != null or $version != null) {
+    error make {msg: '--mod and --version need a single download'}
+  }
+  if $profile != null and not ($data | path join profiles $"($profile).json" | path exists) {
+    error make {msg: $"no profiles/($profile).json"}
+  }
+  let index = read-sources $data
+  let catalog = read-catalog $data
+  let today = date now | format date '%Y-%m-%d'
+  let tmp = sims-config | get blobDir | path expand | path join tmp
+  mkdir $tmp
+
+  let plans = $files | each {|file|
+    let sha = sha256-of $file
+    let name = $file | path basename
+    let indexed = $index | where sha256 == $sha
+    let entries = if ($indexed | is-not-empty) { [] } else if (ext-of $name) in $mod_exts {
+      let size = ls $file | get size.0 | into int
+      [{sha256: $sha, name: $name, size: $size, paths: [], in: null, members: [{path: $name, size: $size, sha256: $sha}]}]
+    } else { index-archive $file $sha $name null $tmp 0 }
+    let entry = $indexed | append $entries | first
+    let mod_files = $entry.members | where {|m| is-mod-file $m.path }
+    let found = if ($mod_files | is-empty) { null } else { match-download $mod_files $catalog }
+    let id = $mod | default $found.id? | default $"unknown/(split-version (without-ext $name) | get stem | slug | default -e mod)"
+    let existing = $catalog | where id == $id | get -o 0.mod
+    # an exact match only counts for the mod it was found in
+    let same = if $found != null and $found.id == $id { $found.same } else { null }
+    let label = $version | default (split-version (without-ext $name) | get version) | default $today
+    let is_archive = (ext-of $name) in $archive_exts
+    let file_entry = if $is_archive {
+      {name: $name, sha256: $sha, members: ($entry.members | select path sha256)}
+    } else { {name: $name, sha256: $sha} }
+    let base = {
+      download: $name
+      sha256: $sha
+      file: $file
+      entries: $entries
+      id: $id
+      version: (if $same != null { $same } else { $label })
+      files: ($mod_files | length)
+    }
+    if ($mod_files | is-empty) {
+      $base | merge {change: 'no mod files', json: null, note: 'nothing to install in it'}
+    } else if $same != null {
+      let json = if $pin and $existing.version? != $same { $existing | upsert version $same } else { null }
+      $base | merge {change: 'known', json: $json, note: $"same files as ($id) ($same)"}
+    } else if $existing != null {
+      if $label in ($existing.versions | columns) {
+        $base | merge {change: 'label taken', json: null, note: $"($id) already has a version ($label): pass --version"}
+      } else {
+        let strip = if $is_archive { best-strip $mod_files $existing } else { 0 }
+        let old_strip = $existing.stripComponents? | default 0
+        let conflict = $is_archive and $old_strip != 0 and $old_strip != $strip
+        let json = $existing | merge {
+          downloadPage: ($existing.downloadPage? | default $page)
+          tags: ($existing.tags? | default [] | append (if ($mod_files | any {|f| (ext-of $f.path) == ts4script }) { [script] } else { [] }) | uniq | sort)
+          versions: ($existing.versions | insert $label {added: $today, files: [$file_entry]})
+        } | upsert stripComponents (if $is_archive and not $conflict { $strip } else { $old_strip })
+        let json = if $pin { $json | upsert version $label } else { $json }
+        let pinned = $existing.version? | default '(newest)'
+        $base | merge {
+          change: (if $conflict { 'strip conflict' } else { 'new version' })
+          json: (if $conflict { null } else { $json })
+          note: (if $conflict { $"its members need stripComponents ($strip), the mod has ($old_strip)" } else if $pin { $"installs it \(was ($pinned)\)" } else { $"($id) stays at ($pinned): --pin to install this one" })
+        }
+      }
+    } else {
+      let json = {
+        title: (without-ext $name)
+        downloadPage: $page
+        tags: (if ($mod_files | any {|f| (ext-of $f.path) == ts4script }) { [script] } else { [] })
+        folder: null
+        include: ['.*\.package' '.*\.ts4script']
+        exclude: []
+        stateFiles: []
+        version: $label
+        versions: {($label): {added: $today, files: [$file_entry]}}
+      }
+      $base | merge {change: 'new mod', json: $json, note: (if $profile == null { 'in no profile: --profile to add it' } else { $"added to ($profile)" })}
+    }
+  }
+  rm -rf $tmp
+
+  let summary = $plans | select download change id version files note
+  if not $apply {
+    print 'dry run: add --apply to store the downloads and write the catalog'
+    return $summary
+  }
+  let root = blob-root
+  mkdir $root
+  for p in $plans {
+    if not ($root | path join $p.sha256 | path exists) { store-blob $root $p.file $p.sha256 }
+  }
+  save-index $data $index ($plans | each {|p| $p.entries } | flatten) ($plans | each {|p| {sha256: $p.sha256, file: $p.file} })
+  for p in ($plans | where json != null) {
+    let file = $data | path join mods $"($p.id).json"
+    mkdir ($file | path dirname)
+    $p.json | to json -i 2 | save -f $file
+  }
+  if $profile != null {
+    let pfile = $data | path join profiles $"($profile).json"
+    let ids = $plans | where change in ['known' 'new version' 'new mod'] | get id
+    let prof = open $pfile
+    $prof | update mods ($prof.mods | append $ids | uniq | sort) | to json -i 2 | save -f $pfile
+  }
+  $summary
 }
