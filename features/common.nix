@@ -16,6 +16,7 @@
           brotab
           byobu
           curl
+          glow
           gnupg
           hstr
           htop
