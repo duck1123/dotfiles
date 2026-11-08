@@ -1,0 +1,37 @@
+#!/bin/sh
+# Started by libvirt (as root) for nasnix's virtiofs device, in place of
+# /usr/lib/qemu/virtiofsd. It runs a static virtiofsd 1.14 (nixpkgs
+# pkgsStatic.virtiofsd) as duck (uid 1000) with duck's NAS groups, so UGOS's
+# share ACLs (ugacl) report files to it the way they do to duck over NFS.
+# Running as root with no groups, it was shown every share as mode 000. UGOS
+# reapplies the share ACLs on every boot, so stripping them doesn't last.
+#
+# libvirt calls it as `--print-capabilities`, or `--fd=N -o source=DIR[,xattr]`.
+set -eu
+BIN=/volume1/@kvm/virtiofsd/virtiofsd
+fd=
+opts=
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --print-capabilities) exec "$BIN" --print-capabilities ;;
+    --fd=*) fd=${1#--fd=} ;;
+    --fd) shift; fd=$1 ;;
+    -o) shift; opts=$1 ;;
+    -o*) opts=${1#-o} ;;
+  esac
+  shift
+done
+src=$(printf '%s\n' "$opts" | tr ',' '\n' | sed -n 's/^source=//p')
+if [ -z "$fd" ] || [ -z "$src" ]; then
+  echo "virtiofsd-duck: expected --fd and -o source=, got fd='$fd' opts='$opts'" >&2
+  exit 1
+fi
+# Without root, virtiofsd can't use file handles (open_by_handle_at), so it
+# keeps an open fd for every inode the guest knows about. libvirt's default
+# limit of 8192 ran out partway through one share ("Too many open files in
+# system"). Raise it while still root; the shares hold about 340k entries and
+# 1048576 is the kernel's per-process maximum (fs.nr_open).
+ulimit -n 1048576
+exec setpriv --reuid=1000 --regid=10 --groups=10,100,133 --inh-caps=-all --bounding-set=-all -- \
+  "$BIN" --fd="$fd" --shared-dir="$src" --sandbox=none --cache=auto --log-level=info \
+  --rlimit-nofile=1048576

@@ -17,6 +17,7 @@ Read the page for the area you're touching before changing it:
 | [docs/secrets.md](docs/secrets.md) | Touching `secrets/`, `.sops.yaml` or anything that reads a secret |
 | [modules/kubernetes/docs/](modules/kubernetes/docs/) (start with `architecture.md`) | Anything in `appTemplates/`, `clusters/`, `modules/kubernetes/` or the live cluster |
 | [docs/setup.md](docs/setup.md) | Setting up a new machine |
+| [docs/nas.md](docs/nas.md) | Anything on the NAS: share permissions, NFS mounts, or nasnix's virtiofs mount |
 
 ## Common commands
 

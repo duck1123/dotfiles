@@ -138,9 +138,10 @@ in
 
           # The NAS's /volume1, shared into this VM over virtiofs (the "volume1"
           # tag set in the VM's libvirt XML on the NAS), so the apps on this node
-          # can read the media without going through UGOS's NFS server. Read-only
-          # while it's being tried out; nofail keeps boot going if the VM was
-          # started without the device.
+          # can read the media without going through UGOS's NFS server. The NAS
+          # side, including why virtiofsd runs as duck, is in docs/nas.md.
+          # Read-only while it's being tried out; nofail keeps boot going if the
+          # VM was started without the device.
           "/mnt/volume1" = {
             device = "volume1";
             fsType = "virtiofs";
