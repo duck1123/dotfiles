@@ -462,10 +462,9 @@ export def "sims save delete-backup" [
 # dotfiles' modules/sims4/_simsnix with `nix eval --impure`; the catalog is read
 # in place from dataDir, so nothing from it is copied to /nix/store.
 
-# Evaluate a profile into the manifest `sims switch` will install
-export def "sims manifest" [
-  profile?: string # profile to evaluate (default: "default")
-]: nothing -> record {
+# Evaluate the catalog with the framework. `body` is a Nix expression over `lib` and
+# `r`, eval.nix's result for `profile` (with `raw = true` when --raw)
+def simsnix-eval [profile: any, body: string, --raw]: nothing -> any {
   let cfg = sims-config
   let data = $cfg.dataDir | path expand
   if not ($data | path exists) {
@@ -479,15 +478,19 @@ export def "sims manifest" [
     framework: $cfg.framework
     nixpkgsLib: $cfg.nixpkgsLib
     sources: [$data]
-    profile: ($profile | default default)
+    profile: $profile
+    raw: $raw
   }
   let expr = '
-    let a = builtins.fromJSON (builtins.getEnv "SIMSNIX_ARGS"); in
-    import (/. + a.framework + "/eval.nix") {
+    let
+      a = builtins.fromJSON (builtins.getEnv "SIMSNIX_ARGS");
       lib = import (/. + a.nixpkgsLib);
-      sources = map (s: /. + s) a.sources;
-      inherit (a) profile;
-    }'
+      r = import (/. + a.framework + "/eval.nix") {
+        inherit lib;
+        sources = map (s: /. + s) a.sources;
+        inherit (a) profile raw;
+      };
+    in (' + $body + ')'
   let r = with-env {SIMSNIX_ARGS: ($args | to json -r)} { ^nix eval --impure --json --expr $expr | complete }
   if $r.exit_code != 0 {
     # the framework's own errors read better without nix's trace
@@ -495,6 +498,13 @@ export def "sims manifest" [
     error make {msg: (if ($own | is-empty) { $r.stderr } else { $own | str join "\n" })}
   }
   $r.stdout | from json
+}
+
+# Evaluate a profile into the manifest `sims switch` will install
+export def "sims manifest" [
+  profile?: string # profile to evaluate (default: "default")
+]: nothing -> record {
+  simsnix-eval ($profile | default default) r
 }
 
 # Importing a folder of mods. Every file is copied into the blob store (the folder
@@ -925,6 +935,210 @@ export def "sims status" [
     blobsMissing: ($known | where $it not-in ($blob_list | get -o sha256 | default []))
     blobsUnreferenced: ($blob_list | where sha256 not-in $known | length)
   }
+}
+
+# Check the profiles against the catalog and the blob store: the framework's checks
+# (unknown profiles, mods and versions, requires and conflicts, clashing targets and
+# folders), then that every file of each enabled mod's version is in the blob store.
+# --hash also re-hashes those blobs. `catalog` holds the problems that don't depend on
+# the profile evaluated (unknown mod ids are among them, labelled with their profile).
+export def "sims validate" [
+  profile?: string # only this profile (default: all of them)
+  --hash           # re-hash the blobs, not only check they're there
+]: nothing -> record {
+  let body = '{
+    inherit (r) failures;
+    profiles = lib.attrNames r.config.profiles;
+    mods = lib.length r.config.activeMods;
+    files = lib.concatMap (
+      m:
+      let
+        v = if m.selectedVersion == null then null else m.versions.${m.selectedVersion} or null;
+      in
+      if !m.enable || v == null then
+        [ ]
+      else
+        map (f: {
+          mod = m.id;
+          version = m.selectedVersion;
+          inherit (f) name sha256;
+        }) v.files
+    ) (lib.concatMap lib.attrValues (lib.attrValues r.config.mods));
+  }'
+  let all = simsnix-eval null $body --raw
+  let names = if $profile == null { $all.profiles } else if $profile in $all.profiles { [$profile] } else {
+    error make {msg: $"unknown profile ($profile) \(known: ($all.profiles | str join ', '))"}
+  }
+  let root = blob-root
+  let results = $names | each {|p|
+    let r = simsnix-eval $p $body --raw
+    let missing = $r.files | where {|f| not ($root | path join $f.sha256 | path exists) }
+    let bad = if $hash {
+      $r.files | where sha256 not-in $missing.sha256 | uniq-by sha256 | par-each {|f|
+        if (sha256-of ($root | path join $f.sha256)) != $f.sha256 { $f }
+      }
+    } else { [] }
+    {
+      profile: $p
+      mods: $r.mods
+      files: ($r.files | length)
+      problems: ($r.failures | where $it not-in $all.failures)
+      missingBlobs: $missing
+      badBlobs: $bad
+    }
+  }
+  let ok = ($all.failures | is-empty) and ($results | all {|r|
+    ($r.problems | is-empty) and ($r.missingBlobs | is-empty) and ($r.badBlobs | is-empty)
+  })
+  {ok: $ok, catalog: $all.failures, profiles: $results}
+}
+
+def "nu-complete sims mods" []: nothing -> list<string> {
+  let dir = sims-config | get dataDir | path expand | path join mods
+  if not ($dir | path exists) { return [] }
+  glob $"($dir)/*/*.{json,nix}" | each {|f|
+    $f | path relative-to $dir | str replace -r '\.(json|nix)$' ''
+  } | uniq | sort
+}
+
+# Rename a mod, e.g. unknown/foo to someone/foo. Dry run unless --apply.
+#
+# Moves mods/<creator>/<mod>.json (and .nix) and rewrites every reference to the id:
+# the import/<name>.json records, profiles/*.json, grouping.json and
+# grouping.suggested.json, other mods' requires and conflicts, and the quoted id in the
+# data folder's .nix files. Other mentions (an attribute path, notes) are listed, not
+# changed.
+#
+# Unless grouping.json already names the mod, its top folders get `groups` entries, so
+# a --fresh import keeps the new id instead of guessing again. A folder that other mods
+# have files in isn't pinned, and neither is a mod of loose files.
+export def "sims mod rename" [
+  old: string@"nu-complete sims mods" # the mod's id, creator/mod
+  new: string                         # its new id
+  --apply                             # move and rewrite the files
+]: nothing -> record {
+  let data = sims-config | get dataDir | path expand
+  if $new !~ '^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$' {
+    error make {msg: $"($new): an id is creator/mod, in lowercase letters, digits and -"}
+  }
+  if $new == $old { error make {msg: "the new id is the old one"} }
+  let path_of = {|id, ext| $data | path join mods $"($id).($ext)" }
+  let moves = [json nix] | each {|ext| {from: (do $path_of $old $ext), to: (do $path_of $new $ext)} } | where {|m| $m.from | path exists }
+  if ($moves | is-empty) { error make {msg: $"($old) isn't in the catalog"} }
+  if ([json nix] | any {|ext| do $path_of $new $ext | path exists }) {
+    error make {msg: $"($new) is already in the catalog"}
+  }
+  let swap = {|id| if $id == $old { $new } else { $id } }
+  let rel = {|f| $f | path relative-to $data }
+
+  # each rewritten JSON file: { file, refs, json }
+  let records = import-reports $data | each {|f| {file: $f, json: (open $f)} }
+  let reports = $records | each {|r|
+    let refs = $r.json.files | where mod == $old | length
+    if $refs > 0 {
+      let files = $r.json.files | each {|x| if $x.mod == $old { $x | update mod $new } else { $x } }
+      {file: $r.file, refs: $refs, json: ($r.json | update files $files)}
+    }
+  }
+  let profiles_dir = $data | path join profiles
+  let profiles = if ($profiles_dir | path exists) { glob $"($profiles_dir)/*.json" } else { [] } | each {|f|
+    let p = open $f
+    if $old in ($p.mods? | default []) {
+      {file: $f, refs: 1, json: ($p | update mods ($p.mods | each $swap | uniq | sort))}
+    }
+  }
+  let deps = read-catalog $data | where id != $old | each {|c|
+    let fields = [requires conflicts] | where {|k| $old in ($c.mod | get -o $k | default []) }
+    if ($fields | is-not-empty) {
+      let json = $fields | reduce -f $c.mod {|k, m| $m | update $k ($m | get $k | each $swap | uniq) }
+      {file: $c.path, refs: ($fields | length), json: $json}
+    }
+  }
+
+  # grouping.json and grouping.suggested.json: the mod's `groups` entries and rules
+  let grouping_file = $data | path join import grouping.json
+  let groupings = [grouping.json grouping.suggested.json] | each {|n| $data | path join import $n } | where { path exists } | each {|f|
+    let g = open $f
+    let groups = $g.groups? | default {}
+    let rules = $g.rules? | default []
+    let in_groups = $groups | values | where {|v| $v.mod? == $old } | length
+    let in_rules = $rules | where {|r| $r.mod? == $old } | length
+    let renamed = if $in_groups == 0 { $g } else {
+      $g | update groups ($groups | transpose k v | reduce -f {} {|e, acc|
+        $acc | insert $e.k (if $e.v.mod? == $old { $e.v | update mod $new } else { $e.v })
+      })
+    }
+    let renamed = if $in_rules == 0 { $renamed } else {
+      $renamed | update rules ($rules | each {|r| if $r.mod? == $old { $r | update mod $new } else { $r } })
+    }
+    {file: $f, refs: ($in_groups + $in_rules), json: $renamed}
+  }
+
+  # top folders to pin in grouping.json: those the imports put this mod's files in,
+  # unless another mod has files there too or a `groups` key already covers them
+  let main = $groupings | where file == $grouping_file | get -o 0
+  let named = $main != null and $main.refs > 0
+  let owned = $records | each {|r| $r.json.files } | flatten
+  let keys = $main.json.groups? | default {} | columns
+  let folders = $owned | where mod == $old and ($it.path | str contains '/') | each {|f| $f.path | path split | first } | uniq | sort
+  let candidates = $folders | where {|d| not ($keys | any {|k| $d == $k or ($d | str starts-with $"($k)/") }) }
+  let shared = $candidates | where {|d|
+    $owned | any {|f| ($f.path | str starts-with $"($d)/") and $f.mod != null and $f.mod != $old }
+  }
+  let pins = if $named { [] } else { $candidates | where $it not-in $shared }
+  let grouping_edit = if ($pins | is-empty) {
+    if $main != null and $main.refs > 0 { $main }
+  } else {
+    let base = $main.json? | default {}
+    let groups = $pins | reduce -f ($base.groups? | default {}) {|d, acc| $acc | insert $d {mod: $new} }
+    {file: $grouping_file, refs: ($main.refs? | default 0), json: ($base | upsert groups $groups)}
+  }
+  let edits = [
+    ...$reports ...$profiles ...$deps
+    ...($groupings | where file != $grouping_file and refs > 0)
+    ...(if $grouping_edit == null { [] } else { [$grouping_edit] })
+  ]
+
+  # the quoted id in .nix files; other mentions of it are only listed
+  let text_files = glob $"($data)/**/*.{nix,md}" | where {|f| '/.git/' not-in $f }
+  let quoted = $'"($old)"'
+  let texts = $text_files | where { str ends-with .nix } | each {|f|
+    let t = open --raw $f | decode utf-8
+    let refs = ($t | split row $quoted | length) - 1
+    if $refs > 0 { {file: $f, refs: $refs, text: ($t | str replace -a $quoted $'"($new)"')} }
+  }
+  let attr = $old | str replace '/' '.'
+  let mentions = $text_files | each {|f|
+    let t = $texts | where file == $f | get -o 0.text | default (open --raw $f | decode utf-8)
+    $t | lines | enumerate | where {|l| ($l.item | str contains $old) or ($l.item | str contains $attr) } | each {|l|
+      {file: (do $rel $f), line: ($l.index + 1), text: ($l.item | str trim)}
+    }
+  } | flatten
+
+  let summary = {
+    from: $old
+    to: $new
+    moved: ($moves | each {|m| $"(do $rel $m.from) -> (do $rel $m.to)" })
+    rewritten: ([...$edits ...$texts] | each {|e| {file: (do $rel $e.file), refs: $e.refs} })
+    pinned: $pins
+    notPinned: (if $named { 'grouping.json already names it' } else if ($folders | is-empty) { 'loose files: no folder to pin' } else { $shared })
+    mentions: $mentions
+    applied: false
+  }
+  if not $apply {
+    print 'dry run: add --apply to move and rewrite the files'
+    return $summary
+  }
+
+  for e in $edits { $e.json | to json -i 2 | save -f $e.file }
+  for e in $texts { $e.text | save -f $e.file }
+  for m in $moves {
+    mkdir ($m.to | path dirname)
+    mv $m.from $m.to
+  }
+  let old_dir = $data | path join mods ($old | path dirname)
+  if (ls -a $old_dir | is-empty) { rm $old_dir }
+  $summary | update applied true
 }
 
 # Download sources. The archives and loose mod files that mods were installed from,
