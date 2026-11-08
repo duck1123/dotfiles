@@ -342,9 +342,9 @@ export def "sims save restore" [
   }
   if not $apply {
     if (not $with_mods) and ($mods_changes | default 0) > 0 {
-      print $"warning: ($mods_changes) files differ between the backup's Mods snapshot and ($t.name)'s Mods/ \(--with-mods to restore them\)"
+      print -e $"warning: ($mods_changes) files differ between the backup's Mods snapshot and ($t.name)'s Mods/ \(--with-mods to restore them\)"
     }
-    print 'dry run: add --apply to restore'
+    print -e 'dry run: add --apply to restore'
     return $plan
   }
 
@@ -390,7 +390,7 @@ export def "sims save wipe" [
     applied: false
   }
   if not $apply {
-    print 'dry run: add --apply to back up and wipe'
+    print -e 'dry run: add --apply to back up and wipe'
     return $plan
   }
   assert-game-closed
@@ -424,7 +424,7 @@ export def "sims save delete" [
     applied: false
   }
   if not $apply {
-    print 'dry run: add --apply to back up and delete'
+    print -e 'dry run: add --apply to back up and delete'
     return $plan
   }
   assert-game-closed
@@ -451,7 +451,7 @@ export def "sims save delete-backup" [
     {id: $id, size: (du $dir | get physical.0), deleted: false}
   }
   if not $apply {
-    print 'dry run: add --apply to delete'
+    print -e 'dry run: add --apply to delete'
     return $found
   }
   for b in $found { rm -r ($root | path join $b.id) }
@@ -854,7 +854,7 @@ export def "sims import" [
     $summary | insert removes {mods: ($old_catalog | length), reports: ($old_reports | each { path basename })}
   } else { $summary }
   if not $apply {
-    print 'dry run: add --apply to write the blobs and the catalog'
+    print -e 'dry run: add --apply to write the blobs and the catalog'
     return $summary
   }
 
@@ -1117,7 +1117,7 @@ export def "sims switch" [
     applied: false
   }
   if not $apply {
-    print 'dry run: add --apply to change Mods/'
+    print -e 'dry run: add --apply to change Mods/'
     return $summary
   }
   if ($conflicts | is-not-empty) {
@@ -1180,7 +1180,7 @@ export def "sims switch" [
   }
   let thumbs = $i.documents | path join localthumbcache.package
   if $changing and ($thumbs | path exists) {
-    print $"mods changed: the game rebuilds ($thumbs) if you delete it"
+    print -e $"mods changed: the game rebuilds ($thumbs) if you delete it"
   }
   $summary | update applied true
 }
@@ -1208,6 +1208,7 @@ export def "sims mod rename" [
   old: string@"nu-complete sims mods" # the mod's id, creator/mod
   new: string                         # its new id
   --apply                             # move and rewrite the files
+  --commit                            # with --apply, commit the files it changed
 ]: nothing -> record {
   let data = sims-config | get dataDir | path expand
   if $new !~ '^[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*$' {
@@ -1318,7 +1319,7 @@ export def "sims mod rename" [
     applied: false
   }
   if not $apply {
-    print 'dry run: add --apply to move and rewrite the files'
+    print -e 'dry run: add --apply to move and rewrite the files'
     return $summary
   }
 
@@ -1330,7 +1331,78 @@ export def "sims mod rename" [
   }
   let old_dir = $data | path join mods ($old | path dirname)
   if (ls -a $old_dir | is-empty) { rm $old_dir }
-  $summary | update applied true
+  let commit = if $commit {
+    let touched = [...$edits ...$texts] | get file | append ($moves | each {|m| [$m.from $m.to] } | flatten)
+    commit-data $data $touched $"sims: rename ($old) to ($new)"
+  }
+  $summary | update applied true | insert commit $commit
+}
+
+# Commit `files` (paths in dataDir, which may have been moved away or deleted) in the
+# repo holding dataDir, and nothing else that's uncommitted there. Returns the commit's
+# short hash, or null when none of the files changed.
+def commit-data [data: path, files: list<path>, message: string]: nothing -> any {
+  let files = $files | uniq
+  if ($files | is-empty) { return null }
+  data-git $data add -A -- ...$files
+  # exit 1: something staged in them
+  if (data-git $data diff --cached --quiet -- ...$files).exit_code == 0 { return null }
+  data-git $data commit -q -m $message -- ...$files
+  data-git $data rev-parse --short HEAD | get stdout | str trim
+}
+
+# git in dataDir's repo; fails on an error (exit 1 is only an answer for `diff`)
+def --wrapped data-git [data: path, ...args: string]: nothing -> record {
+  let r = ^git -C $data ...$args | complete
+  if $r.exit_code > 1 or ($r.exit_code == 1 and $args.0 != diff) {
+    error make {msg: $"git ($args.0): ($r.stderr | str trim)"}
+  }
+  $r
+}
+
+# Set a mod's catalog fields in mods/<creator>/<mod>.json. An empty --page or --title
+# clears it; --tags replaces the list. Writes right away (there's no dry run).
+export def "sims mod set" [
+  id: string@"nu-complete sims mods" # the mod's id, creator/mod
+  --page: string                     # download page, an http(s) URL
+  --title: string                    # display name
+  --tags: list<string>               # every tag the mod has
+  --commit                           # commit the change
+]: nothing -> record {
+  let data = sims-config | get dataDir | path expand
+  let file = $data | path join mods $"($id).json"
+  if not ($file | path exists) {
+    error make {msg: (if ($data | path join mods $"($id).nix" | path exists) {
+      $"($id) is defined in Nix: edit mods/($id).nix"
+    } else { $"($id) isn't in the catalog" })}
+  }
+  if $page != null and $page != '' and $page !~ '^https?://\S+$' {
+    error make {msg: $"($page): a download page is an http\(s\) URL"}
+  }
+  let tags = if $tags == null { null } else {
+    let tags = $tags | each { str trim } | where { is-not-empty } | uniq | sort
+    let bad = $tags | where { $in !~ '^[A-Za-z0-9][A-Za-z0-9 _.-]*$' }
+    if ($bad | is-not-empty) { error make {msg: $"bad tags: ($bad | str join ', ')"} }
+    $tags
+  }
+  let blank = {|v| if $v == '' { null } else { $v } }
+  let wanted = {downloadPage: $page, title: $title, tags: $tags}
+    | transpose field value | where value != null
+    | update value {|r| if $r.field == tags { $r.value } else { do $blank ($r.value | str trim) } }
+  if ($wanted | is-empty) { error make {msg: 'nothing to set: give --page, --title or --tags'} }
+
+  let mod = open $file
+  let changes = $wanted | each {|w|
+    let was = $mod | get -o $w.field
+    if $was != $w.value { {field: $w.field, from: $was, to: $w.value} }
+  }
+  let commit = if ($changes | is-empty) { null } else {
+    $changes | reduce -f $mod {|c, m| $m | upsert $c.field $c.to } | to json -i 2 | save -f $file
+    if $commit {
+      commit-data $data [$file] $"sims: set ($changes | get field | str join ', ') for ($id)"
+    }
+  }
+  {id: $id, changes: $changes, commit: $commit}
 }
 
 # Download sources. The archives and loose mod files that mods were installed from,
@@ -1429,7 +1501,7 @@ export def "sims sources index" [
     applied: false
   }
   if not $apply {
-    print 'dry run: add --apply to unpack, index and store the new downloads'
+    print -e 'dry run: add --apply to unpack, index and store the new downloads'
     return $summary
   }
 
@@ -1671,6 +1743,7 @@ export def "sims add" [
   --pin                     # install this version
   --profile (-p): string    # also add the mod to this profile
   --apply                   # store, index and write the catalog
+  --commit                  # with --apply, commit the catalog files it changed
 ]: nothing -> table {
   if ($paths | is-empty) { error make {msg: 'give one or more downloads'} }
   let data = sims-config | get dataDir | path expand
@@ -1764,7 +1837,7 @@ export def "sims add" [
 
   let summary = $plans | select download change id version files note
   if not $apply {
-    print 'dry run: add --apply to store the downloads and write the catalog'
+    print -e 'dry run: add --apply to store the downloads and write the catalog'
     return $summary
   }
   let root = blob-root
@@ -1778,11 +1851,20 @@ export def "sims add" [
     mkdir ($file | path dirname)
     $p.json | to json -i 2 | save -f $file
   }
-  if $profile != null {
-    let pfile = $data | path join profiles $"($profile).json"
+  let pfile = if $profile != null { $data | path join profiles $"($profile).json" }
+  if $pfile != null {
     let ids = $plans | where change in ['known' 'new version' 'new mod'] | get id
     let prof = open $pfile
     $prof | update mods ($prof.mods | append $ids | uniq | sort) | to json -i 2 | save -f $pfile
+  }
+  if $commit {
+    let written = $plans | where json != null | get id | uniq
+    let touched = [($data | path join archives.json)]
+      | append ($written | each {|id| $data | path join mods $"($id).json" })
+      | append (if $pfile != null { [$pfile] } else { [] })
+    let what = if ($written | is-empty) { $plans | get download | str join ', ' } else { $written | str join ', ' }
+    let hash = commit-data $data $touched $"sims: add ($what)"
+    print -e (if $hash == null { 'nothing to commit' } else { $"committed ($hash)" })
   }
   $summary
 }
