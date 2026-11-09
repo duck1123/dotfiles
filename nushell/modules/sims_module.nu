@@ -1663,7 +1663,7 @@ export def "sims mod list" [
         inherit (m) id title downloadPage tags enable folder version selectedVersion requires conflicts;
         versions = lib.mapAttrs (l: v: {
           inherit (v) added gameVersion;
-          files = map (f: { inherit (f) name; members = lib.length f.members; }) v.files;
+          files = map (f: { inherit (f) name sha256; members = lib.length f.members; }) v.files;
         }) m.versions;
       }) mods;
     }'

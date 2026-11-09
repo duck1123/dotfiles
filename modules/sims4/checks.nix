@@ -141,6 +141,39 @@ _: {
           })
         );
 
+        "one file at two paths installs once when flattened" =
+          lib.filter (f: f.mod == "zed/loose")
+            (run {
+              extraModules = [
+                {
+                  sims4.mods.zed.loose = {
+                    flatten = true;
+                    versions = lib.mkForce {
+                      "1".files = [
+                        {
+                          name = "same.package";
+                          sha256 = "e400";
+                        }
+                        {
+                          name = "Old/same.package";
+                          sha256 = "e400";
+                        }
+                      ];
+                    };
+                  };
+                }
+              ];
+            }).manifest.files == [
+            {
+              mod = "zed/loose";
+              version = "1";
+              target = "same.package";
+              sha256 = "e400";
+              archive = null;
+              member = null;
+            }
+          ];
+
         "flattening onto one name fails" = fails "installed by more than one file" (run {
           extraModules = [
             {

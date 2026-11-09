@@ -56,6 +56,16 @@ test("shows the mod's problems and the ones naming no mod", async () => {
   expect(screen.getByRole("list", { name: "Catalog problems" })).toHaveTextContent("unknown base profile vanilla");
 });
 
+test("a file shows its hash, and a second copy of one says so", async () => {
+  setup(undefined, "zed/loose");
+  const copy = (await screen.findByText("Old/zed_loose_v2.package")).closest("li")!;
+  expect(copy).toHaveTextContent("(same file as zed_loose_v2.package)");
+  expect(copy.title).toMatch(/^sha256 [0-9a-f]{64}$/);
+  const original = screen.getByText("zed_loose_v2.package").closest("li")!;
+  expect(original.title).toBe(copy.title);
+  expect(original).not.toHaveTextContent("same file as");
+});
+
 test("changing the profile reloads the list for it", async () => {
   const { list, user } = setup();
   await waitFor(() => expect(modButtons()).toHaveLength(sampleMods.length));

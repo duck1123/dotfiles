@@ -3,6 +3,13 @@ import type { ModList, ModSummary } from "./types";
 // Made-up mods for stories and tests. Never put real mod names here: this repo
 // is public and the mod list is private (Simsnix rule).
 
+/** A made-up 64-digit hex hash, stable per seed. */
+function fakeHash(seed: string): string {
+  let h = 0;
+  for (const c of seed) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return h.toString(16).padStart(8, "0").repeat(8);
+}
+
 function mod(id: string, fields: Partial<ModSummary> = {}): ModSummary {
   return {
     id,
@@ -15,7 +22,7 @@ function mod(id: string, fields: Partial<ModSummary> = {}): ModSummary {
     selectedVersion: "1.0",
     requires: [],
     conflicts: [],
-    versions: { "1.0": { added: "2026-05-17", gameVersion: null, files: [{ name: `${id.split("/")[1]}.package`, members: 0 }] } },
+    versions: { "1.0": { added: "2026-05-17", gameVersion: null, files: [{ name: `${id.split("/")[1]}.package`, sha256: fakeHash(id), members: 0 }] } },
     editable: true,
     profiles: ["current"],
     problems: [],
@@ -30,8 +37,8 @@ export const sampleMods: ModSummary[] = [
     tags: ["library", "script"],
     selectedVersion: "2.4.1",
     versions: {
-      "2.3.0": { added: "2025-10-09", gameVersion: "1.110", files: [{ name: "AcmeCore_2.3.0.zip", members: 3 }] },
-      "2.4.1": { added: "2026-05-17", gameVersion: "1.116", files: [{ name: "AcmeCore_2.4.1.zip", members: 4 }] },
+      "2.3.0": { added: "2025-10-09", gameVersion: "1.110", files: [{ name: "AcmeCore_2.3.0.zip", sha256: fakeHash("core-2.3.0"), members: 3 }] },
+      "2.4.1": { added: "2026-05-17", gameVersion: "1.116", files: [{ name: "AcmeCore_2.4.1.zip", sha256: fakeHash("core-2.4.1"), members: 4 }] },
     },
   }),
   mod("acme/widgets", {
@@ -53,8 +60,16 @@ export const sampleMods: ModSummary[] = [
     version: "2025-12-01",
     selectedVersion: "2025-12-01",
     versions: {
-      "2025-12-01": { added: "2025-12-01", gameVersion: null, files: [{ name: "zed_loose.package", members: 0 }] },
-      "2026-02-14": { added: "2026-02-14", gameVersion: null, files: [{ name: "zed_loose_v2.package", members: 0 }] },
+      "2025-12-01": { added: "2025-12-01", gameVersion: null, files: [{ name: "zed_loose.package", sha256: fakeHash("loose-1"), members: 0 }] },
+      "2026-02-14": {
+        added: "2026-02-14",
+        gameVersion: null,
+        files: [
+          { name: "zed_loose_v2.package", sha256: fakeHash("loose-2"), members: 0 },
+          // the same file imported from two places
+          { name: "Old/zed_loose_v2.package", sha256: fakeHash("loose-2"), members: 0 },
+        ],
+      },
     },
   }),
   mod("nimbus/weather", {

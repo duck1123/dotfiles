@@ -74,14 +74,23 @@ function ModLinks({ ids, knownIds, onSelect }: { ids: string[]; knownIds?: Reado
   );
 }
 
-/** A version's files; past `shown` of them, the rest fold away. */
+/**
+ * A version's files; past `shown` of them, the rest fold away. Hovering a file
+ * shows its hash, and a file with the same hash as an earlier one says so.
+ */
 function FileList({ files, shown = 5 }: { files: ModFile[]; shown?: number }) {
-  const item = (f: ModFile) => (
-    <li key={f.name}>
-      {f.name}
-      {f.members > 0 && <span className="dui-mod__members"> ({f.members} inside)</span>}
-    </li>
-  );
+  const firstNamed = new Map<string, string>();
+  for (const f of files) if (!firstNamed.has(f.sha256)) firstNamed.set(f.sha256, f.name);
+  const item = (f: ModFile) => {
+    const first = firstNamed.get(f.sha256);
+    return (
+      <li key={f.name} title={`sha256 ${f.sha256}`}>
+        {f.name}
+        {f.members > 0 && <span className="dui-mod__members"> ({f.members} inside)</span>}
+        {first !== f.name && <span className="dui-mod__duplicate"> (same file as {first})</span>}
+      </li>
+    );
+  };
   if (files.length <= shown + 1) {
     return <ul className="dui-mod__files">{files.map(item)}</ul>;
   }

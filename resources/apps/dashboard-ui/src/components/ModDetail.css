@@ -153,6 +153,10 @@
   color: var(--dui-text-muted);
 }
 
+.dui-mod__duplicate {
+  color: var(--dui-danger);
+}
+
 .dui-mod__button {
   padding: 3px 12px;
   border: 1px solid var(--dui-border-strong);

@@ -5,6 +5,8 @@
 /** One file of a mod version, as downloaded. */
 export interface ModFile {
   name: string;
+  /** SHA-256 of the file (hex), the name of its blob. */
+  sha256: string;
   /** Files inside it, for an archive; 0 for a loose mod file. */
   members: number;
 }

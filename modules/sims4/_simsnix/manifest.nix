@@ -69,7 +69,16 @@ let
       }
     ) wanted;
 
-  files = lib.sort (a: b: a.target < b.target) (lib.concatMap filesOf enabled);
+  # one copy of a file a mod has twice at the same target (e.g. imported from
+  # two folders, then flattened)
+  dedupe =
+    fs:
+    lib.attrValues (
+      lib.listToAttrs (
+        map (f: lib.nameValuePair "${lib.toLower f.target}\t${f.sha256}" f) (lib.reverseList fs)
+      )
+    );
+  files = lib.sort (a: b: a.target < b.target) (lib.concatMap (m: dedupe (filesOf m)) enabled);
 
   depth = target: lib.length (lib.splitString "/" target) - 1;
   hasExt = ext: target: lib.hasSuffix ext (lib.toLower target);
