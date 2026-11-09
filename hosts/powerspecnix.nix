@@ -27,7 +27,10 @@ in
       enable = true;
       gortex = {
         enable = true;
-        hooks.enable = true;
+        hooks = {
+          enable = true;
+          mode = "nudge";
+        };
         skills.enable = true;
       };
     };
