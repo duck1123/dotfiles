@@ -1321,6 +1321,23 @@ def folder-value [folder: string]: nothing -> record {
   {drop: false, value: ($f | str trim -c '/')}
 }
 
+# For a flattened mod: one entry per file in each version. Entries with the same
+# hash and base name install to the same place, so only the shortest path is kept.
+# Returns { mod, collapsed } (how many entries were dropped).
+def collapse-flat [mod: record]: nothing -> record {
+  if not ($mod.flatten? | default false) { return {mod: $mod, collapsed: 0} }
+  let before = $mod.versions | values | each { get files | length } | math sum
+  let versions = $mod.versions | items {|label, v|
+    let files = $v.files | enumerate
+      | insert key {|e| $"($e.item.name | path basename | str lowercase)\t($e.item.sha256)" }
+      | insert len {|e| $e.item.name | str length }
+      | sort-by len | uniq-by key | sort-by index | get item
+    {label: $label, v: ($v | update files $files)}
+  } | reduce -f {} {|e, acc| $acc | insert $e.label $e.v }
+  let after = $versions | values | each { get files | length } | math sum
+  {mod: ($mod | update versions $versions), collapsed: ($before - $after)}
+}
+
 def apply-folder [mod: record, folder: record]: nothing -> record {
   if $folder.drop { $mod | reject -o folder } else { $mod | upsert folder $folder.value }
 }
@@ -1404,6 +1421,8 @@ export def "sims mod merge" [
     | upsert version $pin
   let merged = if $folder == null { $merged } else { apply-folder $merged (folder-value $folder) }
   let merged = if $flatten { $merged | upsert flatten true } else { $merged }
+  let merged = collapse-flat $merged | get mod
+  let versions = $merged.versions
 
   # the newest version of each mod should still be in the merged mod's selected one
   let selected = $pin | default ($labels | labels-desc | first)
@@ -1618,6 +1637,8 @@ export def "sims mod set" [
   let next = $wanted | reduce -f $mod {|w, m| $m | upsert $w.field $w.value }
   let next = if $folder == null { $next } else { apply-folder $next (folder-value $folder) }
   let next = if $flatten { $next | upsert flatten true } else if $no_flatten { $next | reject -o flatten } else { $next }
+  let flat = collapse-flat $next
+  let next = $flat.mod
   # a folder field left out is the default folder
   let shown = {|m, k|
     if $k == folder and folder not-in ($m | columns) { $id | str replace '/' '_' } else { $m | get -o $k }
@@ -1626,6 +1647,9 @@ export def "sims mod set" [
     let was = do $shown $mod $k
     let now = do $shown $next $k
     if $was != $now { {field: $k, from: $was, to: $now} }
+  }
+  let changes = if $flat.collapsed == 0 { $changes } else {
+    $changes | append {field: versions, from: null, to: $"($flat.collapsed) duplicate file entries removed"}
   }
   let commit = if ($changes | is-empty) { null } else {
     $next | to json -i 2 | save -f $file
