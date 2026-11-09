@@ -107,6 +107,62 @@ _: {
           })
         );
 
+        "flatten drops a member's path" = lib.elem "acme_widgets/widgets.package" (
+          targets (run {
+            extraModules = [
+              {
+                sims4.mods.acme.widgets = {
+                  stripComponents = lib.mkForce 0;
+                  flatten = true;
+                };
+              }
+            ];
+          })
+        );
+
+        "flatten drops a plain file's path" = lib.elem "zed_loose/loose.package" (
+          targets (run {
+            extraModules = [
+              {
+                sims4.mods.zed.loose = {
+                  folder = lib.mkForce "zed_loose";
+                  flatten = true;
+                  versions = lib.mkForce {
+                    "1".files = [
+                      {
+                        name = "Sub/Dir/loose.package";
+                        sha256 = "e200";
+                      }
+                    ];
+                  };
+                };
+              }
+            ];
+          })
+        );
+
+        "flattening onto one name fails" = fails "installed by more than one file" (run {
+          extraModules = [
+            {
+              sims4.mods.zed.loose = {
+                flatten = true;
+                versions = lib.mkForce {
+                  "1".files = [
+                    {
+                      name = "A/same.package";
+                      sha256 = "e300";
+                    }
+                    {
+                      name = "B/same.package";
+                      sha256 = "e301";
+                    }
+                  ];
+                };
+              };
+            }
+          ];
+        });
+
         "base profile minus remove" =
           map (m: m.id) (run { profile = "lite"; }).manifest.mods == [
             "acme/core"

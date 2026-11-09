@@ -6,7 +6,8 @@
 #   files = [ { mod, version, target, sha256, archive, member } ];
 # }
 #
-# target is relative to Mods/. An archive's members are installed, not the
+# target is relative to Mods/: the mod's folder, then the file's path (just its
+# base name when the mod has `flatten`). An archive's members are installed, not the
 # archive: a member's `archive` is the sha256 of the archive (its blob) and
 # `member` its path inside it; a plain file has both null. A file is installed if
 # its (stripped) path matches one of the mod's `include` regexes and none of
@@ -55,12 +56,18 @@ let
         e: e.path != "" && matchesAny m.include e.path && !(matchesAny m.exclude e.path)
       ) entries;
     in
-    map (e: {
-      mod = m.id;
-      version = m.selectedVersion;
-      target = if m.folder == null then e.path else "${m.folder}/${e.path}";
-      inherit (e) sha256 archive member;
-    }) wanted;
+    map (
+      e:
+      let
+        path = if m.flatten then baseNameOf e.path else e.path;
+      in
+      {
+        mod = m.id;
+        version = m.selectedVersion;
+        target = if m.folder == null then path else "${m.folder}/${path}";
+        inherit (e) sha256 archive member;
+      }
+    ) wanted;
 
   files = lib.sort (a: b: a.target < b.target) (lib.concatMap filesOf enabled);
 

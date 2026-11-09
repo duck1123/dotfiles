@@ -100,6 +100,11 @@ let
           default = "${creator}_${name}";
           description = "Folder under Mods/ the files go in; null puts them directly in Mods/.";
         };
+        flatten = mkOption {
+          type = types.bool;
+          default = false;
+          description = "Install every file directly in `folder`, dropping the path it has in the catalog (a plain file's name, or an archive member's path after stripComponents).";
+        };
         stripComponents = mkOption {
           type = types.ints.unsigned;
           default = 0;

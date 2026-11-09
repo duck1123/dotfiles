@@ -102,6 +102,38 @@ def version-cmp [a: string, b: string]: nothing -> int {
   0
 }
 
+# Version labels compared as Nix's builtins.compareVersions does (the framework picks
+# the highest label with it): -1, 0 or 1
+def label-cmp [a: string, b: string]: nothing -> int {
+  let parts = {|s| $s | parse -r '(\d+|[^\d.-]+)' | get capture0 }
+  let pa = do $parts $a
+  let pb = do $parts $b
+  let num = {|c| if $c =~ '^\d+$' { $c | into int } }
+  let lt = {|x, y|
+    let nx = do $num $x
+    let ny = do $num $y
+    if $nx != null and $ny != null { $nx < $ny
+    } else if $x == '' and $ny != null { true
+    } else if $x == pre and $y != pre { true
+    } else if $y == pre { false
+    } else if $ny != null { true
+    } else if $nx != null { false
+    } else { $x < $y }
+  }
+  for i in 0..<([($pa | length) ($pb | length)] | math max) {
+    let x = $pa | get -o $i | default ''
+    let y = $pb | get -o $i | default ''
+    if (do $lt $x $y) { return (-1) }
+    if (do $lt $y $x) { return 1 }
+  }
+  0
+}
+
+# Labels, highest first
+def labels-desc []: list<string> -> list<string> {
+  sort-by -c {|a, b| (label-cmp $a $b) > 0 }
+}
+
 # A slot id as 8 hex digits, as in Slot_<hex>.save
 def hex8 [n: int]: nothing -> string {
   $n | format number | get upperhex | str replace '0x' '' | fill -a right -c '0' -w 8
@@ -1195,6 +1227,238 @@ def "nu-complete sims mods" []: nothing -> list<string> {
   } | uniq | sort
 }
 
+# Rewrites of every reference to mod ids in dataDir, for `swap` ([{from, to}]): the
+# import/<name>.json records, profiles/*.json, grouping.json and
+# grouping.suggested.json, the requires and conflicts of catalog mods not in `skip`,
+# and the quoted id in .nix files. Other mentions (an attribute path, notes) are
+# only listed. Each edit is { file, refs, json } (`text` for the .nix files); a
+# grouping file is listed even when it doesn't name the ids (refs 0).
+def id-ref-edits [data: path, swap: list<record>, skip: list<string>]: nothing -> record {
+  let olds = $swap | get from
+  let to = {|id| $swap | where from == $id | get -o 0.to | default $id }
+  let rel = {|f| $f | path relative-to $data }
+
+  let records = import-reports $data | each {|f| {file: $f, json: (open $f)} }
+  let reports = $records | each {|r|
+    let refs = $r.json.files | where {|x| $x.mod in $olds } | length
+    if $refs > 0 {
+      let files = $r.json.files | each {|x| if $x.mod in $olds { $x | update mod (do $to $x.mod) } else { $x } }
+      {file: $r.file, refs: $refs, json: ($r.json | update files $files)}
+    }
+  }
+  let profiles_dir = $data | path join profiles
+  let profiles = if ($profiles_dir | path exists) { glob $"($profiles_dir)/*.json" } else { [] } | each {|f|
+    let p = open $f
+    let refs = $p.mods? | default [] | where $it in $olds | length
+    if $refs > 0 {
+      {file: $f, refs: $refs, json: ($p | update mods ($p.mods | each {|m| do $to $m } | uniq | sort))}
+    }
+  }
+  let deps = read-catalog $data | where id not-in $skip | each {|c|
+    let fields = [requires conflicts] | where {|k| $c.mod | get -o $k | default [] | any {|r| $r in $olds } }
+    if ($fields | is-not-empty) {
+      let json = $fields | reduce -f $c.mod {|k, m| $m | update $k ($m | get $k | each {|r| do $to $r } | uniq) }
+      {file: $c.path, refs: ($fields | length), json: $json}
+    }
+  }
+
+  # grouping.json and grouping.suggested.json: `groups` entries and rules
+  let groupings = [grouping.json grouping.suggested.json] | each {|n| $data | path join import $n } | where { path exists } | each {|f|
+    let g = open $f
+    let groups = $g.groups? | default {}
+    let rules = $g.rules? | default []
+    let in_groups = $groups | values | where {|v| $v.mod? in $olds } | length
+    let in_rules = $rules | where {|r| $r.mod? in $olds } | length
+    let renamed = if $in_groups == 0 { $g } else {
+      $g | update groups ($groups | transpose k v | reduce -f {} {|e, acc|
+        $acc | insert $e.k (if $e.v.mod? in $olds { $e.v | update mod (do $to $e.v.mod) } else { $e.v })
+      })
+    }
+    let renamed = if $in_rules == 0 { $renamed } else {
+      $renamed | update rules ($rules | each {|r| if $r.mod? in $olds { $r | update mod (do $to $r.mod) } else { $r } })
+    }
+    {file: $f, refs: ($in_groups + $in_rules), json: $renamed}
+  }
+
+  # the quoted id in .nix files; other mentions of it are only listed
+  let text_files = glob $"($data)/**/*.{nix,md}" | where {|f| '/.git/' not-in $f }
+  let texts = $text_files | where { str ends-with .nix } | each {|f|
+    let t = open --raw $f | decode utf-8
+    let refs = $swap | each {|s| ($t | split row $'"($s.from)"' | length) - 1 } | math sum
+    if $refs > 0 {
+      let text = $swap | reduce -f $t {|s, acc| $acc | str replace -a $'"($s.from)"' $'"($s.to)"' }
+      {file: $f, refs: $refs, text: $text}
+    }
+  }
+  let needles = $olds | each {|o| [$o ($o | str replace '/' '.')] } | flatten
+  let mentions = $text_files | each {|f|
+    let t = $texts | where file == $f | get -o 0.text | default (open --raw $f | decode utf-8)
+    $t | lines | enumerate | where {|l| $needles | any {|n| $l.item | str contains $n } } | each {|l|
+      {file: (do $rel $f), line: ($l.index + 1), text: ($l.item | str trim)}
+    }
+  } | flatten
+
+  {
+    records: $records
+    reports: $reports
+    profiles: $profiles
+    deps: $deps
+    groupings: $groupings
+    texts: $texts
+    mentions: $mentions
+  }
+}
+
+# A `--folder` value as the catalog stores it: `default` drops the field (the mod
+# gets <creator>_<mod>), '' is null (straight into Mods/), else the name itself
+def folder-value [folder: string]: nothing -> record {
+  let f = $folder | str trim
+  if $f == default { return {drop: true, value: null} }
+  if $f == '' { return {drop: false, value: null} }
+  if ($f | str starts-with '/') or ($f | path split | any {|c| $c in ['.' '..'] }) {
+    error make {msg: $"($folder): a folder is a path relative to Mods/"}
+  }
+  {drop: false, value: ($f | str trim -c '/')}
+}
+
+def apply-folder [mod: record, folder: record]: nothing -> record {
+  if $folder.drop { $mod | reject -o folder } else { $mod | upsert folder $folder.value }
+}
+
+# Merge mods into one: their versions, by label, become `into`'s, and every profile,
+# import record, grouping rule and requires/conflicts that names them names `into`
+# instead. Then their catalog files are deleted. Dry run unless --apply.
+#
+# A version label the mods share gets the files of all of them (one copy of a file
+# two mods have). The mods must agree on stripComponents, include and exclude, since
+# those apply to every file of the merged mod. A pinned `version` becomes the highest
+# pin among them. Other fields are `into`'s, filled in from the others where unset;
+# tags, stateFiles, requires and conflicts are combined.
+#
+# --folder sets where the merged mod installs: a folder under Mods/, `default` for
+# <creator>_<mod>, or '' for Mods/ itself. --flatten installs every file directly in
+# that folder, whatever path it was imported at.
+export def "sims mod merge" [
+  into: string@"nu-complete sims mods"     # the mod to keep, creator/mod
+  ...mods: string@"nu-complete sims mods"  # the mods to fold into it
+  --folder: string                         # folder under Mods/, `default` or ''
+  --flatten                                # install files directly in the folder
+  --apply                                  # write the files
+  --commit                                 # with --apply, commit the files it changed
+]: nothing -> record {
+  let data = sims-config | get dataDir | path expand
+  let mods = $mods | uniq | where $it != $into
+  if ($mods | is-empty) { error make {msg: "name at least one mod to merge into it"} }
+  let file_of = {|id| $data | path join mods $"($id).json" }
+  for id in [$into ...$mods] {
+    if not (do $file_of $id | path exists) {
+      error make {msg: (if ($data | path join mods $"($id).nix" | path exists) {
+        $"($id) is defined in Nix: merge it by hand"
+      } else { $"($id) isn't in the catalog" })}
+    }
+  }
+  let all = [$into ...$mods] | each {|id| {id: $id, mod: (open (do $file_of $id))} }
+
+  # fields that decide which files install must match
+  let differ = [stripComponents include exclude] | each {|k|
+    let vals = $all | each {|m| {id: $m.id, v: ($m.mod | get -o $k)} }
+    let norm = $vals | each {|x| if $k == stripComponents { $x.v | default 0 } else { $x.v | default [] } }
+    if ($norm | uniq | length) > 1 { $"($k): ($vals | each {|x| $'($x.id)=($x.v | to json -r)' } | str join ', ')" }
+  }
+  if ($differ | is-not-empty) {
+    error make {msg: $"the mods install files differently; make these match first:\n($differ | str join "\n")"}
+  }
+
+  # versions by label: every mod's files, one per sha256; one name with two hashes clashes
+  let labels = $all | each {|m| $m.mod.versions | columns } | flatten | uniq
+  let versions = $labels | reduce -f {} {|label, acc|
+    let parts = $all | where {|m| $label in ($m.mod.versions | columns) } | each {|m| $m.mod.versions | get $label }
+    let files = $parts | each {|v| $v.files } | flatten | uniq-by sha256
+    let clash = $files | group-by name | values | where { length | $in > 1 } | each { get 0.name }
+    if ($clash | is-not-empty) {
+      error make {msg: $"version ($label): different files named ($clash | str join ', ')"}
+    }
+    let added = $parts | get -o added | compact | sort | get -o 0
+    let game = $parts | get -o gameVersion | compact | get -o 0
+    let v = {added: $added, files: $files}
+    $acc | insert $label (if $game == null { $v } else { $v | insert gameVersion $game })
+  }
+  let pins = $all | each {|m| $m.mod.version? } | compact | uniq
+  let pin = if ($pins | is-empty) { null } else {
+    $pins | labels-desc | first
+  }
+
+  let base = $all.0.mod
+  let others = $all | skip 1 | get mod
+  let combine = {|k| $all | each {|m| $m.mod | get -o $k | default [] } | flatten | uniq | sort }
+  let merged_ids = [$into ...$mods]
+  let fill = {|k| [$base ...$others] | each {|m| $m | get -o $k } | compact | get -o 0 }
+  let merged = $base
+    | upsert title (do $fill title)
+    | upsert downloadPage (do $fill downloadPage)
+    | upsert tags (do $combine tags)
+    | upsert stateFiles (do $combine stateFiles)
+    | upsert requires (do $combine requires | where $it not-in $merged_ids)
+    | upsert conflicts (do $combine conflicts | where $it not-in $merged_ids)
+    | upsert versions $versions
+    | upsert version $pin
+  let merged = if $folder == null { $merged } else { apply-folder $merged (folder-value $folder) }
+  let merged = if $flatten { $merged | upsert flatten true } else { $merged }
+
+  # the newest version of each mod should still be in the merged mod's selected one
+  let selected = $pin | default ($labels | labels-desc | first)
+  # (or a file of the same name, which replaces it)
+  let selected_files = $versions | get $selected | get files
+  let selected_names = $selected_files | get name | each { path basename | str lowercase }
+  let dropped = $all | each {|m|
+    let newest = $m.mod.version? | default ($m.mod.versions | columns | labels-desc | get -o 0)
+    if $newest != null {
+      $m.mod.versions | get $newest | get files | where {|f|
+        $f.sha256 not-in $selected_files.sha256 and ($f.name | path basename | str lowercase) not-in $selected_names
+      } | each {|f|
+        {mod: $m.id, version: $newest, file: $f.name}
+      }
+    }
+  } | flatten
+
+  let refs = id-ref-edits $data ($mods | each {|m| {from: $m, to: $into} }) $merged_ids
+  let edits = [...$refs.reports ...$refs.profiles ...$refs.deps ...($refs.groupings | where refs > 0)]
+  let rel = {|f| $f | path relative-to $data }
+  let summary = {
+    into: $into
+    merged: $mods
+    folder: ($merged.folder? | default (if 'folder' in ($merged | columns) { null } else { $into | str replace '/' '_' }))
+    flatten: ($merged.flatten? | default false)
+    version: $selected
+    versions: ($versions | transpose label v | each {|r|
+      {label: $r.label, files: ($r.v.files | get name)}
+    } | sort-by -c {|a, b| (label-cmp $a.label $b.label) > 0 })
+    notInSelected: $dropped
+    rewritten: ([...$edits ...$refs.texts] | each {|e| {file: (do $rel $e.file), refs: $e.refs} })
+    removed: ($mods | each {|m| do $rel (do $file_of $m) })
+    mentions: $refs.mentions
+    applied: false
+  }
+  if not $apply {
+    print -e 'dry run: add --apply to write the files'
+    return $summary
+  }
+
+  for e in $edits { $e.json | to json -i 2 | save -f $e.file }
+  for e in $refs.texts { $e.text | save -f $e.file }
+  $merged | to json -i 2 | save -f (do $file_of $into)
+  for m in $mods {
+    rm (do $file_of $m)
+    let dir = do $file_of $m | path dirname
+    if (ls -a $dir | is-empty) { rm $dir }
+  }
+  let commit = if $commit {
+    let touched = [...$edits ...$refs.texts] | get file | append (do $file_of $into) | append ($mods | each {|m| do $file_of $m })
+    commit-data $data $touched $"sims: merge ($mods | str join ', ') into ($into)"
+  }
+  $summary | update applied true | insert commit $commit
+}
+
 # Rename a mod, e.g. unknown/foo to someone/foo. Dry run unless --apply.
 #
 # Moves mods/<creator>/<mod>.json (and .nix) and rewrites every reference to the id:
@@ -1223,57 +1487,21 @@ export def "sims mod rename" [
   if ([json nix] | any {|ext| do $path_of $new $ext | path exists }) {
     error make {msg: $"($new) is already in the catalog"}
   }
-  let swap = {|id| if $id == $old { $new } else { $id } }
   let rel = {|f| $f | path relative-to $data }
-
-  # each rewritten JSON file: { file, refs, json }
-  let records = import-reports $data | each {|f| {file: $f, json: (open $f)} }
-  let reports = $records | each {|r|
-    let refs = $r.json.files | where mod == $old | length
-    if $refs > 0 {
-      let files = $r.json.files | each {|x| if $x.mod == $old { $x | update mod $new } else { $x } }
-      {file: $r.file, refs: $refs, json: ($r.json | update files $files)}
-    }
-  }
-  let profiles_dir = $data | path join profiles
-  let profiles = if ($profiles_dir | path exists) { glob $"($profiles_dir)/*.json" } else { [] } | each {|f|
-    let p = open $f
-    if $old in ($p.mods? | default []) {
-      {file: $f, refs: 1, json: ($p | update mods ($p.mods | each $swap | uniq | sort))}
-    }
-  }
-  let deps = read-catalog $data | where id != $old | each {|c|
-    let fields = [requires conflicts] | where {|k| $old in ($c.mod | get -o $k | default []) }
-    if ($fields | is-not-empty) {
-      let json = $fields | reduce -f $c.mod {|k, m| $m | update $k ($m | get $k | each $swap | uniq) }
-      {file: $c.path, refs: ($fields | length), json: $json}
-    }
-  }
-
-  # grouping.json and grouping.suggested.json: the mod's `groups` entries and rules
+  let refs = id-ref-edits $data [{from: $old, to: $new}] [$old]
+  let reports = $refs.reports
+  let profiles = $refs.profiles
+  let deps = $refs.deps
+  let groupings = $refs.groupings
+  let texts = $refs.texts
+  let mentions = $refs.mentions
   let grouping_file = $data | path join import grouping.json
-  let groupings = [grouping.json grouping.suggested.json] | each {|n| $data | path join import $n } | where { path exists } | each {|f|
-    let g = open $f
-    let groups = $g.groups? | default {}
-    let rules = $g.rules? | default []
-    let in_groups = $groups | values | where {|v| $v.mod? == $old } | length
-    let in_rules = $rules | where {|r| $r.mod? == $old } | length
-    let renamed = if $in_groups == 0 { $g } else {
-      $g | update groups ($groups | transpose k v | reduce -f {} {|e, acc|
-        $acc | insert $e.k (if $e.v.mod? == $old { $e.v | update mod $new } else { $e.v })
-      })
-    }
-    let renamed = if $in_rules == 0 { $renamed } else {
-      $renamed | update rules ($rules | each {|r| if $r.mod? == $old { $r | update mod $new } else { $r } })
-    }
-    {file: $f, refs: ($in_groups + $in_rules), json: $renamed}
-  }
 
   # top folders to pin in grouping.json: those the imports put this mod's files in,
   # unless another mod has files there too or a `groups` key already covers them
   let main = $groupings | where file == $grouping_file | get -o 0
   let named = $main != null and $main.refs > 0
-  let owned = $records | each {|r| $r.json.files } | flatten
+  let owned = $refs.records | each {|r| $r.json.files } | flatten
   let keys = $main.json.groups? | default {} | columns
   let folders = $owned | where mod == $old and ($it.path | str contains '/') | each {|f| $f.path | path split | first } | uniq | sort
   let candidates = $folders | where {|d| not ($keys | any {|k| $d == $k or ($d | str starts-with $"($k)/") }) }
@@ -1293,22 +1521,6 @@ export def "sims mod rename" [
     ...($groupings | where file != $grouping_file and refs > 0)
     ...(if $grouping_edit == null { [] } else { [$grouping_edit] })
   ]
-
-  # the quoted id in .nix files; other mentions of it are only listed
-  let text_files = glob $"($data)/**/*.{nix,md}" | where {|f| '/.git/' not-in $f }
-  let quoted = $'"($old)"'
-  let texts = $text_files | where { str ends-with .nix } | each {|f|
-    let t = open --raw $f | decode utf-8
-    let refs = ($t | split row $quoted | length) - 1
-    if $refs > 0 { {file: $f, refs: $refs, text: ($t | str replace -a $quoted $'"($new)"')} }
-  }
-  let attr = $old | str replace '/' '.'
-  let mentions = $text_files | each {|f|
-    let t = $texts | where file == $f | get -o 0.text | default (open --raw $f | decode utf-8)
-    $t | lines | enumerate | where {|l| ($l.item | str contains $old) or ($l.item | str contains $attr) } | each {|l|
-      {file: (do $rel $f), line: ($l.index + 1), text: ($l.item | str trim)}
-    }
-  } | flatten
 
   let summary = {
     from: $old
@@ -1363,12 +1575,18 @@ def --wrapped data-git [data: path, ...args: string]: nothing -> record {
 }
 
 # Set a mod's catalog fields in mods/<creator>/<mod>.json. An empty --page or --title
-# clears it; --tags replaces the list. Writes right away (there's no dry run).
+# clears it; --tags replaces the list. --folder is where it installs: a folder under
+# Mods/, `default` for <creator>_<mod>, or '' for Mods/ itself; --flatten puts every
+# file directly in that folder, dropping the path it was imported at. Writes
+# right away (there's no dry run); a new folder takes effect at the next `sims switch`.
 export def "sims mod set" [
   id: string@"nu-complete sims mods" # the mod's id, creator/mod
   --page: string                     # download page, an http(s) URL
   --title: string                    # display name
   --tags: list<string>               # every tag the mod has
+  --folder: string                   # folder under Mods/, `default` or ''
+  --flatten                          # install files directly in the folder
+  --no-flatten                       # install files at the paths they were imported at
   --commit                           # commit the change
 ]: nothing -> record {
   let data = sims-config | get dataDir | path expand
@@ -1391,15 +1609,26 @@ export def "sims mod set" [
   let wanted = {downloadPage: $page, title: $title, tags: $tags}
     | transpose field value | where value != null
     | update value {|r| if $r.field == tags { $r.value } else { do $blank ($r.value | str trim) } }
-  if ($wanted | is-empty) { error make {msg: 'nothing to set: give --page, --title or --tags'} }
+  if $flatten and $no_flatten { error make {msg: 'give --flatten or --no-flatten, not both'} }
+  if ($wanted | is-empty) and $folder == null and not $flatten and not $no_flatten {
+    error make {msg: 'nothing to set: give --page, --title, --tags, --folder or --flatten'}
+  }
 
   let mod = open $file
-  let changes = $wanted | each {|w|
-    let was = $mod | get -o $w.field
-    if $was != $w.value { {field: $w.field, from: $was, to: $w.value} }
+  let next = $wanted | reduce -f $mod {|w, m| $m | upsert $w.field $w.value }
+  let next = if $folder == null { $next } else { apply-folder $next (folder-value $folder) }
+  let next = if $flatten { $next | upsert flatten true } else if $no_flatten { $next | reject -o flatten } else { $next }
+  # a folder field left out is the default folder
+  let shown = {|m, k|
+    if $k == folder and folder not-in ($m | columns) { $id | str replace '/' '_' } else { $m | get -o $k }
+  }
+  let changes = [downloadPage title tags folder flatten] | each {|k|
+    let was = do $shown $mod $k
+    let now = do $shown $next $k
+    if $was != $now { {field: $k, from: $was, to: $now} }
   }
   let commit = if ($changes | is-empty) { null } else {
-    $changes | reduce -f $mod {|c, m| $m | upsert $c.field $c.to } | to json -i 2 | save -f $file
+    $next | to json -i 2 | save -f $file
     if $commit {
       commit-data $data [$file] $"sims: set ($changes | get field | str join ', ') for ($id)"
     }
