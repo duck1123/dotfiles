@@ -18,6 +18,15 @@ export interface ModVersion {
   files: ModFile[];
 }
 
+/** A file the mod's selected version installs. */
+export interface ModInstall {
+  /** Its path before `folder` and `flatten` apply (an archive member's after stripComponents). */
+  source: string;
+  /** Where it goes, relative to Mods/. */
+  target: string;
+  sha256: string;
+}
+
 export interface ModSummary {
   /** `creator/mod`. */
   id: string;
@@ -28,6 +37,14 @@ export interface ModSummary {
   enable: boolean;
   /** Folder under Mods/ it installs to; null = directly in Mods/. */
   folder: string | null;
+  /** The folder it gets when none is set: `<creator>_<mod>`. */
+  defaultFolder: string;
+  /** Every file goes directly in `folder`, without the path it was imported at. */
+  flatten: boolean;
+  /** Globs, relative to its folder, of files the mod writes. */
+  stateFiles: string[];
+  /** The files its selected version installs, and where. */
+  installs: ModInstall[];
   /** The pinned version label; null = the newest. */
   version: string | null;
   /** The version that installs. */
@@ -58,11 +75,32 @@ export interface ModChanges {
   downloadPage?: string | null;
   title?: string | null;
   tags?: string[];
+  /** Where it installs: "default" for `<creator>_<mod>`, "" for Mods/ itself, else a folder under Mods/. */
+  folder?: string;
+  flatten?: boolean;
 }
 
 export interface WriteResult {
   /** Short hash of the commit the change made, or null when nothing changed. */
   commit: string | null;
+  /** Things to know about the change (e.g. that files move at the next switch). */
+  notes?: string[];
+}
+
+/** What `sims mod rename` does (or, before `apply`, would do). */
+export interface RenameResult {
+  from: string;
+  to: string;
+  /** Catalog files moved, "old -> new". */
+  moved: string[];
+  /** The install folder changes too, for a mod on its default folder. */
+  folder: { from: string; to: string } | null;
+  /** Files whose references to the id are rewritten. */
+  rewritten: { file: string; refs: number }[];
+  /** Other mentions of the id, which aren't changed. */
+  mentions: { file: string; line: number; text: string }[];
+  applied: boolean;
+  commit?: string | null;
 }
 
 export interface ModSource {
@@ -70,6 +108,8 @@ export interface ModSource {
   list(profile?: string, signal?: AbortSignal): Promise<ModList>;
   /** Change a mod's catalog fields. A source without it is read-only. */
   update?(id: string, changes: ModChanges): Promise<WriteResult>;
+  /** Rename a mod (its id); without `apply`, only say what would change. */
+  rename?(id: string, to: string, apply: boolean): Promise<RenameResult>;
   /** Add a mod to a profile or take it out. */
   setInProfile?(profile: string, id: string, enabled: boolean): Promise<WriteResult>;
 }

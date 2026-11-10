@@ -58,6 +58,8 @@ export function ModBrowser({ source, profile: initialProfile, selectedId: initia
   const [filter, setFilter] = useState<ModFilter>("all");
   const [tag, setTag] = useState("");
   const [selectedId, setSelectedId] = useState(initialId);
+  // a message for the mod shown next (after a rename, it's shown under its new id)
+  const [flash, setFlash] = useState<{ id: string; text: string }>();
 
   const load = useCallback(() => {
     const ctl = new AbortController();
@@ -116,8 +118,31 @@ export function ModBrowser({ source, profile: initialProfile, selectedId: initia
   const save =
     source.update &&
     ((id: string) => async (changes: ModChanges) => {
+      const { folder, flatten, ...fields } = changes;
       const result = await source.update!(id, changes);
-      patch(id, changes);
+      patch(id, fields);
+      // where its files go, and the problems that can bring, come from the catalog
+      if (folder !== undefined || flatten !== undefined) {
+        refresh();
+      }
+      return result;
+    });
+
+  const rename =
+    source.rename &&
+    list &&
+    ((id: string) => async (to: string, apply: boolean) => {
+      const result = await source.rename!(id, to, apply);
+      if (apply) {
+        const next = await source.list(list.profile).catch(() => undefined);
+        if (next) {
+          setList(next);
+        } else {
+          patch(id, { id: to });
+        }
+        setFlash({ id: to, text: `Renamed from ${id}${result.commit ? ` (commit ${result.commit})` : ""}.` });
+        select(to);
+      }
       return result;
     });
 
@@ -237,6 +262,8 @@ export function ModBrowser({ source, profile: initialProfile, selectedId: initia
             onSelect={select}
             onSave={save?.(selected.id)}
             onToggle={toggle ? toggle(selected) : undefined}
+            onRename={rename?.(selected.id)}
+            initialNotice={flash?.id === selected.id ? flash.text : undefined}
           />
         ) : (
           status === "ready" && <p className="dui-mods__message">Pick a mod.</p>

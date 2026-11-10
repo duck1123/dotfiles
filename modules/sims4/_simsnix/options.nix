@@ -223,6 +223,12 @@ in
       description = "{ assertion, message } pairs checked by eval.nix.";
     };
 
+    installs = mkOption {
+      type = types.unspecified;
+      readOnly = true;
+      description = "Files each mod's selected version installs, by mod id, enabled or not; see manifest.nix.";
+    };
+
     manifest = mkOption {
       type = types.unspecified;
       readOnly = true;

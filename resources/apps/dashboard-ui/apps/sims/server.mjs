@@ -33,6 +33,8 @@ class BadRequest extends Error {}
 
 const isString = (v) => typeof v === "string";
 const isStringList = (v) => Array.isArray(v) && v.every(isString);
+const isBool = (v) => typeof v === "boolean";
+const optional = (check) => (v) => v === undefined || check(v);
 
 function requireFields(body, checks) {
   for (const [key, ok, what] of checks) {
@@ -50,20 +52,37 @@ const routes = {
     args: (url) => ({ profile: url.searchParams.get("profile") || null }),
     script: "sims mod list --profile $args.profile?",
   },
-  // A field left out stays as it is; "" clears downloadPage or title.
+  // A field left out stays as it is; "" clears downloadPage or title. folder is
+  // "default" (<creator>_<mod>), "" (Mods/ itself) or a folder under Mods/.
   "POST /api/mod/set": {
     args: (_url, body) => {
-      const optional = (check) => (v) => v === undefined || check(v);
       requireFields(body, [
         ["id", isString, "a mod id"],
         ["downloadPage", optional(isString), "a URL or empty"],
         ["title", optional(isString), "a string"],
         ["tags", optional(isStringList), "a list of strings"],
+        ["folder", optional(isString), "a folder, \"default\" or empty"],
+        ["flatten", optional(isBool), "true or false"],
       ]);
-      const { id, downloadPage = null, title = null, tags = null } = body;
-      return { id, downloadPage, title, tags };
+      const { id, downloadPage = null, title = null, tags = null, folder = null, flatten = null } = body;
+      return { id, downloadPage, title, tags, folder, flatten };
     },
-    script: "sims mod set $args.id --page $args.downloadPage? --title $args.title? --tags $args.tags? --commit",
+    script: [
+      "sims mod set $args.id --page $args.downloadPage? --title $args.title? --tags $args.tags? --folder $args.folder?",
+      "--flatten=($args.flatten == true) --no-flatten=($args.flatten == false) --commit",
+    ].join(" "),
+  },
+  // Without apply, only what it would change (a dry run).
+  "POST /api/mod/rename": {
+    args: (_url, body) => {
+      requireFields(body, [
+        ["id", isString, "a mod id"],
+        ["to", isString, "the new id"],
+        ["apply", isBool, "true or false"],
+      ]);
+      return { id: body.id, to: body.to, apply: body.apply };
+    },
+    script: "sims mod rename $args.id $args.to --apply=$args.apply --commit=$args.apply",
   },
   "POST /api/profile/add": {
     args: (_url, body) => profileArgs(body),

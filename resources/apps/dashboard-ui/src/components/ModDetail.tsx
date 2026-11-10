@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
-import type { ModChanges, ModFile, ModSummary, WriteResult } from "../mods/types";
+import { folderProblem, planPlacement, placementProblems, type Placement } from "../mods/placement";
+import type { ModChanges, ModFile, ModSummary, RenameResult, WriteResult } from "../mods/types";
 import "./ModDetail.css";
 
 export interface ModDetailProps {
@@ -14,7 +15,49 @@ export interface ModDetailProps {
   onSave?: (changes: ModChanges) => Promise<WriteResult>;
   /** Add the mod to `profile` or take it out; without it there's no button. */
   onToggle?: (enabled: boolean) => Promise<WriteResult>;
+  /** Rename the mod (preview first, then `apply`); without it there's no button. */
+  onRename?: (to: string, apply: boolean) => Promise<RenameResult>;
+  /** A message to show first (e.g. after a rename brought you here). */
+  initialNotice?: string;
 }
+
+/** Where a mod installs, as the move form picks it. */
+export type PlaceChoice = "default" | "custom" | "root";
+
+export interface PlacementForm {
+  place: PlaceChoice;
+  customFolder: string;
+  flatten: boolean;
+}
+
+/** The move form's starting values for `mod`. */
+export function placementForm(mod: ModSummary): PlacementForm {
+  const place: PlaceChoice = mod.folder === null ? "root" : mod.folder === mod.defaultFolder ? "default" : "custom";
+  return { place, customFolder: place === "custom" ? mod.folder! : "", flatten: mod.flatten };
+}
+
+const tidyFolder = (f: string) => f.trim().replace(/^\/+|\/+$/g, "");
+
+/** The placement the form describes. */
+export function formPlacement(mod: ModSummary, form: PlacementForm): Placement {
+  const folder = form.place === "default" ? mod.defaultFolder : form.place === "root" ? null : tidyFolder(form.customFolder);
+  return { folder, flatten: form.flatten };
+}
+
+/** What the move form changes, as `sims mod set` takes it. */
+export function diffPlacement(mod: ModSummary, form: PlacementForm): ModChanges {
+  const changes: ModChanges = {};
+  const { folder } = formPlacement(mod, form);
+  if (folder !== mod.folder) {
+    changes.folder = form.place === "default" ? "default" : (folder ?? "");
+  }
+  if (form.flatten !== mod.flatten) {
+    changes.flatten = form.flatten;
+  }
+  return changes;
+}
+
+const idPattern = /^[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*$/;
 
 /** Version labels, newest first (numeric parts compare as numbers). */
 export function sortVersions(labels: string[]): string[] {
@@ -50,9 +93,14 @@ function errorText(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }
 
+const sentence = (s: string) => s.charAt(0).toUpperCase() + s.slice(1) + (/[.!?]$/.test(s) ? "" : ".");
+
 function savedText(r: WriteResult): string {
-  return r.commit ? `Saved (commit ${r.commit})` : "No change";
+  const saved = r.commit ? `Saved (commit ${r.commit})` : "No change";
+  return [saved, ...(r.notes ?? []).map(sentence)].join(" ");
 }
+
+const shownFolder = (folder: string | null) => (folder === null ? "Mods/" : `Mods/${folder}/`);
 
 function ModLinks({ ids, knownIds, onSelect }: { ids: string[]; knownIds?: ReadonlySet<string>; onSelect?: (id: string) => void }) {
   return (
@@ -179,14 +227,304 @@ function EditForm({
   );
 }
 
-/** Everything the catalog knows about one mod, and (given onSave/onToggle) its edits. */
-export function ModDetail({ mod, profile, knownIds, onSelect, onSave, onToggle }: ModDetailProps) {
+/** Pick where the mod installs, with a preview of where each file goes. */
+function MoveForm({
+  mod,
+  onSave,
+  onDone,
+}: {
+  mod: ModSummary;
+  onSave: (changes: ModChanges) => Promise<WriteResult>;
+  onDone: (message: string) => void;
+}) {
+  const [form, setForm] = useState(() => placementForm(mod));
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const placement = formPlacement(mod, form);
+  const badFolder = form.place === "custom" ? folderProblem(form.customFolder) : null;
+  const planned = badFolder ? [] : planPlacement(mod.installs, placement);
+  const problems = badFolder ? [badFolder] : placementProblems(planned);
+  const moving = planned.filter((f) => f.from !== f.to);
+  const changes = diffPlacement(mod, form);
+  const unchanged = Object.keys(changes).length === 0;
+  const radio = (place: PlaceChoice) => ({
+    type: "radio" as const,
+    name: "dui-mod-place",
+    checked: form.place === place,
+    onChange: () => setForm({ ...form, place }),
+  });
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (problems.length > 0) {
+      return;
+    }
+    if (unchanged) {
+      onDone("No change");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      onDone(savedText(await onSave(changes)));
+    } catch (err) {
+      setError(errorText(err));
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form className="dui-mod__form" onSubmit={submit} aria-label="Move mod">
+      <fieldset className="dui-mod__choices">
+        <legend>Install to</legend>
+        <label className="dui-mod__choice">
+          <input {...radio("default")} />
+          <span>
+            Its own folder <code>Mods/{mod.defaultFolder}/</code>
+          </span>
+        </label>
+        <label className="dui-mod__choice">
+          <input {...radio("custom")} />
+          <span>Another folder</span>
+        </label>
+        {form.place === "custom" && (
+          <label className="dui-mod__choice-detail">
+            <span>Folder under Mods/</span>
+            <input
+              type="text"
+              autoFocus
+              placeholder={mod.defaultFolder}
+              value={form.customFolder}
+              onChange={(e) => setForm({ ...form, customFolder: e.target.value })}
+            />
+          </label>
+        )}
+        <label className="dui-mod__choice">
+          <input {...radio("root")} />
+          <span>
+            Directly in <code>Mods/</code>
+          </span>
+        </label>
+      </fieldset>
+      <label className="dui-mod__choice">
+        <input type="checkbox" checked={form.flatten} onChange={(e) => setForm({ ...form, flatten: e.target.checked })} />
+        <span>Flatten: put every file directly in the folder, without the folders it was imported in</span>
+      </label>
+
+      <div className="dui-mod__plan" aria-label="Where the files go">
+        {mod.installs.length === 0 ? (
+          <p className="dui-mod__none">The selected version installs no files.</p>
+        ) : (
+          <>
+            <p className="dui-mod__plan-summary">
+              {moving.length === 0 ? "No file moves." : `${moving.length} of ${planned.length} files move:`}
+            </p>
+            {moving.length > 0 && (
+              <ul className="dui-mod__files">
+                {moving.map((f) => (
+                  <li key={`${f.source}\t${f.sha256}`} title={`sha256 ${f.sha256}`}>
+                    <code className="dui-mod__from">{f.from}</code> → <code>{f.to}</code>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
+      {moving.length > 0 && mod.stateFiles.length > 0 && (
+        <p className="dui-mod__warning">
+          It writes state files ({mod.stateFiles.join(", ")}). Those in its old folder aren't moved: move them by hand after
+          switching.
+        </p>
+      )}
+      {problems.length > 0 && (
+        <ul className="dui-mod__problems" role="alert" aria-label="Problems with this placement">
+          {problems.map((p) => (
+            <li key={p}>{p}</li>
+          ))}
+        </ul>
+      )}
+      {error && (
+        <p className="dui-mod__error" role="alert">
+          {error}
+        </p>
+      )}
+      <p className="dui-mod__hint">
+        Files move at the next <code>sims switch</code>: it takes them out of the old place (and any folder left empty) and
+        installs them in the new one.
+      </p>
+      <div className="dui-mod__actions">
+        <button type="submit" className="dui-mod__button dui-mod__button--primary" disabled={saving || problems.length > 0}>
+          {saving ? "Saving…" : "Save"}
+        </button>
+        <button type="button" className="dui-mod__button" disabled={saving} onClick={() => onDone("")}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+/** Rename the mod: preview what changes, then apply it. */
+function RenameForm({
+  mod,
+  onRename,
+  onDone,
+}: {
+  mod: ModSummary;
+  onRename: (to: string, apply: boolean) => Promise<RenameResult>;
+  onDone: (message: string) => void;
+}) {
+  const [to, setTo] = useState(mod.id);
+  const [preview, setPreview] = useState<RenameResult>();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const target = to.trim();
+
+  async function run(apply: boolean) {
+    setBusy(true);
+    setError("");
+    try {
+      const r = await onRename(target, apply);
+      if (apply) {
+        // this form is gone once the mod is shown under its new id
+        onDone(`Renamed to ${r.to}${r.commit ? ` (commit ${r.commit})` : ""}.`);
+        return;
+      }
+      setPreview(r);
+    } catch (err) {
+      setError(errorText(err));
+    }
+    setBusy(false);
+  }
+
+  function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!idPattern.test(target)) {
+      setError("An id is creator/mod, in lowercase letters, digits and -.");
+      return;
+    }
+    if (target === mod.id) {
+      setError("That's its id now.");
+      return;
+    }
+    run(preview?.to === target);
+  }
+
+  return (
+    <form className="dui-mod__form" onSubmit={submit} aria-label="Rename mod">
+      <label>
+        <span>New id (creator/mod)</span>
+        <input
+          type="text"
+          autoFocus
+          spellCheck={false}
+          value={to}
+          onChange={(e) => {
+            setTo(e.target.value);
+            setPreview(undefined);
+          }}
+        />
+      </label>
+      {preview && (
+        <div className="dui-mod__plan" aria-label="What the rename changes">
+          <ul className="dui-mod__files">
+            {preview.moved.map((m) => (
+              <li key={m}>Moves {m}</li>
+            ))}
+            {preview.folder ? (
+              <li>
+                Installs to <code>Mods/{preview.folder.to}/</code> instead of <code>Mods/{preview.folder.from}/</code> (files move
+                at the next <code>sims switch</code>)
+              </li>
+            ) : (
+              <li>Installs to the same folder</li>
+            )}
+            <li>
+              Rewrites the id in {preview.rewritten.length} file{preview.rewritten.length === 1 ? "" : "s"}
+              {preview.rewritten.length > 0 && <>: {preview.rewritten.map((r) => r.file).join(", ")}</>}
+            </li>
+          </ul>
+          {preview.mentions.length > 0 && (
+            <details className="dui-mod__more">
+              <summary>{preview.mentions.length} other mentions, not changed</summary>
+              <ul className="dui-mod__files">
+                {preview.mentions.map((m) => (
+                  <li key={`${m.file}:${m.line}`}>
+                    <code>
+                      {m.file}:{m.line}
+                    </code>{" "}
+                    {m.text}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
+      )}
+      {error && (
+        <p className="dui-mod__error" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="dui-mod__actions">
+        <button type="submit" className="dui-mod__button dui-mod__button--primary" disabled={busy}>
+          {busy ? "Working…" : preview?.to === target ? "Rename" : "Preview"}
+        </button>
+        <button type="button" className="dui-mod__button" disabled={busy} onClick={() => onDone("")}>
+          Cancel
+        </button>
+      </div>
+    </form>
+  );
+}
+
+/** Where the mod installs and, folded away, each file's path. */
+function Placed({ mod }: { mod: ModSummary }) {
+  return (
+    <>
+      <code>{shownFolder(mod.folder)}</code>
+      {mod.flatten && <span className="dui-mod__members"> (flattened)</span>}
+      {mod.installs.length > 0 && (
+        <details className="dui-mod__more">
+          <summary>
+            {mod.installs.length} file{mod.installs.length === 1 ? "" : "s"}
+          </summary>
+          <ul className="dui-mod__files">
+            {mod.installs.map((f) => (
+              <li key={`${f.target}\t${f.sha256}`} title={`from ${f.source}`}>
+                {f.target}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </>
+  );
+}
+
+type Mode = "view" | "edit" | "move" | "rename";
+
+/** Everything the catalog knows about one mod, and (given onSave/onToggle/onRename) its edits. */
+export function ModDetail({ mod, profile, knownIds, onSelect, onSave, onToggle, onRename, initialNotice = "" }: ModDetailProps) {
   const labels = sortVersions(Object.keys(mod.versions));
-  const [editing, setEditing] = useState(false);
+  const [mode, setMode] = useState<Mode>("view");
+  const editing = mode === "edit";
   const [toggling, setToggling] = useState(false);
-  const [notice, setNotice] = useState("");
+  const [notice, setNotice] = useState(initialNotice);
   const [error, setError] = useState("");
   const listed = mod.profiles.includes(profile);
+
+  function open(next: Mode) {
+    setNotice("");
+    setError("");
+    setMode(next);
+  }
+
+  const done = (message: string) => {
+    setMode("view");
+    setNotice(message);
+  };
 
   async function toggle() {
     if (!onToggle) {
@@ -219,17 +557,19 @@ export function ModDetail({ mod, profile, knownIds, onSelect, onSave, onToggle }
             {toggling ? "Saving…" : listed ? `Remove from ${profile}` : `Add to ${profile}`}
           </button>
         )}
-        {onSave && mod.editable && !editing && (
-          <button
-            type="button"
-            className="dui-mod__button"
-            onClick={() => {
-              setNotice("");
-              setError("");
-              setEditing(true);
-            }}
-          >
-            Edit
+        {onSave && mod.editable && mode === "view" && (
+          <>
+            <button type="button" className="dui-mod__button" onClick={() => open("edit")}>
+              Edit
+            </button>
+            <button type="button" className="dui-mod__button" onClick={() => open("move")}>
+              Move…
+            </button>
+          </>
+        )}
+        {onRename && mod.editable && mode === "view" && (
+          <button type="button" className="dui-mod__button" onClick={() => open("rename")}>
+            Rename…
           </button>
         )}
       </header>
@@ -253,16 +593,9 @@ export function ModDetail({ mod, profile, knownIds, onSelect, onSave, onToggle }
         </ul>
       )}
 
-      {editing && onSave && (
-        <EditForm
-          mod={mod}
-          onSave={onSave}
-          onDone={(message) => {
-            setEditing(false);
-            setNotice(message);
-          }}
-        />
-      )}
+      {editing && onSave && <EditForm mod={mod} onSave={onSave} onDone={done} />}
+      {mode === "move" && onSave && <MoveForm mod={mod} onSave={onSave} onDone={done} />}
+      {mode === "rename" && onRename && <RenameForm mod={mod} onRename={onRename} onDone={done} />}
 
       <dl className="dui-mod__fields">
         {!editing && (
@@ -295,7 +628,7 @@ export function ModDetail({ mod, profile, knownIds, onSelect, onSave, onToggle }
         )}
         <dt>Installs to</dt>
         <dd>
-          <code>{mod.folder === null ? "Mods/" : `Mods/${mod.folder}/`}</code>
+          <Placed mod={mod} />
         </dd>
         <dt>Profiles</dt>
         <dd>{mod.profiles.length > 0 ? mod.profiles.join(", ") : <span className="dui-mod__none">None list it</span>}</dd>

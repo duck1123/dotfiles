@@ -6,6 +6,9 @@
 #   files = [ { mod, version, target, sha256, archive, member } ];
 # }
 #
+# installs.<id> is the same list for every mod, enabled or not, with each file's
+# `source` too: its path before `folder` and `flatten` apply.
+#
 # target is relative to Mods/: the mod's folder, then the file's path (just its
 # base name when the mod has `flatten`). An archive's members are installed, not the
 # archive: a member's `archive` is the sha256 of the archive (its blob) and
@@ -64,6 +67,8 @@ let
       {
         mod = m.id;
         version = m.selectedVersion;
+        # the path before `folder` and `flatten` apply, for previewing other placements
+        source = e.path;
         target = if m.folder == null then path else "${m.folder}/${path}";
         inherit (e) sha256 archive member;
       }
@@ -78,7 +83,10 @@ let
         map (f: lib.nameValuePair "${lib.toLower f.target}\t${f.sha256}" f) (lib.reverseList fs)
       )
     );
-  files = lib.sort (a: b: a.target < b.target) (lib.concatMap (m: dedupe (filesOf m)) enabled);
+  installsOf = m: dedupe (filesOf m);
+  files = lib.sort (a: b: a.target < b.target) (
+    map (f: removeAttrs f [ "source" ]) (lib.concatMap installsOf enabled)
+  );
 
   depth = target: lib.length (lib.splitString "/" target) - 1;
   hasExt = ext: target: lib.hasSuffix ext (lib.toLower target);
@@ -132,6 +140,10 @@ in
 {
   config.sims4 = {
     assertions = modProblems ++ fileProblems;
+
+    installs = lib.listToAttrs (
+      map (m: lib.nameValuePair m.id (lib.sort (a: b: a.target < b.target) (installsOf m))) allMods
+    );
 
     manifest = {
       inherit (cfg) profile;

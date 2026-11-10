@@ -1075,12 +1075,15 @@ def install-file [root: path, tmp: path, f: record, dest: path] {
   }
 }
 
+# The folders above `rel` (a path relative to Mods/), outermost first
+def parent-dirs [rel: string]: nothing -> list<string> {
+  let parts = $rel | path split | drop 1
+  0..<($parts | length) | each {|n| $parts | first ($n + 1) | path join }
+}
+
 # Folders above `rel` (relative to Mods/) that don't exist yet, outermost first
 def missing-dirs [mods_dir: path, rel: string]: nothing -> list<string> {
-  let parts = $rel | path split | drop 1
-  0..<($parts | length) | each {|n| $parts | first ($n + 1) | path join } | where {|d|
-    not ($mods_dir | path join $d | path exists)
-  }
+  parent-dirs $rel | where {|d| not ($mods_dir | path join $d | path exists) }
 }
 
 # Install a profile into an instance's Mods/. Dry run unless --apply.
@@ -1091,7 +1094,8 @@ def missing-dirs [mods_dir: path, rel: string]: nothing -> list<string> {
 # doesn't own is ever touched: a different file at a profile's path is a conflict, and
 # --apply refuses until it's resolved by hand. A file simsnix installed that has changed
 # since is a conflict too, unless --force; one the profile dropped is then left in place
-# and disowned.
+# and disowned. A mod whose folder (or flatten) changed has its files removed from the
+# old paths and installed at the new ones; a folder left empty by a removal is removed.
 #
 # --apply refuses while the game runs, and first backs up the newest save (`sims save
 # backup`) unless --no-backup.
@@ -1172,7 +1176,7 @@ export def "sims switch" [
   mkdir $tmp
   # removals first, so a path can move from one mod to another
   let order = {|op| match $op { remove => 0, disown => 0, gone => 0, replace => 1, install => 2, _ => 3 } }
-  let start = {files: ($state.files | where {|o| (do $key $o.target) in $wanted_keys }), dirs: $state.dirs, error: null}
+  let start = {files: ($state.files | where {|o| (do $key $o.target) in $wanted_keys }), dirs: $state.dirs, emptied: [], error: null}
   let result = $ops | sort-by {|op| do $order $op.op } | reduce -f $start {|op, acc|
     if $acc.error != null { $acc } else {
       try {
@@ -1181,7 +1185,7 @@ export def "sims switch" [
         let without = $acc.files | where {|f| (do $key $f.target) != $k }
         let entry = {target: $op.path, sha256: $op.sha256, mod: $op.mod}
         match $op.op {
-          'remove' => { rm -f $dest; $acc }
+          'remove' => { rm -f $dest; $acc | update emptied ($acc.emptied | append (parent-dirs $op.path)) }
           'disown' | 'gone' => { $acc }
           'keep' | 'adopt' => { $acc | update files ($without | append $entry) }
           _ => {
@@ -1189,19 +1193,21 @@ export def "sims switch" [
             if $new_dirs != [] { mkdir ($dest | path dirname) }
             if $op.op == replace { rm -f $dest }
             install-file $root $tmp $op $dest
-            {files: ($without | append $entry), dirs: ($acc.dirs | append $new_dirs | uniq), error: null}
+            $acc | update files ($without | append $entry) | update dirs ($acc.dirs | append $new_dirs | uniq)
           }
         }
       } catch {|e| $acc | update error $"($op.path): ($e.msg)" }
     }
   }
   rm -rf $tmp
-  # the folders simsnix made that are now empty, deepest first
-  let dirs = $result.dirs | sort-by {|d| $d | path split | length } --reverse | reduce -f [] {|d, kept|
+  # the folders simsnix made, and those its removals emptied (a mod moved out of a
+  # shared folder), that are now empty, deepest first
+  let dirs = $result.dirs | append $result.emptied | uniq | sort-by {|d| $d | path split | length } --reverse | reduce -f [] {|d, kept|
     let full = $mods_dir | path join $d
     if not ($full | path exists) { $kept
     } else if (ls -a $full | is-empty) { rm $full; $kept
-    } else { $kept | append $d }
+    } else if $d in $result.dirs { $kept | append $d
+    } else { $kept }
   } | sort
   {
     profile: (if $result.error == null { $profile } else { $state.profile })
@@ -1486,6 +1492,9 @@ export def "sims mod merge" [
 # data folder's .nix files. Other mentions (an attribute path, notes) are listed, not
 # changed.
 #
+# A mod on its default folder (<creator>_<mod>) moves with it at the next `sims switch`;
+# `folder` in the result says so.
+#
 # Unless grouping.json already names the mod, its top folders get `groups` entries, so
 # a --fresh import keeps the new id instead of guessing again. A folder that other mods
 # have files in isn't pinned, and neither is a mod of loose files.
@@ -1507,6 +1516,11 @@ export def "sims mod rename" [
     error make {msg: $"($new) is already in the catalog"}
   }
   let rel = {|f| $f | path relative-to $data }
+  # a mod without a folder field installs to <creator>_<mod>, which the rename changes
+  let json_file = do $path_of $old json
+  let folder_change = if ($json_file | path exists) and 'folder' not-in (open $json_file | columns) {
+    {from: ($old | str replace '/' '_'), to: ($new | str replace '/' '_')}
+  }
   let refs = id-ref-edits $data [{from: $old, to: $new}] [$old]
   let reports = $refs.reports
   let profiles = $refs.profiles
@@ -1545,6 +1559,7 @@ export def "sims mod rename" [
     from: $old
     to: $new
     moved: ($moves | each {|m| $"(do $rel $m.from) -> (do $rel $m.to)" })
+    folder: $folder_change
     rewritten: ([...$edits ...$texts] | each {|e| {file: (do $rel $e.file), refs: $e.refs} })
     pinned: $pins
     notPinned: (if $named { 'grouping.json already names it' } else if ($folders | is-empty) { 'loose files: no folder to pin' } else { $shared })
@@ -1657,7 +1672,17 @@ export def "sims mod set" [
       commit-data $data [$file] $"sims: set ($changes | get field | str join ', ') for ($id)"
     }
   }
-  {id: $id, changes: $changes, commit: $commit}
+  let moved = $changes | any {|c| $c.field in [folder flatten] }
+  let state = $mod.stateFiles? | default []
+  let notes = if not $moved { [] } else {
+    [
+      'the files move at the next `sims switch`'
+      ...(if ($state | is-empty) { [] } else {
+        [$"it writes state files \(($state | str join ', ')\): the ones in its old folder stay there; move them by hand"]
+      })
+    ]
+  }
+  {id: $id, changes: $changes, commit: $commit, notes: $notes}
 }
 
 # The profile last switched to on an instance, else `current`
@@ -1668,9 +1693,11 @@ def default-profile [instance?: string]: nothing -> string {
   $active | default current
 }
 
-# Every mod in the catalog, as the web UI browses it: its fields, versions, whether
-# `profile` enables it, which profiles list it, and the framework's problems that
-# name it. `problems` holds all of them, for the ones that name no mod.
+# Every mod in the catalog, as the web UI browses it: its fields, versions, the files
+# its selected version installs (`installs`: { source, target, sha256 }, where source is
+# the path before folder and flatten apply), whether `profile` enables it, which
+# profiles list it, and the framework's problems that name it. `problems` holds all of
+# them, for the ones that name no mod.
 export def "sims mod list" [
   --profile (-p): string                                # profile (default: the one last switched to, else current)
   --instance (-i): string@"nu-complete sims instances" # instance whose last switch picks the default profile
@@ -1684,7 +1711,8 @@ export def "sims mod list" [
       inherit (r) failures;
       profiles = lib.mapAttrs (n: p: { inherit (p) base mods remove; }) c.profiles;
       mods = map (m: {
-        inherit (m) id title downloadPage tags enable folder version selectedVersion requires conflicts;
+        inherit (m) id title downloadPage tags enable folder flatten stateFiles version selectedVersion requires conflicts;
+        installs = map (f: { inherit (f) source target sha256; }) (c.installs.${m.id} or [ ]);
         versions = lib.mapAttrs (l: v: {
           inherit (v) added gameVersion;
           files = map (f: { inherit (f) name sha256; members = lib.length f.members; }) v.files;
@@ -1699,6 +1727,7 @@ export def "sims mod list" [
   let listed_in = $r.profiles | transpose name p | each {|e| $e.p.mods | each {|id| {id: $id, profile: $e.name} } } | flatten
   let mods = $r.mods | each {|m|
     $m | merge {
+      defaultFolder: ($m.id | str replace '/' '_')
       editable: ($data | path join mods $"($m.id).json" | path exists)
       profiles: ($listed_in | where id == $m.id | get profile)
       # the id as a whole word: acme/core must not match acme/core-extra

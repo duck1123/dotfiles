@@ -3,15 +3,17 @@ import userEvent from "@testing-library/user-event";
 import { createMockModSource, type MockModOptions } from "../mods/mockModSource";
 import { sampleMods } from "../mods/sampleMods";
 import { ModBrowser } from "./ModBrowser";
-import { diffFields, parseTags } from "./ModDetail";
+import { diffFields, diffPlacement, parseTags, placementForm } from "./ModDetail";
+import { folderProblem, placeTarget, planPlacement, placementProblems } from "../mods/placement";
 
 async function setup(id: string, options: MockModOptions = {}) {
   const source = createMockModSource(options);
   const update = source.update ? vi.spyOn(source, "update") : undefined;
   const setInProfile = source.setInProfile ? vi.spyOn(source, "setInProfile") : undefined;
+  const rename = source.rename ? vi.spyOn(source, "rename") : undefined;
   render(<ModBrowser source={source} selectedId={id} />);
   await screen.findByRole("heading", { level: 2 });
-  return { update, setInProfile, user: userEvent.setup(), detail: () => within(screen.getByRole("main")) };
+  return { update, setInProfile, rename, user: userEvent.setup(), detail: () => within(screen.getByRole("main")) };
 }
 
 test("sets a download page and shows the commit", async () => {
@@ -100,4 +102,105 @@ test("helpers", () => {
   const mod = sampleMods[0];
   expect(diffFields(mod, { downloadPage: mod.downloadPage!, title: mod.title!, tags: "script, library" })).toEqual({});
   expect(diffFields(mod, { downloadPage: " ", title: mod.title!, tags: "library,script" })).toEqual({ downloadPage: null });
+});
+
+test("moves a mod out of a shared folder into its own, flattened", async () => {
+  const { update, user, detail } = await setup("acme/tweak-moodlets");
+  expect(detail().getByText("Mods/", { selector: "code" })).toBeInTheDocument();
+  await user.click(detail().getByRole("button", { name: "Move…" }));
+  expect(detail().getByRole("radio", { name: /Directly in/ })).toBeChecked();
+  await user.click(detail().getByRole("radio", { name: /Its own folder/ }));
+  // still under Acme/ until flattened
+  expect(detail().getByLabelText("Where the files go")).toHaveTextContent("acme_tweak-moodlets/Acme/Acme_TweakMoodlets.package");
+  await user.click(detail().getByRole("checkbox", { name: /Flatten/ }));
+  expect(detail().getByLabelText("Where the files go")).toHaveTextContent(
+    "Acme/Acme_TweakMoodlets.package → acme_tweak-moodlets/Acme_TweakMoodlets.package",
+  );
+  await user.click(detail().getByRole("button", { name: "Save" }));
+
+  expect(update).toHaveBeenCalledWith("acme/tweak-moodlets", { folder: "default", flatten: true });
+  expect(await detail().findByRole("status")).toHaveTextContent(/Saved \(commit [0-9a-f]+\) The files move at the next `sims switch`/);
+  await waitFor(() => expect(detail().getByText("Mods/acme_tweak-moodlets/", { selector: "code" })).toBeInTheDocument());
+});
+
+test("a custom folder: checked as typed, and the game's depth limits block saving", async () => {
+  const { update, user, detail } = await setup("acme/core");
+  await user.click(detail().getByRole("button", { name: "Move…" }));
+  await user.click(detail().getByRole("radio", { name: "Another folder" }));
+  const folder = detail().getByRole("textbox", { name: "Folder under Mods/" });
+  await user.type(folder, "../up");
+  expect(detail().getByRole("alert")).toHaveTextContent("without . or .. parts");
+  expect(detail().getByRole("button", { name: "Save" })).toBeDisabled();
+  await user.clear(folder);
+  await user.type(folder, "Libraries/Acme");
+  // the script would be two folders deep
+  expect(detail().getByRole("alert")).toHaveTextContent(".ts4script files load at most one folder below Mods/");
+  expect(detail().getByText(/It writes state files/)).toBeInTheDocument();
+  await user.clear(folder);
+  await user.type(folder, "Acme Libraries/");
+  expect(detail().queryByRole("alert")).not.toBeInTheDocument();
+  await user.click(detail().getByRole("button", { name: "Save" }));
+  expect(update).toHaveBeenCalledWith("acme/core", { folder: "Acme Libraries" });
+});
+
+test("renames a mod after a preview and shows it under its new id", async () => {
+  const { rename, user, detail } = await setup("acme/widgets");
+  await user.click(detail().getByRole("button", { name: "Rename…" }));
+  const id = detail().getByRole("textbox", { name: /New id/ });
+  await user.clear(id);
+  await user.type(id, "Acme/Bad Id");
+  await user.click(detail().getByRole("button", { name: "Preview" }));
+  expect(detail().getByRole("alert")).toHaveTextContent("lowercase letters");
+  expect(rename).not.toHaveBeenCalled();
+
+  await user.clear(id);
+  await user.type(id, "acme/gadgets");
+  await user.click(detail().getByRole("button", { name: "Preview" }));
+  expect(rename).toHaveBeenLastCalledWith("acme/widgets", "acme/gadgets", false);
+  const plan = await detail().findByLabelText("What the rename changes");
+  expect(plan).toHaveTextContent("Installs to Mods/acme_gadgets/ instead of Mods/acme_widgets/");
+  expect(plan).toHaveTextContent("mods/acme/widgets-extra.json");
+
+  await user.click(detail().getByRole("button", { name: "Rename" }));
+  expect(rename).toHaveBeenLastCalledWith("acme/widgets", "acme/gadgets", true);
+  expect(await screen.findByText("acme/gadgets", { selector: ".dui-mod__id" })).toBeInTheDocument();
+  expect(detail().getByRole("status")).toHaveTextContent(/Renamed from acme\/widgets \(commit/);
+});
+
+test("editing the id resets the rename preview", async () => {
+  const { rename, user, detail } = await setup("acme/widgets");
+  await user.click(detail().getByRole("button", { name: "Rename…" }));
+  const id = detail().getByRole("textbox", { name: /New id/ });
+  await user.clear(id);
+  await user.type(id, "acme/gadgets");
+  await user.click(detail().getByRole("button", { name: "Preview" }));
+  await detail().findByRole("button", { name: "Rename" });
+  await user.type(id, "-2");
+  expect(detail().getByRole("button", { name: "Preview" })).toBeInTheDocument();
+  expect(rename).toHaveBeenCalledTimes(1);
+});
+
+test("placement helpers", () => {
+  expect(placeTarget("A/b/c.package", { folder: "x", flatten: false })).toBe("x/A/b/c.package");
+  expect(placeTarget("A/b/c.package", { folder: "x", flatten: true })).toBe("x/c.package");
+  expect(placeTarget("A/c.package", { folder: null, flatten: true })).toBe("c.package");
+  // one file imported twice installs once when flattened; different files on one path clash
+  const installs = [
+    { source: "a/one.package", target: "m/a/one.package", sha256: "1" },
+    { source: "b/one.package", target: "m/b/one.package", sha256: "1" },
+    { source: "c/one.package", target: "m/c/one.package", sha256: "2" },
+  ];
+  const planned = planPlacement(installs, { folder: "m", flatten: true });
+  expect(planned).toHaveLength(2);
+  expect(placementProblems(planned)).toEqual([expect.stringContaining("2 different files would install here")]);
+  expect(folderProblem(" ok/folder/ ")).toBeNull();
+  expect(folderProblem("/abs")).not.toBeNull();
+  expect(folderProblem("a//b")).not.toBeNull();
+
+  const mod = sampleMods.find((m) => m.id === "zed/loose")!;
+  expect(placementForm(mod)).toEqual({ place: "root", customFolder: "", flatten: false });
+  expect(diffPlacement(mod, { place: "root", customFolder: "", flatten: false })).toEqual({});
+  expect(diffPlacement(mod, { place: "custom", customFolder: " Zed/ ", flatten: false })).toEqual({ folder: "Zed" });
+  const core = sampleMods[0];
+  expect(diffPlacement(core, { place: "root", customFolder: "", flatten: true })).toEqual({ folder: "", flatten: true });
 });

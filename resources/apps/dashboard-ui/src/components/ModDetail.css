@@ -245,3 +245,69 @@
   display: flex;
   gap: 8px;
 }
+
+.dui-mod__choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.dui-mod__choices legend {
+  margin-bottom: 4px;
+  padding: 0;
+  color: var(--dui-text-muted);
+  font-size: 0.9em;
+}
+
+.dui-mod__form label.dui-mod__choice {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dui-mod__form label.dui-mod__choice > span {
+  color: inherit;
+  font-size: inherit;
+  overflow-wrap: anywhere;
+}
+
+.dui-mod__form label.dui-mod__choice-detail {
+  margin-left: 24px;
+}
+
+.dui-mod__plan {
+  padding: 8px 10px;
+  border: 1px solid var(--dui-border);
+  border-radius: var(--dui-radius);
+  background: var(--dui-bg);
+}
+
+.dui-mod__plan-summary {
+  margin: 0 0 4px;
+  color: var(--dui-text-muted);
+}
+
+.dui-mod__plan .dui-mod__files li + li {
+  margin-top: 2px;
+}
+
+.dui-mod__from {
+  color: var(--dui-text-muted);
+  text-decoration: line-through;
+}
+
+.dui-mod__warning {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: var(--dui-radius);
+  background: var(--dui-highlight);
+}
+
+.dui-mod__hint {
+  margin: 0;
+  color: var(--dui-text-muted);
+  font-size: 0.9em;
+}

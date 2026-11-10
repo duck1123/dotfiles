@@ -3,7 +3,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ModBrowser } from "../../src/components/ModBrowser";
-import type { ModList, ModSource, WriteResult } from "../../src/mods/types";
+import type { ModList, ModSource, RenameResult, WriteResult } from "../../src/mods/types";
 import "../../src/theme.css";
 import "./app.css";
 
@@ -41,7 +41,10 @@ const source: ModSource = {
       downloadPage: clearable(changes.downloadPage),
       title: clearable(changes.title),
       tags: changes.tags,
+      folder: changes.folder,
+      flatten: changes.flatten,
     }),
+  rename: (id, to, apply) => postJson<RenameResult>("api/mod/rename", { id, to, apply }),
   setInProfile: (profile, id, enabled) =>
     postJson<WriteResult>(enabled ? "api/profile/add" : "api/profile/remove", { profile, ids: [id] }),
 };

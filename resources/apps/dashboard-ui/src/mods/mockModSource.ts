@@ -1,5 +1,6 @@
+import { planPlacement } from "./placement";
 import { sampleModList } from "./sampleMods";
-import type { ModList, ModSource } from "./types";
+import type { ModList, ModSource, RenameResult } from "./types";
 
 export interface MockModOptions {
   list?: ModList;
@@ -72,8 +73,61 @@ export function createMockModSource({
     await write();
     const mod = find(id);
     const before = JSON.stringify(mod);
-    Object.assign(mod, changes);
-    return { commit: JSON.stringify(mod) === before ? null : fakeCommit() };
+    const { folder, flatten, ...fields } = changes;
+    Object.assign(mod, fields);
+    if (folder !== undefined) {
+      mod.folder = folder === "default" ? mod.defaultFolder : folder.trim().replace(/^\/+|\/+$/g, "") || null;
+    }
+    if (flatten !== undefined) {
+      mod.flatten = flatten;
+    }
+    const moved = folder !== undefined || flatten !== undefined;
+    if (moved) {
+      mod.installs = planPlacement(mod.installs, mod).map((f) => ({ source: f.source, sha256: f.sha256, target: f.to }));
+    }
+    const changed = JSON.stringify(mod) !== before;
+    const notes = changed && moved ? ["the files move at the next `sims switch`"] : [];
+    return { commit: changed ? fakeCommit() : null, notes };
+  };
+  source.rename = async (id, to, apply) => {
+    await write();
+    const mod = find(id);
+    if (!/^[a-z0-9][a-z0-9-]*\/[a-z0-9][a-z0-9-]*$/.test(to)) {
+      throw new Error(`${to}: an id is creator/mod, in lowercase letters, digits and -`);
+    }
+    if (state.mods.some((m) => m.id === to)) {
+      throw new Error(`${to} is already in the catalog`);
+    }
+    const onDefault = mod.folder === mod.defaultFolder;
+    const newDefault = to.replace("/", "_");
+    const referrers = state.mods.filter((m) => m.requires.includes(id) || m.conflicts.includes(id));
+    const result: RenameResult = {
+      from: id,
+      to,
+      moved: [`mods/${id}.json -> mods/${to}.json`],
+      folder: onDefault ? { from: mod.defaultFolder, to: newDefault } : null,
+      rewritten: [
+        ...mod.profiles.map((p) => ({ file: `profiles/${p}.json`, refs: 1 })),
+        ...referrers.map((m) => ({ file: `mods/${m.id}.json`, refs: 1 })),
+      ],
+      mentions: [],
+      applied: apply,
+    };
+    if (!apply) {
+      return result;
+    }
+    for (const m of referrers) {
+      m.requires = m.requires.map((r) => (r === id ? to : r));
+      m.conflicts = m.conflicts.map((r) => (r === id ? to : r));
+    }
+    mod.id = to;
+    mod.defaultFolder = newDefault;
+    if (onDefault) {
+      mod.folder = newDefault;
+      mod.installs = planPlacement(mod.installs, mod).map((f) => ({ source: f.source, sha256: f.sha256, target: f.to }));
+    }
+    state.mods.sort((a, b) => a.id.localeCompare(b.id));
+    return { ...result, commit: fakeCommit() };
   };
   source.setInProfile = async (profile, id, enabled) => {
     await write();

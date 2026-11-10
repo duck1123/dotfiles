@@ -47,3 +47,10 @@ export const DefinedInNix: Story = {
 export const MissingDependency: Story = {
   args: { mod: { ...byId("acme/widgets"), requires: ["acme/core", "gone/away"] } },
 };
+
+export const InSharedFolder: Story = {
+  args: {
+    mod: byId("acme/tweak-moodlets"),
+    onSave: fn(async () => ({ commit: "abc1234", notes: ["the files move at the next `sims switch`"] })),
+  },
+};
