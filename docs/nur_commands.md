@@ -185,7 +185,7 @@ Copies folders from the NAS's `/volume1` onto the RECOVERY_BACKUP USB drive atta
 | `nur nas archive <share/folder> [--dry-run] [--skip-arr] [--bwlimit 60M]` | Copy (resumable rsync), hash the source, then check the drive copy against it with the page cache dropped. **Doesn't delete the source**: a verified run prints the `rm` command. Re-running resumes. For a `TV/<show>` or `Movies/<movie>` folder it first sets `Monitored = false` in Sonarr's or Radarr's database, and refuses while that app is running (unmonitor in its UI, then pass `--skip-arr`). |
 | `nur nas archive-verify <share/folder> [--bwlimit 60M]` | Re-check a folder on the drive against its manifest (bit-rot check for the offline copy). |
 | `nur nas archive-adopt <share/folder> [--bwlimit 60M]` | For a folder moved some other way (e.g. UGOS File Manager): fix the root-owned `000` directories UGOS leaves, then write its manifest. Refuses if the source still exists or UGOS temp files are present. |
-| `nur nas archive-status` | Running and finished jobs, the last journal lines of running ones, drive free space, and the end of `ARCHIVE.log`. |
+| `nur nas archive-status` | Running and finished jobs, the last journal lines of running ones, the `FAILED` lines (e.g. which files didn't match) of failed ones, drive free space, and the end of `ARCHIVE.log`. |
 
 ### Other cluster helpers
 

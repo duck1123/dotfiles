@@ -2520,6 +2520,10 @@ systemctl list-units --all --no-legend --plain 'nas-archive-*' | awk '{print $1,
 for u in $(systemctl list-units --state=active --no-legend --plain 'nas-archive-*' | awk '{print $1}'); do
   echo \"== $u\"; sudo journalctl -u \"$u\" --no-pager -n 3 -o cat | tr '\\r' '\\n' | tail -n 3
 done
+for u in $(systemctl list-units --state=failed --no-legend --plain 'nas-archive-*' | awk '{print $1}'); do
+  echo \"== $u (failed)\"
+  sudo journalctl -u \"$u\" _SYSTEMD_INVOCATION_ID=$(systemctl show -p InvocationID --value \"$u\") --no-pager -o cat | grep -E 'FAILED' | tail -n 10
+done
 echo '== drive'; df -h \"$drive\" | tail -n 1
 echo '== ARCHIVE.log'; tail -n 15 \"$drive/ARCHIVE.log\" 2>/dev/null || echo '(empty)'"
 }

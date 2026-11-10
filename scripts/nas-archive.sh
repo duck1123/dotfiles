@@ -125,8 +125,22 @@ case $mode in
     files=$(wc -l < "$dst/$MANIFEST.tmp")
     [ "$(count_files "$dst")" -eq "$files" ] || fail "file count differs: source $files, drive $(count_files "$dst")"
 
-    echo "== verifying the drive copy ($files files)"
-    verify_against "$dst/$MANIFEST.tmp" || fail "checksum mismatch; source kept, re-run to retry"
+    # A file that doesn't match is removed from the drive and copied once
+    # more (otherwise rsync's size+mtime check would skip it on every retry).
+    for attempt in 1 2; do
+      echo "== verifying the drive copy ($files files)"
+      out=$(verify_against "$dst/$MANIFEST.tmp") && break
+      printf '%s\n' "$out"
+      mapfile -t bad < <(printf '%s\n' "$out" | sed -n 's/: FAILED.*$//p')
+      [ "${#bad[@]}" -gt 0 ] || fail "checksum check failed without naming a file"
+      for f in "${bad[@]}"; do
+        log MISMATCH "$f"
+        rm -f -- "$dst/$f"
+      done
+      [ "$attempt" = 1 ] || fail "checksum mismatch again in ${#bad[@]} file(s), removed from the drive; source kept"
+      echo "== re-copying ${#bad[@]} mismatched file(s)"
+      rsync "${rsync_opts[@]}" --info=stats1 "$src/" "$dst/" || fail "rsync exited $?"
+    done
     mv "$dst/$MANIFEST.tmp" "$dst/$MANIFEST"
     log VERIFIED "$files files, $(numfmt --to=iec "$need")"
 
