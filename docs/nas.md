@@ -16,9 +16,9 @@ UGOS manages share permissions with its own ACLs (`+` in `ls -l`; `getfacl` show
 
 nasnix mounts the NAS's `/volume1` read-only at `/mnt/volume1` (`hosts/nasnix.nix`, virtiofs tag `volume1`). This bypasses UGOS's NFS server.
 
-Because of the share ACLs, virtiofsd has to run as duck (uid 1000 with the NAS groups `admin`, `users`, `ughomeusers`), so UGOS reports files to it the way it does to duck. UGOS's own `/usr/lib/qemu/virtiofsd` needs root, so libvirt starts [`resources/nas/virtiofsd-duck`](../resources/nas/virtiofsd-duck) instead. That wrapper raises the open-file limit, drops to duck with `setpriv`, and runs a static virtiofsd with `--sandbox=none`.
+Because of the share ACLs, virtiofsd has to run as duck (uid 1000 with the NAS groups `admin`, `users`, `ughomeusers`), so UGOS reports files to it the way it does to duck. UGOS's own `/usr/lib/qemu/virtiofsd` needs root, so libvirt starts [`resources/nas/virtiofsd-duck`](../resources/nas/virtiofsd-duck) instead. That wrapper raises the open-file limit, drops to duck with `setpriv` while keeping only `CAP_DAC_READ_SEARCH`, and runs a static virtiofsd with `--sandbox=none --inode-file-handles=mandatory --readonly`.
 
-Without root, virtiofsd can't use file handles, so it keeps one open fd for every inode nasnix knows about. Walking the 11 media shares holds about 292k. The limit is 1048576, the kernel's per-process maximum. "Too many open files in system" inside nasnix means it was hit.
+The capability is what lets virtiofsd use file handles (`open_by_handle_at`) instead of keeping an open fd for every inode nasnix knows about. Without it, walking the 11 media shares held about 292k fds. Each held fd also kept a deleted file allocated, so deleting a show on the NAS freed nothing until nasnix forgot the inodes or restarted. To check, look for deleted files virtiofsd still holds: `ls -l /proc/$(pgrep -u duck virtiofsd)/fd | grep '(deleted)'`. A file nasnix actually has open still uses an fd, and still holds its space until it's closed. The capability also skips read-permission checks, which is why the wrapper passes `--readonly`. With `mandatory`, virtiofsd refuses to start if file handles don't work (`Refusing to use (mandatory) file handles`), rather than falling back to fds.
 
 ### What's on the NAS
 
@@ -77,6 +77,7 @@ As root on the NAS:
    virsh shutdown ce28a2d8-b04c-426f-9b61-795b9e737887   # wait for "shut off" in `virsh list --all`
    virsh start ce28a2d8-b04c-426f-9b61-795b9e737887
    ps -eo user,args | grep '[v]irtiofsd'                # should run as duck
+   grep CapEff /proc/$(pgrep -u duck virtiofsd)/status  # 0000000000000004 (dac_read_search only)
    ```
 
 If the VM won't start, virtiofsd's log is under `/var/log/libvirt/qemu/`.
