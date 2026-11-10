@@ -286,3 +286,19 @@ async function handle(req, res) {
 server.listen(port, "127.0.0.1", () => {
   console.error(`sims web: serving ${root} on http://127.0.0.1:${port}/`);
 });
+
+// ctrl-c (or a kill) is how `sims web` stops: exit cleanly, so Nushell doesn't report
+// the server as killed by a signal. A write in progress finishes first (git keeps a
+// lock while it commits); a second signal doesn't wait.
+let stopping = false;
+function stop() {
+  if (stopping) {
+    process.exit(130);
+  }
+  stopping = true;
+  server.close();
+  server.closeAllConnections();
+  writes.finally(() => process.exit(0));
+}
+process.on("SIGINT", stop);
+process.on("SIGTERM", stop);
