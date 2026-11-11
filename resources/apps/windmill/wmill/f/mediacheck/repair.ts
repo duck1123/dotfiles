@@ -27,7 +27,7 @@ import { mkdirSync, statSync, writeFileSync } from "node:fs";
 import { rename, unlink } from "node:fs/promises";
 import { dirname, join, normalize } from "node:path";
 
-const MAX_ACTIVE = 3;
+const MAX_ACTIVE = 5;
 const MAX_ATTEMPTS = 3;
 const MIN_FREE_BYTES = 100e9;
 const SEARCH_IDLE_HOURS = 3;
