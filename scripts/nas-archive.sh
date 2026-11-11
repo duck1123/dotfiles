@@ -107,7 +107,7 @@ case $mode in
     # --delete mirrors $src: $dst belongs to this path, and anything else in
     # it (e.g. UGOS temp files from an interrupted move) would otherwise be
     # left unverified next to the archive.
-    rsync_opts=(-aH --delete --filter="P $MANIFEST" --partial-dir=.rsync-partial --no-inc-recursive --bwlimit="$bwlimit")
+    rsync_opts=(-aH --delete --filter="P $MANIFEST" --filter="P $MANIFEST.tmp" --partial-dir=.rsync-partial --no-inc-recursive --bwlimit="$bwlimit")
     if [ "$dry" = 1 ]; then
       mkdir -p "$(dirname "$dst")"
       rsync "${rsync_opts[@]}" --dry-run --itemize-changes --stats "$src/" "$dst/" | tail -n 25
