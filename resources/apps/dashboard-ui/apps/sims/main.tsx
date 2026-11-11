@@ -43,6 +43,7 @@ const source: ModSource = {
       tags: changes.tags,
       folder: changes.folder,
       flatten: changes.flatten,
+      version: changes.version,
     }),
   rename: (id, to, apply) => postJson<RenameResult>("api/mod/rename", { id, to, apply }),
   setInProfile: (profile, id, enabled) =>

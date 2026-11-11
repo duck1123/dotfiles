@@ -536,9 +536,9 @@ def simsnix-eval [profile: any, body: string, --raw]: nothing -> any {
 
 # Evaluate a profile into the manifest `sims switch` will install
 export def "sims manifest" [
-  profile?: string # profile to evaluate (default: "default")
+  profile?: string # profile to evaluate (default: the one last switched to, else current)
 ]: nothing -> record {
-  simsnix-eval ($profile | default default) r
+  simsnix-eval ($profile | default (default-profile)) r
 }
 
 # Importing a folder of mods. Every file is copied into the blob store (the folder
@@ -1100,12 +1100,13 @@ def missing-dirs [mods_dir: path, rel: string]: nothing -> list<string> {
 # --apply refuses while the game runs, and first backs up the newest save (`sims save
 # backup`) unless --no-backup.
 export def "sims switch" [
-  profile: string                                       # profile to install
+  profile?: string                                      # profile to install (default: the one last switched to, else current)
   --instance (-i): string@"nu-complete sims instances" # instance (default from config)
   --apply                                               # change Mods/
   --force                                               # replace or remove simsnix's files even if changed
   --no-backup                                           # don't back up the newest save first
 ]: nothing -> record {
+  let profile = $profile | default (default-profile $instance)
   let i = instance $instance
   let mods_dir = $i.documents | path join Mods
   if not ($mods_dir | path exists) { error make {msg: $"($mods_dir) not found"} }
