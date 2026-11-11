@@ -122,6 +122,18 @@ def "main once" [] {
   let file = $lib.root | path join $job.path
   print $"checking ($job.library)/($job.path)"
   let result = decode $file
+  # ffmpeg wasn't allowed to open the file, so this says nothing about the file.
+  # (A file deleted since the scan is still reported; the next scan marks it missing.)
+  # In November 2026 the NFS mount refused reads in bursts for a day, and every
+  # file checked meanwhile was reported as a crash. Hand the claim back and
+  # wait instead; the file is claimed again once reads work.
+  if $result.decoded == null and ($result.log | any {|l| $l.msg =~ 'Error opening input.*Permission denied' }) {
+    let reason = $result.log | last | get msg
+    api release {host: (host)}
+    print -e $"  couldn't open it \(($reason)\); released, retrying in ($IDLE_MINUTES) minutes"
+    sleep ($IDLE_MINUTES * 1min)
+    return true
+  }
   let now = ls -l $file | first
   let reported = api report ({id: $job.id, size: ($now.size | into int), mtime: (($now.modified | into int) // 1_000_000_000)} | merge $result)
   print $"  ($reported.status) in ($result.checkSeconds | math round)s: ($result.lineCount) error lines"
