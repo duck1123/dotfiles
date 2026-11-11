@@ -1,6 +1,11 @@
 {
   homeManager =
-    { config, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       inherit (config.host.identity) username;
     in
@@ -8,31 +13,35 @@
       home = {
         homeDirectory = "/home/${username}";
 
-        packages = with pkgs; [
-          appimage-run
-          argocd
-          baobab
-          bat
-          brotab
-          byobu
-          curl
-          glow
-          gnupg
-          hstr
-          htop
-          keepassxc
-          lens
-          libnotify
-          nerdfetch
-          nh
-          nix-tree
-          nixd
-          nixfmt
-          ripgrep
-          smartmontools
-          unzip
-          xsel
-        ];
+        # Skip what the host's platform can't build (lens is x86_64-only).
+        packages = lib.filter (lib.meta.availableOn pkgs.stdenv.hostPlatform) (
+          with pkgs;
+          [
+            appimage-run
+            argocd
+            baobab
+            bat
+            brotab
+            byobu
+            curl
+            glow
+            gnupg
+            hstr
+            htop
+            keepassxc
+            lens
+            libnotify
+            nerdfetch
+            nh
+            nix-tree
+            nixd
+            nixfmt
+            ripgrep
+            smartmontools
+            unzip
+            xsel
+          ]
+        );
 
         username = "${username}";
       };

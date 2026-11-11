@@ -21,6 +21,7 @@ The flake is assembled with [flake-parts](https://github.com/hercules-ci/flake-p
 | nixmini | NixOS x86_64 | k3s node |
 | powerspecnix | NixOS x86_64 | Primary gaming PC |
 | steamdeck | home-manager only | user: deck |
+| steamframe | home-manager only, aarch64 | Steam Frame; user: deck |
 | vavirl-pw0bwnq8 | NixOS-WSL + home-manager | user: drenfer; home config `drenfer@VAVIRL-PW0BWNQ8`, `--host vallen` |
 | pixel8 | feature/syncthing config only | Android phone; no NixOS or home-manager build target |
 

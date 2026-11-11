@@ -1,14 +1,7 @@
 {
   homeManager =
+    { config, ... }:
     {
-      config,
-      inputs,
-      pkgs,
-      ...
-    }:
-    {
-      home.packages = [ inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.ngit ];
-
       programs =
         let
           inherit (config.host.identity) email gpgKey name;

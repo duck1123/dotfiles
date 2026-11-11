@@ -12,7 +12,7 @@ git clone git@github.com:duck1123/dotfiles.git ~/dotfiles
 
 ## 2. Nix (non-NixOS hosts only)
 
-NixOS machines already have Nix. For home-manager-only hosts (steamdeck), use the [Determinate Nix installer](https://github.com/DeterminateSystems/nix-installer), which handles upgrades cleanly:
+NixOS machines already have Nix. For home-manager-only hosts (steamdeck, steamframe), use the [Determinate Nix installer](https://github.com/DeterminateSystems/nix-installer), which handles upgrades cleanly:
 
 ```sh
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install \
@@ -27,7 +27,7 @@ The Determinate installer enables flakes itself. Put any local Nix settings in `
 
 Everything runs through `nur` (see [nur_commands.md](nur_commands.md)). Until home-manager has been applied, get it one of two ways:
 
-- `nix run .#pnu`: a Nushell session with the tasks loaded; run `nur <task>` inside it.
+- `nix run .#pnu`: a Nushell session with the tasks loaded; run `nur <task>` inside it. It works on every system (including the aarch64 Steam Frame) and before any Nushell config exists.
 - direnv: `.envrc` is git-ignored, so copy the example, fill it in, and allow it. Its `use flake` loads the devShell (`modules/flake/devShells.nix`), which provides `nur`, `nh`, `sops`, `age`, `ssh-to-age`, `kubectl` and more.
 
   ```sh

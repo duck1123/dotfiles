@@ -144,45 +144,61 @@ let
     patches = (old.patches or [ ]) ++ [ ../../patches/niri-side-button-drag.patch ];
   });
 
-  pnu = pkgs.writeShellApplication {
-    name = "pnu";
-    runtimeInputs = [ pkgs.nushell ];
-    text = ''
-      CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/nushell"
-      CONFIG="$CONFIG_DIR/config.nu"
-      ENV_CONFIG="$CONFIG_DIR/env.nu"
-      SCRIPT="$PWD/scripts/nur.nu"
+  # Built for every system (unlike the x86_64-only packages above): it's how
+  # a new host gets `nur` before home-manager is applied (`nix run .#pnu`).
+  mkPnu =
+    pkgs:
+    pkgs.writeShellApplication {
+      name = "pnu";
+      runtimeInputs = [ pkgs.nushell ];
+      text = ''
+        CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}/nushell"
+        CONFIG="$CONFIG_DIR/config.nu"
+        ENV_CONFIG="$CONFIG_DIR/env.nu"
+        SCRIPT="$PWD/scripts/nur.nu"
 
-      TMP=$(mktemp --suffix=.nu)
-      trap 'rm -f "$TMP"' EXIT
+        TMP=$(mktemp --suffix=.nu)
+        trap 'rm -f "$TMP"' EXIT
 
-      if [ -f "$SCRIPT" ]; then
-        printf 'source "%s"\noverlay use "%s"\n' "$CONFIG" "$SCRIPT" > "$TMP"
-      else
-        printf 'source "%s"\n' "$CONFIG" > "$TMP"
-      fi
+        # A fresh machine has no nushell config until home-manager is applied.
+        : > "$TMP"
+        if [ -f "$CONFIG" ]; then
+          printf 'source "%s"\n' "$CONFIG" >> "$TMP"
+        fi
+        if [ -f "$SCRIPT" ]; then
+          printf 'overlay use "%s"\n' "$SCRIPT" >> "$TMP"
+        fi
 
-      exec nu --env-config "$ENV_CONFIG" --config "$TMP" "$@"
-    '';
-  };
+        ENV_ARGS=()
+        if [ -f "$ENV_CONFIG" ]; then
+          ENV_ARGS=(--env-config "$ENV_CONFIG")
+        fi
+
+        exec nu "''${ENV_ARGS[@]}" --config "$TMP" "$@"
+      '';
+    };
 
 in
 {
   perSystem =
-    { system, ... }:
-    if system == "x86_64-linux" then
-      {
-        packages = {
-          inherit
-            caldera-amp
-            caldera-music
-            ngit
-            niri
-            pnu
-            soap-cli
-            ;
-        };
+    { pkgs, system, ... }:
+    {
+      packages = {
+        pnu = mkPnu pkgs;
       }
-    else
-      { };
+      // (
+        if system == "x86_64-linux" then
+          {
+            inherit
+              caldera-amp
+              caldera-music
+              ngit
+              niri
+              soap-cli
+              ;
+          }
+        else
+          { }
+      );
+    };
 }
