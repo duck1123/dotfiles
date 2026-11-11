@@ -71,6 +71,23 @@ test("a decision can be undone", async () => {
   await waitFor(() => expect(fileButtons()).toHaveLength(openFiles.length));
 });
 
+test("a crashed decode can go back to the checker's queue", async () => {
+  const { decide, user } = setup();
+  await waitFor(() => expect(fileButtons()).toHaveLength(openFiles.length));
+  expect(screen.queryByRole("button", { name: "Check again" })).not.toBeInTheDocument();
+
+  const crashed = fileButtons().find((b) => b.textContent?.includes("S01E03"))!;
+  expect(crashed).toHaveTextContent("Decode crashed");
+  await user.click(crashed);
+  await user.click(await screen.findByRole("button", { name: "Check again" }));
+  expect(decide).toHaveBeenCalledWith(10, "recheck");
+  await waitFor(() => expect(fileButtons()).toHaveLength(openFiles.length - 1));
+  for (const view of ["Replacement requested", "Marked good"]) {
+    await user.click(screen.getByRole("button", { name: view }));
+    await waitFor(() => expect(screen.queryByText(/S01E03/)).not.toBeInTheDocument());
+  }
+});
+
 test("a replaced original is only removed after confirming, and stays listed until it's gone", async () => {
   const { decide, user } = setup();
   await user.click(screen.getByRole("button", { name: "Replaced" }));

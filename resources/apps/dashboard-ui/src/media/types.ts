@@ -56,7 +56,7 @@ export interface MediaRepair {
 /** Which files to show: waiting on a decision, or already decided. */
 export type MediaView = "open" | "replace" | "replaced" | "good";
 
-export type MediaDecision = "good" | "replace" | "reopen" | "remove_original" | "remove_leftover";
+export type MediaDecision = "good" | "replace" | "reopen" | "remove_original" | "remove_leftover" | "recheck";
 
 /** Where a media review gets its files and records decisions. */
 export interface MediaSource {

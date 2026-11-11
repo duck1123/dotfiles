@@ -57,6 +57,12 @@ export function createMockMediaSource(options: MockMediaOptions = {}): MediaSour
         files = files.map((f) => (f.id === id ? removing : f));
         return removing;
       }
+      if (decision === "recheck") {
+        // Back in the checker's queue: it leaves every view until it's checked again.
+        const queued = { ...file, status: "queued" };
+        files = files.map((f) => (f.id === id ? queued : f));
+        return queued;
+      }
       const status = decision === "good" ? "marked_good" : decision === "replace" ? "replace_requested" : (file.verdict ?? "suspect");
       const updated = { ...file, status };
       files = files.map((f) => (f.id === id ? updated : f));

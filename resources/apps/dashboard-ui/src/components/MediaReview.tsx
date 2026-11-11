@@ -114,7 +114,8 @@ function hint(view: MediaView, file: MediaFile): string {
     return "Removing it on the next repair run, within 15 minutes.";
   }
   if (view === "open") {
-    return "A replacement request moves the file out of Plex when its turn comes. It's kept in quarantine until you remove it.";
+    const request = "A replacement request moves the file out of Plex when its turn comes. It's kept in quarantine until you remove it.";
+    return file.fatal ? `${request} If the crash wasn't the file's fault, check it again: it goes to the front of the checker's queue.` : request;
   }
   if (view === "replaced") {
     return "The original stays in quarantine until you remove it.";
@@ -335,6 +336,11 @@ export function MediaReview({ source }: MediaReviewProps) {
                   <button type="button" className="dui-media__button" disabled={saving} onClick={() => decide("good")}>
                     Mark good
                   </button>
+                  {current.fatal && (
+                    <button type="button" className="dui-media__button" disabled={saving} onClick={() => decide("recheck")}>
+                      Check again
+                    </button>
+                  )}
                 </>
               )}
               {remove && !confirmingRemove && (

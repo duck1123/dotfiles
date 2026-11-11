@@ -2,7 +2,7 @@ summary: Review decisions for the media integrity queue
 description: >-
   Backs the Media tab of the inbox review app: list files waiting on a decision,
   get one with its error log, and decide (mark good, request a replacement,
-  reopen, or remove a replaced original). Records decisions only; it never
+  reopen, check again, or remove a replaced original). Records decisions only; it never
   touches the files. f/mediacheck/repair acts on them.
 lock: '!inline f/mediacheck/review.script.lock'
 kind: script

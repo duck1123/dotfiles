@@ -12,7 +12,9 @@
 //   it changes, "replace" asks for a replacement, "reopen" undoes either one
 //   until the repair has moved the file. "remove_original" has the next repair
 //   run delete a replaced file's quarantined copies, and "remove_leftover" an
-//   untracked file that has a tracked copy.
+//   untracked file that has a tracked copy. "recheck" puts a file waiting on
+//   review back in the checker's queue, ahead of the rest, for a decode that
+//   crashed or was cut short for some reason other than the file.
 //
 // Nothing here touches the files. f/mediacheck/repair acts on these decisions.
 import * as wmill from "windmill-client";
@@ -138,6 +140,14 @@ async function decide(args: { id: number; decision: string }) {
       where media_file_id = ${args.id} and state = 'untracked' and tracked_copy is not null
       returning id`;
     if (!removing.length) throw new Error(`media_file ${args.id} isn't a leftover`);
+    return get({ id: args.id });
+  }
+  if (args.decision === "recheck") {
+    const rows = await db`
+      update media_file set status = 'queued', check_first = true, claimed_by = null, claimed_at = null, reviewed_at = null
+      where id = ${args.id} and status in ${db(VIEWS.open)}
+      returning id`;
+    if (!rows.length) throw new Error(`media_file ${args.id} isn't waiting on review`);
     return get({ id: args.id });
   }
   // Once the repair has moved the file, it has to run its course.
