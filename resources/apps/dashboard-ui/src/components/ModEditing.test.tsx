@@ -227,3 +227,23 @@ test("lists an archive's files and, for the installed version, where each goes",
   await detail().findByRole("status");
   expect(within(row("2.4.1")).getByText("AcmeCore.package").closest("li")).toHaveTextContent("→ Mods/AcmeCore.package");
 });
+
+test("pins an older version and unpins back to the newest", async () => {
+  const { update, user, detail } = await setup("acme/core");
+  const row = (label: string) => detail().getByRole("rowheader", { name: new RegExp(`^${label.replace(/\./g, "\\.")}`) });
+  expect(row("2.4.1")).toHaveTextContent("installs (newest)");
+
+  await user.click(detail().getByRole("button", { name: "Pin 2.3.0" }));
+  expect(update).toHaveBeenCalledWith("acme/core", { version: "2.3.0" });
+  expect(await detail().findByRole("status")).toHaveTextContent("The version changes at the next `sims switch`.");
+  expect(row("2.3.0")).toHaveTextContent("installs (pinned)");
+  expect(row("2.4.1")).not.toHaveTextContent("installs");
+  // the pinned version's files now say where they go
+  expect(within(row("2.3.0").closest("tr")!).getByText("AcmeCore.package").closest("li")).toHaveTextContent(
+    "→ Mods/acme_core/AcmeCore.package",
+  );
+
+  await user.click(detail().getByRole("button", { name: "Unpin 2.3.0" }));
+  expect(update).toHaveBeenLastCalledWith("acme/core", { version: "" });
+  await waitFor(() => expect(row("2.4.1")).toHaveTextContent("installs (newest)"));
+});

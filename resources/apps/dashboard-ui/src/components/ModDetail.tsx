@@ -554,6 +554,7 @@ export function ModDetail({ mod, profile, knownIds, onSelect, onSave, onToggle, 
   const [mode, setMode] = useState<Mode>("view");
   const editing = mode === "edit";
   const [toggling, setToggling] = useState(false);
+  const [pinning, setPinning] = useState(false);
   const [notice, setNotice] = useState(initialNotice);
   const [error, setError] = useState("");
   const listed = mod.profiles.includes(profile);
@@ -584,6 +585,24 @@ export function ModDetail({ mod, profile, knownIds, onSelect, onSave, onToggle, 
       setToggling(false);
     }
   }
+
+  /** Pin a version ("" unpins, so the newest installs). */
+  async function pin(label: string) {
+    if (!onSave) {
+      return;
+    }
+    setPinning(true);
+    setError("");
+    setNotice("");
+    try {
+      setNotice(savedText(await onSave({ version: label })));
+    } catch (e) {
+      setError(errorText(e));
+    } finally {
+      setPinning(false);
+    }
+  }
+  const canPin = onSave !== undefined && mod.editable && mode === "view";
 
   return (
     <article className="dui-mod" aria-labelledby="dui-mod-title">
@@ -722,6 +741,18 @@ export function ModDetail({ mod, profile, knownIds, onSelect, onSave, onToggle, 
                     {label}
                     {selected && (
                       <span className="dui-mod__badge">{mod.version === null ? "installs (newest)" : "installs (pinned)"}</span>
+                    )}
+                    {canPin && (
+                      <button
+                        type="button"
+                        className="dui-mod__button dui-mod__pin"
+                        disabled={pinning}
+                        aria-label={mod.version === label ? `Unpin ${label}` : `Pin ${label}`}
+                        title={mod.version === label ? "Install the newest version instead" : "Install this version"}
+                        onClick={() => pin(mod.version === label ? "" : label)}
+                      >
+                        {mod.version === label ? "Unpin" : "Pin"}
+                      </button>
                     )}
                   </th>
                   <td>{v.added ?? "—"}</td>

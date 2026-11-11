@@ -88,6 +88,8 @@ export interface ModChanges {
   /** Where it installs: "default" for `<creator>_<mod>`, "" for Mods/ itself, else a folder under Mods/. */
   folder?: string;
   flatten?: boolean;
+  /** Pin this version label; "" unpins it, so the newest installs. */
+  version?: string;
 }
 
 export interface WriteResult {

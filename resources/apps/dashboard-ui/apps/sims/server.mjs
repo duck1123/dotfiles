@@ -53,7 +53,8 @@ const routes = {
     script: "sims mod list --profile $args.profile?",
   },
   // A field left out stays as it is; "" clears downloadPage or title. folder is
-  // "default" (<creator>_<mod>), "" (Mods/ itself) or a folder under Mods/.
+  // "default" (<creator>_<mod>), "" (Mods/ itself) or a folder under Mods/. version
+  // pins a version label; "" unpins it (the newest installs).
   "POST /api/mod/set": {
     args: (_url, body) => {
       requireFields(body, [
@@ -63,12 +64,13 @@ const routes = {
         ["tags", optional(isStringList), "a list of strings"],
         ["folder", optional(isString), "a folder, \"default\" or empty"],
         ["flatten", optional(isBool), "true or false"],
+        ["version", optional(isString), "a version label or empty"],
       ]);
-      const { id, downloadPage = null, title = null, tags = null, folder = null, flatten = null } = body;
-      return { id, downloadPage, title, tags, folder, flatten };
+      const { id, downloadPage = null, title = null, tags = null, folder = null, flatten = null, version = null } = body;
+      return { id, downloadPage, title, tags, folder, flatten, version };
     },
     script: [
-      "sims mod set $args.id --page $args.downloadPage? --title $args.title? --tags $args.tags? --folder $args.folder?",
+      "sims mod set $args.id --page $args.downloadPage? --title $args.title? --tags $args.tags? --folder $args.folder? --version $args.version?",
       "--flatten=($args.flatten == true) --no-flatten=($args.flatten == false) --commit",
     ].join(" "),
   },

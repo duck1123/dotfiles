@@ -1611,8 +1611,9 @@ def --wrapped data-git [data: path, ...args: string]: nothing -> record {
 # Set a mod's catalog fields in mods/<creator>/<mod>.json. An empty --page or --title
 # clears it; --tags replaces the list. --folder is where it installs: a folder under
 # Mods/, `default` for <creator>_<mod>, or '' for Mods/ itself; --flatten puts every
-# file directly in that folder, dropping the path it was imported at. Writes
-# right away (there's no dry run); a new folder takes effect at the next `sims switch`.
+# file directly in that folder, dropping the path it was imported at. --version pins
+# one of its versions ('' unpins: the newest installs). Writes right away (there's no
+# dry run); a new folder or version takes effect at the next `sims switch`.
 export def "sims mod set" [
   id: string@"nu-complete sims mods" # the mod's id, creator/mod
   --page: string                     # download page, an http(s) URL
@@ -1621,6 +1622,7 @@ export def "sims mod set" [
   --folder: string                   # folder under Mods/, `default` or ''
   --flatten                          # install files directly in the folder
   --no-flatten                       # install files at the paths they were imported at
+  --version: string                  # pin this version label; '' installs the newest
   --commit                           # commit the change
 ]: nothing -> record {
   let data = sims-config | get dataDir | path expand
@@ -1644,21 +1646,26 @@ export def "sims mod set" [
     | transpose field value | where value != null
     | update value {|r| if $r.field == tags { $r.value } else { do $blank ($r.value | str trim) } }
   if $flatten and $no_flatten { error make {msg: 'give --flatten or --no-flatten, not both'} }
-  if ($wanted | is-empty) and $folder == null and not $flatten and not $no_flatten {
-    error make {msg: 'nothing to set: give --page, --title, --tags, --folder or --flatten'}
+  if ($wanted | is-empty) and $folder == null and not $flatten and not $no_flatten and $version == null {
+    error make {msg: 'nothing to set: give --page, --title, --tags, --folder, --flatten or --version'}
   }
 
   let mod = open $file
+  let labels = $mod.versions? | default {} | columns
+  if $version != null and $version != '' and $version not-in $labels {
+    error make {msg: $"($id) has no version ($version) \(known: ($labels | str join ', ')\)"}
+  }
   let next = $wanted | reduce -f $mod {|w, m| $m | upsert $w.field $w.value }
   let next = if $folder == null { $next } else { apply-folder $next (folder-value $folder) }
   let next = if $flatten { $next | upsert flatten true } else if $no_flatten { $next | reject -o flatten } else { $next }
+  let next = if $version == null { $next } else if $version == '' { $next | reject -o version } else { $next | upsert version $version }
   let flat = collapse-flat $next
   let next = $flat.mod
   # a folder field left out is the default folder
   let shown = {|m, k|
     if $k == folder and folder not-in ($m | columns) { $id | str replace '/' '_' } else { $m | get -o $k }
   }
-  let changes = [downloadPage title tags folder flatten] | each {|k|
+  let changes = [downloadPage title tags folder flatten version] | each {|k|
     let was = do $shown $mod $k
     let now = do $shown $next $k
     if $was != $now { {field: $k, from: $was, to: $now} }
@@ -1682,6 +1689,9 @@ export def "sims mod set" [
       })
     ]
   }
+  let notes = if ($changes | any {|c| $c.field == version }) {
+    $notes | append 'the version changes at the next `sims switch`'
+  } else { $notes }
   {id: $id, changes: $changes, commit: $commit, notes: $notes}
 }
 
@@ -1891,12 +1901,14 @@ def index-archive [file: path, sha256: string, name: string, parent: any, tmp: p
 
 # Index the downloads in a folder: every archive (7z, rar, zip) and loose .package or
 # .ts4script file, at any depth. Dry run unless --apply, which unpacks the new ones in
-# a scratch folder beside the blob store, adds them to archives.json and copies each
-# download into the blob store. Downloads already indexed (by hash) aren't unpacked again.
+# a scratch folder beside the blob store, adds them to archives.json (and commits it,
+# unless --no-commit) and copies each download into the blob store. Downloads already
+# indexed (by hash) aren't unpacked again.
 export def "sims sources index" [
   dir: path                      # folder of downloads; only read
   --skip (-s): list<string> = [] # regexes of paths (relative to dir) to leave out
   --apply                        # unpack, index and store the new downloads
+  --no-commit                    # with --apply, leave archives.json uncommitted
 ]: nothing -> record {
   let dir = $dir | path expand
   let data = sims-config | get dataDir | path expand
@@ -1941,10 +1953,16 @@ export def "sims sources index" [
   } | flatten
   rm -rf $tmp
   save-index $data $index $added ($hashed | each {|r| {sha256: $r.sha256, file: ($dir | path join $r.path)} })
+  let names = $added | where in == null | get name
+  let commit = if $no_commit { null } else {
+    let what = if ($names | is-empty) { 'download paths' } else { $names | str join ', ' }
+    commit-data $data [($data | path join archives.json)] $"sims: index ($what)"
+  }
   $summary | merge {
     indexed: ($added | length)
     errors: ($added | where {|s| $s.error? != null } | each {|s| {name: $s.name, error: $s.error} })
     applied: true
+    commit: $commit
   }
 }
 
@@ -2163,8 +2181,8 @@ export def "sims add" [
   --page: string            # download page, for a mod that has none
   --pin                     # install this version
   --profile (-p): string    # also add the mod to this profile
-  --apply                   # store, index and write the catalog
-  --commit                  # with --apply, commit the catalog files it changed
+  --apply                   # store, index, write and commit the catalog
+  --no-commit               # with --apply, leave the catalog files it changed uncommitted
 ]: nothing -> table {
   if ($paths | is-empty) { error make {msg: 'give one or more downloads'} }
   let data = sims-config | get dataDir | path expand
@@ -2278,7 +2296,7 @@ export def "sims add" [
     let prof = open $pfile
     $prof | update mods ($prof.mods | append $ids | uniq | sort) | to json -i 2 | save -f $pfile
   }
-  if $commit {
+  if not $no_commit {
     let written = $plans | where json != null | get id | uniq
     let touched = [($data | path join archives.json)]
       | append ($written | each {|id| $data | path join mods $"($id).json" })

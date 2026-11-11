@@ -118,11 +118,12 @@ export function ModBrowser({ source, profile: initialProfile, selectedId: initia
   const save =
     source.update &&
     ((id: string) => async (changes: ModChanges) => {
-      const { folder, flatten, ...fields } = changes;
+      const { folder, flatten, version, ...fields } = changes;
       const result = await source.update!(id, changes);
-      patch(id, fields);
-      // where its files go, and the problems that can bring, come from the catalog
-      if (folder !== undefined || flatten !== undefined) {
+      patch(id, version === undefined ? fields : { ...fields, version: version || null });
+      // where its files go (and which version installs), and the problems that can
+      // bring, come from the catalog
+      if (folder !== undefined || flatten !== undefined || version !== undefined) {
         refresh();
       }
       return result;

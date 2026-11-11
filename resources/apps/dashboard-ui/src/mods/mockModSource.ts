@@ -1,6 +1,22 @@
-import { planPlacement } from "./placement";
+import { placeTarget, planPlacement } from "./placement";
 import { sampleModList } from "./sampleMods";
 import type { ModInstall, ModList, ModSource, ModSummary, RenameResult } from "./types";
+
+/** The newest of a mod's version labels (numeric parts compare as numbers). */
+function newest(mod: ModSummary): string | null {
+  const labels = Object.keys(mod.versions).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+  return labels[0] ?? null;
+}
+
+/** Every file of the mod's selected version, where it installs (no include/exclude or stripComponents). */
+function versionInstalls(mod: ModSummary): ModInstall[] {
+  const files = mod.selectedVersion ? (mod.versions[mod.selectedVersion]?.files ?? []) : [];
+  return files.flatMap((f): ModInstall[] =>
+    f.members.length === 0
+      ? [{ source: f.name, sha256: f.sha256, target: placeTarget(f.name, mod), archive: null, member: null }]
+      : f.members.map((m) => ({ source: m.path, sha256: m.sha256, target: placeTarget(m.path, mod), archive: f.sha256, member: m.path })),
+  );
+}
 
 /** The mod's installs at its (new) folder and flatten, keeping where each came from. */
 function moveInstalls(mod: ModSummary): ModInstall[] {
@@ -81,8 +97,19 @@ export function createMockModSource({
     await write();
     const mod = find(id);
     const before = JSON.stringify(mod);
-    const { folder, flatten, ...fields } = changes;
+    const { folder, flatten, version, ...fields } = changes;
     Object.assign(mod, fields);
+    if (version !== undefined) {
+      if (version !== "" && !(version in mod.versions)) {
+        throw new Error(`${id} has no version ${version}`);
+      }
+      const selected = version || newest(mod);
+      mod.version = version || null;
+      if (selected !== mod.selectedVersion) {
+        mod.selectedVersion = selected;
+        mod.installs = versionInstalls(mod);
+      }
+    }
     if (folder !== undefined) {
       mod.folder = folder === "default" ? mod.defaultFolder : folder.trim().replace(/^\/+|\/+$/g, "") || null;
     }
@@ -94,7 +121,10 @@ export function createMockModSource({
       mod.installs = moveInstalls(mod);
     }
     const changed = JSON.stringify(mod) !== before;
-    const notes = changed && moved ? ["the files move at the next `sims switch`"] : [];
+    const notes = [
+      ...(changed && moved ? ["the files move at the next `sims switch`"] : []),
+      ...(changed && version !== undefined ? ["the version changes at the next `sims switch`"] : []),
+    ];
     return { commit: changed ? fakeCommit() : null, notes };
   };
   source.rename = async (id, to, apply) => {

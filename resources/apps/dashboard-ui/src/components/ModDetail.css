@@ -158,6 +158,12 @@
   padding-left: 1.25em;
 }
 
+.dui-mod__pin {
+  margin-left: 6px;
+  padding: 0 8px;
+  font-size: 0.85em;
+}
+
 .dui-mod__target {
   color: var(--dui-text-muted);
 }
