@@ -46,7 +46,7 @@ Follow-up work and open decisions for this repo are Trilium tickets. The convent
 Hosts are `hosts/<hostname>.nix`; the [README](README.md#hosts) has the table and `nix eval --json .#hostInfo` has the details. Non-obvious ones:
 
 - `vavirl-pw0bwnq8` is NixOS-WSL with user `drenfer`. Its home config is `drenfer@VAVIRL-PW0BWNQ8`, and `--host` takes `vallen` (its `sshHost`).
-- `steamdeck` is home-manager only (user `deck`). `steamframe` (Steam Frame) is the same on `aarch64-linux`, the only ARM host: packages in `modules/flake/packages.nix` other than `pnu` are x86_64-only.
+- `steamdeck` is home-manager only (user `deck`). `frame` (Steam Frame, user `steamos`) is the same on `aarch64-linux`, the only ARM host: packages in `modules/flake/packages.nix` other than `pnu` are x86_64-only.
 - `pixel8` is an Android phone: feature flags and Syncthing only, with no build target.
 
 <!-- gortex:communities:start -->

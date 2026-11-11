@@ -12,7 +12,7 @@ git clone git@github.com:duck1123/dotfiles.git ~/dotfiles
 
 ## 2. Nix (non-NixOS hosts only)
 
-NixOS machines already have Nix. For home-manager-only hosts (steamdeck, steamframe), use the [Determinate Nix installer](https://github.com/DeterminateSystems/nix-installer), which handles upgrades cleanly:
+NixOS machines already have Nix. For home-manager-only hosts (steamdeck, frame), use the [Determinate Nix installer](https://github.com/DeterminateSystems/nix-installer), which handles upgrades cleanly:
 
 ```sh
 curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install \

@@ -41,7 +41,7 @@
   };
 
   id = "MKZPRXH-DOEZGKX-R4IPRSX-BTLWTHU-M3CBTAB-CPAA3NO-3YP2U5Y-HHYFLAI";
-  identity = config.identities.deck;
+  identity = config.identities.steamos;
   home-manager.enable = true;
   nixos.enable = false;
 
