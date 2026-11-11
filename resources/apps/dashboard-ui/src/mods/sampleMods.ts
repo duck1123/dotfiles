@@ -28,7 +28,7 @@ function mod(id: string, fields: Partial<ModSummary> = {}): ModSummary {
     selectedVersion: "1.0",
     requires: [],
     conflicts: [],
-    versions: { "1.0": { added: "2026-05-17", gameVersion: null, files: [{ name: `${id.split("/")[1]}.package`, sha256: fakeHash(id), members: 0 }] } },
+    versions: { "1.0": { added: "2026-05-17", gameVersion: null, files: [{ name: `${id.split("/")[1]}.package`, sha256: fakeHash(id), members: [] }] } },
     editable: true,
     profiles: ["current"],
     problems: [],
@@ -37,7 +37,7 @@ function mod(id: string, fields: Partial<ModSummary> = {}): ModSummary {
   if (!fields.installs) {
     const files = m.selectedVersion ? (m.versions[m.selectedVersion]?.files ?? []) : [];
     m.installs = files
-      .filter((f) => f.members === 0)
+      .filter((f) => f.members.length === 0)
       .map((f) => ({ source: f.name, sha256: f.sha256, target: placeTarget(f.name, m) }));
   }
   return m;
@@ -51,13 +51,48 @@ export const sampleMods: ModSummary[] = [
     selectedVersion: "2.4.1",
     stateFiles: ["*.log", "settings.cfg"],
     versions: {
-      "2.3.0": { added: "2025-10-09", gameVersion: "1.110", files: [{ name: "AcmeCore_2.3.0.zip", sha256: fakeHash("core-2.3.0"), members: 3 }] },
-      "2.4.1": { added: "2026-05-17", gameVersion: "1.116", files: [{ name: "AcmeCore_2.4.1.zip", sha256: fakeHash("core-2.4.1"), members: 4 }] },
+      "2.3.0": {
+        added: "2025-10-09",
+        gameVersion: "1.110",
+        files: [
+          {
+            name: "AcmeCore_2.3.0.zip",
+            sha256: fakeHash("core-2.3.0"),
+            members: [
+              { path: "AcmeCore.ts4script", sha256: fakeHash("core-script-2.3.0") },
+              { path: "AcmeCore.package", sha256: fakeHash("core-package-2.3.0") },
+              { path: "Readme.txt", sha256: fakeHash("core-readme") },
+            ],
+          },
+        ],
+      },
+      "2.4.1": {
+        added: "2026-05-17",
+        gameVersion: "1.116",
+        files: [
+          {
+            name: "AcmeCore_2.4.1.zip",
+            sha256: fakeHash("core-2.4.1"),
+            members: [
+              { path: "AcmeCore.ts4script", sha256: fakeHash("core-script") },
+              { path: "AcmeCore.package", sha256: fakeHash("core-package") },
+              { path: "Extras/AcmeCore_Extras.package", sha256: fakeHash("core-extras") },
+              { path: "Readme.txt", sha256: fakeHash("core-readme") },
+            ],
+          },
+        ],
+      },
     },
     installs: [
-      { source: "AcmeCore.ts4script", sha256: fakeHash("core-script"), target: "acme_core/AcmeCore.ts4script" },
-      { source: "AcmeCore.package", sha256: fakeHash("core-package"), target: "acme_core/AcmeCore.package" },
-      { source: "Extras/AcmeCore_Extras.package", sha256: fakeHash("core-extras"), target: "acme_core/Extras/AcmeCore_Extras.package" },
+      { source: "AcmeCore.ts4script", sha256: fakeHash("core-script"), target: "acme_core/AcmeCore.ts4script", archive: fakeHash("core-2.4.1"), member: "AcmeCore.ts4script" },
+      { source: "AcmeCore.package", sha256: fakeHash("core-package"), target: "acme_core/AcmeCore.package", archive: fakeHash("core-2.4.1"), member: "AcmeCore.package" },
+      {
+        source: "Extras/AcmeCore_Extras.package",
+        sha256: fakeHash("core-extras"),
+        target: "acme_core/Extras/AcmeCore_Extras.package",
+        archive: fakeHash("core-2.4.1"),
+        member: "Extras/AcmeCore_Extras.package",
+      },
     ],
   }),
   // one of several mods imported from a creator's shared folder, installed where it was found
@@ -68,7 +103,7 @@ export const sampleMods: ModSummary[] = [
       "2026-03-07": {
         added: "2026-03-07",
         gameVersion: null,
-        files: [{ name: "Acme/Acme_TweakMoodlets.package", sha256: fakeHash("tweak-moodlets"), members: 0 }],
+        files: [{ name: "Acme/Acme_TweakMoodlets.package", sha256: fakeHash("tweak-moodlets"), members: [] }],
       },
     },
     version: "2026-03-07",
@@ -93,14 +128,14 @@ export const sampleMods: ModSummary[] = [
     version: "2025-12-01",
     selectedVersion: "2025-12-01",
     versions: {
-      "2025-12-01": { added: "2025-12-01", gameVersion: null, files: [{ name: "zed_loose.package", sha256: fakeHash("loose-1"), members: 0 }] },
+      "2025-12-01": { added: "2025-12-01", gameVersion: null, files: [{ name: "zed_loose.package", sha256: fakeHash("loose-1"), members: [] }] },
       "2026-02-14": {
         added: "2026-02-14",
         gameVersion: null,
         files: [
-          { name: "zed_loose_v2.package", sha256: fakeHash("loose-2"), members: 0 },
+          { name: "zed_loose_v2.package", sha256: fakeHash("loose-2"), members: [] },
           // the same file imported from two places
-          { name: "Old/zed_loose_v2.package", sha256: fakeHash("loose-2"), members: 0 },
+          { name: "Old/zed_loose_v2.package", sha256: fakeHash("loose-2"), members: [] },
         ],
       },
     },

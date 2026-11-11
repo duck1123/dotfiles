@@ -1,6 +1,14 @@
 import { planPlacement } from "./placement";
 import { sampleModList } from "./sampleMods";
-import type { ModList, ModSource, RenameResult } from "./types";
+import type { ModInstall, ModList, ModSource, ModSummary, RenameResult } from "./types";
+
+/** The mod's installs at its (new) folder and flatten, keeping where each came from. */
+function moveInstalls(mod: ModSummary): ModInstall[] {
+  return planPlacement(mod.installs, mod).map((p) => ({
+    ...mod.installs.find((f) => f.source === p.source && f.sha256 === p.sha256)!,
+    target: p.to,
+  }));
+}
 
 export interface MockModOptions {
   list?: ModList;
@@ -83,7 +91,7 @@ export function createMockModSource({
     }
     const moved = folder !== undefined || flatten !== undefined;
     if (moved) {
-      mod.installs = planPlacement(mod.installs, mod).map((f) => ({ source: f.source, sha256: f.sha256, target: f.to }));
+      mod.installs = moveInstalls(mod);
     }
     const changed = JSON.stringify(mod) !== before;
     const notes = changed && moved ? ["the files move at the next `sims switch`"] : [];
@@ -124,7 +132,7 @@ export function createMockModSource({
     mod.defaultFolder = newDefault;
     if (onDefault) {
       mod.folder = newDefault;
-      mod.installs = planPlacement(mod.installs, mod).map((f) => ({ source: f.source, sha256: f.sha256, target: f.to }));
+      mod.installs = moveInstalls(mod);
     }
     state.mods.sort((a, b) => a.id.localeCompare(b.id));
     return { ...result, commit: fakeCommit() };

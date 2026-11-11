@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { folderProblem, planPlacement, placementProblems, type Placement } from "../mods/placement";
-import type { ModChanges, ModFile, ModSummary, RenameResult, WriteResult } from "../mods/types";
+import type { ModChanges, ModFile, ModInstall, ModSummary, RenameResult, WriteResult } from "../mods/types";
 import "./ModDetail.css";
 
 export interface ModDetailProps {
@@ -123,19 +123,62 @@ function ModLinks({ ids, knownIds, onSelect }: { ids: string[]; knownIds?: Reado
 }
 
 /**
- * A version's files; past `shown` of them, the rest fold away. Hovering a file
- * shows its hash, and a file with the same hash as an earlier one says so.
+ * Where a version's file goes: the targets of the installs that came from it (an
+ * archive member by archive and path, a loose file by its name and hash), or
+ * "not installed" when include/exclude or stripComponents left it out.
  */
-function FileList({ files, shown = 5 }: { files: ModFile[]; shown?: number }) {
+function Destination({ installs, archive, path, sha256 }: { installs: ModInstall[]; archive: string | null; path: string; sha256: string }) {
+  const placed = installs.filter((i) =>
+    archive === null ? !i.archive && i.source === path && i.sha256 === sha256 : i.archive === archive && i.member === path,
+  );
+  if (placed.length === 0) {
+    return <span className="dui-mod__members"> (not installed)</span>;
+  }
+  return (
+    <span className="dui-mod__target">
+      {" → "}
+      {placed.map((i, n) => (
+        <span key={i.target}>
+          {n > 0 && ", "}
+          <code>Mods/{i.target}</code>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/**
+ * A version's files; past `shown` of them, the rest fold away. Hovering a file
+ * shows its hash, and a file with the same hash as an earlier one says so. An
+ * archive lists the files inside it. Given `installs` (for the version that
+ * installs), each file also says where it goes.
+ */
+function FileList({ files, installs, shown = 5 }: { files: ModFile[]; installs?: ModInstall[]; shown?: number }) {
   const firstNamed = new Map<string, string>();
   for (const f of files) if (!firstNamed.has(f.sha256)) firstNamed.set(f.sha256, f.name);
   const item = (f: ModFile) => {
     const first = firstNamed.get(f.sha256);
+    const archive = f.members.length > 0;
     return (
       <li key={f.name} title={`sha256 ${f.sha256}`}>
         {f.name}
-        {f.members > 0 && <span className="dui-mod__members"> ({f.members} inside)</span>}
         {first !== f.name && <span className="dui-mod__duplicate"> (same file as {first})</span>}
+        {!archive && installs && <Destination installs={installs} archive={null} path={f.name} sha256={f.sha256} />}
+        {archive && (
+          <details className="dui-mod__more dui-mod__inside" open={installs !== undefined && f.members.length <= 10}>
+            <summary>
+              {f.members.length} file{f.members.length === 1 ? "" : "s"} inside
+            </summary>
+            <ul className="dui-mod__files">
+              {f.members.map((m) => (
+                <li key={m.path} title={`sha256 ${m.sha256}`}>
+                  {m.path}
+                  {installs && <Destination installs={installs} archive={f.sha256} path={m.path} sha256={m.sha256} />}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
       </li>
     );
   };
@@ -684,7 +727,7 @@ export function ModDetail({ mod, profile, knownIds, onSelect, onSave, onToggle, 
                   <td>{v.added ?? "—"}</td>
                   <td>{v.gameVersion ?? "—"}</td>
                   <td>
-                    <FileList files={v.files} />
+                    <FileList files={v.files} installs={selected ? mod.installs : undefined} />
                   </td>
                 </tr>
               );

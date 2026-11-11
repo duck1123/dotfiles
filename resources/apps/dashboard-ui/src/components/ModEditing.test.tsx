@@ -204,3 +204,26 @@ test("placement helpers", () => {
   const core = sampleMods[0];
   expect(diffPlacement(core, { place: "root", customFolder: "", flatten: true })).toEqual({ folder: "", flatten: true });
 });
+
+test("lists an archive's files and, for the installed version, where each goes", async () => {
+  const { user, detail } = await setup("acme/core");
+  const row = (label: string) => detail().getByRole("rowheader", { name: new RegExp(`^${label.replace(/\./g, "\\.")}`) }).closest("tr")!;
+
+  const installed = within(row("2.4.1"));
+  expect(installed.getByText("4 files inside")).toBeInTheDocument();
+  expect(installed.getByText("AcmeCore.package").closest("li")).toHaveTextContent(
+    "AcmeCore.package → Mods/acme_core/AcmeCore.package",
+  );
+  expect(installed.getByText("Readme.txt").closest("li")).toHaveTextContent("Readme.txt (not installed)");
+
+  // an older version lists its files without destinations
+  const older = within(row("2.3.0"));
+  expect(older.getByText("Readme.txt").closest("li")).toHaveTextContent(/^Readme\.txt$/);
+
+  // a move shows the new destinations
+  await user.click(detail().getByRole("button", { name: "Move…" }));
+  await user.click(detail().getByRole("radio", { name: /Directly in/ }));
+  await user.click(detail().getByRole("button", { name: "Save" }));
+  await detail().findByRole("status");
+  expect(within(row("2.4.1")).getByText("AcmeCore.package").closest("li")).toHaveTextContent("→ Mods/AcmeCore.package");
+});

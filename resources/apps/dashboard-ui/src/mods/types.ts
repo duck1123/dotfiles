@@ -7,8 +7,15 @@ export interface ModFile {
   name: string;
   /** SHA-256 of the file (hex), the name of its blob. */
   sha256: string;
-  /** Files inside it, for an archive; 0 for a loose mod file. */
-  members: number;
+  /** Files inside it, for an archive; empty for a loose mod file. */
+  members: ModMember[];
+}
+
+/** A file inside an archive. */
+export interface ModMember {
+  /** Its path inside the archive. */
+  path: string;
+  sha256: string;
 }
 
 export interface ModVersion {
@@ -25,6 +32,9 @@ export interface ModInstall {
   /** Where it goes, relative to Mods/. */
   target: string;
   sha256: string;
+  /** For an archive member: the archive's sha256 and the member's path inside it; null (or absent) for a loose file. */
+  archive?: string | null;
+  member?: string | null;
 }
 
 export interface ModSummary {

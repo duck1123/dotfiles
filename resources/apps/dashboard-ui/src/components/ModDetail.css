@@ -153,6 +153,15 @@
   color: var(--dui-text-muted);
 }
 
+/* the files inside an archive, under its name */
+.dui-mod__inside > .dui-mod__files {
+  padding-left: 1.25em;
+}
+
+.dui-mod__target {
+  color: var(--dui-text-muted);
+}
+
 .dui-mod__duplicate {
   color: var(--dui-danger);
 }

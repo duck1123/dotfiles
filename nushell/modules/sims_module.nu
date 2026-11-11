@@ -1694,8 +1694,10 @@ def default-profile [instance?: string]: nothing -> string {
 }
 
 # Every mod in the catalog, as the web UI browses it: its fields, versions, the files
-# its selected version installs (`installs`: { source, target, sha256 }, where source is
-# the path before folder and flatten apply), whether `profile` enables it, which
+# its selected version installs (`installs`: { source, target, sha256, archive, member },
+# where source is the path before folder and flatten apply, and archive/member name the
+# archive and path inside it an archive member comes from), each version's files with
+# an archive's members ({ path, sha256 }), whether `profile` enables it, which
 # profiles list it, and the framework's problems that name it. `problems` holds all of
 # them, for the ones that name no mod.
 export def "sims mod list" [
@@ -1712,10 +1714,10 @@ export def "sims mod list" [
       profiles = lib.mapAttrs (n: p: { inherit (p) base mods remove; }) c.profiles;
       mods = map (m: {
         inherit (m) id title downloadPage tags enable folder flatten stateFiles version selectedVersion requires conflicts;
-        installs = map (f: { inherit (f) source target sha256; }) (c.installs.${m.id} or [ ]);
+        installs = map (f: { inherit (f) source target sha256 archive member; }) (c.installs.${m.id} or [ ]);
         versions = lib.mapAttrs (l: v: {
           inherit (v) added gameVersion;
-          files = map (f: { inherit (f) name sha256; members = lib.length f.members; }) v.files;
+          files = map (f: { inherit (f) name sha256; members = map (mem: { inherit (mem) path sha256; }) f.members; }) v.files;
         }) m.versions;
       }) mods;
     }'
