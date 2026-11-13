@@ -19,7 +19,7 @@
     font.enable = true;
     gaming.enable = true;
     git.enable = true;
-    glances.enable = true;
+    glances.enable = false;
 
     kubernetes = {
       client.enable = true;
