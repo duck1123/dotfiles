@@ -11,6 +11,7 @@
         # nexusmods-app
         protontricks
         satisfactorymodmanager
+        steamcmd
         wine
       ];
     };
