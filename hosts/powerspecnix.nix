@@ -106,6 +106,12 @@ in
           gameDir = "~/Games/direct/the-sims-4-1.121.372/drive_c/Program Files/EA Games/The Sims 4";
         };
 
+        # Frozen 1.129 copy, made the same way; started with an empty Mods/ for simsnix
+        "frozen-1.129" = {
+          documents = "~/Games/direct/the-sims-4-1.129.39/drive_c/users/steamuser/Documents/Electronic Arts/The Sims 4";
+          gameDir = "~/Games/direct/the-sims-4-1.129.39/drive_c/Program Files/EA Games/The Sims 4";
+        };
+
         # Steam install, left to update
         steam = {
           documents = "~/.local/share/Steam/steamapps/compatdata/1222670/pfx/drive_c/users/steamuser/Documents/Electronic Arts/The Sims 4";
