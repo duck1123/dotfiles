@@ -21,7 +21,7 @@ in
     firefox.enable = true;
     font.enable = true;
     git.enable = true;
-    glances.enable = true;
+    glances.enable = false;
 
     kubernetes = {
       client.enable = true;
