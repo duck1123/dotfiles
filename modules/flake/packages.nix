@@ -133,7 +133,10 @@ let
       inherit version src;
       cargoLock.lockFile = "${src}/Cargo.lock";
       nativeBuildInputs = [ pkgs.pkg-config ];
-      buildInputs = [ pkgs.openssl ];
+      buildInputs = [
+        pkgs.libgit2
+        pkgs.openssl
+      ];
       doCheck = false;
       meta.mainProgram = "ngit";
     };
