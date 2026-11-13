@@ -141,8 +141,8 @@ These only edit `clusters/dev/state.json` (always the dev cluster); commit and d
 |---|---|
 | `nur argocd refresh [name]` | Make ArgoCD re-diff against git now instead of waiting for its poll interval. No name = every Application. Doesn't apply anything, run hooks, or retry a failed operation. |
 | `nur argocd sync [name]` | Start a real sync (applies changes, runs `Sync`/`PostSync` hooks). Uses `argocd --core` against a temporary kubeconfig set to the `argocd` namespace, so no port-forward or login is needed. No name = every Application. |
-| `nur argocd install` | Install or upgrade ArgoCD from `kubernetes/infra-manifests/argocd/` (downloads `install.yaml` first if missing). Safe to re-run. |
-| `nur argocd update-manifest` | Download the latest stable ArgoCD `install.yaml` into `kubernetes/infra-manifests/argocd/`; commit it to pin the version. |
+| `nur argocd install` | Install or upgrade ArgoCD from `kubernetes/infra-manifests/argocd/` (downloads `install.yaml` first if missing). Safe to re-run. The dev cluster's server (`nasnix`, `kubernetes.argocd.enable`) applies the same directory through k3s, so normally switching that host is enough. |
+| `nur argocd update-manifest [tag]` | Download ArgoCD's `install.yaml` for a release tag (e.g. `v3.5.7`; default: upstream's `stable` branch) into `kubernetes/infra-manifests/argocd/`; commit it to pin the version. Read the upstream upgrade guide for each minor version you cross. |
 | `nur argocd apply-master` | Apply `kubernetes/infra-manifests/00-master.yaml`, the app-of-apps that tracks `dev/apps` in `argo-manifests`. Only needed when bootstrapping a cluster that doesn't have `00-master` yet. |
 
 ### Port-forwards

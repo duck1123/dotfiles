@@ -1040,17 +1040,25 @@ export def "nur kuma-cli config" [] {
 # so `nur argocd apply-master` re-applies kubernetes/infra-manifests/00-master.yaml
 # for real.
 
-# Download latest stable ArgoCD install manifest to kubernetes/infra-manifests/argocd/install.yaml
-export def "nur argocd update-manifest" [] {
+# Download an ArgoCD install manifest to kubernetes/infra-manifests/argocd/install.yaml.
+# Pass a release tag (e.g. v3.5.7) to pin it; with no tag it takes whatever
+# upstream's `stable` branch points at, which may be a brand-new minor. Read the
+# upgrade guides (docs/operator-manual/upgrading/) for every minor you cross.
+export def "nur argocd update-manifest" [
+  version?: string # release tag, e.g. v3.5.7 (default: stable)
+] {
+  let ref = ($version | default "stable")
   try {
     mkdir kubernetes/infra-manifests/argocd
   } catch { |err|
     error make {msg: $"Failed to create kubernetes/infra-manifests/argocd: ($err.msg)"}
   }
-  print "Fetching latest stable ArgoCD manifest..."
+  print $"Fetching ArgoCD manifest at ($ref)..."
   try {
     (
-      http get "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+      # --raw: without it nu parses the .yaml and saves it back as one YAML
+      # list, which kustomize rejects.
+      http get --raw $"https://raw.githubusercontent.com/argoproj/argo-cd/($ref)/manifests/install.yaml"
       | save --force kubernetes/infra-manifests/argocd/install.yaml
     )
   } catch { |err|
