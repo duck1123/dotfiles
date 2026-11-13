@@ -56,16 +56,33 @@ def os-part [host: string]: nothing -> record<name: string, expr: string> {
   {name: $"(host-info $host | get hostname)-os", expr: $"f.nixosConfigurations.(os-attr $host | to json).config.system.build.toplevel"}
 }
 
-# linkFarm entries for every host's home-manager activation package.
-def all-home-parts []: nothing -> list<record<name: string, expr: string>> {
-  host-infos | where homeConfiguration != null | each {|h|
+# Systems this machine can build for: its own plus nix's extra-platforms
+# (binfmt emulation, if configured, shows up there).
+def buildable-systems []: nothing -> list<string> {
+  [(^nix config show system | str trim) ...(^nix config show extra-platforms | split row " " | where $it != "")]
+}
+
+# Hosts --all builds: those whose system this machine can build. Notes the rest.
+def buildable-host-infos []: nothing -> table {
+  let systems = (buildable-systems)
+  let hosts = (host-infos)
+  let skipped = ($hosts | where system not-in $systems)
+  if ($skipped | is-not-empty) {
+    print $"note: skipping hosts this machine can't build: ($skipped | each {|h| $h.sshHost + " (" + $h.system + ")" } | str join ', ')"
+  }
+  $hosts | where system in $systems
+}
+
+# linkFarm entries for every buildable host's home-manager activation package.
+def all-home-parts [hosts: table]: nothing -> list<record<name: string, expr: string>> {
+  $hosts | where homeConfiguration != null | each {|h|
     {name: $"($h.hostname)-home", expr: $"f.homeConfigurations.($h.homeConfiguration | to json).activationPackage"}
   }
 }
 
-# linkFarm entries for every host's NixOS toplevel.
-def all-os-parts []: nothing -> list<record<name: string, expr: string>> {
-  host-infos | where nixosConfiguration != null | each {|h|
+# linkFarm entries for every buildable host's NixOS toplevel.
+def all-os-parts [hosts: table]: nothing -> list<record<name: string, expr: string>> {
+  $hosts | where nixosConfiguration != null | each {|h|
     {name: $"($h.hostname)-os", expr: $"f.nixosConfigurations.($h.nixosConfiguration | to json).config.system.build.toplevel"}
   }
 }
@@ -177,9 +194,10 @@ export def "nur build" [
   let args = (if $fallback { ["--fallback"] } else { [] })
 
   if $all {
+    let hosts = (buildable-host-infos)
     let parts = [
-      ...(if $targets.os { all-os-parts } else { [] })
-      ...(if $targets.home { all-home-parts } else { [] })
+      ...(if $targets.os { all-os-parts $hosts } else { [] })
+      ...(if $targets.home { all-home-parts $hosts } else { [] })
     ]
 
     if ($parts | is-not-empty) {

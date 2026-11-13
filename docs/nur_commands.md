@@ -28,7 +28,7 @@ nur build                      # build this host's os + home configs
 nur build home                 # only home-manager
 nur build home k8s             # home-manager + k8s manifests
 nur build --host edgenix       # build another host's configs (no activation)
-nur build --all                # build every host's os + home configs
+nur build --all                # build every host's os + home configs (skips hosts of a system this machine can't build, e.g. frame on x86_64)
 nur build --tarball --host vavirl-pw0bwnq8   # NixOS-WSL tarball builder (see setup.md)
 ```
 
