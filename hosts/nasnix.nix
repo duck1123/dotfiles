@@ -22,6 +22,7 @@ in
     jujutsu.enable = false;
 
     kubernetes = {
+      argocd.enable = true;
       client.enable = true;
       server.enable = true;
       dualStack.enable = false;

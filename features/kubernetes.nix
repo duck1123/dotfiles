@@ -11,6 +11,10 @@
     mkOption {
       type = types.submodule {
         options = {
+          # k3s applies the rendered kubernetes/infra-manifests/argocd on startup and whenever
+          # it changes. Server role only. Enable it on one server per cluster (k3s doesn't sync
+          # AddOns between servers). Turning it off leaves ArgoCD running.
+          argocd = simpleFeature { inherit inputs lib; } "ArgoCD install via k3s auto-deploy manifests";
           client = simpleFeature { inherit inputs lib; } "kubernetes client";
           clusterInit = mkOption {
             type = types.bool;
@@ -92,6 +96,38 @@
           };
         };
       }
+      (
+        let
+          kubernetes = config.host.features.kubernetes;
+          isJoiningAsAgent =
+            (kubernetes.token != null || kubernetes.tokenFile != null)
+            && kubernetes.serverAddr != null
+            && !kubernetes.controlPlane;
+          # install.yaml leaves namespaces off (kustomize sets them) and doesn't create the
+          # namespace, so k3s gets the kustomize output with the Namespace in front.
+          argocdManifest =
+            pkgs.runCommand "argocd-install.yaml" { nativeBuildInputs = [ pkgs.kustomize ]; }
+              ''
+                cat > $out <<'EOF'
+                apiVersion: v1
+                kind: Namespace
+                metadata:
+                  name: argocd
+                ---
+                EOF
+                kustomize build ${../kubernetes/infra-manifests/argocd} >> $out
+              '';
+        in
+        lib.mkIf (kubernetes.server.enable && kubernetes.argocd.enable) {
+          assertions = [
+            {
+              assertion = !isJoiningAsAgent;
+              message = "host.features.kubernetes.argocd needs a k3s server; this host joins as an agent (k3s agents ignore auto-deploy manifests).";
+            }
+          ];
+          services.k3s.manifests.argocd.source = argocdManifest;
+        }
+      )
       (lib.mkIf config.host.features.kubernetes.server.enable {
         # Read access to the k3s journal without sudo
         users.users.${config.host.identity.username}.extraGroups = [ "systemd-journal" ];

@@ -6,11 +6,19 @@ Prerequisites on the workstation: a working kubeconfig for the new cluster, the 
 
 ## 1. Install ArgoCD
 
+The k3s server installs it. Set `kubernetes.argocd.enable = true` on the cluster's server host (it's on `nasnix` for the dev cluster) and switch that host. The kubernetes feature renders `kubernetes/infra-manifests/argocd/` (the pinned `install.yaml` plus the ingress) with kustomize, adds the `argocd` Namespace, and links it into k3s's auto-deploy manifests directory. k3s applies it on startup and whenever the file changes. Enable it on only one server per cluster: k3s doesn't sync AddOns between servers. Turning the option off leaves ArgoCD installed.
+
+To upgrade:
+
 ```sh
-nur argocd install
+nur argocd update-manifest v3.5.7    # pin a release tag; read the upstream upgrade guide for each minor you cross
+git add -A kubernetes/infra-manifests/argocd && git commit
+nur switch os --host nasnix          # k3s re-applies it, no k3s restart
 ```
 
-This applies the pinned `kubernetes/infra-manifests/argocd/install.yaml` (downloading it first if it's missing) and waits for `argocd-server`. It's safe to re-run, and doubles as the upgrade path after `nur argocd update-manifest`.
+`nur argocd install` still works without the Nix feature (for example on a cluster whose server isn't one of these hosts). It applies the same directory with `kubectl apply --server-side` and waits for `argocd-server`, and is safe to re-run.
+
+After a major upgrade, run `nur argocd sync` once so every Application gets the new tracking metadata (ArgoCD 3.0 switched from label to annotation tracking).
 
 ## 2. Give ArgoCD access to argo-manifests
 
