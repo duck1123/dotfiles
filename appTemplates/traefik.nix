@@ -42,7 +42,7 @@ with lib;
     };
 
     service = {
-      type = cfg.service.type;
+      spec.type = cfg.service.type;
       annotations = optionalAttrs (cfg.service.loadBalancerIP != "") {
         "metallb.universe.tf/loadBalancerIPs" = cfg.service.loadBalancerIP;
       };
