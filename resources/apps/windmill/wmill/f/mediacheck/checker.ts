@@ -7,7 +7,8 @@
 //   batch of a library scan. New files, changed ones (size or mtime, epoch
 //   seconds) and missing ones that came back are queued.
 // - sync_done { library, scanStarted }: files of that library the scan didn't
-//   see become missing.
+//   see become missing. Refused when the scan saw nothing, or would mark more
+//   than MAX_MISSING_FILES and MAX_MISSING_SHARE of the library missing.
 // - claim { host }: the next file to check, or null: replacements waiting on
 //   their decode first (f/mediacheck/repair), then files of a whole number of
 //   MiB (a failed copy leaves that size, so they're likely truncated), then
@@ -29,6 +30,10 @@ import { SQL } from "bun";
 import { classify, type LogLine } from "./classify.ts";
 
 const CLAIM_HOURS = 6;
+// sync_done refuses to mark more than this many files, and this share of the
+// library's present files, missing in one scan.
+const MAX_MISSING_FILES = 50;
+const MAX_MISSING_SHARE = 0.1;
 const LIBRARIES = ["movies", "tv"];
 
 type ScanFile = { path: string; size: number; mtime: number };
@@ -71,9 +76,20 @@ async function sync(args: { library: string; scanStarted: string; files: ScanFil
 
 async function syncDone(args: { library: string; scanStarted: string }) {
   const lib = library(args.library);
+  const scanStarted = new Date(args.scanStarted);
+  // A scan of an unmounted or half-readable library sees few files, and would
+  // mark the rest missing. Refuse that; files really gone in bulk need a look.
+  const [{ seen, present }] = await db`
+    select count(*) filter (where seen_at >= ${scanStarted})::int as seen,
+      count(*) filter (where status <> 'missing')::int as present
+    from media_file where library = ${lib}`;
+  const vanishing = present - seen;
+  if (seen === 0 || (vanishing > MAX_MISSING_FILES && vanishing > present * MAX_MISSING_SHARE)) {
+    throw new Error(`${lib}: the scan saw ${seen} files, so ${vanishing} of ${present} would go missing; not marking them`);
+  }
   const missing = await db`
     update media_file set status = 'missing', claimed_by = null, claimed_at = null
-    where library = ${lib} and seen_at < ${new Date(args.scanStarted)} and status <> 'missing'
+    where library = ${lib} and seen_at < ${scanStarted} and status <> 'missing'
     returning path`;
   return { missing: missing.map((r: { path: string }) => r.path) };
 }

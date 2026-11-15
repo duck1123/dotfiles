@@ -92,19 +92,36 @@ def scan-due [] {
 }
 
 # Scan every library and record the files in the queue.
+#
+# A scan ends with sync_done, which marks every file it didn't see missing, so
+# it only runs against a library that's really there. In November 2026 the NFS
+# mounts failed at boot; the scan read the empty mount points and marked every
+# movie missing, once every restart.
 def "main scan" [] {
   for lib in (libraries) {
-    if not ($lib.root | path exists) {
-      print -e $"skipping ($lib.name): ($lib.root) isn't there"
+    if (^mountpoint -q $lib.root | complete).exit_code != 0 {
+      print -e $"skipping ($lib.name): nothing is mounted at ($lib.root)"
       continue
     }
     let scan_started = date now | format date "%+"
     let files = scan-files $lib.root
+    if ($files | is-empty) {
+      print -e $"skipping ($lib.name): no video files under ($lib.root)"
+      continue
+    }
     let totals = $files | chunks $SYNC_BATCH | each {|batch|
       api sync {library: $lib.name, scanStarted: $scan_started, files: $batch}
     }
-    let done = api sync_done {library: $lib.name, scanStarted: $scan_started}
-    print $"($lib.name): ($files | length) files, ($totals | get new | math sum) new, ($totals | get queued | math sum) queued, ($done.missing | length) missing"
+    # The checker refuses a scan that would mark much of the library missing.
+    let done = try {
+      api sync_done {library: $lib.name, scanStarted: $scan_started}
+    } catch {|e|
+      print -e $"($lib.name): missing files not recorded: ($e.msg)"
+      {missing: []}
+    }
+    let new = $totals | reduce --fold 0 {|t, sum| $sum + $t.new }
+    let queued = $totals | reduce --fold 0 {|t, sum| $sum + $t.queued }
+    print $"($lib.name): ($files | length) files, ($new) new, ($queued) queued, ($done.missing | length) missing"
   }
   touch (state-dir | path join last-scan)
 }
@@ -119,6 +136,13 @@ def "main once" [] {
   let job = api claim {host: (host)}
   if $job == null { return false }
   let lib = libraries | where name == $job.library | first
+  # Unmounted, every file would fail to open and be reported as a crash.
+  if (^mountpoint -q $lib.root | complete).exit_code != 0 {
+    api release {host: (host)}
+    print -e $"nothing is mounted at ($lib.root); released, retrying in ($IDLE_MINUTES) minutes"
+    sleep ($IDLE_MINUTES * 1min)
+    return true
+  }
   let file = $lib.root | path join $job.path
   print $"checking ($job.library)/($job.path)"
   let result = decode $file
