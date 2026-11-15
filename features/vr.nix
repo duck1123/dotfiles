@@ -39,5 +39,10 @@
 
       };
 
+      # SteamVR's desktop view is captured by the Steam client. Under a Wayland
+      # compositor (niri) it can only capture through PipeWire/the screencast
+      # portal, and it only tries that when launched with -pipewire; otherwise
+      # streaming_log.txt says "Desktop capture unavailable".
+      programs.steam.package = pkgs.steam.override { extraArgs = "-pipewire"; };
     };
 }
