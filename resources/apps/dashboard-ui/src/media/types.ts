@@ -47,8 +47,13 @@ export interface MediaRepair {
   /** For an untracked file, the copy Sonarr or Radarr tracks instead. Makes it a leftover. */
   trackedCopy?: string;
   replacement?: string;
-  /** The replacement's check result: ok, or minor with a glitch or two. */
+  /** The replacement's check result: ok, or minor with a glitch or two. While
+   * it waits on its decode, its queue status: queued or checking. */
   replacementVerdict?: string;
+  /** The checker host decoding the replacement, while it's checking. */
+  replacementClaimedBy?: string;
+  /** When the repair entered its current state (ISO). */
+  since?: string;
   /** Removing the original or leftover was requested; the next repair run does it. */
   removing: boolean;
 }

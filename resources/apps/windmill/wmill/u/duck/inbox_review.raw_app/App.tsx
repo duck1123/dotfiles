@@ -46,6 +46,9 @@ const mediaSource: MediaSource = {
   decide: (id, decision) => media("decide", { id, decision }),
 };
 
+// MAX_ACTIVE in f/mediacheck/repair: how many repairs it runs at once.
+const REPAIR_SLOTS = 5;
+
 // On a phone the page is mostly for capturing, so the capture box gets the
 // focus rather than the first item's topic search.
 const narrow = window.matchMedia("(max-width: 720px)").matches;
@@ -65,7 +68,7 @@ export default function App() {
       {tab === "inbox" ? (
         <InboxReview inbox={inbox} notes={notes} topicScope={TOPICS} focusCapture={narrow} />
       ) : (
-        <MediaReview source={mediaSource} />
+        <MediaReview source={mediaSource} repairSlots={REPAIR_SLOTS} />
       )}
     </div>
   );

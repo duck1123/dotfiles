@@ -14,7 +14,8 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const STATUS: Record<MediaView, (file: MediaFile) => boolean> = {
   open: (f) => ["suspect", "unclear", "minor"].includes(f.status),
-  replace: (f) => f.status === "replace_requested",
+  // A repair that has moved the file leaves its row missing, as in review.ts.
+  replace: (f) => f.status === "replace_requested" || ["searching", "verifying", "attention"].includes(f.repair?.state ?? ""),
   replaced: (f) => f.repair?.state === "replaced",
   good: (f) => f.status === "marked_good",
 };

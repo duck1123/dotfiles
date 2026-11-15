@@ -54,6 +54,25 @@
   margin-bottom: 12px;
 }
 
+.dui-media__slots {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--dui-border);
+}
+
+.dui-media__slot-wait {
+  font-size: 0.85em;
+  overflow-wrap: anywhere;
+}
+
+.dui-media__slot-free {
+  padding: 6px 10px;
+  border: 1px dashed var(--dui-border);
+  border-radius: var(--dui-radius);
+  color: var(--dui-text-muted);
+  font-size: 0.85em;
+}
+
 .dui-media__group-heading {
   display: flex;
   align-items: center;

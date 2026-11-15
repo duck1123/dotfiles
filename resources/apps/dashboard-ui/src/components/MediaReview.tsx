@@ -4,6 +4,9 @@ import "./MediaReview.css";
 
 export interface MediaReviewProps {
   source: MediaSource;
+  /** How many repairs f/mediacheck/repair runs at once (its MAX_ACTIVE), for the
+   * slot count in the Replacement requested view. */
+  repairSlots?: number;
 }
 
 const VIEWS: { view: MediaView; label: string }[] = [
@@ -93,6 +96,91 @@ function copies(file: MediaFile): string {
   return count === 1 ? "1 quarantined file" : `${count} quarantined files`;
 }
 
+/** The repair states that take one of the repair run's slots. */
+const SLOT_STATES: MediaRepair["state"][] = ["searching", "verifying"];
+
+function age(since: string, now: number): string {
+  const hours = (now - new Date(since).getTime()) / 3_600_000;
+  if (hours < 1) {
+    return `${Math.max(1, Math.round(hours * 60))} min`;
+  }
+  return hours < 48 ? `${Math.floor(hours)} h` : `${Math.floor(hours / 24)} days`;
+}
+
+/** What a repair in a slot is waiting on. */
+function slotWait(repair: MediaRepair): string {
+  if (repair.state === "searching") {
+    return repair.note ?? "Nothing downloading yet";
+  }
+  if (repair.replacementVerdict === "checking") {
+    return repair.replacementClaimedBy ? `Being decoded on ${repair.replacementClaimedBy}` : "Being decoded";
+  }
+  if (repair.replacementVerdict === "queued") {
+    return "Waiting for the checker to pick it up (it's first in line)";
+  }
+  if (repair.note) {
+    return repair.note;
+  }
+  return repair.replacementVerdict ? `Decoded (${repair.replacementVerdict}); the next repair run takes it from here` : "Waiting for the next repair run";
+}
+
+interface RepairSlotsProps {
+  files: MediaFile[];
+  slots?: number;
+  selectedId?: number;
+  onSelect: (id: number) => void;
+}
+
+/** Which repairs hold the repair run's slots, and what each is waiting on. */
+function RepairSlots({ files, slots, selectedId, onSelect }: RepairSlotsProps) {
+  const now = Date.now();
+  const active = files
+    .filter((f) => f.repair && SLOT_STATES.includes(f.repair.state))
+    .sort((a, b) => (a.repair?.since ?? "").localeCompare(b.repair?.since ?? ""));
+  const waiting = files.filter((f) => !f.repair && f.status === "replace_requested").length;
+  const free = slots === undefined ? 0 : Math.max(0, slots - active.length);
+  return (
+    <section className="dui-media__slots" aria-label="Repair slots">
+      <h3 className="dui-media__group-heading">
+        Repair slots
+        <span className="dui-media__group-count">{slots === undefined ? active.length : `${active.length} of ${slots}`}</span>
+      </h3>
+      <ol className="dui-media__list">
+        {active.map((file) => (
+          <li key={file.id}>
+            <button
+              type="button"
+              className="dui-media__item"
+              aria-current={file.id === selectedId ? "true" : undefined}
+              onClick={() => onSelect(file.id)}
+            >
+              <span className="dui-media__item-title">
+                {parts(file).group}: {shortTitle(file)}
+              </span>
+              <span className="dui-media__item-meta">
+                <span className="dui-media__verdict">{file.repair!.state === "searching" ? "Searching" : "Verifying"}</span>
+                {file.repair!.since && <span>for {age(file.repair!.since, now)}</span>}
+              </span>
+              <span className="dui-media__slot-wait">{slotWait(file.repair!)}</span>
+            </button>
+          </li>
+        ))}
+        {Array.from({ length: free }, (_, i) => (
+          <li key={`free-${i}`} className="dui-media__slot-free">
+            Free
+          </li>
+        ))}
+      </ol>
+      {waiting > 0 && (
+        <p className="dui-media__hint">
+          {waiting === 1 ? "1 file waits" : `${waiting} files wait`} for a slot.
+          {free > 0 && " A slot is free, so the next repair run (every 15 minutes) should start one. If it doesn't, the NAS is likely short on space: repairs keep 100 GB free."}
+        </p>
+      )}
+    </section>
+  );
+}
+
 /** A repair that has moved the file has to run its course. */
 function canReopen(file: MediaFile): boolean {
   return !file.repair || file.repair.state === "no_release" || file.repair.state === "untracked";
@@ -136,7 +224,7 @@ function groupFiles(files: MediaFile[]): { group: string; files: MediaFile[] }[]
 }
 
 /** Review the files the media integrity checker flagged. Decisions are recorded here; f/mediacheck/repair acts on them. */
-export function MediaReview({ source }: MediaReviewProps) {
+export function MediaReview({ source, repairSlots }: MediaReviewProps) {
   const [view, setView] = useState<MediaView>("open");
   const [files, setFiles] = useState<MediaFile[]>([]);
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -249,6 +337,9 @@ export function MediaReview({ source }: MediaReviewProps) {
               Retry
             </button>
           </div>
+        )}
+        {status === "ready" && view === "replace" && (
+          <RepairSlots files={files} slots={repairSlots} selectedId={selectedId} onSelect={setSelectedId} />
         )}
         {status === "ready" && files.length === 0 && <p className="dui-media__message">Nothing here.</p>}
         {status === "ready" && files.length > 0 && (

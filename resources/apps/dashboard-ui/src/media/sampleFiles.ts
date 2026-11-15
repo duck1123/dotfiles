@@ -2,6 +2,8 @@ import type { MediaFile } from "./types";
 
 const base = { library: "tv", size: 2407334094, checkedAt: "2026-11-01T12:00:00Z", unknown: 0, unknownSamples: [] };
 
+const hoursAgo = (hours: number) => new Date(Date.now() - hours * 3_600_000).toISOString();
+
 export const sampleFiles: MediaFile[] = [
   {
     ...base,
@@ -164,6 +166,48 @@ export const sampleFiles: MediaFile[] = [
       attempts: 0,
       quarantined: [],
       removing: false,
+    },
+  },
+  {
+    ...base,
+    id: 11,
+    path: "Severance/Season 2/Severance - S02E03 - Who Is Alive WEBDL-1080p.mkv",
+    status: "missing",
+    verdict: "suspect",
+    duration: 2950,
+    decoded: 1200,
+    damage: 1,
+    spots: [],
+    truncated: { duration: 2950, decoded: 1200 },
+    repair: {
+      state: "searching",
+      note: "No files found are eligible for import in /downloads/complete/Severance.S02E03.1080p.WEB",
+      attempts: 0,
+      quarantined: [".quarantine/Severance/Season 2/Severance - S02E03 - Who Is Alive WEBDL-1080p.mkv"],
+      removing: false,
+      since: hoursAgo(30),
+    },
+  },
+  {
+    ...base,
+    id: 12,
+    library: "movies",
+    path: "Arrival (2016)/Arrival (2016) Bluray-1080p.mkv",
+    status: "missing",
+    verdict: "suspect",
+    duration: 6990,
+    decoded: 6990,
+    damage: 3,
+    spots: [{ t: 4021, lines: 3, rules: ["mkv-ebml"] }],
+    repair: {
+      state: "verifying",
+      attempts: 0,
+      quarantined: [".quarantine/Arrival (2016)/Arrival (2016) Bluray-1080p.mkv"],
+      replacement: "Arrival (2016)/Arrival (2016) Remux-1080p.mkv",
+      replacementVerdict: "checking",
+      replacementClaimedBy: "powerspecnix",
+      removing: false,
+      since: hoursAgo(2),
     },
   },
 ];

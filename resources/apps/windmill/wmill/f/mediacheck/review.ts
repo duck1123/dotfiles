@@ -60,6 +60,8 @@ function toFile(row: Row) {
             trackedCopy: row.tracked_copy ?? undefined,
             replacement: row.replacement_path ?? undefined,
             replacementVerdict: row.replacement_status ?? undefined,
+            replacementClaimedBy: row.replacement_claimed_by ?? undefined,
+            since: row.repair_since ?? undefined,
             removing: row.remove_requested_at !== null,
           },
         }
@@ -70,6 +72,11 @@ function toFile(row: Row) {
 // A file's latest repair, with the findings from before any replacement took
 // its row. A replacement at a new path has a row of its own, which stays out of
 // the review list until its repair is done with it.
+//
+// repair_since is when the repair entered its current state, for the app's
+// repair slots. The repair run only touches a verifying row when its state
+// changes; a searching one gets its note updated every run, so it goes by when
+// the search started.
 const OPEN_REPAIR_STATES = ["searching", "verifying", "no_release", "attention", "untracked"];
 
 async function list(args: { view?: string }) {
@@ -99,7 +106,8 @@ function repairRows(where: unknown): Promise<Row[]> {
       coalesce(r.original_findings, m.findings) as findings,
       r.state as repair_state, r.note as repair_note, r.attempts as repair_attempts,
       r.quarantined as repair_quarantined, r.remove_requested_at, r.tracked_copy,
-      n.path as replacement_path, n.status as replacement_status
+      n.path as replacement_path, n.status as replacement_status, n.claimed_by as replacement_claimed_by,
+      case when r.state = 'searching' then coalesce(r.search_started_at, r.started_at) else r.updated_at end as repair_since
     from media_file m
     left join media_repair r on r.media_file_id = m.id
     left join media_file n on n.id = r.replacement_file_id
@@ -114,7 +122,8 @@ async function get(args: { id: number }) {
       coalesce(r.original_findings, m.findings) as findings, m.log,
       r.state as repair_state, r.note as repair_note, r.attempts as repair_attempts,
       r.quarantined as repair_quarantined, r.remove_requested_at, r.tracked_copy,
-      n.path as replacement_path, n.status as replacement_status
+      n.path as replacement_path, n.status as replacement_status, n.claimed_by as replacement_claimed_by,
+      case when r.state = 'searching' then coalesce(r.search_started_at, r.started_at) else r.updated_at end as repair_since
     from media_file m
     left join lateral (
       select * from media_repair where media_file_id = m.id order by started_at desc limit 1

@@ -51,9 +51,28 @@ test("a replacement request moves on to the next file and shows up in its own vi
   expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("S02E06");
 
   await user.click(screen.getByRole("button", { name: "Replacement requested" }));
-  await waitFor(() => expect(fileButtons()).toHaveLength(4));
+  await waitFor(() => expect(fileButtons()).toHaveLength(6));
   expect(fileButtons()[0]).toHaveTextContent("S01E10");
   expect(screen.getByText("Waiting its turn")).toBeInTheDocument();
+  expect(screen.getByText(/1 file waits for a slot\./)).toBeInTheDocument();
+});
+
+test("the repair slots say what each one is waiting on", async () => {
+  render(<MediaReview source={createMockMediaSource()} repairSlots={5} />);
+  const user = userEvent.setup();
+  await user.click(screen.getByRole("button", { name: "Replacement requested" }));
+  const slots = await screen.findByRole("region", { name: "Repair slots" });
+  expect(within(slots).getByRole("heading")).toHaveTextContent("2 of 5");
+
+  // Oldest first.
+  const [searching, verifying] = within(slots).getAllByRole("button");
+  expect(searching).toHaveTextContent(/Severance: S02E03.*Searching.*for 30 h.*No files found are eligible/);
+  expect(verifying).toHaveTextContent(/Arrival \(2016\): .*Verifying.*for 2 h.*Being decoded on powerspecnix/);
+  expect(within(slots).getAllByText("Free")).toHaveLength(3);
+  expect(within(slots).queryByText(/for a slot/)).not.toBeInTheDocument();
+
+  await user.click(verifying);
+  expect(await screen.findByText("New file: Arrival (2016)/Arrival (2016) Remux-1080p.mkv")).toBeInTheDocument();
 });
 
 test("a decision can be undone", async () => {
