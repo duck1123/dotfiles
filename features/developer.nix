@@ -32,70 +32,24 @@
     in
     {
       home.packages = with pkgs; [
-        age
-        # argo-workflows
-        # argocd
-        # arkade
         autokuma # provides the `kuma` CLI, used by `nur kuma-cli config`
-        # colmena
-        # dbx
-        dbeaver-bin
-        # devpod
-        # devpod-desktop
-        # devspace
-        # devenv
         diffr
-        dig
-        # distrobox
-        # dnschef
-        # dnslookup
-        # dnsmap
-        docker
-        # docker-compose
         # doctl
         # extraNodePackages.prettier
         # fish
         # gcc9
-        gh
-        gh-cal
-        gh-dash
-        gh-f
         # gnumake
-        # gitu
         go
         gum
         jet
-        k3d
-        k9s
-        # krew
-        # kty
-        kubernetes-helm
-        kubectl
-        kubernix
-        kubeseal
-        kustomize
-        # lens
         # md-tangle
         # minio-client
-        # mr
-        nixd
-        nmap
         nodejs
-        # openjdk
-        # openjdk17
-        # podman
-        # podman-desktop
-        # podman-tui
         # postman
         # runme
         sqlite
-        sops
         # sqsh
         soap-cli
-        ssh-to-age
-        # tilt
-        # vcluster
-        # virtualbox
         vscode
         yq-go # used by scripts/k8s-bootstrap-argocd-repo.sh and k8s-post-process-manifests.nu
       ];

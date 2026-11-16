@@ -60,6 +60,8 @@
         databricks-cli
         databricks-sql-cli
         # dbt-core
+        # dbx
+        dbeaver-bin
       ];
 
       xdg.configFile."fish/completions/databricks.fish".source =

@@ -52,9 +52,16 @@
     { config, pkgs, ... }:
     {
       # Used by scripts/nur.nu: nom for builds, statix for `nur lint`
-      home.packages = [
-        pkgs.nix-output-monitor
-        pkgs.statix
+      home.packages = with pkgs; [
+        age
+        # colmena
+        # devenv
+        # distrobox
+        nix-output-monitor
+        nixd
+        sops
+        ssh-to-age
+        statix
       ];
 
       nix.package = pkgs.nix;

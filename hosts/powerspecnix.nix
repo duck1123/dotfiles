@@ -17,7 +17,7 @@ in
   };
 
   features = {
-    backups.enable = true;
+    backups.enable = false;
     bitcoin.enable = false;
     bluetooth.enable = true;
     clojure.enable = false;

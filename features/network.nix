@@ -2,7 +2,14 @@
   homeManager =
     { pkgs, ... }:
     {
-      home.packages = with pkgs; [ networkmanager ];
+      home.packages = with pkgs; [
+        dig
+        # dnschef
+        # dnslookup
+        # dnsmap
+        networkmanager
+        nmap
+      ];
     };
 
   nixos =

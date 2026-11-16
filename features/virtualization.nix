@@ -1,4 +1,14 @@
 {
+
+  homeManager =
+    { config, pkgs, ... }:
+    {
+      home.packages = with pkgs; [
+        # vcluster
+        # virtualbox
+      ];
+    };
+
   nixos =
     { config, ... }:
     {

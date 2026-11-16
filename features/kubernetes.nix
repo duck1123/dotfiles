@@ -69,6 +69,27 @@
       description = "Kubernetes configuration";
     };
 
+  homeManager =
+    { config, pkgs, ... }:
+    {
+      home.packages = with pkgs; [
+        # argo-workflows
+        # argocd
+        # arkade
+        # devspace
+        kubernetes-helm
+        kubectl
+        kubernix
+        kubeseal
+        kustomize
+        k3d
+        k9s
+        # krew
+        # kty
+        # lens
+      ];
+    };
+
   nixos =
     {
       config,

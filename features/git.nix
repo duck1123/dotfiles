@@ -1,7 +1,16 @@
 {
   homeManager =
-    { config, ... }:
+    { config, pkgs, ... }:
     {
+      home.packages = with pkgs; [
+        # gitu
+        gh
+        gh-cal
+        gh-dash
+        gh-f
+        # mr
+      ];
+
       programs =
         let
           inherit (config.host.identity) email gpgKey name;

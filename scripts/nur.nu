@@ -247,7 +247,7 @@ export def "nur ci" []: nothing -> nothing {
 
 # Format all .nix files using nixfmt
 export def "nur format" []: nothing -> nothing {
-  ^find . -name '*.nix' -exec nixfmt {} + # nu-lint-ignore: unhandled_external_error
+  ^find . -name '*.nix' -exec nixfmt '{}' + # nu-lint-ignore: unhandled_external_error
 }
 
 # Lint all .nix files using statix. `nur lint nushell` exists separately
