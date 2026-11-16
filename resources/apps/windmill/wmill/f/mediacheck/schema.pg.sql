@@ -9,7 +9,8 @@
 --   ffmpeg's error output, which f/mediacheck/checker sorts into a verdict.
 --
 -- Statuses:
---   queued    new or changed since its last check
+--   queued    new or changed since its last check; retry_after defers one the
+--             checker wasn't allowed to open
 --   checking  claimed by a checker (claimed_by, claimed_at)
 --   ok        no damage found
 --   minor     a glitch or two (see classify.ts); waits for review, after suspect
@@ -63,6 +64,9 @@ create index if not exists media_file_queue on media_file (status, mtime desc);
 
 -- Checked ahead of the rest of the queue: a replacement waiting on its decode.
 alter table media_file add column if not exists check_first boolean not null default false;
+
+-- A queued file the checker wasn't allowed to open: not claimed before this.
+alter table media_file add column if not exists retry_after timestamptz;
 
 create table if not exists media_repair (
   id                  bigserial primary key,

@@ -3,7 +3,8 @@ description: >-
   Called by the mediacheck service on powerspecnix: sync records a library
   scan, claim hands out the next file to decode, report stores a decode's
   error output with its verdict from f/mediacheck/classify. Also release,
-  reclassify (after a rule change) and stats.
+  defer (a file it can't open), retry (clear deferrals), reclassify (after a
+  rule change) and stats.
 lock: '!inline f/mediacheck/checker.script.lock'
 kind: script
 schema:
@@ -18,6 +19,8 @@ schema:
         - sync_done
         - claim
         - release
+        - defer
+        - retry
         - report
         - reclassify
         - stats

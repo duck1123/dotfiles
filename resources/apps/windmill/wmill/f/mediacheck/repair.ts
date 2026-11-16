@@ -263,6 +263,7 @@ async function queueDecode(arr: Arr, repair: Row, rel: string) {
     values (${arr.library}, ${rel}, ${stat.size}, ${mtime}, 'queued', true)
     on conflict (library, path) do update set
       check_first = true,
+      retry_after = null,
       status = case
         when media_file.size <> excluded.size or media_file.mtime <> excluded.mtime
           or media_file.status in ('missing', 'replace_requested') then 'queued'

@@ -153,7 +153,8 @@ async function decide(args: { id: number; decision: string }) {
   }
   if (args.decision === "recheck") {
     const rows = await db`
-      update media_file set status = 'queued', check_first = true, claimed_by = null, claimed_at = null, reviewed_at = null
+      update media_file set status = 'queued', check_first = true, claimed_by = null, claimed_at = null, reviewed_at = null,
+        retry_after = null
       where id = ${args.id} and status in ${db(VIEWS.open)}
       returning id`;
     if (!rows.length) throw new Error(`media_file ${args.id} isn't waiting on review`);

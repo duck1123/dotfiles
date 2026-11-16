@@ -15,6 +15,8 @@ const VIDEO_EXTS = [mkv mp4 m4v avi mpg mpeg ts m2ts mov wmv webm flv vob]
 const MAX_LINES = 2000
 const SYNC_BATCH = 1000
 const IDLE_MINUTES = 10
+# Files in a row the checker isn't allowed to open before it waits IDLE_MINUTES.
+const MAX_DENIED = 20
 
 def state-dir [] {
   let dir = ($env.XDG_STATE_HOME? | default ($env.HOME | path join .local state)) | path join mediacheck
@@ -131,17 +133,18 @@ def "main check" [file: path] {
   decode $file
 }
 
-# Check the next queued file. Returns false when the queue is empty.
+# Check the next queued file. Returns "checked", "denied" (the NAS refused to
+# open it, so it's deferred) or "empty".
 def "main once" [] {
   let job = api claim {host: (host)}
-  if $job == null { return false }
+  if $job == null { return "empty" }
   let lib = libraries | where name == $job.library | first
   # Unmounted, every file would fail to open and be reported as a crash.
   if (^mountpoint -q $lib.root | complete).exit_code != 0 {
     api release {host: (host)}
     print -e $"nothing is mounted at ($lib.root); released, retrying in ($IDLE_MINUTES) minutes"
     sleep ($IDLE_MINUTES * 1min)
-    return true
+    return "checked"
   }
   let file = $lib.root | path join $job.path
   print $"checking ($job.library)/($job.path)"
@@ -149,33 +152,49 @@ def "main once" [] {
   # ffmpeg wasn't allowed to open the file, so this says nothing about the file.
   # (A file deleted since the scan is still reported; the next scan marks it missing.)
   # In November 2026 the NFS mount refused reads in bursts for a day, and every
-  # file checked meanwhile was reported as a crash. Hand the claim back and
-  # wait instead; the file is claimed again once reads work.
+  # file checked meanwhile was reported as a crash. Defer it instead: the queue
+  # skips it for a while (`mediacheck retry` clears that) and goes on with the
+  # rest. Handing it straight back stalled the whole queue on one file.
   if $result.decoded == null and ($result.log | any {|l| $l.msg =~ 'Error opening input.*Permission denied' }) {
     let reason = $result.log | last | get msg
-    api release {host: (host)}
-    print -e $"  couldn't open it \(($reason)\); released, retrying in ($IDLE_MINUTES) minutes"
-    sleep ($IDLE_MINUTES * 1min)
-    return true
+    let deferred = api defer {id: $job.id, host: (host)}
+    print -e $"  couldn't open it \(($reason)\); deferred until ($deferred.retry_after)"
+    return "denied"
   }
   let now = ls -l $file | first
   let reported = api report ({id: $job.id, size: ($now.size | into int), mtime: (($now.modified | into int) // 1_000_000_000)} | merge $result)
   print $"  ($reported.status) in ($result.checkSeconds | math round)s: ($result.lineCount) error lines"
-  true
+  "checked"
 }
 
 # Work through the queue, scanning every MEDIACHECK_SCAN_HOURS.
 def "main run" [] {
   print $"released (api release {host: (host)} | get released) unfinished claims"
+  mut denied = 0
   loop {
     if (scan-due) { main scan }
-    if not (main once) { sleep ($IDLE_MINUTES * 1min) }
+    let outcome = main once
+    $denied = if $outcome == "denied" { $denied + 1 } else { 0 }
+    if $outcome == "empty" {
+      sleep ($IDLE_MINUTES * 1min)
+    } else if $denied >= $MAX_DENIED {
+      # Likely the whole library: wait rather than defer it all in one go.
+      print -e $"($denied) files in a row couldn't be opened; waiting ($IDLE_MINUTES) minutes"
+      sleep ($IDLE_MINUTES * 1min)
+      $denied = 0
+    }
   }
 }
 
 # Queue counts per library and status.
 def "main stats" [] {
   api stats {}
+}
+
+# Check files the NAS wouldn't let the checker open again now, instead of
+# when their deferral runs out (e.g. after fixing their permissions).
+def "main retry" [] {
+  api retry {}
 }
 
 # Stop checking (systemctl --user stop), e.g. before a game.
