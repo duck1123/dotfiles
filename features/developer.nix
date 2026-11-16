@@ -42,17 +42,17 @@
         dbeaver-bin
         # devpod
         # devpod-desktop
-        devspace
-        devenv
+        # devspace
+        # devenv
         diffr
         dig
-        distrobox
+        # distrobox
         # dnschef
         # dnslookup
         # dnsmap
         docker
         # docker-compose
-        doctl
+        # doctl
         # extraNodePackages.prettier
         # fish
         # gcc9
