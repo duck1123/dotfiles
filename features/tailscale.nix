@@ -78,14 +78,44 @@
         '';
       };
 
-      services.resolved.settings.Resolve = {
-        # Prevent tailscaled from pushing its split-DNS nameserver (a Tailscale
-        # infrastructure IP only reachable from Tailscale IPs) directly into
-        # systemd-resolved, which would query it from the LAN IP and get REFUSED.
-        # Instead we point resolved at 100.100.100.100 (tailscaled's local proxy)
-        # which routes queries through the tunnel from the correct Tailscale IP.
-        DNS = "100.100.100.100";
-        Domains = "~ts.net";
+      # NetworkManager would otherwise treat tailscale0 as an external
+      # connection and could reset the per-link DNS set below.
+      networking.networkmanager.unmanaged = lib.mkIf config.networking.networkmanager.enable [
+        config.services.tailscale.interfaceName
+      ];
+
+      # Send only *.ts.net lookups to tailscaled's local MagicDNS proxy
+      # (100.100.100.100), and only via tailscale0. With --accept-dns=false
+      # tailscaled has no upstream resolvers, so putting it in the global
+      # resolved config (as this used to) made it SERVFAIL every ordinary
+      # lookup, racing the router's DNS. Per-link settings vanish when
+      # tailscaled recreates the interface, so re-apply on every restart.
+      systemd.services.tailscale-dns = lib.mkIf config.services.resolved.enable {
+        description = "Route *.ts.net lookups to Tailscale's resolver";
+        after = [
+          "tailscaled.service"
+          "systemd-resolved.service"
+        ];
+        partOf = [ "tailscaled.service" ];
+        wantedBy = [ "tailscaled.service" ];
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        script =
+          let
+            iface = config.services.tailscale.interfaceName;
+            resolvectl = "${config.systemd.package}/bin/resolvectl";
+          in
+          ''
+            for i in $(seq 1 30); do
+              [ -e /sys/class/net/${iface} ] && break
+              sleep 1
+            done
+            ${resolvectl} dns ${iface} 100.100.100.100
+            ${resolvectl} domain ${iface} '~ts.net'
+            ${resolvectl} default-route ${iface} false
+          '';
       };
     };
 }
