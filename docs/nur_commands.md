@@ -73,6 +73,7 @@ nur switch k8s --no-review     # same without the review/confirmation
 | `nur format` | Run `nixfmt` on every `.nix` file |
 | `nur lint` / `nur lint nix` | `statix check .` |
 | `nur lint nushell` | `nu-lint`, failing on warnings as well as errors. Not part of `nur lint`/`nur ci` yet because of existing warnings in `scripts/nur.nu`. |
+| `nur docs [--print]` | Build `.#docs`, the option reference (`host.*` including every feature, plus other repo-declared NixOS and home-manager options), and open it with `xdg-open`. `--print` only prints the `file://` URL. Built by `modules/flake/docs.nix` from edgenix's evaluation, with `nixosOptionsDoc` and mdBook. |
 
 Flake inputs are updated with plain `nix flake update`; there's no task for it.
 

@@ -245,6 +245,14 @@ export def "nur ci" []: nothing -> nothing {
   nur build --all
 }
 
+# Build the option reference (modules/flake/docs.nix) and open it in a browser.
+# --print only prints the file:// URL.
+export def "nur docs" [--print]: nothing -> nothing {
+  let out = (^nix build .#docs --no-link --print-out-paths | str trim)
+  let url = $"file://($out)/share/doc/dotfiles/index.html"
+  if $print { print $url } else { ^xdg-open $url }
+}
+
 # Format all .nix files using nixfmt
 export def "nur format" []: nothing -> nothing {
   ^find . -name '*.nix' -exec nixfmt '{}' + # nu-lint-ignore: unhandled_external_error
