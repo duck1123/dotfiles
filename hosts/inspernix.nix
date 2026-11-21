@@ -88,7 +88,31 @@ in
     {
       home = {
         packages = with pkgs; [
+          antigravity
+          bespokesynth
           cheese
+          clonehero
+          comical
+          comigo
+          dig
+          efibootmgr
+          feh
+          ffmpeg
+          geeqie
+          gh
+          helio-workstation
+          # hermes-agent
+          kubectl
+          mqttx-cli
+          muse
+          nicotine-plus
+          nmap
+          picard
+          qbittorrent
+          qcomicbook
+          usbimager
+          vlc
+          yt-dlp
         ];
         sessionPath = [
           "$HOME/.cargo/bin:$PATH"
