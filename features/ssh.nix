@@ -15,13 +15,22 @@
         enable = true;
         enableDefaultConfig = false;
 
-        # Aliases via Tailscale MagicDNS instead of LAN mDNS/avahi, which is
-        # unreliable across WiFi APs/VLANs and doesn't work off the LAN.
+        # Hosts with a static `lanIp` are reached by it directly; the rest go
+        # via Tailscale MagicDNS instead of LAN mDNS/avahi, which is unreliable
+        # across WiFi APs/VLANs and doesn't work off the LAN. `<host>-ts`
+        # always goes via Tailscale, for reaching a lanIp host off the LAN.
         settings =
           lib.mapAttrs (_: host: {
-            HostName = "${host.hostname}.${tailnet-domain}";
+            HostName = if host.lanIp != null then host.lanIp else "${host.hostname}.${tailnet-domain}";
             User = host.identity.username;
           }) tailscale-hosts
+          // lib.mapAttrs' (
+            name: host:
+            lib.nameValuePair "${name}-ts" {
+              HostName = "${host.hostname}.${tailnet-domain}";
+              User = host.identity.username;
+            }
+          ) (lib.filterAttrs (_: host: host.lanIp != null) tailscale-hosts)
           // {
             # Previous enableDefaultConfig defaults, kept explicitly since that
             # option is being deprecated upstream.

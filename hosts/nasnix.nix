@@ -1,8 +1,10 @@
 { config, ... }:
 let
+  lan-ip = "192.168.0.16";
   nas-ip = "192.168.0.124";
 in
 {
+  lanIp = lan-ip;
   system = "x86_64-linux";
   id = "WUCVTEF-D2NOIGW-IFJPFKD-RHT7NSP-CZSIWM7-KLCHS3S-EIO3WFD-6DGAVAN";
   identity = config.identities.duck;
@@ -105,7 +107,7 @@ in
           };
           ipv4 = {
             method = "manual";
-            addresses = "192.168.0.16/24";
+            addresses = "${lan-ip}/24";
             gateway = "192.168.0.1";
             dns = "192.168.0.1;";
           };

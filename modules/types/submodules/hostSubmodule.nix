@@ -54,6 +54,12 @@ _: {
             description = "The identity configuration (name, username, email, gpgKey)";
           };
 
+          lanIp = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Static LAN IPv4 address. When set, ssh aliases reach the host by it instead of Tailscale.";
+          };
+
           name = mkOption {
             type = types.str;
             description = "The host name";
