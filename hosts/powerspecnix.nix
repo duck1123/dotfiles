@@ -72,6 +72,8 @@ in
       tokenFile = ./../secrets/k3s-token.yaml;
     };
 
+    logitech.enable = true;
+
     media = {
       enable = true;
       server.enable = false;
