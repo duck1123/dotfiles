@@ -5,6 +5,8 @@ let
   jwt-secret = "bookorbit-jwt-secret";
   setup-token-secret = "bookorbit-setup-token";
   db-secret = "bookorbit-database-password";
+  request-key-secret = "bookorbit-book-request-encryption-key";
+  mountDownloads = cfg: cfg.nfs.enable && cfg.nfs.downloadsPath != "";
 in
 rec {
   inherit name;
@@ -34,6 +36,7 @@ rec {
     ${jwt-secret}.JWT_SECRET = cfg.jwtSecret;
     ${setup-token-secret}.SETUP_BOOTSTRAP_TOKEN = cfg.setupBootstrapToken;
     ${db-secret}.password = cfg.database.password;
+    ${request-key-secret}.BOOK_REQUEST_ENCRYPTION_KEY = cfg.bookRequestEncryptionKey;
   };
 
   extraOptions = {
@@ -78,6 +81,28 @@ rec {
         One-time token required by the `/auth/setup` endpoint to create the first
         admin account. Stored in secrets.enc.yaml as `bookorbit.setupBootstrapToken`
         (generate: openssl rand -hex 32).
+      '';
+      type = types.str;
+      default = "";
+    };
+
+    bookRequestEncryptionKey = mkOption {
+      description = mdDoc ''
+        Encrypts the indexer and download-client credentials that book requests
+        store (and metadata-provider auth headers). Exactly 64 hex characters.
+        Stored in secrets.enc.yaml as `bookorbit.bookRequestEncryptionKey`.
+        Don't rotate it: credentials saved under the old key become unreadable.
+      '';
+      type = types.str;
+      default = "";
+    };
+
+    nfs.downloadsPath = mkOption {
+      description = mdDoc ''
+        NFS export path for the download client's folder, mounted at /downloads so
+        book requests can import finished downloads. qBittorrent reports the same
+        /downloads paths, so the Requests path mapping is /downloads -> /downloads.
+        Leave empty to skip.
       '';
       type = types.str;
       default = "";
@@ -189,6 +214,13 @@ rec {
                     };
                   }
                   {
+                    name = "BOOK_REQUEST_ENCRYPTION_KEY";
+                    valueFrom.secretKeyRef = {
+                      name = request-key-secret;
+                      key = "BOOK_REQUEST_ENCRYPTION_KEY";
+                    };
+                  }
+                  {
                     name = "APP_URL";
                     value = "https://${cfg.ingress.domain}";
                   }
@@ -237,6 +269,10 @@ rec {
                 ++ optional (cfg.nfs.enable && cfg.nfs.audiobooksPath != "") {
                   mountPath = "/books/Audiobooks";
                   name = "audiobooks";
+                }
+                ++ optional (mountDownloads cfg) {
+                  mountPath = "/downloads";
+                  name = "downloads";
                 };
               }
             ];
@@ -251,6 +287,10 @@ rec {
             ++ optional (cfg.nfs.enable && cfg.nfs.audiobooksPath != "") {
               name = "audiobooks";
               persistentVolumeClaim.claimName = "${name}-${name}-audiobooks";
+            }
+            ++ optional (mountDownloads cfg) {
+              name = "downloads";
+              persistentVolumeClaim.claimName = "${name}-${name}-downloads";
             };
           };
         };
@@ -309,6 +349,14 @@ rec {
         resources.requests.storage = "1Gi";
         storageClassName = "";
         volumeName = "${name}-${name}-audiobooks-nfs";
+      };
+    }
+    // optionalAttrs (mountDownloads cfg) {
+      "${name}-${name}-downloads".spec = {
+        accessModes = [ "ReadWriteMany" ];
+        resources.requests.storage = "1Gi";
+        storageClassName = "";
+        volumeName = "${name}-${name}-downloads-nfs";
       };
     };
 
@@ -376,6 +424,31 @@ rec {
             nfs = {
               server = cfg.nfs.server;
               path = cfg.nfs.audiobooksPath;
+            };
+            persistentVolumeReclaimPolicy = "Retain";
+          };
+        };
+      }
+      // lib.optionalAttrs (mountDownloads cfg) {
+        "${name}-${name}-downloads-nfs" = {
+          apiVersion = "v1";
+          kind = "PersistentVolume";
+          metadata = {
+            name = "${name}-${name}-downloads-nfs";
+          };
+          spec = {
+            capacity.storage = "1Ti";
+            accessModes = [ "ReadWriteMany" ];
+            mountOptions = [
+              "nolock"
+              "nfsvers=3"
+              "noexec"
+              "soft"
+              "timeo=30"
+            ];
+            nfs = {
+              server = cfg.nfs.server;
+              path = cfg.nfs.downloadsPath;
             };
             persistentVolumeReclaimPolicy = "Retain";
           };
