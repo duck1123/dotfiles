@@ -183,6 +183,10 @@
       "data": "pvc-31a2f2bc-8818-4500-ab0a-88f2db40d7b7"
     }
   },
+  "nostalgiatv": {
+    "enable": true,
+    "replicas": 1
+  },
   "opensearch-dashboards": {
     "enable": false
   },
