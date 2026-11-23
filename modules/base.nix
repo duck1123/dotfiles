@@ -42,6 +42,8 @@ _: {
           nixos.specialisations
           nixos.users
           generic.options
+          # Options only; features/crystal-forge.nix turns it on.
+          inputs.crystal-forge.nixosModules.crystal-forge
           inputs.home-manager.nixosModules.home-manager
           inputs.sddm-sugar-candy-nix.nixosModules.default
           inputs.sops-nix.nixosModules.sops

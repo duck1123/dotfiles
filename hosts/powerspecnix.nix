@@ -23,6 +23,12 @@ in
     clojure.enable = false;
     common.enable = true;
     chat.enable = false;
+
+    crystal-forge = {
+      enable = true;
+      builder.enable = true;
+    };
+
     claude = {
       enable = true;
       gortex = {

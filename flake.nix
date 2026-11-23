@@ -26,6 +26,12 @@
       url = "github:zhaofengli/attic";
     };
 
+    # Crystal Forge (features/crystal-forge.nix). Deliberately not following
+    # our nixpkgs: it's a crane/Rust build pinned to its own release branch,
+    # with no public binary cache, so it's built locally either way and its
+    # own lock is the combination upstream tests.
+    crystal-forge.url = "gitlab:crystal-forge/crystal-forge/dev";
+
     flake-compat.url = "github:edolstra/flake-compat";
 
     flake-parts = {

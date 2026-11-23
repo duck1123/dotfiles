@@ -17,6 +17,12 @@ in
     bluetooth.enable = true;
     clojure.enable = true;
     common.enable = true;
+
+    crystal-forge = {
+      enable = true;
+      server.enable = true;
+    };
+
     docker.enable = true;
     emacs.enable = true;
     firefox.enable = true;
