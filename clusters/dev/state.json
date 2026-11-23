@@ -87,7 +87,7 @@
     "enable": false
   },
   "home-assistant": {
-    "enable": false,
+    "enable": true,
     "pins": {
       "config": "pvc-fbf41b36-718b-4942-bbe1-adf65e5bc7d1"
     }
