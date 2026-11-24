@@ -32,6 +32,9 @@
   "crafty-controller": {
     "enable": false
   },
+  "crystal-forge": {
+    "enable": true
+  },
   "ditto-relay": {
     "enable": true,
     "pins": {
