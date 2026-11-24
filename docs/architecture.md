@@ -14,7 +14,7 @@ Top-level registry directories, auto-loaded (see [Registries](#registries)):
 
 - `hosts/`: one `<hostname>.nix` per host (see [Hosts](#hosts))
 - `features/`: one `<name>.nix` per feature that hosts toggle (see [Features](#features))
-- `environments/`: one `<name>.nix` per desktop environment (budgie, gnome, hyprland, i3, niri, plasma6, plus the text-only `headless`) (see [Environments](#environments))
+- `environments/`: one `<name>.nix` per desktop environment (bigscreen, budgie, gnome, hyprland, i3, niri, plasma6, plus the text-only `headless`) (see [Environments](#environments))
 - `identities/`: per-user identities (duck, deck, drenfer)
 - `appTemplates/`: one `<name>.nix` per Kubernetes app, holding the spec lambda passed to `mkArgoApp`
 

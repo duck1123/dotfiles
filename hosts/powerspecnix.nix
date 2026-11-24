@@ -11,6 +11,7 @@ in
 
   environments = {
     primary = "niri";
+    bigscreen.enable = true;
     hyprland.enable = false;
     # niri.enable = true;
     plasma6.enable = true;

@@ -9,7 +9,8 @@ in
   identity = config.identities.duck;
 
   environments = {
-    primary = "headless";
+    primary = "bigscreen";
+    headless.enable = true;
     plasma6.enable = true;
   };
 
