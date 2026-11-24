@@ -13,6 +13,11 @@
     {
       environment.systemPackages = [ bigscreen ];
 
+      # The homescreen plasmoid imports org.kde.kdeconnect for its KDE Connect
+      # indicator; without it on the QML path the whole HomeScreen fails to
+      # load. This also opens the KDE Connect firewall ports for pairing.
+      programs.kdeconnect.enable = true;
+
       services = {
         desktopManager.plasma6.enable = true;
 

@@ -111,6 +111,12 @@ in
 
         time.timeZone = "America/Detroit";
 
+        # TV box: log straight into the default (Bigscreen) session.
+        services.displayManager.autoLogin = {
+          enable = true;
+          user = config.host.identity.username;
+        };
+
         # Pin the LAN IP so it doesn't drift under DHCP -- other hosts/services
         # (k3s serverAddr, ssh known_hosts, homepage widgets) reference it by IP.
         networking.networkmanager.ensureProfiles.profiles."Wired connection 1" = {
