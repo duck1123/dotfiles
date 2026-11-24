@@ -1367,6 +1367,29 @@
         "type": "github"
       }
     },
+    "polaris": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1795046964,
+        "narHash": "sha256-fGF5Jszqay85dRZLaJaciiG/sZ04O+jzCLa51PPleEs=",
+        "ref": "refs/tags/v1.5.0",
+        "rev": "5d29d3c17d58e70968276ac1adcb2e068338b8a3",
+        "revCount": 2903,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/papi-ux/polaris"
+      },
+      "original": {
+        "ref": "refs/tags/v1.5.0",
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/papi-ux/polaris"
+      }
+    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": [
@@ -1491,6 +1514,7 @@
         "nixpkgs-lib": "nixpkgs-lib",
         "nur": "nur",
         "nur-taskrunner": "nur-taskrunner",
+        "polaris": "polaris",
         "pre-commit-hooks": "pre-commit-hooks",
         "sddm-sugar-candy-nix": "sddm-sugar-candy-nix",
         "sops-nix": "sops-nix",

@@ -51,6 +51,12 @@ in
       enable = true;
     };
     nushell.enable = true;
+
+    polaris = {
+      enable = true;
+      client.enable = true;
+    };
+
     sddm.enable = true;
     sound.enable = true;
     sleep.enable = true;

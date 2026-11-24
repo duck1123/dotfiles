@@ -117,6 +117,14 @@
 
     nixpkgs-lib.url = "github:nix-community/nixpkgs.lib";
 
+    # Polaris game-stream host (features/polaris.nix). git+https with
+    # submodules=1 because the github: shorthand skips the third-party
+    # submodules the build needs. Pinned to a release tag; bump it on purpose.
+    polaris = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "git+https://github.com/papi-ux/polaris?ref=refs/tags/v1.5.0&submodules=1";
+    };
+
     nur = {
       inputs = {
         flake-parts.follows = "flake-parts";

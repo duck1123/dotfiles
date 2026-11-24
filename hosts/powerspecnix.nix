@@ -100,6 +100,12 @@ in
     obsidian.enable = false;
     office.enable = false;
     pictures.enable = true;
+
+    polaris = {
+      enable = true;
+      server.enable = true;
+    };
+
     python.enable = true;
     radio.enable = true;
     sddm.enable = false;

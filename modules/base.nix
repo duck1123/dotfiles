@@ -16,6 +16,8 @@ _: {
           homeManager.host-info
           homeManager.emacs-parts
           generic.options
+          # Options only; features/polaris.nix turns it on.
+          inputs.polaris.homeModules.polaris
           inputs.stylix.homeModules.stylix
           inputs.zen-browser.homeModules.beta
         ]
@@ -45,6 +47,10 @@ _: {
           # Options only; features/crystal-forge.nix turns it on.
           inputs.crystal-forge.nixosModules.crystal-forge
           inputs.home-manager.nixosModules.home-manager
+          # Options only; features/polaris.nix turns it on. It disables
+          # nixpkgs' unrelated Polaris music-server module, which uses the
+          # same services.polaris name.
+          inputs.polaris.nixosModules.polaris
           inputs.sddm-sugar-candy-nix.nixosModules.default
           inputs.sops-nix.nixosModules.sops
           inputs.stylix.nixosModules.stylix
