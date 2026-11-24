@@ -38,6 +38,14 @@ in
       template = {
         metadata.labels = labels;
         spec = {
+          # Pinned (hostAffinity) to the host running the server, so the
+          # server sees this pod's connections from that node's pod CIDR, which
+          # it trusts for X-Forwarded-Proto (features/crystal-forge.nix,
+          # trustedProxyCidrs). Builders need that to receive cache push
+          # credentials.
+          nodeSelector = optionalAttrs (cfg.hostAffinity != null) {
+            "kubernetes.io/hostname" = cfg.hostAffinity;
+          };
           containers = [
             {
               inherit name;

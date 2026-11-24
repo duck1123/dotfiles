@@ -44,7 +44,9 @@
 
       serverUrl = lib.mkOption {
         type = lib.types.str;
-        default = "http://nixmini:3000";
+        # HTTPS through the cluster proxy: over plain http the server refuses
+        # to give the builder cache push credentials.
+        default = "https://crystal-forge.home.kronkltd.net";
         description = "Server URL a builder connects to.";
       };
     };
@@ -159,6 +161,16 @@
           # private IPs ("Target blocked"), and our Attic
           # (attic.home.kronkltd.net) is on the LAN VIP.
           allow_private_cache_test_targets = true;
+
+          # The server only hands cache push credentials to a builder over
+          # verified HTTPS. Builders come in through Traefik (which sets
+          # X-Forwarded-Proto itself) and the socat pod in
+          # appTemplates/crystal-forge.nix, pinned to nixmini. The server sees
+          # that pod's own IP, so trust nixmini's pod CIDR (`kubectl get node
+          # nixmini -o jsonpath='{.spec.podCIDR}'`) rather than a /32 that
+          # changes whenever the pod restarts.
+          trust_forwarded_builder_https = true;
+          trustedProxyCidrs = [ "10.42.3.0/24" ];
         };
 
         build = {
