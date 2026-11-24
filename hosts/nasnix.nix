@@ -14,6 +14,7 @@ in
   features = {
     clojure.enable = false;
     common.enable = true;
+    crystal-forge.enable = true;
     developer.enable = true;
     docker.enable = true;
     emacs.enable = true;

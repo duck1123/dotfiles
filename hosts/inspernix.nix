@@ -30,6 +30,7 @@ in
     };
     clojure.enable = false;
     common.enable = true;
+    crystal-forge.enable = true;
     docker.enable = false;
     emacs.enable = true;
     firefox.enable = true;

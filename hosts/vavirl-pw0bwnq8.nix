@@ -4,6 +4,7 @@
 
   features = {
     common.enable = true;
+    crystal-forge.enable = true;
     dbt.enable = true;
     developer.enable = true;
     emacs.enable = true;
