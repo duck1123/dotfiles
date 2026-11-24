@@ -1,5 +1,3 @@
-# Not enabled on any host: nixpkgs' budgie module references pkgs.qogir-theme,
-# which was removed upstream (depended on gtk-engine-murrine/GTK2)
 {
   desktopNames = [ "Budgie" ];
 

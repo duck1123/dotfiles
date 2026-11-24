@@ -53,6 +53,7 @@ nur switch k8s --no-review     # same without the review/confirmation
 - Locally, `home` builds with `nom` first, then runs `home-manager switch` with a timestamped backup extension (`-b backup.<epoch>`). `os` builds with `nom`, then `sudo nixos-rebuild switch` (or `boot`). If the switch fails, the last 50 journal lines are printed.
 - With `--host`, everything is built locally, `nix copy`'d over SSH and activated remotely. Activating `os` prompts for the remote sudo password. Prerequisites: key-based SSH to the host, and sudo there.
 - `--fallback` passes `--fallback` to every Nix build it runs (local or `--host`, os, home and the k8s render), same as `nur build --fallback`.
+- Switching `os` keeps you in the environment you're running. Each specialisation (non-primary environment) writes its name to `/etc/nixos-specialisation`; when that file exists, `nur switch os` activates the same specialisation of the new build (`nixos-rebuild switch --specialisation <name>` locally, `<toplevel>/specialisation/<name>/bin/switch-to-configuration` with `--host`). If the new build no longer has that specialisation, it warns and activates the primary. `--boot` always makes the primary the boot default.
 - `--boot` only applies to the `os` target. Use it when activation itself is slow or risky (e.g. a kernel or k3s change on a cluster node).
 - `k8s` is the same as `nur k8s deploy` (see [Kubernetes manifests](#kubernetes-manifests)). It **deploys to the cluster**, so it can't be combined with `--host`.
 

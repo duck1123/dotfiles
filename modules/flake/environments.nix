@@ -202,8 +202,13 @@ in
 
           # Specialisations inherit the whole host config and only swap the
           # active environment; nixpkgs drops nested specialisations itself.
+          # /etc/nixos-specialisation names the running one, so `nur switch os`
+          # re-activates it instead of falling back to the primary.
           config.specialisation = lib.genAttrs specialised (name: {
-            configuration.environments.active = lib.mkForce name;
+            configuration = {
+              environments.active = lib.mkForce name;
+              environment.etc."nixos-specialisation".text = name;
+            };
           });
         };
     };

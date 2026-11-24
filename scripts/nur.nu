@@ -517,8 +517,10 @@ export def "nur switch" [
       if $boot {
         ^sudo nixos-rebuild boot ...$args --flake . --show-trace
       } else {
+        let spec = (switch-specialisation (local-specialisation) (nix-specialisations (sys host).hostname))
+        let spec_args = (if ($spec | is-empty) { [] } else { ["--specialisation" $spec] })
         try {
-          ^sudo nixos-rebuild switch ...$args --flake . --show-trace
+          ^sudo nixos-rebuild switch ...$args ...$spec_args --flake . --show-trace
         } catch {|e|
           print "\n=== systemd journal (last 50 lines) ==="
           ^journalctl -xe --no-pager -n 50
@@ -705,6 +707,29 @@ def do-diff-remote-os [host: string] {
   }
 }
 
+# Specialisation (non-primary environment) this machine is running, or "" for the primary.
+def local-specialisation []: nothing -> string {
+  if ("/etc/nixos-specialisation" | path exists) { open --raw /etc/nixos-specialisation | str trim } else { "" }
+}
+
+# Specialisation names the flake builds for a NixOS host.
+def nix-specialisations [host: string]: nothing -> list<string> {
+  ^nix eval --json $".#nixosConfigurations.(os-attr $host).config.specialisation" --apply builtins.attrNames | from json
+}
+
+# Which specialisation to activate: the running one if the new build still has it.
+# Activating the primary while in a specialisation swaps the desktop out from under the session.
+def switch-specialisation [running: string, available: list<string>]: nothing -> string {
+  if ($running | is-empty) { return "" }
+  if $running in $available {
+    print --stderr $"Running specialisation '($running)'; activating it instead of the primary."
+    $running
+  } else {
+    print --stderr $"WARNING: running specialisation '($running)' is not in the new build; activating the primary."
+    ""
+  }
+}
+
 # Helper: build NixOS config locally with nom, copy and switch on remote host
 def do-switch-remote-os [host: string, --fallback] {
   let attr = (os-attr $host)
@@ -718,8 +743,12 @@ def do-switch-remote-os [host: string, --fallback] {
   if ($system_path | str starts-with "/nix/store") {
     print --stderr $"Copying system to ($host): ($system_path)"
     ^nix copy --to $"ssh://($target)" $system_path
+    let running = (^ssh $target "cat /etc/nixos-specialisation 2>/dev/null || true" | str trim)
+    let available = (try { ls $"($system_path)/specialisation" | get name | path basename } catch { [] })
+    let spec = (switch-specialisation $running $available)
+    let activate = (if ($spec | is-empty) { $system_path } else { $"($system_path)/specialisation/($spec)" })
     print --stderr $"Activating on ($host) \(will prompt for sudo password\)..."
-    ^ssh -t $target $"sudo nix-env -p /nix/var/nix/profiles/system --set ($system_path) && sudo ($system_path)/bin/switch-to-configuration switch"
+    ^ssh -t $target $"sudo nix-env -p /nix/var/nix/profiles/system --set ($system_path) && sudo ($activate)/bin/switch-to-configuration switch"
   } else {
     print --stderr "ERROR: Failed to build or get system path"
   }
