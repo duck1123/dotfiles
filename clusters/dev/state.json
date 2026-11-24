@@ -117,6 +117,9 @@
       "data": "pvc-0ef43a60-ec9c-4a49-8da3-a38827d3c53a"
     }
   },
+  "libre-closet": {
+    "enable": true
+  },
   "lidarr": {
     "enable": true,
     "pins": {
