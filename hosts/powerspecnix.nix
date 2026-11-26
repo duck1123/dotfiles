@@ -12,6 +12,7 @@ in
   environments = {
     primary = "niri";
     bigscreen.enable = true;
+    budgie.enable = true;
     hyprland.enable = false;
     # niri.enable = true;
     plasma6.enable = true;
