@@ -88,6 +88,7 @@ in
     };
 
     mediacheck.enable = true;
+    mo2.enable = true;
 
     music.enable = true;
     network.enable = true;
@@ -136,7 +137,6 @@ in
       };
     };
 
-    skyrim.enable = true;
     sound.enable = true;
     ssh.enable = true;
     starship.enable = true;
