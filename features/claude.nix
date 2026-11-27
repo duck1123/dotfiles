@@ -196,7 +196,7 @@ in
               "consult-unlock"
               "nudge"
             ];
-            default = "deny";
+            default = "nudge";
             description = ''
               Hook posture (`gortex install --hook-mode`). `deny` redirects
               Grep/Glob/Read of indexed source to the graph; `enrich` never
