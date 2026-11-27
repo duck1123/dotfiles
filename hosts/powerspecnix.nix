@@ -136,6 +136,7 @@ in
       };
     };
 
+    skyrim.enable = true;
     sound.enable = true;
     ssh.enable = true;
     starship.enable = true;
