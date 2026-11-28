@@ -14,7 +14,6 @@
           [
             age
             cachix
-            emacs
             git
             home-manager
             keepassxc
