@@ -104,7 +104,7 @@ in
     pictures.enable = true;
 
     polaris = {
-      enable = true;
+      enable = false;
       server.enable = true;
     };
 
